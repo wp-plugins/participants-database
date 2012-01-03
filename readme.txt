@@ -62,6 +62,9 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 4. Place [pdb_record] in your blog posts and pages to show the signup form
 5. Additonal features and instructions can be found on the help tab of the plugin's settings page
 
+= USE =
+[Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/)
+
 == Use ==
 
 The way this works, is there are two shortcodes: [pdb_signup] and [pdb_record]. Use the [pdb_signup] one to give people a way to add their name to your list. You can customize which fields they need to fill in. This way, your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them.
