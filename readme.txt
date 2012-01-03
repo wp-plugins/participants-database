@@ -6,7 +6,7 @@ Requires at least: 2.8.4
 Tested up to: 3.2.1
 Stable tag: 0.8.1
 
-Build and maintain a fully customizable database of participants, members, supporters, or volunteers. Features both front-end and back-end forms, custom lists, and CSV support.
+Build and maintain a fully customizable database of participants or volunteers with shortcodes for forms, admin backend, custom lists, and CSV import/export.
 
 == Description ==
 
@@ -70,6 +70,10 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 
 == Changelog ==
 
+= 0.8.1 =
+* release version
+* tested working all features
+
 = 0.7 =
-* Initial release version
+* Initial version
 * No internationalization
