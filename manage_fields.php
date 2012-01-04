@@ -6,8 +6,6 @@
 $error_msgs = array();
 if ( isset( $_POST['action'] ) ) {
 	
-	error_log( __FILE__.' post:'.print_r( $_POST,true ));
-	
 	switch ( strtolower( $_POST['action'] ) ) {
 		
 		case 'reorder_fields':

@@ -251,7 +251,7 @@ class Signup {
 	// send a mesage to a mail handler function
 	private function _mail( $recipients, $subject, $body ) {
 
-		error_log(__METHOD__.' with: '.$recipients.' '.$subject.' '.$body );
+		// error_log(__METHOD__.' with: '.$recipients.' '.$subject.' '.$body );
 
 		$sent = wp_mail( $recipients, $subject, $body, $this->email_header );
 

@@ -503,6 +503,7 @@ class Participants_Db {
 
       // record with same email exists...get the id and update the existing record
       $participant_id = self::_get_participant_id_by_term( 'email', $post['email'] );
+			unset( $post['private_id'] ); 
       $action = 'update';
 
     }

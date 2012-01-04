@@ -171,7 +171,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'=> array(
           'type'=>'text-field',
           'help_text'=> 'Note to display on the web page after someone has submitted a signup form. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link].',
-          'value'=>'<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting this link at any time: <a href="[record_link]">[record_link]</a>.</p>',
+          'value'=>'<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting the link provided in the email.</p>',
           )
         );
 
