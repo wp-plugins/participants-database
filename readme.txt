@@ -67,7 +67,8 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 4. Place [pdb_record] in your blog posts and pages to show the signup form
 5. Additonal features and instructions can be found on the help tab of the plugin's settings page
 
-= USE =
+* USE *
+
 [Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/)
 
 == Frequently Asked Questions ==
@@ -102,7 +103,9 @@ The idea is to use the database as a roster of volunteers, supporters, etc. for 
 
 The form will only appear if someone uses a valid private link to access the page. All that's required for a private link is a valid "pid" value has to be included in the URI. (it looks like "pid=TH65J" in the link) This code can be seen in the record if you want to make your own links.
 
-== Use ==
+== Other Notes ==
+
+= Using the Plugin =
 
 This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
 
