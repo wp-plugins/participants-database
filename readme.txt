@@ -6,7 +6,7 @@ Requires at least: 2.8.4
 Tested up to: 3.2.1
 Stable tag: 0.9
 
-Build and maintain a fully customizable database of participants or volunteers with shortcodes for forms, admin backend, custom lists, and CSV import/export.
+Build and maintain a fully customizable database of participants or volunteers with shortcodes for forms, admin backend, custom lists, and CSV support.
 
 == Description ==
 
@@ -69,6 +69,38 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 
 = USE =
 [Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/)
+
+== Frequently Asked Questions ==
+
+= Where do I put the shortcode? =
+
+Put the [pdb_signup] shortcode where you want your signup form to go.
+
+= What happens then? =
+
+Their record is added to the database with the information provided in the signup form. Also, two emails will be sent (if you want) one to the admin to notify them of the signup, and also to the user to tell them they've signed up and also give them a private link to their record edit page so they can update or add to their record.
+
+= What do you mean by a users record edit page? =
+
+This form appears on the page where you have placed the [pdb_record] shortcode. It is an expanded version of the signup form.
+
+An individual record can be edited on the frontend of your website by someone who has the private link to that record. The purpose here is to let people maintain their own records. It's also possible to put things like survey questions in the form so you can get feedback from people. You have complete control over what fields appear on this form. Fields can be deginated as showing up on the signup form, on the frontend user's form, and on the backend admin form.
+
+You don't have to use the plugin this way, you can remove the private link from the email they get when they sign up.
+
+= What if I just want them to sign up and fill out all their info at that point? =
+
+OK, just assign all the fields you want them to fill out to the signup form (this is done in the "manage fields" page). That form can be as big as you want. Then, remove the private link from the email they get when they sign up.
+
+= When someone signs up, are they now users on my WordPress site? =
+
+No, these signups and records are separate from people who can register on your site as users. If there are things only registered users can do (such as a forum or comments), the will have to register or sign in as usual.
+
+The idea is to use the database as a roster of volunteers, supporters, etc. for the organization, not the website. If there is a popular call for it, I can try to make this plugin's signups also be site users, but I am not sure if it's possible.
+
+= I don't see anything on the page where I put the [pdb_record] shortcode. What's up? =
+
+The form will only appear if someone uses a valid private link to access the page. All that's required for a private link is a valid "pid" value has to be included in the URI. (it looks like "pid=TH65J" in the link) This code can be seen in the record if you want to make your own links.
 
 == Use ==
 
