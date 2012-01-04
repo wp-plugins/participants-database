@@ -85,9 +85,7 @@ Their record is added to the database with the information provided in the signu
 
 This form appears on the page where you have placed the [pdb_record] shortcode. It is an expanded version of the signup form.
 
-An individual record can be edited on the frontend of your website by someone who has the private link to that record. The purpose here is to let people maintain their own records. It's also possible to put things like survey questions in the form so you can get feedback from people. You have complete control over what fields appear on this form. Fields can be deginated as showing up on the signup form, on the frontend user's form, and on the backend admin form.
-
-You don't have to use the plugin this way, you can remove the private link from the email they get when they sign up.
+An individual record can be edited on the frontend of your website by someone who has the private link to that record. The purpose here is to let people maintain their own records. It's also possible to put things like survey questions in the form so you can get feedback from people. You have complete control over what fields appear on this form. Fields can be desginated as showing up on the signup form, on the frontend user's form, and on the backend admin form.
 
 = What if I just want them to sign up and fill out all their info at that point? =
 
@@ -102,6 +100,12 @@ The idea is to use the database as a roster of volunteers, supporters, etc. for 
 = I don't see anything on the page where I put the [pdb_record] shortcode. What's up? =
 
 The form will only appear if someone uses a valid private link to access the page. All that's required for a private link is a valid "pid" value has to be included in the URI. (it looks like "pid=TH65J" in the link) This code can be seen in the record if you want to make your own links.
+
+= What if someone loses their private link? =
+
+If someone does not have the private link to edit their record, they can sign up again with the same email address. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record.
+
+It's also possible to send them the link again in an email, but the plugin does not provide a way to do this. You will have to sent them a link to the edit record page (the one with the [pdb_record] shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page.
 
 == Other Notes ==
 
