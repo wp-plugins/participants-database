@@ -20,12 +20,18 @@ class Signup {
 
 	// holds the recipient values after a form submission
 	private $recipient;
+	
+	// boolean to send the reciept email
+	private $send_reciept;
 
 	// the receipt subject line
 	private $receipt_subject;
 	
 	// holds the body of the signup receipt email
 	private $receipt_body;
+	
+	// boolean to send the notification email
+	private $send_notification;
 
 	// holds the notify recipient emails
 	private $notify_recipients;
@@ -71,6 +77,8 @@ class Signup {
 
 		$options = get_option( Participants_Db::$participants_db_options );
 
+		$this->send_reciept = $options['send_signup_receipt_email'];
+		$this->send_notification = $options['send_signup_notify_email'];
 		$this->notify_recipients = $options['email_signup_notify_addresses'];
 		$this->notify_subject = $options['email_signup_notify_subject'];
 		$this->notify_body = $options['email_signup_notify_body'];
@@ -171,7 +179,7 @@ class Signup {
 				<?php endif ?>
 					<tr>
 						<td colspan="2" class="submit-buttons">
-							<input class="button-primary" type="submit" value="<?php echo Participants_Db::get_option('signup_button_text')?>" name="submit">
+							<input class="button-primary" type="submit" value="<?php $options = get_option(Participants_Db::$participants_db_options); echo $options['signup_button_text']?>" name="submit">
 						</td>
 					</tr>
 				</table>
@@ -214,8 +222,8 @@ class Signup {
 	// sends an email
 	private function _send_email() {
 
-		$this->_do_notify();
-		$this->_do_receipt();
+		if ( $this->send_notification ) $this->_do_notify();
+		if ( $this->send_reciept ) $this->_do_receipt();
 	
 	}
 
@@ -263,6 +271,9 @@ class Signup {
 	public function process_submit() {
 		
 		if ( !isset( $_POST['submit'] ) || $_POST['action'] != 'signup' ) return false;
+		
+		// instantiate the validation object
+		Participants_Db::$validation_errors = new FormValidation();
 
 		/* if someone signs up with an email that already exists, we update that
 		 * record rather than let them create a new record. This gives us a method

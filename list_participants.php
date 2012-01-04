@@ -14,9 +14,9 @@ if ( isset( $_POST['action'] ) && $_POST['action']=='list_action' ) {
 			
 		case 'Change':
 		
-			$value = ( ! is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? self::get_option( 'list_limit' ) : $_POST['list_limit'];
+			$value = ( ! is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? Participants_Db::$plugin_settings->get_option( 'list_limit' ) : $_POST['list_limit'];
 		
-			self::update_option( 'list_limit', $value );
+			Participants_Db::$plugin_settings->update_option( 'list_limit', $value );
 			break;
 			
 		default:
@@ -195,7 +195,7 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 			$head_pattern = "<th>%s</th>";?>
       <thead>
         <tr>
-          <th scope="col" style="width:6em">&#10004; all<input type="checkbox" onclick="checkedAll('list_form');" name="checkall" style="top: 2px; margin-left: 4px;"></th>
+          <th scope="col" style="width:6em">&#10004; all<input type="checkbox" onClick="checkedAll('list_form');" name="checkall" style="top: 2px; margin-left: 4px;"></th>
           <?php
 				 foreach ( $display_columns as $column ) {
 					printf ( $head_pattern, Participants_Db::column_title( $column ) );
