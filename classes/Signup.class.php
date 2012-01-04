@@ -221,6 +221,8 @@ class Signup {
 
 	// sends a receipt email
 	private function _do_receipt() {
+		
+		if ( ! isset( $this->participant['email'] ) || empty( $this->participant['email'] ) ) return NULL;
 
 		$body = $this->_proc_tags( $this->receipt_body );
 
