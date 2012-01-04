@@ -114,7 +114,7 @@ class Signup {
 			// load the values from the newly-submitted record
 			$this->_load_participant( $submission_id );
 			
-			$this->registration_page = get_bloginfo('url').'/'.$options['registration_page'].'?pid='.$this->participant['private_id'];
+			$this->registration_page = get_bloginfo('url').'/'.( isset( $options['registration_page'] ) ? $options['registration_page'] : '' ).'?pid='.$this->participant['private_id'];
 			
 			// print the thank you note
 			$this->_thanks();
