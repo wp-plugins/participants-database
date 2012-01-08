@@ -136,6 +136,10 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 
 == Changelog ==
 
+= 0.9.1 =
+* fixed settings object instantiation bug
+* fixed problem with private id dropping off record form
+
 = 0.9 =
 * critical update
 * fixed major bug in signup class
