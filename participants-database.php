@@ -4,12 +4,13 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 0.9
+Version: 1.0
 Author URI: http://xnau.com 
 License: GPL2
+Text Domain: participants-database
 */
 	
-/*  Copyright 2011 Roland Barker xnau webdesign  (email : webdesign@xnau.com)
+/*  Copyright 2011, 2012 Roland Barker xnau webdesign  (email : webdesign@xnau.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
@@ -37,7 +38,7 @@ class Participants_Db {
 	const PLUGIN_NAME = 'participants-database';
 	
 	// display title
-	const PLUGIN_TITLE = 'Participants Database';
+	public static $plugin_title;
 	
 	// main participants index table
 	public static $participants_table;
@@ -135,9 +136,9 @@ class Participants_Db {
 		add_filter('wp_mail_content_type',create_function('', 'return "text/html";'));
 
 		// set the WP hooks to finish setting up the plugin
-		add_action( 'admin_init', array( __CLASS__, 'admin_init') );
-		add_action( 'admin_menu', array( __CLASS__, 'plugin_menu') );
 		add_action( 'init', array( __CLASS__, 'init') );
+		add_action( 'admin_menu', array( __CLASS__, 'plugin_menu') );
+		add_action( 'admin_init', array( __CLASS__, 'admin_init') );
 
 		// define our shortcodes
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
@@ -148,11 +149,15 @@ class Participants_Db {
 	function admin_init() {
 		
 		// set the db version as a WP option
-		self::$plugin_settings->update_option('db_version', self::$participants_db_db_version);
+		if ( is_object( self::$plugin_settings ) ) self::$plugin_settings->update_option('db_version', self::$participants_db_db_version);
 		
 	}
 	
 	public function init() {
+
+    load_plugin_textdomain( self::PLUGIN_NAME, false, basename(dirname(__FILE__) ) );
+
+    self::$plugin_title = __('Participants Database', self::PLUGIN_NAME );
 
 		// this processes form submits before any output so that redirects can be used
 		self::process_page_request();
@@ -167,7 +172,7 @@ class Participants_Db {
 
 		// define the plugin admin menu pages
 	  add_menu_page(
-			self::PLUGIN_TITLE, self::PLUGIN_TITLE, 'editor', self::PLUGIN_NAME, array( __CLASS__, 'include_admin_file' ) );
+			self::$plugin_title, self::$plugin_title, 'editor', self::PLUGIN_NAME, array( __CLASS__, 'include_admin_file' ) );
 		$listpage = add_submenu_page(
 			self::PLUGIN_NAME, 'List Participants','List Participants', 'edit_pages',self::$plugin_page.'-list_participants', array( __CLASS__, 'include_admin_file' ) );
 		$addpage = add_submenu_page(
@@ -503,7 +508,7 @@ class Participants_Db {
 
       // record with same email exists...get the id and update the existing record
       $participant_id = self::_get_participant_id_by_term( 'email', $post['email'] );
-			unset( $post['private_id'] ); 
+			//unset( $post['private_id'] ); 
       $action = 'update';
 
     }
@@ -1045,7 +1050,7 @@ class Participants_Db {
 	
 		if( empty( $src_file ) || ! is_file( $src_file ) ) {
 		
-			return 'Input file does not exist or path is incorrect.<br />Attempted to load: '.basename($src_file);
+			return __('Input file does not exist or path is incorrect.<br />Attempted to load:', self::PLUGIN_NAME).' '.basename($src_file);
 	
 		}
 	
@@ -1079,7 +1084,7 @@ class Participants_Db {
 		
 		foreach ( $CSV->data as $csv_line ) {
 	
-			error_log( __METHOD__.' csv line= '.print_r( $csv_line, true ) );
+			// error_log( __METHOD__.' csv line= '.print_r( $csv_line, true ) );
 			
 			$values = array();
 			
@@ -1089,11 +1094,11 @@ class Participants_Db {
 	
 			if ( count( $values ) != count( $column_names) ) {
 	
-				return 'The number of items in line '.$line_num.' is incorrect.<br />There are '.count( $values ).' and there should be '.count( $column_names );
+				return sprintf( __('The number of items in line %s is incorrect.<br />There are %s and there should be %s.', self::PLUGIN_NAME), $line_num, count( $values ), count( $column_names ) );
 	
 			}
 			
-			if ( ! $post = array_combine( $column_names, $values ) ) return 'Number of values does not match number of columns' ;// suspenders and a belt here
+			if ( ! $post = array_combine( $column_names, $values ) ) return __('Number of values does not match number of columns', self::PLUGIN_NAME) ;// suspenders and a belt here
 			
 			// error_log( __METHOD__.' post array='.print_r( $post, true));
 			
@@ -1121,23 +1126,23 @@ class Participants_Db {
 	 *
 	 * @return string HTML
 	 */
-  public function plugin_footer() { ?>
-
-  <div id="PDb_footer" class="widefat">
-    <div class="section">
-      <h4>Participants Database<br />WordPress Plugin</h4>
-      <p><em>Helping organizations manage their volunteers, members and participants.</em></p>
+  public function plugin_footer() {
+  ?>
+    <div id="PDb_footer" class="widefat">
+      <div class="section">
+        <h4><?php echo self::$plugin_title?><br /><?php _e('WordPress Plugin', self::PLUGIN_NAME )?></h4>
+        <p><em><?php _e('Helping organizations manage their volunteers, members and participants.', self::PLUGIN_NAME)?></em></p>
+      </div>
+      <div class="section">
+        <h4><a href="http://xnau.com"><img src="<?php bloginfo( 'wpurl' ) ?>/wp-content/plugins/<?php echo self::PLUGIN_NAME ?>/ui/xnau-square-60.png" style="float:left;width:50px;height:auto;margin-right:10px" /></a><?php _e('Developed by', self::PLUGIN_NAME)?><br /><a href="http://xnau.com">xn&lowast;au webdesign</a></h4>
+        <p><?php _e('Suggestions or crticisms of this plugin? I&#39;d love to hear them: email ', self::PLUGIN_NAME)?><a href="mailto:support@xnau.com">support@xnau.com.</a>
+      </div>
+      <div class="section">
+        <p><?php printf( __('Please consider contributing to the continued support and development of this software by visiting %1$sthis plugin&#39;s page,%3$s giving the plugin a %2$srating%3$s or review, or dropping something in the %1$stip jar.%3$s Thanks!', self::PLUGIN_NAME), '<a href="http://xnau.com/wordpress-plugins/participants-database">','<a href="http://wordpress.org/extend/plugins/participants-database/">', '</a>')?></p>
+      </div>
     </div>
-    <div class="section">
-      <h4><a href="http://xnau.com"><img src="<?php bloginfo( 'wpurl' ) ?>/wp-content/plugins/<?php echo self::PLUGIN_NAME ?>/ui/xnau-square-60.png" style="float:left;width:50px;height:auto;margin-right:10px" /></a>Developed by<br /><a href="http://xnau.com">xn&lowast;au webdesign</a></h4>
-      <p>Suggestions or crticisms of this plugin? I'd love to hear them: email <a href="mailto:support@xnau.com">support@xnau.com.</a>
-    </div>
-    <div class="section">
-      <p>Please consider contributing to the continued support and development of this software by visiting <a href="http://xnau.com/wordpress-plugins/participants-database">this plugin's page,</a> giving the plugin a <a href="http://wordpress.org/extend/plugins/participants-database/">rating</a> or review, or dropping something in the <a href="http://xnau.com/wordpress-plugins/participants-database">tip jar.</a> Thanks!</p>
-    </div>
-  </div>
-
-  <?php }
+    <?php
+  }
 	
 	
 	

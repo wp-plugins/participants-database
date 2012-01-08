@@ -1,10 +1,19 @@
 <?php
+// translations strings for buttons
+/* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
+$PDb_i18n = array(
+  'delete_checked' => __( 'Delete checked', Participants_Db::PLUGIN_NAME ),
+  'change' => __( 'Change', Participants_Db::PLUGIN_NAME ),
+  'sort' => __( 'Sort', Participants_Db::PLUGIN_NAME ),
+  'filter' => __( 'Filter', Participants_Db::PLUGIN_NAME ),
+  'clear' => __( 'Clear', Participants_Db::PLUGIN_NAME ),
+  );
 // process all the general list actions first
 if ( isset( $_POST['action'] ) && $_POST['action']=='list_action' ) {
 	
 	switch ( $_POST['submit'] ) {
 		
-		case 'Delete checked':
+		case $PDb_i18n['delete_checked']:
 	
 			$pattern = count( $_POST['pid'] ) > 1 ? 'in ( %s )' : '= %s';
 			$value = implode( ',',$_POST['pid'] );
@@ -12,7 +21,7 @@ if ( isset( $_POST['action'] ) && $_POST['action']=='list_action' ) {
 			$wpdb->query( $wpdb->prepare( $sql, $value ) );
 			break;
 			
-		case 'Change':
+		case $PDb_i18n['change']:
 		
 			$value = ( ! is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? Participants_Db::$plugin_settings->get_option( 'list_limit' ) : $_POST['list_limit'];
 		
@@ -31,8 +40,8 @@ $skip_default = ' `id` != '.Participants_Db::$id_base_number;
 // set up the query to display the list
 switch ( @$_POST['submit'] ) {
 
-  case 'Sort':
-  case 'Filter':
+  case $PDb_i18n['sort']:
+  case $PDb_i18n['filter']:
   
 		$list_query = 'SELECT * FROM '.Participants_Db::$participants_table;
 		$delimiter = ( false !== stripos( $_POST['operator'], 'LIKE' ) ? '%' : '' );
@@ -49,7 +58,7 @@ switch ( @$_POST['submit'] ) {
 		
 		break;
 		
-  case 'Clear' :
+  case $PDb_i18n['clear'] :
 		unset( $_POST['value'], $_POST['where_clause'] );
 
 		// go back to the first page
@@ -81,7 +90,7 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 ?>
 <script type="text/javascript" language="javascript">  
 	function delete_confirm() {
-		var x=window.confirm("Do you really want to delete these participants?")
+		var x=window.confirm("<?php _e('Do you really want to delete these participants?', Participants_Db::PLUGIN_NAME )?>")
 		if (x)
 			return true
 		else
@@ -104,15 +113,15 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 </script>
 
 <div class="wrap">
-  <h2><?php echo Participants_Db::PLUGIN_TITLE?></h2>
-  <h3>List Participants: <?php echo $num_records?> records found, sorted by: <?php echo isset( $_POST['sortBy'] ) ? Participants_Db::column_title( $_POST['sortBy'] ) : Participants_Db::column_title( 'last_name' ) ?>.</h3>
+  <h2><?php echo Participants_Db::$plugin_title?></h2>
+  <h3><?php printf( _n( 'List Participants: %s record found, sorted by:', 'List Participants: %s records found, sorted by:', $num_records ), $num_records )?> <?php echo isset( $_POST['sortBy'] ) ? Participants_Db::column_title( $_POST['sortBy'] ) : Participants_Db::column_title( 'last_name' ) ?>.</h3>
   <form method="post">
     <input type="hidden" name="action" value="sort">
     <fieldset class="widefat">
-    <legend>Show only records with:</legend>
+    <legend><?php _e('Show only records with', Participants_Db::PLUGIN_NAME )?>:</legend>
     <?php
 			//build the list of columns available for filtering
-			$filter_columns = array( '(show all)' => 'none' );
+			$filter_columns = array( '('.__('show all', Participants_Db::PLUGIN_NAME ).')' => 'none' );
 			foreach ( Participants_db::get_column_atts() as $column ) {
 				
 				if ( in_array( $column->name, Participants_Db::$internal_columns ) ) continue;
@@ -136,20 +145,20 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
                         'name'     => 'operator',
                         'value'    => isset( $_POST['operator'] ) ? $_POST['operator'] : 'LIKE',
                         'options'  => array(
-                                          'is'               => '=',
-                                          'is not'           => '!=',
-                                          'contains'         => 'LIKE',
-                                          "doesn't contain"  => 'NOT LIKE',
+                                          __('is', Participants_Db::PLUGIN_NAME )         => '=',
+                                          __('is not', Participants_Db::PLUGIN_NAME )     => '!=',
+                                          __('contains', Participants_Db::PLUGIN_NAME )   => 'LIKE',
+                                          __('doesn&#39;t contain', Participants_Db::PLUGIN_NAME )  => 'NOT LIKE',
                                           ),
                         );
       FormElement::print_element( $element );
       ?>
       <input id="participant_search_term" type="text" name="value" value="<?php echo @$_POST['value'] ?>">
-      <input name="submit" type="submit" value="Filter">
-      <input name="submit" type="submit" value="Clear">
+      <input name="submit" type="submit" value="<?php echo $PDb_i18n['filter']?>">
+      <input name="submit" type="submit" value="<?php echo $PDb_i18n['clear']?>">
     </fieldset>
     <fieldset class="widefat">
-    <legend>Sort by:</legend>
+    <legend><?php _e('Sort by', Participants_Db::PLUGIN_NAME )?>:</legend>
     	<?php
 		
 			$element = array(
@@ -164,23 +173,25 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 											 'type'		=> 'radio',
 											 'name'		=> 'ascdesc',
 											 'value'	=>	isset( $_POST['ascdesc'] ) ? $_POST['ascdesc'] : 'asc',
-											 'options'	=> array( 'Ascending' => 'asc', 'Descending' => 'desc' ),
+											 'options'	=> array(
+											                    __('Ascending', Participants_Db::PLUGIN_NAME )  => 'asc',
+											                    __('Descending', Participants_Db::PLUGIN_NAME ) => 'desc'
+											                    ),
 											 );
       FormElement::print_element( $element );
 			
 			?>
-      <input name="submit" type="submit" value="Sort">
+      <input name="submit" type="submit" value="<?php echo $PDb_i18n['sort'] ?>">
     </fieldset>
   </form>
   <form id="list_form"  method="post">
     <input type="hidden" name="action" value="list_action">
     <div style="margin-top:10px">
       
-      <input type="submit" name="submit" value="Delete checked" onClick="return delete_confirm();" class="delete-button">
-      <span style="padding-left:20px">Show
-      <?php FormElement::print_element( array( 'type'=>'text-line', 'name'=>'list_limit', 'value'=>$options['list_limit'], 'size'=>'1' ) )?>
-      items per page.
-      <?php FormElement::print_element( array( 'type'=>'submit', 'name'=>'submit','value'=>'Change') )?>
+      <input type="submit" name="submit" value="<?php echo $PDb_i18n['delete_checked'] ?>" onClick="return delete_confirm();" class="delete-button">
+      <?php $list_limit = FormElement::get_element( array( 'type'=>'text-line', 'name'=>'list_limit', 'value'=>$options['list_limit'], 'size'=>'1' ) )?>
+      <span style="padding-left:20px"><?php printf( __( 'Show %s items per page.', Participants_Db::PLUGIN_NAME ),$list_limit )?>
+      <?php FormElement::print_element( array( 'type'=>'submit', 'name'=>'submit','value'=>$PDb_i18n['change']) )?>
       </span>
     </div>
     <table class="wp-list-table widefat fixed pages" cellspacing="0" >
@@ -195,7 +206,7 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 			$head_pattern = "<th>%s</th>";?>
       <thead>
         <tr>
-          <th scope="col" style="width:6em">&#10004; all<input type="checkbox" onClick="checkedAll('list_form');" name="checkall" style="top: 2px; margin-left: 4px;"></th>
+          <th scope="col" style="width:6em"><?php /* translators: uses the check symbol to mean "check all" */ _e( '&#10004; all', Participants_Db::PLUGIN_NAME )?><input type="checkbox" onClick="checkedAll('list_form');" name="checkall" style="top: 2px; margin-left: 4px;"></th>
           <?php
 				 foreach ( $display_columns as $column ) {
 					printf ( $head_pattern, Participants_Db::column_title( $column ) );
@@ -219,7 +230,7 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 			foreach ( $participants as $value ) {
 			?>
       <tr>
-        <td><a href="admin.php?page=<?php echo Participants_Db::PLUGIN_NAME ?>-edit_participant&action=edit&id=<?= $value['id']?>">Edit</a> |
+        <td><a href="admin.php?page=<?php echo Participants_Db::PLUGIN_NAME ?>-edit_participant&action=edit&id=<?= $value['id']?>"><?php _e( 'Edit', Participants_Db::PLUGIN_NAME )?></a> |
           <input type="checkbox" name="pid[]" value="<?= $value['id']?>"></td>
         <?php foreach ( $display_columns as $column ) {
 				 printf ($col_pattern, Participants_Db::prepare_value( $value[ $column ] ) );
@@ -230,35 +241,36 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 		else :
 		?>
       <tr>
-        <td>No participants found</td>
+        <td><?php _e('No participants found', Participants_Db::PLUGIN_NAME )?></td>
       </tr>
       <?php
 		endif; // participants array 
 		?>
     </table>
   </form>
-  <div class="pagination"><label>Page:</label> 
+  <div class="pagination"><label><?php _e('Page', Participants_Db::PLUGIN_NAME )?>:</label> 
     <?php
 		$pagination->links();
 		?>
   </div>
   <fieldset class="widefat">
-  <h3>Export CSV</h3>
+  <h3><?php _e('Export CSV', Participants_Db::PLUGIN_NAME )?></h3>
     <form method="post">
       <input type="hidden" name="source" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
       <input type="hidden" name="action" value="output CSV" />
       <input type="hidden" name="CSV type" value="participant list" />
       <input type="hidden" name="query" value="<?php echo rawurlencode( $list_query )?>" />
-      <!-- query: <?php echo $list_query ?> -->
-      <?php 
-      $suggested_filename = Participants_Db::PLUGIN_NAME.'-'.date('M-d-Y').'.csv';
+      <?php
+      /* translators: date format, (see http://php.net/date) must output valid string for filename  */
+      $date_string = __('M-d-Y', Participants_Db::PLUGIN_NAME );
+      $suggested_filename = Participants_Db::PLUGIN_NAME.'-'.date($date_string).'.csv';
       $namelength = round( strlen( $suggested_filename ) * 0.9 ) ;
       ?>
-      <p>File Name:
+      <p><?php _e( 'File Name', Participants_Db::PLUGIN_NAME  )?>:
         <input type="text" name="filename" value="<?php echo $suggested_filename?>" size="<?php echo $namelength ?>" />
-        <input type="submit" name="submit" value="Download CSV for this list" />
+        <input type="submit" name="submit" value="<?php _e( 'Download CSV for this list', Participants_Db::PLUGIN_NAME  )?>" />
       </p>
-      <p>This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages.</p>
+      <p><?php _e( 'This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages.', Participants_Db::PLUGIN_NAME  )?></p>
     </form>
   </fieldset>
   <?php Participants_Db::plugin_footer(); ?>

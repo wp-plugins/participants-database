@@ -12,12 +12,12 @@ if ( ! isset( $participant_id ) ) {
 if ( $participant_id == Participants_Db::$id_base_number ) {
 	
   $action = 'insert';
-  $page_title = 'Add New Participant Record';
+  $page_title = __('Add New Participant Record', Participants_Db::PLUGIN_NAME );
 	
 } else {
 	
   $action = 'update';
-  $page_title = 'Edit Existing Participant Record';
+  $page_title = __('Edit Existing Participant Record', Participants_Db::PLUGIN_NAME );
 	
 }
 
@@ -44,6 +44,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$v
 	FormElement::print_hidden_fields( array(
 																					'action' => $action, 
 																					'id' => ( isset( $participant_values[ 'id' ] ) ? $participant_values[ 'id' ] : $participant_id ),
+																					'private_id' => $participant_values[ 'private_id' ],
 																					'source' => Participants_Db::PLUGIN_NAME,
 																					) );
 																					
@@ -113,11 +114,11 @@ if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$v
       </td>
     </tr>
     <tr>
-      <td colspan="2"><strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one </td>
+      <td colspan="2"><?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', Participants_Db::PLUGIN_NAME )?> </td>
     </tr>
     <?php else : ?>
     <tr>
-      <th><h3>Save Your Changes</h3></th>
+      <th><h3><?php _e('Save Your Changes', Participants_Db::PLUGIN_NAME )?></h3></th>
       <td class="submit-buttons">
         <input class="button-primary" type="submit" value="Save" name="save">
         <input name="submit" type="hidden" value="Apply">

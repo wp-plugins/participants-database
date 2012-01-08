@@ -136,6 +136,9 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 
 == Changelog ==
 
+= 1.0 =
+* internationalization
+
 = 0.9 =
 * critical update
 * fixed major bug in signup class
