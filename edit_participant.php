@@ -44,6 +44,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$v
 	FormElement::print_hidden_fields( array(
 																					'action' => $action, 
 																					'id' => ( isset( $participant_values[ 'id' ] ) ? $participant_values[ 'id' ] : $participant_id ),
+																					'private_id' => $participant_values[ 'private_id' ],
 																					'source' => Participants_Db::PLUGIN_NAME,
 																					) );
 																					

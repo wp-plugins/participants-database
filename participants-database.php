@@ -135,9 +135,9 @@ class Participants_Db {
 		add_filter('wp_mail_content_type',create_function('', 'return "text/html";'));
 
 		// set the WP hooks to finish setting up the plugin
-		add_action( 'admin_init', array( __CLASS__, 'admin_init') );
-		add_action( 'admin_menu', array( __CLASS__, 'plugin_menu') );
 		add_action( 'init', array( __CLASS__, 'init') );
+		add_action( 'admin_menu', array( __CLASS__, 'plugin_menu') );
+		add_action( 'admin_init', array( __CLASS__, 'admin_init') );
 
 		// define our shortcodes
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
@@ -148,7 +148,7 @@ class Participants_Db {
 	function admin_init() {
 		
 		// set the db version as a WP option
-		self::$plugin_settings->update_option('db_version', self::$participants_db_db_version);
+		if ( is_object( self::$plugin_settings ) ) self::$plugin_settings->update_option('db_version', self::$participants_db_db_version);
 		
 	}
 	
@@ -493,7 +493,7 @@ class Participants_Db {
 			
 			}
 			
-			error_log( __METHOD__.' default record: '.$action );
+			// error_log( __METHOD__.' default record: '.$action );
 
 		}
 
@@ -503,7 +503,7 @@ class Participants_Db {
 
       // record with same email exists...get the id and update the existing record
       $participant_id = self::_get_participant_id_by_term( 'email', $post['email'] );
-			unset( $post['private_id'] ); 
+			//unset( $post['private_id'] ); 
       $action = 'update';
 
     }
@@ -587,6 +587,8 @@ class Participants_Db {
 
 		// add the WHERE clause
 		$sql .= $where;
+		
+		// error_log( __METHOD__.' sql:'.$wpdb->prepare( $sql, $new_values ) );
 
 		$wpdb->query( $wpdb->prepare( $sql, $new_values ) );
 
@@ -797,7 +799,7 @@ class Participants_Db {
 		// only process POST arrays from this plugin's pages
 		if ( ! isset( $_POST['source'] ) or $_POST['source'] != self::PLUGIN_NAME or ! isset( $_POST['action'] ) ) return NULL;
 
-    error_log( __METHOD__.' post:'.print_r( $_POST, true ) );
+    // error_log( __METHOD__.' post:'.print_r( $_POST, true ) );
 
 		// instantiate the validation object
 		self::$validation_errors = new FormValidation();
@@ -1079,7 +1081,7 @@ class Participants_Db {
 		
 		foreach ( $CSV->data as $csv_line ) {
 	
-			error_log( __METHOD__.' csv line= '.print_r( $csv_line, true ) );
+			// error_log( __METHOD__.' csv line= '.print_r( $csv_line, true ) );
 			
 			$values = array();
 			
