@@ -30,7 +30,7 @@ This database could be of use to any organization that needs to build and mainta
 
 **Database**
 
-The heart of this plugin is the participants database, which is completely configuarble. It comes pre-filled with standard fields such as name, address, phone, etc., but you can define any fields you want, including the type of field, validation, help text and a print title for each field. Fields are also organized into groups so large amounts of information can be better managed, and long forms broken up into logical sections.
+The heart of this plugin is the participants database, which is completely configurable. It comes pre-filled with standard fields such as name, address, phone, etc., but you can define any fields you want, including the type of field, validation, help text and a print title for each field. Fields are also organized into groups so large amounts of information can be better managed, and long forms broken up into logical sections.
 
 Fields can be defined as text-lines, text-areas, single and multiple-select dropdowns, checkboxes or radio buttons. Each field has its own validation which can be required, not required, or validated with a regular expression.
 
@@ -141,6 +141,8 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 * fixed validation bug on empty validation
 * set default validation to NO on new fields
 * added database integrity test and fix
+* fixed select disply for multi-select elements
+* CSS improvements for multi-selects
 
 = 0.9.1 =
 * fixed settings object instantiation bug

@@ -17,7 +17,7 @@ body[class*='participants-database'] input[type=checkbox] {
 .pdb-signup th {
 	width:200px;
 }
-.edit-participant textarea, .participants_db textarea, .participants_db input[type='text'], .edit-participant  input[type='text'], .edit-participant  input[type='checkbox'] {
+.edit-participant textarea, .participants_db textarea, .participants_db input[type='text'], .edit-participant  input[type='text'], .edit-participant  input[type='checkbox'], .edit-participant .multicheckbox label {
 	float:left;
 	margin-right:10px;
 }
