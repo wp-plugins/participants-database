@@ -223,6 +223,11 @@ class Participants_Db {
 		wp_register_script( 'manage_fields', plugins_url( 'js/manage_fields.js', __FILE__ ) );
 		wp_enqueue_script( 'cookie' );
 		wp_enqueue_script( 'manage_fields' );
+		/* translators: don't translate the words in brackets {} */
+		wp_localize_script( 'manage_fields', 'L10n', array(
+			'must_remove' => '<h4>You must remove all fields from the {name} group before deleting it.</h4>',
+			'delete_confirm' => '<h4>Delete the "{name}" {thing}?</h4>',
+		) );
 	}
 
 	// callback for plugin admin subpages
@@ -498,7 +503,7 @@ class Participants_Db {
 			
 			}
 			
-			error_log( __METHOD__.' default record: '.$action );
+			// error_log( __METHOD__.' default record: '.$action );
 
 		}
 
@@ -794,6 +799,52 @@ class Participants_Db {
 
 		$wpdb->insert( self::$fields_table, $defaults );
 		
+		if ( false === ( self::_add_db_column( $defaults ) ) ) {
+			
+			error_log( __METHOD__.' failed to add column:'.print_r( $defaults, true ) );
+			
+		}
+		
+	}
+	
+	private function _add_db_column( $atts ) {
+		
+		global $wpdb;
+		
+		$datatype = self::set_datatype( $atts['form_element'] );
+		
+		$sql = 'ALTER TABLE `'.self::$participants_table.'` ADD `'.$atts['name'].'` '.$datatype.' NULL';
+		
+		return $wpdb->query( $sql );
+		
+	}
+					
+	// returns a MYSQL datatype appropriate to the form element type
+	public function set_datatype( $element ) {
+		
+		switch ( $element ) {
+
+            case 'multi-select':
+            case 'multi-checkbox':
+            case 'text-field':
+            $datatype = 'TEXT';
+            break;
+
+            case 'date':
+            $datatype = 'DATE';
+            break;
+
+            case 'checkbox':
+            case 'radio':
+            case 'dropdown':
+            case 'text-line':
+            default :
+            $datatype = 'TINYTEXT';
+
+          }
+		
+		return $datatype;
+		
 	}
   
 	// processes any POST requests for the submitted edit page
@@ -802,7 +853,7 @@ class Participants_Db {
 		// only process POST arrays from this plugin's pages
 		if ( ! isset( $_POST['source'] ) or $_POST['source'] != self::PLUGIN_NAME or ! isset( $_POST['action'] ) ) return NULL;
 
-    error_log( __METHOD__.' post:'.print_r( $_POST, true ) );
+    // error_log( __METHOD__.' post:'.print_r( $_POST, true ) );
 
 		// instantiate the validation object
 		self::$validation_errors = new FormValidation();

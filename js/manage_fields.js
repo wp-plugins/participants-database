@@ -40,7 +40,7 @@ jQuery(document).ready(function($){
     // set the dialog text
     if ( not_empty_group ) {
 
-      $('#confirmation-dialog').html('<h4>You must remove all fields from the "'+ name + '" group before deleting it.</h4>');
+      $('#confirmation-dialog').html(L10n.must_remove.replace('{name}',name));
 
       // initialize the dialog action
       $('#confirmation-dialog').dialog({
@@ -56,7 +56,7 @@ jQuery(document).ready(function($){
 
     } else {
 
-      $('#confirmation-dialog').html('<h4>Delete the "'+ name + '" ' + thing + '?</h4>');
+      $('#confirmation-dialog').html(L10n.delete_confirm.replace('{name}',name).replace('{thing}',thing));
 
       // initialize the dialog action
       $('#confirmation-dialog').dialog({

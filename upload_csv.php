@@ -25,7 +25,7 @@ if( isset( $_POST['file_upload'] ) ) :
 
 	if( false !== move_uploaded_file( $_FILES['uploadedfile']['tmp_name'], $target_path ) ) {
 
-		$errors[] = '<strong>The file '.$_FILES['uploadedfile']['name'].' has been uploaded.</strong>';
+		$errors[] = '<strong>'.sprintf( __('The file %s has been uploaded.', Participants_Db::PLUGIN_NAME ), $_FILES['uploadedfile']['name'] ).'</strong>';
 		
 		$file_name = Participants_Db::$uploads_path.basename( $_FILES['uploadedfile']['name']);
 		
@@ -33,16 +33,16 @@ if( isset( $_POST['file_upload'] ) ) :
 
 		if ( is_numeric( $insert_error ) ) {
 
-			$errors[] = '<strong>'.$insert_error.( $insert_error > 1 ? ' records':' record').' imported.</strong>';
+			$errors[] = '<strong>'.$insert_error.' '._n('record imported','records imported', $insert_error, Participants_Db::PLUGIN_NAME ).'.</strong>';
 
 		} elseif( empty( $insert_error ) ) {
 
-			$errors[] = 'Zero records imported.';
+			$errors[] = __('Zero records imported.', Participants_Db::PLUGIN_NAME );
 			$status = 'error';
 
 		} else { // parse error
 		
-			$errors[] = '<strong>Error occured while trying to add the data to the database:</strong>';
+			$errors[] = '<strong>'.__('Error occured while trying to add the data to the database', Participants_Db::PLUGIN_NAME ).':</strong>';
 			$errors[] = $insert_error;
 			$status = 'error';
 
@@ -50,8 +50,8 @@ if( isset( $_POST['file_upload'] ) ) :
 	} // file move successful
 	else { // file move failed
 
-			$errors[] = '<strong>There was an error uploading the file.</strong>';
-			$errors[] = 'Destination: '.$target_path;
+			$errors[] = '<strong>'.__('There was an error uploading the file.', Participants_Db::PLUGIN_NAME ).'</strong>';
+			$errors[] = __('Destination', Participants_Db::PLUGIN_NAME ).': '.$target_path;
 			$status = 'error';
 
 	}
@@ -61,7 +61,7 @@ endif; // isset( $_POST['file_upload']
 <div class="wrap">
 	<div id="poststuff">
 		<div id="post-body">
-			<h2><?php echo Participants_Db::PLUGIN_TITLE?> Import CSV File</h2>
+			<h2><?php echo Participants_Db::$plugin_title.' '.__('Import CSV File', Participants_Db::PLUGIN_NAME )?></h2>
 			
 			<?php
 			if ( ! empty( $errors ) ): 
@@ -81,9 +81,9 @@ endif; // isset( $_POST['file_upload']
 			<input type="hidden" name="action" value="output CSV" />
 			<input type="hidden" name="CSV type" value="blank" />
 				<div class="postbox">
-					<h3>1. Prepare a spreadsheet file with the correct format:</h3>
+					<h3><?php _e('1. Prepare a spreadsheet file with the correct format:', Participants_Db::PLUGIN_NAME )?></h3>
 					<div class="inside">
-						<p>To properly import your membership data, the columns in your spreadsheet must match exactly the columns in the database. Currently, the columns are as follows:</p>
+						<p><?php _e('To properly import your membership data, the columns in your spreadsheet must match exactly the columns in the database. Currently, the columns are as follows:', Participants_Db::PLUGIN_NAME )?></p>
 						<table class="spreadsheet">
 							<tr>
 							<?php
@@ -98,22 +98,22 @@ endif; // isset( $_POST['file_upload']
 								?>
 							</tr>
 						</table>
-						<p>This means your spreadsheet needs to have <?php echo $column_count?> columns, and the heading in each of those columns needs to match exactly the names above. If there is no data for a particular column, leave it blank, but the header and column must be included in the CSV. The order of the columns doesn't matter.</p>
-						<p><strong>Note:</strong> Imported records are checked against existing records by email. If a record with an email matching an existing record is imported, the existing record will be updated with the data from the imported record. Blank or missing fields in such an imported record will not overwrite existing data.</p>
-						<p><input type="submit" value="Get Blank CSV File" style="float:left;margin:0 5px 5px 0" />You can download this file, then open it in Open Office, Excel or Google Docs.</p>
+						<p><?php printf( __('This means your spreadsheet needs to have %s columns, and the heading in each of those columns needs to match exactly the names above. If there is no data for a particular column, leave it blank, but the header and column must be included in the CSV. The order of the columns doesn&#39;t matter.', Participants_Db::PLUGIN_NAME ),$column_count)?></p>
+						<p><?php _e( '<strong>Note:</strong> Imported records are checked against existing records by email. If a record with an email matching an existing record is imported, the existing record will be updated with the data from the imported record. Blank or missing fields in such an imported record will not overwrite existing data.', Participants_Db::PLUGIN_NAME )?></p>
+						<p><input type="submit" value="<?php _e('Get Blank CSV File', Participants_Db::PLUGIN_NAME )?>" style="float:left;margin:0 5px 5px 0" /><?php _e( 'You can download this file, then open it in Open Office, Excel or Google Docs.', Participants_Db::PLUGIN_NAME )?></p>
 					</div>
 				</div>
 			</form>
 
 			<div class="postbox">
-				<h3>2. Upload the .csv file</h3>
+				<h3><?php _e( '2. Upload the .csv file', Participants_Db::PLUGIN_NAME )?></h3>
 				<div class="inside">
-						<p>When you have your spreadsheet properly set up and filled with data, export it as any of the following: "comma-delimited csv", "tab-delimited csv", or just "csv". Save it to your computer then upload it here.</p>
+						<p><?php _e( 'When you have your spreadsheet properly set up and filled with data, export it as any of the following: "comma-delimited csv", "tab-delimited csv", or just "csv". Save it to your computer then upload it here.', Participants_Db::PLUGIN_NAME )?></p>
 					<form enctype="multipart/form-data" action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="POST">
 						<input type="hidden" name="file_upload" id="file_upload" value="true" />
 						<input type="hidden" name="MAX_FILE_SIZE" value="100000" />
-						Choose .csv file to import: <input name="uploadedfile" type="file" /><br />
-						<input type="submit" class="button-primary" value="Upload File" />
+						<?php _e('Choose .csv file to import:', Participants_Db::PLUGIN_NAME )?> <input name="uploadedfile" type="file" /><br />
+						<input type="submit" class="button-primary" value="<?php _e('Upload File', Participants_Db::PLUGIN_NAME )?>" />
 					</form>
 				</div>
 			</div>
