@@ -135,38 +135,22 @@ class PDb_Init
           ';
         foreach( array_keys( self::$field_groups ) as $group ) {
 
-        // these are not added to the sql in the loop
-        if ( $group == 'internal' ) continue;
-
-        foreach( self::${$group.'_fields'} as $name => &$defaults ) {
-
-          if ( ! isset( $defaults['form_element'] ) ) $defaults['form_element'] = 'text-line';
-
-          switch ( $defaults['form_element'] ) {
-
-            case 'multi-select':
-            case 'multi-checkbox':
-            case 'text-field':
-            $datatype = 'TEXT';
-            break;
-
-            case 'date':
-            $datatype = 'DATE';
-            break;
-
-            case 'checkbox':
-            case 'radio':
-            case 'dropdown':
-            case 'text-line':
-            default :
-            $datatype = 'TINYTEXT';
-
-          }
-
-          $sql .= '`'.$name.'` '.$datatype.' NULL,
-          ';
+					// these are not added to the sql in the loop
+					if ( $group == 'internal' ) continue;
+	
+					foreach( self::${$group.'_fields'} as $name => &$defaults ) {
+	
+						if ( ! isset( $defaults['form_element'] ) ) $defaults['form_element'] = 'text-line';
+	
+						$datatype = Participants_Db::set_datatype( $defaults['form_element'] );
+						
+						$sql .= '`'.$name.'` '.$datatype.' NULL,
+	';
+						
+					}
+					
         }
-        }
+				
         $sql .= '`date_recorded` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           `date_updated` TIMESTAMP NOT NULL,
           PRIMARY KEY  (`id`)

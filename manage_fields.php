@@ -74,6 +74,7 @@ if ( isset( $_POST['action'] ) ) {
 																			'title' => $_POST['title'], 
 															 				'group' => $_POST['group'],
 																			'order' => $_POST['order'],
+																			'validation' => 'no',
 																			),
 															 $_POST
 															 );

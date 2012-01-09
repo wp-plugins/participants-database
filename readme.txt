@@ -3,8 +3,8 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team
 Requires at least: 2.8.4
-Tested up to: 3.2.1
-Stable tag: 0.9.1
+Tested up to: 3.3.1
+Stable tag: 0.9.2
 
 Build and maintain a fully customizable database of participants or volunteers with shortcodes for forms, admin backend, custom lists, and CSV support.
 
@@ -135,6 +135,12 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 3. Import CSV File: page where CSV files can be imported, includes detialed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 0.9.2 =
+* fixed new fields not getting correctly added to database in all cases
+* fixed validation bug on empty validation
+* set default validation to NO on new fields
+* added database integrity test and fix
 
 = 0.9.1 =
 * fixed settings object instantiation bug

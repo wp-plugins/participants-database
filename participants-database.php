@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 0.9.1
+Version: 0.9.2
 Author URI: http://xnau.com 
 License: GPL2
 */
@@ -142,6 +142,29 @@ class Participants_Db {
 		// define our shortcodes
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
+		
+		// db integrity check and fix
+		$query = 'SELECT * FROM '.self::$fields_table;
+		$fields = $wpdb->get_results( $query, ARRAY_A );
+		$columns_raw = self::get_columns();
+		$columns = array();
+		foreach( $columns_raw as $col ) $columns[] = $col['Field'];
+		foreach ( $fields as $field ) {
+			
+			if ( ! in_array( $field['name'], $columns ) ) {
+				
+				error_log( 'adding column:'.print_r( $field, true ));
+				
+				self::_add_db_column( $field );
+				
+			}
+			
+		}
+		
+			
+			
+		
+		
 	
 	}
 	
@@ -389,7 +412,7 @@ class Participants_Db {
 	}
   
   // gets an associative array of all column names and types
-  public function get_columns() {
+  public function get_columns( ) {
   
 		global $wpdb;
 
@@ -398,6 +421,8 @@ class Participants_Db {
 		return $wpdb->get_results($sql, ARRAY_A);
 	 
   }
+	
+	// gets an array of column names
 
 	/**
 	 * gets the field attributes as filtered by the type of form to display
@@ -790,6 +815,52 @@ class Participants_Db {
 		$defaults = wp_parse_args( $atts, array( 'form_element'=>'text-line' ) );
 
 		$wpdb->insert( self::$fields_table, $defaults );
+		
+		if ( false === ( self::_add_db_column( $defaults ) ) ) {
+			
+			error_log( __METHOD__.' failed to add column:'.print_r( $defaults, true ) );
+			
+		}
+		
+	}
+	
+	private function _add_db_column( $atts ) {
+		
+		global $wpdb;
+		
+		$datatype = self::set_datatype( $atts['form_element'] );
+		
+		$sql = 'ALTER TABLE `'.self::$participants_table.'` ADD `'.$atts['name'].'` '.$datatype.' NULL';
+		
+		return $wpdb->query( $sql );
+		
+	}
+					
+	// returns a MYSQL datatype appropriate to the form element type
+	public function set_datatype( $element ) {
+		
+		switch ( $element ) {
+
+            case 'multi-select':
+            case 'multi-checkbox':
+            case 'text-field':
+            $datatype = 'TEXT';
+            break;
+
+            case 'date':
+            $datatype = 'DATE';
+            break;
+
+            case 'checkbox':
+            case 'radio':
+            case 'dropdown':
+            case 'text-line':
+            default :
+            $datatype = 'TINYTEXT';
+
+          }
+		
+		return $datatype;
 		
 	}
   
