@@ -128,23 +128,28 @@ div.pagination {
 }
 
 /* manage fields */
-table.manage-fields {
-	min-width:900px;
+div.manage-fields-wrap {
+	min-width:1100px;
 }
-.manage-fields thead {
+.manage-fields thead > tr {
 	height:70px;
 }
+.manage-fields.widefat th {
+  padding:5px 0;
+  vertical-align:middle;
+  text-align:center;
+}
 .manage-fields th.sortable {
-	padding:7px 7px 8px;
+	/*padding:7px 7px 8px;*/
 }
 .id, .order, .persistent, .sortable, .column, .import {
 	text-align:center;
 }
 th.id, th.order, th.persistent, th.sortable, th.import, th.delete, th.signup {
-	width:10px;
+	width:25px;
 }
 th.column, th.display {
-	width:20px;
+	width:40px;
 }
 th.form_element {
 	width:130px;
@@ -155,13 +160,20 @@ th.validation, th.title, th.default, th.group {
 #field_groups th.title {
 	width:auto;
 }
-th.order span, th.persistent span, th.sortable span, th.column span, th.import span, th.delete span, th.signup span, th.display span {
-	-moz-transform: rotate(90deg) translate(-35%, -19px);
-	-moz-transform-origin: left top;
-	-webkit-transform: rotate(90deg) translate(35%, -19px);
-	-webkit-transform-origin: left top;
+.manage-fields th.vertical-title {
+	vertical-align:top;
+}
+.manage-fields th.vertical-title span {
+  writing-mode:tb-rl;
+	-moz-transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  white-space:nowrap;
 	word-wrap: normal;
 	display:block;
+	width:20px;
+	height:20px;
+	line-height: 0.5;
 }
 .manage-fields input, .manage-fields textarea {
 	width:100%;
