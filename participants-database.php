@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 0.9.2
+Version: 0.9.3
 Author URI: http://xnau.com 
 License: GPL2
 */
@@ -522,12 +522,18 @@ class Participants_Db {
 
 		}
 
+		$options = get_option( self::$plugin_settings );
+
 		// check for an existing record with same email so we can at least avoid
 		// inserting a duplicate email address into the database
-		if ( isset( $post['email'] ) && self::email_exists( $post['email'] ) ) {
+		if ( $options['unique_email'] && isset( $post['email'] ) && self::email_exists( $post['email'] ) ) {
 
       // record with same email exists...get the id and update the existing record
       $participant_id = self::_get_participant_id_by_term( 'email', $post['email'] );
+			
+			// if there is more than one record with a particular email, return the first one
+			if ( is_array( $participant_id ) ) $participant_id = current( $participant_id );
+			
 			//unset( $post['private_id'] ); 
       $action = 'update';
 
@@ -753,6 +759,7 @@ class Participants_Db {
 	// unserialize if necessary
 	public function unserialize_array( $string ) {
 		
+		// is_serialized is a WordPress utility function
 		return is_serialized( $string ) ? unserialize( $string ) : $string ;
 		
 	}
@@ -942,7 +949,7 @@ class Participants_Db {
 
 				global $wpdb;
 
-				$data += $wpdb->get_results( rawurldecode( $_POST['query'] ), ARRAY_A );
+				$data += self::_prepare_CSV_rows( $wpdb->get_results( rawurldecode( $_POST['query'] ), ARRAY_A ) );
 				
 				break;
 			 
@@ -1099,6 +1106,48 @@ class Participants_Db {
 				return array( 'type' => 'dropdown', 'options'=> self::get_groups('name') );
 				
 		endswitch;
+		
+	}
+	
+	/**
+	 * prepares a set of rows for CSV output
+	 *
+	 * @param array $raw_array the raw array output from the query
+	 *
+	 * @return array of record arrays
+	 */
+	private function _prepare_CSV_rows( $raw_array ) {
+		
+		$output = array();
+		
+		foreach( $raw_array as $key => $value ) {
+			
+			$output[ $key ] = self::_prepare_CSV_row( $value );
+			
+		}
+		
+		return $output;
+		
+	}
+	
+	/**
+	 * prepares a row of data for CSV output
+	 *
+	 * @param array $raw_array the raw array output from the query
+	 *
+	 * @return array with all the serialized arrays in human-readable form
+	 */
+	private function _prepare_CSV_row( $raw_array ) {
+		
+		$output = array();
+		
+		foreach( $raw_array as $key => $value ) {
+			
+			$output[ $key ] = is_serialized( $value ) ? implode( ', ', unserialize( $value ) ) : $value;
+			
+		}
+		
+		return $output;
 		
 	}
 	

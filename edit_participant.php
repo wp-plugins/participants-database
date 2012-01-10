@@ -105,7 +105,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$v
 	?>
 	</table>
   <table class="form-table">
-    <?php if ( Participants_Db::backend_user() ) : ?>
+    <?php if ( is_admin() ) : ?>
     <tr>
       <th><h3>Save the Record</h3></th>
       <td class="submit-buttons"><input class="button-primary" type="submit" value="Submit" name="submit">

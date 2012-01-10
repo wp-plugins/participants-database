@@ -52,12 +52,25 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'=>'unique_email',
+        'title'=>'Don&#39;t Allow Duplicate Email Addresses',
+        'group'=>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => 'if someone registers with an email address that already exists, update the existing record, don&#39;t create a new one.',
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
         'name'=>'registration_page',
         'title'=>'Participant Record Page',
         'group'=>'main',
         'options'=>array(
           'type'=>'text',
-          'help_text'=> 'the slug of the page where your participant record is displayed',
+          'help_text'=> 'the slug of the page where your participant record ([pdb_record] shortcode) is displayed',
           )
         );
 
@@ -89,7 +102,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'=> 'main',
         'options'=>array(
           'type'=>'text',
-          'help_text'=> 'the style applied to an input or text field that is missing or has not passed validation',
+          'help_text'=> 'the CSS style applied to an input or text field that is missing or has not passed validation',
           'value' => 'border: 1px solid red',
           )
         );
@@ -122,7 +135,7 @@ class PDb_Settings extends Plugin_Settings {
 
     $this->plugin_settings[] = array(
         'name'=>'receipt_from_address',
-        'title'=>'Sugnup Email From Address',
+        'title'=>'Signup Email From Address',
         'group'=> 'signup',
         'options'=> array(
           'type'=>'text',
@@ -159,7 +172,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'=> 'signup',
         'options'=> array(
           'type'=>'text-field',
-          'help_text'=> 'body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link].',
+          'help_text'=> 'Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. Placing the [record_link] here is not recommended.',
           'value'=>'<p>Thank you, [first_name] for signing up with '.get_bloginfo('name').'.</p><p>You may complete your registration with additional information or update your information by visiting this link at any time: <a href="[record_link]">[record_link]</a>.</p>',
           )
         );

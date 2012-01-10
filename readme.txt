@@ -101,9 +101,9 @@ The form will only appear if someone uses a valid private link to access the pag
 
 = What if someone loses their private link? =
 
-If someone does not have the private link to edit their record, they can sign up again with the same email address. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address. 
+If someone does not have the private link to edit their record, they can sign up again with the same email address if "Don't Allow Duplicate Email Addresses" is checked in the plugin settings. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address. 
 
-It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the [pdb_record] shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page.
+It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the [pdb_record] shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
 
 == Other Notes ==
 
@@ -135,6 +135,12 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 3. Import CSV File: page where CSV files can be imported, includes detialed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 0.9.3 =
+* fixed possible submit failure on non-unique email
+* added unique email setting to allow multiple records with same email address
+* polished CSV output for readable array data fields
+* frontend edit form stays on frontend for admin user
 
 = 0.9.2 =
 * fixed new fields not getting correctly added to database in all cases

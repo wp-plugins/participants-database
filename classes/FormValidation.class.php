@@ -209,7 +209,7 @@ class FormValidation {
 	 */
 	private function _validate_field( $value, $name, $validation = NULL ) {
 
-		error_log( __METHOD__.' validating field '.$name.' of value '.$value.' with '.$validation );
+		// error_log( __METHOD__.' validating field '.$name.' of value '.$value.' with '.$validation );
 
 		if ( empty( $validation ) || NULL === $validation || 'no' == strtolower( $validation ) ) return;
 
