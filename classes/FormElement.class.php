@@ -616,7 +616,7 @@ class FormElement {
     if ( $value === false ) $value = $this->value;
     $size = $this->size ? ' size="'.$this->size.'" ' : '';
 
-    return '<input type="' . $type . '" name="' . $this->name . ( $group ? '[]' : '' ) . '"' . $size . ( $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . '  value="' . $value . '" />';
+    return '<input type="' . $type . '" name="' . $this->name . ( $group ? '[]' : '' ) . '"' . $size . ( false !== $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . '  value="' . $value . '" />';
 
   }
   
@@ -765,7 +765,10 @@ class FormElement {
    */
   private function _set_selected( $element_value, $new_value, $attribute = 'selected', $state = true ) {
 
-    //error_log( __METHOD__.' checking value:'.$this->_prep_comp_string($new_value).' against:'.$this->_prep_comp_string($element_value) );
+		
+		if ( is_array( $new_value ) ) return $this->_set_multi_selected( $element_value, $new_value, $attribute, $state );
+		
+    // error_log( __METHOD__.' checking value:'.$this->_prep_comp_string($new_value).' against:'.$this->_prep_comp_string($element_value) );
 
     if (
         ( is_array( $element_value ) && ( $state === in_array( $this->_prep_comp_string( $new_value ), $this->_prep_comp_array( $element_value ) ) ) )
@@ -807,6 +810,21 @@ class FormElement {
     return $output;
 
   }
+
+  /**
+	 * sets the select states for a multi-select element
+	 */
+	private function _set_multi_selected( $element_value, $new_value, $attribute = 'selected', $state = true ) {
+		
+		$new_values = $this->_prep_comp_array( $new_value );
+		
+    // error_log( __METHOD__.' checking value:'.$this->_prep_comp_string($element_value).' against:'.print_r($new_values,true).' state:'.( in_array( $this->_prep_comp_string( $element_value ), $new_values )?'true':'false').' setting: '.$attribute );
+			
+		if ( $state === in_array( $this->_prep_comp_string( $element_value ), $new_values ) ) return  sprintf( ' %1$s="%1$s" ', $attribute );
+		
+		else return '';
+		
+	}
 
   /**
    * tests the type of an array, returns true if associative

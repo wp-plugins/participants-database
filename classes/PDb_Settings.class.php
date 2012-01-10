@@ -52,6 +52,19 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'=>'unique_email',
+        'title'=>'Don&#39;t Allow Duplicate Email Addresses',
+        'group'=>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => 'if someone registers with an email address that already exists, update the existing record, don&#39;t create a new one.',
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
         'name'=>'registration_page',
         'title'=>'Participant Record Page',
         'group'=>'main',
@@ -234,7 +247,7 @@ class PDb_Settings extends Plugin_Settings {
   public function show_settings_form() {
     ?>
     <div class="wrap participants_db settings-class">
-      <h2><?php echo Participants_Db::PLUGIN_TITLE?> Settings</h2>
+      <h2><?php echo Participants_Db::$plugin_title?> Settings</h2>
 
       <?php parent::show_settings_form() ?>
 

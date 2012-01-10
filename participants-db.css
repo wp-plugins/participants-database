@@ -17,7 +17,7 @@ body[class*='participants-database'] input[type=checkbox] {
 .pdb-signup th {
 	width:200px;
 }
-.edit-participant textarea, .participants_db textarea, .participants_db input[type='text'], .edit-participant  input[type='text'], .edit-participant  input[type='checkbox'] {
+.edit-participant textarea, .participants_db textarea, .participants_db input[type='text'], .edit-participant  input[type='text'], .edit-participant  input[type='checkbox'], .edit-participant .multicheckbox label {
 	float:left;
 	margin-right:10px;
 }
@@ -161,6 +161,7 @@ th.order span, th.persistent span, th.sortable span, th.column span, th.import s
 	-webkit-transform: rotate(90deg) translate(35%, -19px);
 	-webkit-transform-origin: left top;
 	word-wrap: normal;
+	display:block;
 }
 .manage-fields input, .manage-fields textarea {
 	width:100%;
