@@ -2,19 +2,11 @@
 /*
  * add / edit / delete fields and field groups and their attributes 
  */
-// translations strings for buttons
-/* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
-$PDb_i18n = array(
-  'update fields' => __( 'Update Fields', Participants_Db::PLUGIN_NAME ),
-  'update groups' => __( 'Update Groups', Participants_Db::PLUGIN_NAME ),
-  'add field'     => __( 'Add Field',     Participants_Db::PLUGIN_NAME ),
-  'add group'     => __( 'Add Group',     Participants_Db::PLUGIN_NAME ),
-  );
 // process form submission
 $error_msgs = array();
 if ( isset( $_POST['action'] ) ) {
 	
-	switch ( $_POST['action'] ) {
+	switch ( strtolower( $_POST['action'] ) ) {
 		
 		case 'reorder_fields':
 			unset( $_POST['action'], $_POST['submit'] );
@@ -30,7 +22,7 @@ if ( isset( $_POST['action'] ) ) {
       }
       break;
 			
-		case $PDb_i18n['update fields']:
+		case 'update fields':
 
 			// dispose of these now unneeded fields
 			unset( $_POST['action'], $_POST['submit'] );
@@ -59,7 +51,7 @@ if ( isset( $_POST['action'] ) ) {
 			}
 			break;
 
-    case $PDb_i18n['update groups']:
+    case 'update groups':
 
       // dispose of these now unneeded fields
       unset( $_POST['action'], $_POST['submit'], $_POST['group_title'], $_POST['group_order'] );
@@ -73,7 +65,7 @@ if ( isset( $_POST['action'] ) ) {
       break;
 
 		// add a new blank field
-		case $PDb_i18n['add field']:
+		case 'add field':
 			if ( false === strpos($_POST['title'],'new field') ) {
 
 				// use the wp function to clear out any irrelevant POST values
@@ -88,12 +80,12 @@ if ( isset( $_POST['action'] ) ) {
 															 );
 				Participants_Db::add_blank_field( $atts );
 			} else {
-				$error_msgs[] = __('You must give your new field a name before adding it.',Participants_Db::PLUGIN_NAME );
+				$error_msgs[] = 'You must give your new field a name before adding it.';
 			}
 			break;
 
 		// add a new blank field
-		case $PDb_i18n['add group']:
+		case 'add group':
 			if ( false === strpos($_POST['group_title'],'new group') ) {
 
 				global $wpdb;
@@ -110,7 +102,7 @@ if ( isset( $_POST['action'] ) ) {
 				if ( $wpdb->last_error ) $error_msgs[] = PDb_parse_db_error( $wpdb->last_error, $_POST['action'] );
 				
 			} else {
-				$error_msgs[] = __('You must give your new group a name before adding it.',Participants_Db::PLUGIN_NAME );
+				$error_msgs[] = 'You must give your new group a name before adding it.';
 			}
 			break;
 			
@@ -168,8 +160,8 @@ foreach( array( 'id','name' ) as $item ) {
 // second bit disables the submit on return behavior
 ?>
 <div class="wrap">
-<h2><?php echo Participants_Db::$plugin_title?></h2>
-<h3><?php _e('Manage Database Fields',Participants_Db::PLUGIN_NAME )?></h3>
+<h2><?php echo Participants_Db::PLUGIN_TITLE?></h2>
+<h3>Manage Database Fields</h3>
 <?php
 if ( ! empty( $error_msgs ) ) :
 ?>
@@ -179,15 +171,15 @@ error_log( __FILE__.' errors registered:'.print_r( $error_msgs,true ));
 foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 </div>
 <?php endif?>
-<h4><?php _e('Field Groups',Participants_Db::PLUGIN_NAME )?>:</h4>
+<h4>Field Groups:</h4>
 <div id="fields-tabs">
 	<ul>
 		<?php
 		foreach ( $groups as $group ) {
 			echo '<li><a href="#'.$group.'">'.ucwords( str_replace( '_',' ',$group ) ).'</a></li>';
 		}
-		echo '<li><a href="#field_groups">'.__('Field Groups',Participants_Db::PLUGIN_NAME ).'</a></li>';
-    echo '<li><a href="#help">'.__('Help',Participants_Db::PLUGIN_NAME ).'</a></li>';
+		echo '<li><a href="#field_groups">Field Groups</a></li>';
+    echo '<li><a href="#help">Help</a></li>';
 		?>
 	</ul>
 	<?php
@@ -195,12 +187,13 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	?>
 	<div id="<?php echo $group?>" class="manage-fields-wrap" >
 		<form id="manage_<?php echo $group?>_fields" method="post">
-		<h3><?php echo ucwords( str_replace( '_',' ',$group ) ), __('Field Groups',Participants_Db::PLUGIN_NAME )?></h3>
+		<!--<input type="hidden" name="action" value="update fields" />-->
+		<h3><?php echo ucwords( str_replace( '_',' ',$group ) )?> Field Group</h3>
 		<p>
 		<?php
 		// "add field" functionality
-		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add field'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button' ) ) );
-		FormElement::print_element( array( 'type'=>'text', 'name'=>'title','value'=>__('new field name',Participants_Db::PLUGIN_NAME ).'&hellip;','attributes'=>array('onclick'=>"this.value=''",'class'=>'add_field') ) );
+		FormElement::print_element( array( 'type'=>'submit','value'=>'Add Field','name'=>'action', 'attributes'=>array( 'class'=>'add_field_button' ) ) );
+		FormElement::print_element( array( 'type'=>'text', 'name'=>'title','value'=>'new field name&hellip;','attributes'=>array('onclick'=>"this.value=''",'class'=>'add_field') ) );
 
 		// number of rows in the group
 		$num_group_rows = count( $database_rows[ $group ] );
@@ -231,7 +224,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 			<?php
 			if ( $num_group_rows < 1 ) { // there are no rows in this group to show
 			?>
-			<tr><td colspan="<?php echo count( $attribute_columns ) + 1 ?>"><?php _e('No fields in this group',Participants_Db::PLUGIN_NAME )?></td></tr>
+			<tr><td colspan="<?php echo count( $attribute_columns ) + 1 ?>">No fields in this group</td></tr>
 			<?php
 			} else {
 				// add the rows of the group
@@ -303,7 +296,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		</script>
 		<p class="submit">
 			<?php
-			FormElement::print_element( array('type'=>'submit', 'name'=>'action','value'=>$PDb_i18n['update fields'], 'class'=>'button-primary') );
+			FormElement::print_element( array('type'=>'submit', 'name'=>'action','value'=>'Update Fields', 'class'=>'button-primary') );
 			?>
 		</p>
 		</form>
@@ -316,14 +309,14 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	?>
 	<div id="field_groups">
 		<form id="manage_field_groups" method="post">
-		<input type="hidden" name="action" value="<?php echo $PDb_i18n['update groups']?>" />
-		<h3><?php _e('Edit / Add / Remove Field Groups',Participants_Db::PLUGIN_NAME )?></h3>
+		<input type="hidden" name="action" value="update groups" />
+		<h3>Edit / Add / Remove Field Groups</h3>
 		<p>
 		<?php
 		
 		// "add group" functionality
-		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add group'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button' ) ) );
-		FormElement::print_element( array( 'type'=>'text', 'name'=>'group_title','value'=>__('new group name',Participants_Db::PLUGIN_NAME ).'&hellip;','attributes'=>array('onclick'=>"this.value=''",'class'=>'add_field') ) );
+		FormElement::print_element( array( 'type'=>'submit','value'=>'Add Group','name'=>'action', 'attributes'=>array( 'class'=>'add_field_button' ) ) );
+		FormElement::print_element( array( 'type'=>'text', 'name'=>'group_title','value'=>'new group name&hellip;','attributes'=>array('onclick'=>"this.value=''",'class'=>'add_field') ) );
 		$next_order = count( $groups ) + 1;
 		FormElement::print_hidden_fields( array( 'group_order'=>$next_order ) );
 		
@@ -332,7 +325,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<table class="wp-list-table widefat fixed manage-fields" cellspacing="0" >
 		<thead>
 			<tr>
-				<th scope="col" class="delete"><span><?php echo PDb_header( __('delete',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
+				<th scope="col" class="delete"><span><?php echo PDb_header( 'delete' ) ?></span></th>
 			<?php
 			foreach ( current( $groups ) as $column => $value ) {
 
@@ -423,7 +416,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		</script>
 		<p class="submit">
 			<?php
-			FormElement::print_element( array('type'=>'submit', 'name'=>'submit','value'=>$PDb_i18n['update groups'], 'class'=>'button-primary') );
+			FormElement::print_element( array('type'=>'submit', 'name'=>'submit','value'=>'Update Groups', 'class'=>'button-primary') );
 			?>
 		</p>
 		</form>
@@ -483,9 +476,9 @@ function PDb_parse_db_error( $error, $context ) {
 
 		switch ( $context ) {
 
-			case $PDb_i18n['add group']:
+			case 'Add Group':
 
-				$message = __("The group was not added. Your new group must have a unique name.", Participants_Db::PLUGIN_NAME );
+				$message = "The group was not added. Your new group must have a unique name.";
 				break;
 
 		}
