@@ -193,7 +193,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	<?php
 	foreach ( $groups as $group ) :
 	?>
-	<div id="<?php echo $group?>" >
+	<div id="<?php echo $group?>" class="manage-fields-wrap" >
 		<form id="manage_<?php echo $group?>_fields" method="post">
 		<h3><?php echo ucwords( str_replace( '_',' ',$group ) ), __('Field Groups',Participants_Db::PLUGIN_NAME )?></h3>
 		<p>
@@ -214,11 +214,14 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<table class="wp-list-table widefat fixed manage-fields" cellspacing="0" >
 		<thead>
 			<tr>
-				<th scope="col" class="delete"><span><?php echo PDb_header( 'delete' ) ?></span></th>
+				<th scope="col" class="delete vertical-title"><span><?php echo PDb_header( 'delete' ) ?></span></th>
 			<?php
 			foreach( $attribute_columns as $attribute_column ) {
+				
+				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'column', 'import', 'signup', 'display' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
+				
 				?>
-				<th scope="col" class="<?php echo $attribute_column?>"><span><?php echo PDb_header( $attribute_column ) ?></span></th>
+				<th scope="col" class="<?php echo $column_class?>"><span><?php echo PDb_header( $attribute_column ) ?></span></th>
 				<?php
 			}
 			?>
