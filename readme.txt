@@ -109,6 +109,8 @@ If someone does not have the private link to edit their record, they can sign up
 
 It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the [pdb_record] shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
 
+
+
 == Other Notes ==
 
 = Using the Plugin =
