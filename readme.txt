@@ -132,7 +132,7 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 
 1. Managing Database fields: this is where you set up your database fields and all attributes for each field
 2. Edit Record: this is where an individual record can be created or edited
-3. Import CSV File: page where CSV files can be imported, includes detialed instructions and a blank spreadsheet download
+3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
 
