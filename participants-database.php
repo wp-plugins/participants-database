@@ -904,6 +904,8 @@ class Participants_Db {
 
     }
 
+    if ( ! is_admin() ) return;
+
 		// redirect according to which submit button was used
 		switch ( $_POST['submit'] ) {
 
