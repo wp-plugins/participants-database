@@ -128,6 +128,7 @@ When they sign in, they will be sent an email with a private link to their full 
 
 Of course, records can be entered in the backend by a user with "editor" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file.
 
+
 == Screenshots ==
 
 1. Managing Database fields: this is where you set up your database fields and all attributes for each field
