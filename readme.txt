@@ -130,11 +130,14 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 
 == Screenshots ==
 
-1. Managing Database fields: this is where you cet up your database fields and all attributes for each field
+1. Managing Database fields: this is where you set up your database fields and all attributes for each field
 2. Edit Record: this is where an individual record can be created or edited
 3. Import CSV File: page where CSV files can be imported, includes detialed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 0.9.4 =
+* improved CSS on manage fields page
 
 = 0.9.3 =
 * fixed possible submit failure on non-unique email
