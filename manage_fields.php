@@ -307,7 +307,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	// build the groups edit panel
 	$groups = Participants_Db::get_groups();
 	?>
-	<div id="field_groups">
+	<div id="field_groups" class="manage-fields-wrap">
 		<form id="manage_field_groups" method="post">
 		<input type="hidden" name="action" value="update groups" />
 		<h3>Edit / Add / Remove Field Groups</h3>
@@ -325,14 +325,16 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<table class="wp-list-table widefat fixed manage-fields" cellspacing="0" >
 		<thead>
 			<tr>
-				<th scope="col" class="delete"><span><?php echo PDb_header( 'delete' ) ?></span></th>
+				<th scope="col" class="delete vertical-title"><span><?php echo PDb_header( 'delete' ) ?></span></th>
 			<?php
 			foreach ( current( $groups ) as $column => $value ) {
+				
+				$column_class = in_array( $column, array( 'order', 'display' ) ) ? $column.' vertical-title' : $column;
 
 				// skip non-editable columns
 				if ( in_array( $column, array( 'id', 'name' ) ) ) continue;
 				?>
-				<th scope="col" class="<?php echo $column?>"><span><?php echo PDb_header( $column ) ?></span></th>
+				<th scope="col" class="<?php echo $column_class?>"><span><?php echo PDb_header( $column ) ?></span></th>
 				<?php
 			}
 			?>

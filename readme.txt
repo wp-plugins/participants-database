@@ -111,7 +111,7 @@ It's also possible to send them the link again in an email, but the plugin does 
 
 This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
 
-To collect signups on your website there are two shortcodes: [pdb_signup] and [pdb_record]. Use the [pdb_signup] one to give people a way to add their name to your list. You can customize which fields they need to fill in. [pdb_record] displays an expanded version of the form so people can add to or edit their own record.
+To collect signups on your website there are two shortcodes: [pdb_signup] and [pdb_record]. Use the [pdb_signup] one to give people a way to add their name to your list. You can customize which fields they need to fill in. [pdb_record] displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want.
 
 This way, your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
 
@@ -135,6 +135,13 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 3. Import CSV File: page where CSV files can be imported, includes detialed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 0.9.5 =
+* prevent frontend record edit submission from redirecting to admin
+* further CSS improvements to backend fields management page
+* better default settings for field groups
+* logic to allow both signup and record shortcodes to be on the same page
+* setting to show the private ID and link on the admin participant listing page
 
 = 0.9.4 =
 * improved CSS on manage fields page

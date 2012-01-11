@@ -198,7 +198,7 @@ class PDb_Init
         foreach( self::$field_groups as $group=>$title ) {
           $defaults['name'] = $group;
           $defaults['title'] = $title;
-          $defaults['display'] = $group == 'internal' ? 0 : 1;
+          $defaults['display'] = ( in_array( $group, array( 'internal', 'admin', 'source' ) ) ? 0 : 1 );
           $defaults['order'] = $i;
 
           $wpdb->insert( Participants_Db::$groups_table, $defaults );

@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 0.9.4
+Version: 0.9.5
 Author URI: http://xnau.com 
 License: GPL2
 */
@@ -402,6 +402,8 @@ class Participants_Db {
 		$column_set[ $column[ 'column' ] ] = $column[ 'name' ];
 		
 	 }
+	 
+	 if ( self::$plugin_settings->get_option( 'show_pid' ) ) $column_set[0] = 'private_id';
 	 
 	 ksort( $column_set );
 	 
@@ -897,6 +899,9 @@ class Participants_Db {
       return;
 
     }
+		
+		// if we are submitting from the frontend, we're done
+		if ( ! is_admin() ) return;
 
 		// redirect according to which submit button was used
 		switch ( $_POST['submit'] ) {

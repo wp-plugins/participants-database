@@ -65,6 +65,19 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'=>'show_pid',
+        'title'=>'Show the Private ID in List',
+        'group'=>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => 'whether to show the private ID in the participant list in the admin',
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
         'name'=>'registration_page',
         'title'=>'Participant Record Page',
         'group'=>'main',
