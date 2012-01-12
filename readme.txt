@@ -140,6 +140,12 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 
 == Changelog ==
 
+= 0.9.6 =
+* added ability to change group name
+* smoother logic and JS enhancements for deleting field groups
+* added "number of fields in group" column on field groups list
+* fixed install db error: integrity check on nonexistent table
+
 = 0.9.5 =
 * prevent frontend record edit submission from redirecting to admin
 * further CSS improvements to backend fields management page

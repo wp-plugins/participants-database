@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 0.9.5
+Version: 0.9.6
 Author URI: http://xnau.com 
 License: GPL2
 */
@@ -142,7 +142,8 @@ class Participants_Db {
 		// define our shortcodes
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
-		
+
+		if ($wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') == Participants_Db::$participants_table) :
 		// db integrity check and fix
 		$query = 'SELECT * FROM '.self::$fields_table;
 		$fields = $wpdb->get_results( $query, ARRAY_A );
@@ -160,6 +161,7 @@ class Participants_Db {
 			}
 			
 		}
+		endif;// end integrity check and fix
 		
 			
 			
@@ -825,9 +827,14 @@ class Participants_Db {
 
 		$wpdb->insert( self::$fields_table, $defaults );
 		
-		if ( false === ( self::_add_db_column( $defaults ) ) ) {
-			
-			error_log( __METHOD__.' failed to add column:'.print_r( $defaults, true ) );
+		// if this column does not exist in the DB, add it
+		if ( count( $wpdb->get_results( "SHOW COLUMNS FROM `".self::$participants_table."` LIKE '".$defaults['name']."'", ARRAY_A ) ) < 1 ) {
+		
+			if ( false === ( self::_add_db_column( $defaults ) ) ) {
+				
+				error_log( __METHOD__.' failed to add column:'.print_r( $defaults, true ) );
+				
+			}
 			
 		}
 		

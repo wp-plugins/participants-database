@@ -4,8 +4,11 @@
 	text-align:left;
 	vertical-align:top;
 }
-.widefat td {
-  vertical-align:top;
+body[class*='participants-database'] .widefat td {
+  vertical-align:middle;
+}
+body[class*='participants-database']  .widefat tr:nth-child(even) {
+	background-color:#dddddd;
 }
 .participants_db input[type='text'] {
 	width: 300px;
@@ -17,11 +20,17 @@ body[class*='participants-database'] input[type=checkbox] {
 .pdb-signup th {
 	width:200px;
 }
-.edit-participant textarea, .participants_db textarea, .participants_db input[type='text'], .edit-participant  input[type='text'], .edit-participant  input[type='checkbox'], .edit-participant .multicheckbox label {
+.edit-participant textarea, 
+.participants_db textarea, 
+.participants_db input[type='text'], 
+.edit-participant  input[type='text'], 
+.edit-participant  input[type='checkbox'], 
+.edit-participant .multicheckbox label {
 	float:left;
 	margin-right:10px;
 }
-fieldset.widefat,#PDb_footer.widefat {
+fieldset.widefat,
+#PDb_footer.widefat {
   padding:7px;
   width:auto;
   margin-top: 1.4em;
@@ -132,7 +141,7 @@ div.manage-fields-wrap {
 	min-width:1100px;
 }
 .manage-fields thead > tr {
-	height:70px;
+	height:6em;
 }
 .manage-fields.widefat th {
   padding:5px 0;
@@ -161,7 +170,7 @@ th.validation, th.title, th.default, th.group {
 	width:auto;
 }
 .manage-fields th.vertical-title {
-	vertical-align:top;
+	vertical-align:text-top;
 }
 .manage-fields th.vertical-title span {
   writing-mode:tb-rl;
@@ -175,16 +184,28 @@ th.validation, th.title, th.default, th.group {
 	height:20px;
 	line-height: 0.5;
 }
-.manage-fields input, .manage-fields textarea {
+.manage-fields input, 
+.manage-fields textarea {
 	width:100%;
 }
-.manage-fields input[type="checkbox"], .manage-fields input[type="radio"] {
+.manage-fields input[type="checkbox"], 
+.manage-fields input[type="radio"] {
 	width:auto;
 	position:relative;
 	top:-1px;
 }
 .manage-fields textarea {
 	height:3.5em;
+}
+.manage-field-groups th.name {
+	width:160px;
+}
+.manage-field-groups td[id^='field_count'] {
+	text-align:center;
+}
+.manage-field-groups th.column span {
+	position:relative;
+	left:5px;
 }
 td.order {
 	padding:3px 0;

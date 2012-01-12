@@ -33,18 +33,23 @@ jQuery(document).ready(function($){
     var parent = $(this).parent().parent('tr');
     var name = parent.find( 'td.title input' ).attr('value');
     var thing = $(this).attr('ref');
-    var count = $(this).attr('href');
+    // set the group ID and get the field count for the group
+    var group = parent.children('td.group').children('select').val();
+    if ( typeof group != "undefined" ) var group_id = group;
+    else var group_id = row_id;
+    var countDisplay = $('#field_count_'+group_id);
+    var count = countDisplay.html();
     // test to see if the group we're deleting has fields in it
     var not_empty_group = ( /[0-9]+/.test( count ) && count > 0 ) ? true : false ;
 
     // set the dialog text
-    if ( not_empty_group ) {
+    if ( not_empty_group && thing == 'group' ) {
 
       $('#confirmation-dialog').html('<h4>You must remove all fields from the "'+ name + '" group before deleting it.</h4>');
 
       // initialize the dialog action
       $('#confirmation-dialog').dialog({
-        autoOpen: false,
+        autoOpen: false,  
         height: 'auto',
         minHeight: '20',
         buttons: {
@@ -79,6 +84,8 @@ jQuery(document).ready(function($){
                   parent.slideUp(600, function () { //remove the Table row .
                       parent.remove();
                   });
+                  countDisplay.html( count - 1 );// update the group field count
+                  $('#tab_'+row_id).fadeOut();
                 }
               });// ajax
           },// ok
