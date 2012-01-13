@@ -84,6 +84,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    =>array
 					(
           'type'       =>'text',
+          /* translators: don't translate words in brackets [] */
           'help_text'  => __('the slug of the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
           )
         );

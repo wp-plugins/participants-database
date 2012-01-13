@@ -1271,8 +1271,9 @@ class Participants_Db {
 		$errorMsg = '';
 	
 		if( empty( $src_file ) || ! is_file( $src_file ) ) {
-		
-			return __('Input file does not exist or path is incorrect.<br />Attempted to load:', self::PLUGIN_NAME).' '.basename($src_file);
+
+      /* translators: the %s will be the name of the file */
+			return sprintf( __('Input file does not exist or path is incorrect.<br />Attempted to load: %s', self::PLUGIN_NAME), basename($src_file) );
 	
 		}
 	
@@ -1381,7 +1382,7 @@ class Participants_Db {
 		
 		if ( $file['size'] > $options[ 'image_upload_limit' ] * 1024 ) {
 			
-			self::$validation_errors->add_error( $name, sprintf( __('The image you tried to upload is too large. The file must be smaller than %sK.', self::PLUGIN_NAME ), $options[ 'image_upload_limit' ] ) );
+			self::$validation_errors->add_error( $name, sprintf( __('The image you tried to upload is too large. The file must be smaller than %sK.'), self::PLUGIN_NAME ), $options[ 'image_upload_limit' ] );
 			
 			return false;
 			

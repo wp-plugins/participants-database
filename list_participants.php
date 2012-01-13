@@ -1,6 +1,6 @@
 <?php
 // translations strings for buttons
-/* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
+/* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
 $PDb_i18n = array(
   'delete_checked' => __( 'Delete checked', Participants_Db::PLUGIN_NAME ),
   'change' => __( 'Change', Participants_Db::PLUGIN_NAME ),
@@ -211,7 +211,7 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 			?>
       <thead>
         <tr>
-          <th scope="col" style="width:6em"><?php /* translators: uses the check symbol to mean "check all" */ _e( '&#10004; all', Participants_Db::PLUGIN_NAME )?><input type="checkbox" onClick="checkedAll('list_form');" name="checkall" style="top: 2px; margin-left: 4px;"></th>
+          <th scope="col" style="width:6em"><?php /* translators: uses the check symbol in a phrase that means "check all" */ _e( '&#10004; all', Participants_Db::PLUGIN_NAME )?><input type="checkbox" onClick="checkedAll('list_form');" name="checkall" style="top: 2px; margin-left: 4px;"></th>
           <?php
 				 foreach ( $display_columns as $column ) {
 					printf ( $head_pattern, Participants_Db::column_title( $column ) );
