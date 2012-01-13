@@ -32,7 +32,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, 2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.0
+ * @version    Release: 1.2
  * @link       https://code.google.com/p/participants-database/
  *
  */
@@ -85,9 +85,6 @@ class FormElement {
   
   // boolean: is the element part of a group?
   public $group;
-  
-  // a list of all the element types available
-  public static $element_types;
   
   // linebreak character
   const BR = PHP_EOL;
@@ -222,25 +219,16 @@ class FormElement {
       case 'hidden':
         $this->_hidden();
         break;
+        
+      case 'image-upload':
+			case 'file':
+			case 'file-upload':
+        $this->_upload();
+        break;
 
       default:
 
     endswitch;
-
-    // define an array of all available elements for the use of external functions
-    self::$element_types = array(
-                                 'text-line',
-                                 'textarea',
-                                 'checkbox',
-                                 'radio',
-                                 'dropdown',
-                                 'date',
-                                 'dropdown-other',
-                                 'multi-checkbox',
-                                 'select-other',
-                                 'multi-select-other',
-                                 'drag-sort'
-                                 );
     
   }
   
@@ -594,6 +582,29 @@ class FormElement {
     $this->_addline( $this->_input_tag( 'hidden' ) );
     
   }
+	
+	/**
+	 * builds a file upload element
+	 */
+	private function _upload() {
+		
+		// if an image is already defined, show it
+		if ( ! empty( $this->value ) ) {
+			
+			$this->_addline( '<img class="uploaded-image" id="image_'.$this->name.'" src="'.$this->value.'" />' );
+			
+		}
+		
+		// add the MAX_FILE_SIZE field
+		// this is really just for guidance, not a valid safeguard; this must be checked on submission
+		if ( isset( $this->options[ 'max_file_size' ] ) ) $max_size = $this->options[ 'max_file_size' ];
+		else $max_size = ( ini_get( 'post_max_size' ) / 2 ) * 1048576;// half it to give a cushion
+		
+		$this->_addline( $this->print_hidden_fields( array( 'MAX_FILE_SIZE'=>$max_size ) ) );
+		
+		$this->_addline( $this->_input_tag( 'file' ) );
+		
+	}
 
   /************************ 
 	* SUB-ELEMENTS

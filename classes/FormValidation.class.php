@@ -151,6 +151,10 @@ class FormValidation {
 				case 'text-line':
 					$element = 'input';
 					break;
+					
+				case 'file-upload':
+					$element = 'input';
+					break;
 
 				default:
 					$element = false;
@@ -172,6 +176,8 @@ class FormValidation {
 					break;
 
 				default:
+				
+					$error_messages[] = $error;
 
 			}
 
@@ -179,6 +185,15 @@ class FormValidation {
 
 		return $this->_error_html( $error_CSS, $error_messages );
 
+	}
+	
+	/**
+	 * adds an arbitrary error to the object
+	 */
+	public function add_error( $name, $message ) {
+		
+		$this->_add_error( $name, $message );
+		
 	}
 
 	/**

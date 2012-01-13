@@ -140,6 +140,10 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 
 == Changelog ==
 
+= 0.1 =
+* internationalization on all display strings
+* added image upload field
+
 = 0.9.6 =
 * added ability to change group name
 * smoother logic and JS enhancements for deleting field groups

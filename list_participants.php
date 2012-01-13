@@ -202,8 +202,13 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 		  $display_columns = Participants_Db::get_list_display_columns();
 		
 			//now output the table of participants
-			$col_pattern = "<td>%s</td>";
-			$head_pattern = "<th>%s</th>";?>
+			$col_pattern = '<td>%s</td>';
+			$head_pattern = '<th>%s</th>';
+			
+			$PID_pattern = '<td><a href="'.get_bloginfo('url').'/'.( isset( $options['registration_page'] ) ? $options['registration_page'] : '' ).'?pid=%1$s">%1$s</a></td>';
+			
+			
+			?>
       <thead>
         <tr>
           <th scope="col" style="width:6em"><?php /* translators: uses the check symbol to mean "check all" */ _e( '&#10004; all', Participants_Db::PLUGIN_NAME )?><input type="checkbox" onClick="checkedAll('list_form');" name="checkall" style="top: 2px; margin-left: 4px;"></th>
@@ -233,7 +238,26 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
         <td><a href="admin.php?page=<?php echo Participants_Db::PLUGIN_NAME ?>-edit_participant&action=edit&id=<?= $value['id']?>"><?php _e( 'Edit', Participants_Db::PLUGIN_NAME )?></a> |
           <input type="checkbox" name="pid[]" value="<?= $value['id']?>"></td>
         <?php foreach ( $display_columns as $column ) {
-				 printf ($col_pattern, Participants_Db::prepare_value( $value[ $column ] ) );
+					
+					$column_atts = Participants_Db::get_field_atts( $column, 'form_element' );
+					
+					switch ( $column_atts->form_element ) {
+						
+						case 'file-upload':
+						
+							$display_value = basename( $value[ $column ] );
+							break;
+							
+						default:
+						
+							$display_value = $value[ $column ];
+							
+					}
+					
+					if ( $column == 'private_id' ) printf ($PID_pattern, Participants_Db::prepare_value( $display_value ) );
+						
+					else printf ($col_pattern, Participants_Db::prepare_value( $display_value ) );
+					
 				} ?>
       </tr>
       <?php }

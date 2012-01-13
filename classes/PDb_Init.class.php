@@ -142,31 +142,15 @@ class PDb_Init
 
           if ( ! isset( $defaults['form_element'] ) ) $defaults['form_element'] = 'text-line';
 
-          switch ( $defaults['form_element'] ) {
+						$datatype = Participants_Db::set_datatype( $defaults['form_element'] );
 
-            case 'multi-select':
-            case 'multi-checkbox':
-            case 'text-field':
-            $datatype = 'TEXT';
-            break;
-
-            case 'date':
-            $datatype = 'DATE';
-            break;
-
-            case 'checkbox':
-            case 'radio':
-            case 'dropdown':
-            case 'text-line':
-            default :
-            $datatype = 'TINYTEXT';
+						$sql .= '`'.$name.'` '.$datatype.' NULL,
+	';
 
           }
 
-          $sql .= '`'.$name.'` '.$datatype.' NULL,
-          ';
         }
-        }
+				
         $sql .= '`date_recorded` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           `date_updated` TIMESTAMP NOT NULL,
           PRIMARY KEY  (`id`)
@@ -214,7 +198,7 @@ class PDb_Init
         foreach( self::$field_groups as $group=>$title ) {
           $defaults['name'] = $group;
           $defaults['title'] = $title;
-          $defaults['display'] = $group == 'internal' ? 0 : 1;
+          $defaults['display'] = ( in_array( $group, array( 'internal', 'admin', 'source' ) ) ? 0 : 1 );
           $defaults['order'] = $i;
 
           $wpdb->insert( Participants_Db::$groups_table, $defaults );

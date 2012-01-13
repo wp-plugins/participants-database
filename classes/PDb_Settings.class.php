@@ -14,8 +14,8 @@ class PDb_Settings extends Plugin_Settings {
     // define the settings sections
     // no need to worry about the namespace, it will be prefixed
     $this->sections = array(
-                            'main' => 'General Settings',
-                            'signup' => 'Signup Form Settings',
+                            'main' => __('General Settings', Participants_Db::PLUGIN_NAME ),
+                            'signup' => __('Signup Form Settings', Participants_Db::PLUGIN_NAME ),
                             );
 
     // run the parent class initialization to finish setting up the class 
@@ -40,162 +40,202 @@ class PDb_Settings extends Plugin_Settings {
     // general settings
 
     $this->plugin_settings[] = array(
-        'name'=>'list_limit',
-        'title'=>'Records per Page',
-        'group'=>'main',
-        'options'=>array(
-          'type'=>'text',
-          'help_text'=> 'the number of records to show on each page',
-          'attributes'=>array( 'style'=>'width:40px' ),
-          'value'=>10,
+        'name'       =>'list_limit',
+        'title'      => __('Records per Page', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array(
+          'type'        =>'text',
+          'help_text'   => __('the number of records to show on each page', Participants_Db::PLUGIN_NAME ),
+          'attributes'  =>array( 'style'=>'width:40px' ),
+          'value'       =>10,
           ),
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'unique_email',
-        'title'=>'Don&#39;t Allow Duplicate Email Addresses',
-        'group'=>'main',
+        'name'       =>'unique_email',
+        'title'      => __('Don&#39;t Allow Duplicate Email Addresses', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => 'if someone registers with an email address that already exists, update the existing record, don&#39;t create a new one.',
+          'help_text'   => __('if someone registers with an email address that already exists, update the existing record, don&#39;t create a new one.', Participants_Db::PLUGIN_NAME ),
           'value'       => 1,
           'options'     => array( 1, 0 ),
           ),
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'registration_page',
-        'title'=>'Participant Record Page',
-        'group'=>'main',
-        'options'=>array(
-          'type'=>'text',
-          'help_text'=> 'the slug of the page where your participant record ([pdb_record] shortcode) is displayed',
+        'name'       =>'show_pid',
+        'title'      =>__('Show the Private ID in List', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('whether to show the private ID in the participant list in the admin', Participants_Db::PLUGIN_NAME ),
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'registration_page',
+        'title'      =>__('Participant Record Page', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array
+					(
+          'type'       =>'text',
+          'help_text'  => __('the slug of the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'empty_field_message',
-        'title'=>'Missing Field Error Message',
-        'group'=>'main',
-        'options'=>array(
-          'type'=>'text',
-          'help_text'=> 'the message shown when a field is required, but left empty (the %s is replaced by the name of the field)',
-          'value' => 'The %s field is required.',
+        'name'       =>'empty_field_message',
+        'title'      =>__('Missing Field Error Message', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __('the message shown when a field is required, but left empty (the %s is replaced by the name of the field)', Participants_Db::PLUGIN_NAME ),
+          'value'      => __('The %s field is required.', Participants_Db::PLUGIN_NAME ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'invalid_field_message',
-        'title'=>'Invalid Field Error Message',
-        'group'=>'main',
-        'options'=>array(
-          'type'=>'text',
-          'help_text'=> "the message shown when a field's value does not pass the validation test",
-          'value' => 'The %s field appears to be incorrect.',
+        'name'       =>'invalid_field_message',
+        'title'      =>__('Invalid Field Error Message', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __("the message shown when a field's value does not pass the validation test", Participants_Db::PLUGIN_NAME ),
+          'value'      => __('The %s field appears to be incorrect.', Participants_Db::PLUGIN_NAME ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'field_error_style',
-        'title'=>'Field Error Style',
-        'group'=> 'main',
-        'options'=>array(
-          'type'=>'text',
-          'help_text'=> 'the CSS style applied to an input or text field that is missing or has not passed validation',
-          'value' => 'border: 1px solid red',
+        'name'       =>'field_error_style',
+        'title'      =>__('Field Error Style', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'        =>'text',
+          'help_text'   => __('the CSS style applied to an input or text field that is missing or has not passed validation', Participants_Db::PLUGIN_NAME ),
+          'value'       => __('border: 1px solid red', Participants_Db::PLUGIN_NAME ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       => 'image_upload_location',
+        'title'      => __('Image Upload Location', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'        => 'text',
+          'help_text'   => __('this defines where the uploaded files will go, relative to the WordPress root.', Participants_Db::PLUGIN_NAME ),
+          'value'       => Participants_Db::$uploads_path,
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'image_upload_limit',
+        'title'      =>__('Image Upload Limit', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'        =>'dropdown',
+          'help_text'   => __('the maximum allowed file size for an uploaded image', Participants_Db::PLUGIN_NAME ),
+          'value'       => '100K',
+					'options'     => array( '10K'=>10,'20K'=>20,'50K'=>50,'100K'=>100,'150K'=>150,'250K'=>250,'500K'=>500, '750K'=>750 ),
           )
         );
 
     // signup form settings
 
     $this->plugin_settings[] = array(
-        'name'=>'signup_button_text',
-        'title'=>'Signup Button Text',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text',
-          'help_text'=> 'text shown on the button to sign up',
-          'value' => 'Sign Up',
+        'name'       =>'signup_button_text',
+        'title'      =>__('Signup Button Text', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('text shown on the button to sign up', Participants_Db::PLUGIN_NAME ),
+          'value'       => __('Sign Up', Participants_Db::PLUGIN_NAME ),
           )
         );
 
     $this->plugin_settings[] = array(
         'name'       => 'send_signup_receipt_email',
-        'title'      => 'Send Signup Response Email',
+        'title'      => __('Send Signup Response Email', Participants_Db::PLUGIN_NAME ),
         'group'      => 'signup',
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => 'Send a receipt email to people who sign up',
+          'help_text'   => __('Send a receipt email to people who sign up', Participants_Db::PLUGIN_NAME ),
           'value'       => 1,
           'options'     => array( 1, 0 ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'receipt_from_address',
-        'title'=>'Signup Email From Address',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text',
-          'help_text'=> 'the "From" address on signup receipt emails. If the recipient hits "reply", their reply will go to this address',
-          'value' => get_bloginfo( 'admin_email' ),
+        'name'       =>'receipt_from_address',
+        'title'      =>__('Signup Email From Address', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('the "From" address on signup receipt emails. If the recipient hits "reply", their reply will go to this address', Participants_Db::PLUGIN_NAME ),
+          'value'       => get_bloginfo( 'admin_email' ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'receipt_from_name',
-        'title'=>'Signup Email From Name',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text',
-          'help_text'=> 'the "From" name on signup receipt emails.',
-          'value' => get_bloginfo( 'name' ),
+        'name'       =>'receipt_from_name',
+        'title'      =>__('Signup Email From Name', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('the "From" name on signup receipt emails.', Participants_Db::PLUGIN_NAME ),
+          'value'       => get_bloginfo( 'name' ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'signup_receipt_email_subject',
-        'title'=>'Signup Response Email Subject',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text',
-          'help_text'=> 'subject line for the signup response email',
-          'value' => "You've just signed up on ".get_bloginfo('name'),
+        'name'       =>'signup_receipt_email_subject',
+        'title'      =>__('Signup Response Email Subject', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('subject line for the signup response email', Participants_Db::PLUGIN_NAME ),
+          'value'       => sprintf( __("You've just signed up on %s", Participants_Db::PLUGIN_NAME ), get_bloginfo('name') ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'signup_receipt_email_body',
-        'title'=>'Signup Response Email',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text-field',
-          'help_text'=> 'Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. Placing the [record_link] here is not recommended.',
-          'value'=>'<p>Thank you, [first_name] for signing up with '.get_bloginfo('name').'.</p><p>You may complete your registration with additional information or update your information by visiting this link at any time: <a href="[record_link]">[record_link]</a>.</p>',
+        'name'       =>'signup_receipt_email_body',
+        'title'      =>__('Signup Response Email', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text-field',
+					/* translators: don't translate words in brackets[] */
+          'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. Placing the [record_link] here is not recommended.', Participants_Db::PLUGIN_NAME ),
+					/* translators: the %s will be the name of the website */
+          'value'       =>sprintf( __('<p>Thank you, [first_name] for signing up with %s.</p><p>You may complete your registration with additional information or update your information by visiting this link at any time: <a href="[record_link]">[record_link]</a>.</p>', Participants_Db::PLUGIN_NAME ),get_bloginfo('name') ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'signup_thanks',
-        'title'=>'Signup Thanks Message',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text-field',
-          'help_text'=> 'Note to display on the web page after someone has submitted a signup form. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link].',
-          'value'=>'<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting the link provided in the email.</p>',
+        'name'       =>'signup_thanks',
+        'title'      =>__('Signup Thanks Message', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text-field',
+          'help_text'   => __('Note to display on the web page after someone has submitted a signup form. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link].', Participants_Db::PLUGIN_NAME ),
+					/* translators: don't translate words in brackets[] */
+          'value'       =>__('<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting the link provided in the email.</p>', Participants_Db::PLUGIN_NAME ),
           )
         );
 
     $this->plugin_settings[] = array(
         'name'       => 'send_signup_notify_email',
-        'title'      => 'Send Signup Notification Email',
+        'title'      => __('Send Signup Notification Email', Participants_Db::PLUGIN_NAME ),
         'group'      => 'signup',
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => 'Send an email notification that a signup has occurred.',
+          'help_text'   => __('Send an email notification that a signup has occurred.', Participants_Db::PLUGIN_NAME ),
           'value'       => 1,
           'options'     => array( 1, 0 ),
           )
@@ -203,35 +243,37 @@ class PDb_Settings extends Plugin_Settings {
 
 
     $this->plugin_settings[] = array(
-        'name'=>'email_signup_notify_addresses',
-        'title'=>'Signup Notification Recipients',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text',
-          'help_text'=> 'comma-separated list of email addresses to send signup notifications to',
-          'value' => get_bloginfo( 'admin_email' ),
+        'name'       =>'email_signup_notify_addresses',
+        'title'      =>__('Signup Notification Recipients', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('comma-separated list of email addresses to send signup notifications to', Participants_Db::PLUGIN_NAME ),
+          'value'       => get_bloginfo( 'admin_email' ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'email_signup_notify_subject',
-        'title'=>'Signup Notification Email Subject',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text',
-          'help_text'=> 'subject of the notification email',
-          'value' => 'New signup on '.get_bloginfo('name'),
+        'name'       =>'email_signup_notify_subject',
+        'title'      =>__('Signup Notification Email Subject', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('subject of the notification email', Participants_Db::PLUGIN_NAME ),
+					/* translators: the %s will be the name of the website */
+          'value'       => sprintf( __('New signup on %s', Participants_Db::PLUGIN_NAME ), get_bloginfo('name') ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'=>'email_signup_notify_body',
-        'title'=>'Signup Notification Email',
-        'group'=> 'signup',
-        'options'=> array(
-          'type'=>'text-field',
-          'help_text'=> 'notification email body',
-          'value' => '<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>',
+        'name'       =>'email_signup_notify_body',
+        'title'      =>__('Signup Notification Email'),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text-field',
+          'help_text'   => __('notification email body'),
+					/* translators: don't translate words in brackets[] */
+          'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>'),
           )
         );
 
@@ -247,7 +289,7 @@ class PDb_Settings extends Plugin_Settings {
   public function show_settings_form() {
     ?>
     <div class="wrap participants_db settings-class">
-      <h2><?php echo Participants_Db::$plugin_title?> Settings</h2>
+      <h2><?php echo Participants_Db::$plugin_title?> <?php _e('Settings', Participants_Db::PLUGIN_NAME )?></h2>
 
       <?php parent::show_settings_form() ?>
 

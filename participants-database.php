@@ -61,8 +61,11 @@ class Participants_Db {
 	// locations
 	public static $plugin_page;
 	public static $plugin_path;
-	public static $uploads_url;
+	public static $plugin_url;
+	
+	// file uploads
 	public static $uploads_path;
+	public static $allowed_extensions;
 	
 	// arrays for building default field set
 	public static $internal_fields;
@@ -71,6 +74,9 @@ class Participants_Db {
 	public static $personal_fields;
 	public static $source_fields;
 	public static $field_groups;
+  
+  // a list of all the form element types available
+  public static $element_types;
 
 	// holds the form validation errors
 	public static $validation_errors;
@@ -102,9 +108,29 @@ class Participants_Db {
 		// define some locations
 		self::$participants_db_options = self::PLUGIN_NAME.'_options';
 		self::$plugin_page = self::PLUGIN_NAME;
-		self::$uploads_url = WP_PLUGIN_URL.'/'.self::PLUGIN_NAME.'/uploads/';
+		self::$plugin_url = WP_PLUGIN_URL.'/'.self::PLUGIN_NAME;
 		self::$plugin_path = dirname(__FILE__);
-		self::$uploads_path = self::$plugin_path.'/uploads/';
+		// this is relative to the plugin
+		self::$uploads_path = 'wp-content/plugins/'.self::PLUGIN_NAME.'/uploads/';
+		
+		// hard-code some image file extensions
+		self::$allowed_extensions = array( 'jpg','jpeg','gif','png' );
+		
+		// define an array of all available form element types
+    self::$element_types = array(
+                                 'text-line',
+                                 'textarea',
+                                 'checkbox',
+                                 'radio',
+                                 'dropdown',
+                                 'date',
+                                 'dropdown-other',
+                                 'multi-checkbox',
+                                 'select-other',
+                                 'multi-select-other',
+																 'image-upload'
+                                 );
+		
 
     // install/deactivate and uninstall methods are handled by the PDB_Init class
     register_activation_hook( __FILE__, array( 'PDb_Init', 'on_activate' ) );
@@ -144,6 +170,7 @@ class Participants_Db {
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
 	
+		if ($wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') == Participants_Db::$participants_table) :
 		// db integrity check and fix
 		$query = 'SELECT * FROM '.self::$fields_table;
 		$fields = $wpdb->get_results( $query, ARRAY_A );
@@ -154,13 +181,14 @@ class Participants_Db {
 			
 			if ( ! in_array( $field['name'], $columns ) ) {
 				
-				error_log( 'adding column:'.print_r( $field, true ));
+				//error_log( 'adding column:'.print_r( $field, true ));
 				
 				self::_add_db_column( $field );
 				
 			}
 			
 		}
+		endif;// end integrity check and fix
 		
 			
 			
@@ -195,19 +223,65 @@ class Participants_Db {
 
 		// define the plugin admin menu pages
 	  add_menu_page(
-			self::$plugin_title, self::$plugin_title, 'editor', self::PLUGIN_NAME, array( __CLASS__, 'include_admin_file' ) );
+			self::$plugin_title, 
+			self::$plugin_title, 
+			'', 
+			self::PLUGIN_NAME, 
+			array( __CLASS__, 'include_admin_file' ) 
+			);
+		
 		$listpage = add_submenu_page(
-			self::PLUGIN_NAME, 'List Participants','List Participants', 'edit_pages',self::$plugin_page.'-list_participants', array( __CLASS__, 'include_admin_file' ) );
+			self::PLUGIN_NAME, 
+			__('List Participants', self::PLUGIN_NAME ),
+			__('List Participants', self::PLUGIN_NAME ), 
+			'edit_pages',
+			self::$plugin_page.'-list_participants', 
+			array( __CLASS__, 'include_admin_file' ) 
+			);
+		
 		$addpage = add_submenu_page(
-			self::PLUGIN_NAME, 'Add Participant', 'Add Participant','edit_pages', self::$plugin_page.'-edit_participant', array( __CLASS__, 'include_admin_file' ) );
+			self::PLUGIN_NAME,  
+			__('Add Participant', self::PLUGIN_NAME ), 
+			__('Add Participant', self::PLUGIN_NAME ),
+			'edit_pages', 
+			self::$plugin_page.'-edit_participant', 
+			array( __CLASS__, 'include_admin_file' ) 
+			);
+		
 		$managepage = add_submenu_page(
-			self::PLUGIN_NAME, 'Manage Fields', 'Manage Database Fields', 'manage_options', self::$plugin_page.'-manage_fields', array( __CLASS__, 'include_admin_file' ) );
+			self::PLUGIN_NAME, 
+			__('Manage Database Fields', self::PLUGIN_NAME ), 
+			__('Manage Database Fields', self::PLUGIN_NAME ), 
+			'manage_options', 
+			self::$plugin_page.'-manage_fields', 
+			array( __CLASS__, 'include_admin_file' ) 
+			);
+		
 		$uploadpage = add_submenu_page(
-			self::PLUGIN_NAME, 'Import CSV File', 'Import CSV File', 'manage_options', self::$plugin_page.'-upload_csv', array( __CLASS__, 'include_admin_file' ) );
+			self::PLUGIN_NAME, 
+			__('Import CSV File', self::PLUGIN_NAME ), 
+			__('Import CSV File', self::PLUGIN_NAME ), 
+			'manage_options', 
+			self::$plugin_page.'-upload_csv', 
+			array( __CLASS__, 'include_admin_file' ) 
+			);
+		
 		$settingspage = add_submenu_page(
-			self::PLUGIN_NAME, 'Settings','Settings', 'manage_options', self::$plugin_page.'_settings_page', array( self::$plugin_settings, 'show_settings_form' ) );
+			self::PLUGIN_NAME, 
+			__('Settings', self::PLUGIN_NAME ),
+			__('Settings', self::PLUGIN_NAME ), 
+			'manage_options', 
+			self::$plugin_page.'_settings_page', 
+			array( self::$plugin_settings, 'show_settings_form' ) 
+			);
+		
 		$editpage = add_submenu_page(
-			'', 'Edit Record', 'Edit Record', 'edit_pages', self::$plugin_page.'_edit_participant');
+			'', 
+			__('Edit Record', self::PLUGIN_NAME ), 
+			__('Edit Record', self::PLUGIN_NAME ), 
+			'edit_pages', 
+			self::$plugin_page.'_edit_participant'
+			);
 
 		// add the CSS for the admin pages such that it will only be loaded when
 		// those pages are called. There is probably a better way to do this, but
@@ -413,6 +487,8 @@ class Participants_Db {
 		
 	 }
 	 
+	 if ( self::$plugin_settings->get_option( 'show_pid' ) ) $column_set[0] = 'private_id';
+	 
 	 ksort( $column_set );
 	 
 	 //error_log( __METHOD__.' columns='.print_r( $column_set, true));
@@ -528,6 +604,21 @@ class Participants_Db {
 			
 			// error_log( __METHOD__.' default record: '.$action );
 
+		}
+		
+		if ( ! empty( $_FILES ) ) {
+			
+			foreach ( $_FILES as $fieldname => $attributes ) {
+				
+				if ( UPLOAD_ERR_NO_FILE == $attributes['error'] ) continue;
+				
+				// place the path to the file in the field value
+				$filepath = self::_handle_file_upload( $fieldname, $attributes );
+				
+				if ( false !== $filepath ) $post[ $fieldname ] = $filepath;
+				
+			}
+			
 		}
 		
 		$options = get_option( self::$plugin_settings );
@@ -829,12 +920,17 @@ class Participants_Db {
 
 		$wpdb->insert( self::$fields_table, $defaults );
 		
+		// if this column does not exist in the DB, add it
+		if ( count( $wpdb->get_results( "SHOW COLUMNS FROM `".self::$participants_table."` LIKE '".$defaults['name']."'", ARRAY_A ) ) < 1 ) {
+		
 		if ( false === ( self::_add_db_column( $defaults ) ) ) {
 			
 			error_log( __METHOD__.' failed to add column:'.print_r( $defaults, true ) );
 			
 		}
 		
+	}
+	
 	}
 	
 	private function _add_db_column( $atts ) {
@@ -904,6 +1000,7 @@ class Participants_Db {
 
     }
 
+		// if we are submitting from the frontend, we're done
     if ( ! is_admin() ) return;
 
 		// redirect according to which submit button was used
@@ -1104,7 +1201,7 @@ class Participants_Db {
 			// drop-down fields
 			case 'form_element':
 				// populate the dropdown with the available field types from the FormElement class
-				return array( 'type' => 'dropdown', 'options'=>FormElement::$element_types );
+				return array( 'type' => 'dropdown', 'options'=>self::$element_types );
 				
 			case 'validation':
 				return array( 'type' => 'dropdown-other', 'options'=>array('No'=>'no','Yes'=>'yes'), 'attributes'=> array( 'other'=>'regex' ) );
@@ -1245,6 +1342,67 @@ class Participants_Db {
     $value = trim( $value, $enclosure );
 
 	}
+	
+	/**
+	 * handles file uploads
+	 *
+	 * @param array $upload_file the $_FILES array element corresponding to one file
+	 *
+	 * return string the path to the uploaded file or false if error
+	 */ 
+	private function _handle_file_upload( $name, $file ) {
+		
+		if ( ! is_uploaded_file( $file['tmp_name'] ) ) {
+			
+			self::$validation_errors->add_error( $name, __('There is something wrong with the file you tried to upload. Try another.', self::PLUGIN_NAME ) );
+			
+			return false;
+			
+		}
+		
+		$fileinfo = getimagesize( $file['tmp_name'] );
+		
+		// check the type of file to make sure it is an image file
+		if ( ! in_array( $fileinfo[2], array( IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WBMP ) ) ) {
+			
+			self::$validation_errors->add_error( $name, __('You may only upload image files like JPEGs, GIFs or PNGs.', self::PLUGIN_NAME ) );
+			
+			return false;
+			
+		}
+		
+		// make sure the filename is OK:
+		$new_filename = preg_replace( 
+                     array("/\s+/", "/[^-\.\w]+/"), 
+                     array("_", ""), 
+                     trim( $file['name'] ) ); 
+		
+		$options = get_option( self::$participants_db_options );
+		
+		if ( $file['size'] > $options[ 'image_upload_limit' ] * 1024 ) {
+			
+			self::$validation_errors->add_error( $name, sprintf( __('The image you tried to upload is too large. The file must be smaller than %sK.', self::PLUGIN_NAME ), $options[ 'image_upload_limit' ] ) );
+			
+			return false;
+			
+		}
+		
+    if ( false === move_uploaded_file( $file['tmp_name'], ABSPATH.$options['image_upload_location'].$new_filename ) ) {
+			
+			self::$validation_errors->add_error( $name, __('The file could not be saved.', self::PLUGIN_NAME ) );
+			
+			return false;
+			
+		}
+		
+		else return get_bloginfo('wpurl').DIRECTORY_SEPARATOR.$options['image_upload_location'].$new_filename;
+	
+	} 
+	
+	
+	
+	
+	
 
 	/**
 	 * displays a credit footer for the plugin

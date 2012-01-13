@@ -106,8 +106,23 @@ class Signup {
 		// do we have a submission?
 		if ( false === $submission_id ) {
 
+				// no submission
+				// if the signup and edit record shortcodes are on the same page, we check to see which one we will show:
+				// if no private id is included in the URI, we show the signup form; also
+				// if there is a private id in the URI, we check to see if it's valid; if not, show the signup form
+				if (
+						! isset( $_GET['pid'] )
+						||
+						( isset( $_GET['pid'] ) && false === Participants_Db::get_participant_id( $_GET['pid'] ) ) 
+					 )
+				{
+					
+					error_log( 'check PID='.Participants_Db::get_participant_id( $_GET['pid'] ) );
+	
 			// no submission; output the form
 			$this->_form( $atts );
+			
+				}
 			
 		} else {
 
