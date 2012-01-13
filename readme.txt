@@ -67,7 +67,7 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 4. Place [pdb_record] in your blog posts and pages to show the signup form
 5. Additonal features and instructions can be found on the help tab of the plugin's settings page
 
-= [Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/) =
+** [Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/) **
 
 == Frequently Asked Questions ==
 
@@ -167,7 +167,7 @@ It's also possible to send them the link again in an email, but the plugin does 
 == Upgrade Notice ==
 
 = 0.9.6 =
-Important upgrade fixes 2 bugs and provdes improved functionality.
+Important upgrade fixes 2 bugs and provides improved functionality.
 
 == Using the Plugin ==
 
