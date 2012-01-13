@@ -25,6 +25,7 @@ This database could be of use to any organization that needs to build and mainta
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
 * email notification and confirmation with secure individual access link
 * searchable, sortable record listings in the WordPress admin
+* many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, etc.
 * export CSV files for interacting with other databases, mass email, print records
 * import CSV files to add large numbers of records from spreadsheets such as Open Office or Google Docs
 
@@ -67,7 +68,8 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 4. Place [pdb_record] in your blog posts and pages to show the signup form
 5. Additonal features and instructions can be found on the help tab of the plugin's settings page
 
-** [Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/) **
+**Using the Plugin:**
+[Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/)
 
 == Frequently Asked Questions ==
 
@@ -105,7 +107,7 @@ You can control which groups of fields show up in the frontend record edit scree
 
 = What if someone loses their private link? =
 
-If someone does not have the private link to edit their record, they can sign up again with the same email address if "Don't Allow Duplicate Email Addresses" is checked in the plugin settings. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address. 
+If someone does not have the private link to edit their record, they can sign up again with the same email address if "Don't Allow Duplicate Email Addresses" is checked in the plugin settings. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address.
 
 It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the [pdb_record] shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
 
@@ -170,8 +172,6 @@ It's also possible to send them the link again in an email, but the plugin does 
 Important upgrade fixes 2 bugs and provides improved functionality.
 
 == Using the Plugin ==
-
-= Using the Plugin =
 
 This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
 
