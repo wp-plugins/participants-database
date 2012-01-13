@@ -6,7 +6,7 @@ Requires at least: 2.8.4
 Tested up to: 3.3.1
 Stable tag: 0.9.6
 
-Build and maintain a fully customizable database of participants or volunteers with shortcodes for forms, admin backend, custom lists, and CSV support.
+Build and maintain a fully customizable database of participants and volunteers with signup forms, admin backend, custom lists, and CSV support.
 
 == Description ==
 
