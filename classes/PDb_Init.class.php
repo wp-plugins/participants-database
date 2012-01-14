@@ -2,12 +2,21 @@
 /*
  * plugin initialization class
  *
+ * version 1.1
+ *
+ * The way db updates will work is we will first set the "fresh intall" db
+ * initialization to the latest version's structure. Then, we add the "delta"
+ * queries to the series of upgrade steps that follow. Whichever version the
+ * plugin comes in with when activated, it will jump into the series at that
+ * point and complete the series to bring the database up to date.
+ *
+ * we're not using WP's dbDelta for updates because it's too fussy
  */
 
 class PDb_Init
 {
-    // set to true for convenience during development.
-    const UNINSTALL_ON_DEACTIVATE = false;
+    // this is the current db version
+    const VERSION = '0.2';
 
     // arrays for building default field set
     public static $internal_fields;
@@ -17,26 +26,25 @@ class PDb_Init
     public static $source_fields;
     public static $field_groups;
 
-
     function __construct( $mode = false )
     {
         if ( ! $mode )
             wp_die( 'class must be be called on the activation hooks', 'object not correctly instantiated' );
 
-        error_log( __METHOD__.' called with '.$mode );
+        // error_log( __METHOD__.' called with '.$mode );
 
         switch( $mode )
         {
             case 'activate' :
-								$this->_activate();
+                $this->_activate();
                 break;
 
             case 'deactivate' :
-								$this->_deactivate();
+                $this->_deactivate();
                 break;
 
             case 'uninstall' :
-								$this->_uninstall();
+                $this->_uninstall();
                 break;
         }
     }
@@ -56,11 +64,7 @@ class PDb_Init
      */
     public function on_deactivate()
     {
-        $mode = 'deactivate';
-        if ( self::UNINSTALL_ON_DEACTIVATE )
-            $mode = 'uninstall';
-
-        new PDb_Init( $mode );
+        new PDb_Init( 'deactivate' );
     }
 
     /**
@@ -68,7 +72,6 @@ class PDb_Init
      */
     public function on_uninstall()
     {
-
         new PDb_Init( 'uninstall' );
     }
 
@@ -79,12 +82,8 @@ class PDb_Init
 
       global $wpdb;
 
-      // skip if the tables have already been installed
-      // this will be modified when the db update capability is added
-      // we will then be checking a db version number for a changed version
+      // fresh install: install the tables if they don't exist
       if ($wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') != Participants_Db::$participants_table) :
-
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
         // create the field values table
         $sql = 'CREATE TABLE '.Participants_Db::$fields_table.' (
@@ -98,7 +97,8 @@ class PDb_Init
           `form_element` TINYTEXT NULL,
           `values` TEXT NULL,
           `validation` TINYTEXT NULL,
-          `column` INT(3) DEFAULT 0,
+          `display_column` INT(3) DEFAULT 0,
+          `admin_column` INT(3) DEFAULT 0,
           `sortable` BOOLEAN DEFAULT 0,
           `import` BOOLEAN DEFAULT 0,
           `persistent` BOOLEAN DEFAULT 0,
@@ -110,7 +110,7 @@ class PDb_Init
           )
           DEFAULT CHARACTER SET utf8
           ';
-        dbDelta($sql);
+        $wpdb->query($sql);
 
         // create the groups table
         $sql = 'CREATE TABLE '.Participants_Db::$groups_table.' (
@@ -126,7 +126,7 @@ class PDb_Init
           DEFAULT CHARACTER SET utf8
           AUTO_INCREMENT = 1
           ';
-        dbDelta($sql);
+        $wpdb->query($sql);
 
         // create the main data table
         $sql = 'CREATE TABLE ' . Participants_Db::$participants_table . ' (
@@ -142,15 +142,15 @@ class PDb_Init
 
           if ( ! isset( $defaults['form_element'] ) ) $defaults['form_element'] = 'text-line';
 
-						$datatype = Participants_Db::set_datatype( $defaults['form_element'] );
+            $datatype = Participants_Db::set_datatype( $defaults['form_element'] );
 
-						$sql .= '`'.$name.'` '.$datatype.' NULL,
-	';
+            $sql .= '`'.$name.'` '.$datatype.' NULL,
+  ';
 
           }
 
         }
-				
+
         $sql .= '`date_recorded` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           `date_updated` TIMESTAMP NOT NULL,
           PRIMARY KEY  (`id`)
@@ -159,19 +159,19 @@ class PDb_Init
           AUTO_INCREMENT = '.Participants_Db::$id_base_number.'
           ;';
 
-        dbDelta($sql);
+        $wpdb->query($sql);
 
-        // don't do this if the tables don't exist yet
-        $table = $wpdb->get_var('show tables like "'.Participants_Db::$fields_table.'"');
-        if ( $table != Participants_Db::$fields_table ) return;
+        // save the db version
+        add_option( Participants_Db::$db_version );
+        update_option( Participants_Db::$db_version, self::VERSION );
 
-        // put the default fields into the database
+        // now load the default values into the database
         $i = 0;
-				unset( $defaults );
+        unset( $defaults );
         foreach( array_keys( self::$field_groups ) as $group ) {
-					
+
           foreach( self::${$group.'_fields'} as $name => $defaults ) {
-						
+
             $defaults['name'] = $name;
             $defaults['group'] = $group;
             $defaults['import'] = 'main' == $group ? 1 : 0;
@@ -210,26 +210,52 @@ class PDb_Init
         // create the default record
         $this->_set_default_record();
 
-      endif;// if table doesn't exist
+      endif;// end of the fresh install
+
+      if ( false === get_option( Participants_Db::$db_version ) || '0.1' == get_option( Participants_Db::$db_version ) ) {
+
+        /*
+         * updates version 0.1 database to 0.2
+         *
+         * adding a new column "display_column" and renaming "column" to
+         * "admin_column" to accommodate the new frontend display shortcode
+         */
+
+        $sql = "ALTER TABLE ".Participants_Db::$fields_table." ADD COLUMN `display_column` INT(3) DEFAULT 0 AFTER `validation`,";
+
+        $sql .= "CHANGE COLUMN `column` `admin_column` INT(3)";
+
+        if ( false !== $wpdb->query( $sql ) ) {
+
+          // in case the option doesn't exist
+          add_option( Participants_Db::$db_version );
+
+          // set the version number this step brings the db to
+          update_option( Participants_Db::$db_version, '0.2' );
+
+        }
+
+      }
+      
     }
 
     private function _deactivate()
     {
-        error_log( __METHOD__.' plugin deactivated' );
+        error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
     }
 
     private function _uninstall()
     {
-        error_log( __METHOD__.' plugin uninstalled' );
-        
-				global $wpdb;
-				
-				// delete tables
-				$sql = 'DROP TABLE `'.Participants_Db::$fields_table.'`, `'.Participants_Db::$participants_table.'`, `'.Participants_Db::$groups_table.'`;';
-				$wpdb->query( $sql );
-				
-				// remove options
-				delete_option( Participants_Db::$participants_db_options );
+        error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
+
+        global $wpdb;
+
+        // delete tables
+        $sql = 'DROP TABLE `'.Participants_Db::$fields_table.'`, `'.Participants_Db::$participants_table.'`, `'.Participants_Db::$groups_table.'`;';
+        $wpdb->query( $sql );
+
+        // remove options
+        delete_option( Participants_Db::$participants_db_options );
     }
 
     /**
@@ -241,12 +267,12 @@ class PDb_Init
 
       // define the default field groups
       self::$field_groups = array(
-																	'main'      => 'Participant Info',
-																	'admin'     => 'Administrative Info',
-																	'personal'  => 'Personal Info',
-																	'source'    => 'Source of the Record',
+                                  'main'      => 'Participant Info',
+                                  'admin'     => 'Administrative Info',
+                                  'personal'  => 'Personal Info',
+                                  'source'    => 'Source of the Record',
                                   'internal'  => 'Record Info',
-																	);
+                                  );
 
       // fields for keeping track of records; not manually edited, but they can be displayed
       self::$internal_fields = array(
@@ -254,21 +280,21 @@ class PDb_Init
                                                     'title' => 'Record ID',
                                                     'signup' => 1,
                                                     'form_element'=>'text-line',
-																										),
+                                                    ),
                             'private_id'     => array(
                                                     'title' => 'Private ID',
                                                     'signup' => 1,
                                                     'form_element' => 'text',
                                                     'default' => 'RPNE2',
-																										),
+                                                    ),
                             'date_recorded'  => array(
                                                     'title' => 'Date Recorded',
                                                     'form_element'=>'date',
-																										),
+                                                    ),
                             'date_updated'   => array(
                                                     'title' => 'Date Updated',
                                                     'form_element'=>'date',
-																										),
+                                                    ),
                             );
 
       // these are some fields just to get things started
@@ -296,109 +322,108 @@ class PDb_Init
       //               matches 'default' value then it defaults checked
       self::$main_fields = array(
                                   'first_name'   => array(
-																												'title' => 'First Name',
-																												'form_element' => 'text-line',
-																												'validation' => 'yes',
-																												'sortable' => 1,
-																												'column' => 1,
-																												'signup' => 1 
-																												),
+                                                        'title' => 'First Name',
+                                                        'form_element' => 'text-line',
+                                                        'validation' => 'yes',
+                                                        'sortable' => 1,
+                                                        'admin_column' => 1,
+                                                        'signup' => 1
+                                                        ),
                                   'last_name'    => array(
-																												'title' => 'Last Name',
-																												'form_element' => 'text-line',
-																												'validation' => 'yes',
-																												'sortable' => 1,
-																												'column' => 2,
-																												'signup' => 1 
-																												),
+                                                        'title' => 'Last Name',
+                                                        'form_element' => 'text-line',
+                                                        'validation' => 'yes',
+                                                        'sortable' => 1,
+                                                        'admin_column' => 2,
+                                                        'signup' => 1
+                                                        ),
                                   'address'      => array(
-																												'title' => 'Address',
-																												'form_element' => 'text-line',
-																												),
+                                                        'title' => 'Address',
+                                                        'form_element' => 'text-line',
+                                                        ),
                                   'city'         => array(
-																												'title' => 'City',
-																												'sortable' => 1,
-																												'persistent' => 1,
-																												'form_element' => 'text-line',
-																												'column' => 3, 
-																											),
+                                                        'title' => 'City',
+                                                        'sortable' => 1,
+                                                        'persistent' => 1,
+                                                        'form_element' => 'text-line',
+                                                        'admin_column' => 3,
+                                                      ),
                                   'state'        => array(
-																												'title' => 'State',
-																												'form_element' => 'text-line',
-																											),
+                                                        'title' => 'State',
+                                                        'form_element' => 'text-line',
+                                                      ),
                                   'country'      => array(
-																												'title' => 'Country',
-																												'form_element' => 'text-line',
-																											),
+                                                        'title' => 'Country',
+                                                        'form_element' => 'text-line',
+                                                      ),
                                   'zip'          => array(
-																												'title' => 'Zip Code',
-																												'form_element' => 'text-line', 
-																											),
+                                                        'title' => 'Zip Code',
+                                                        'form_element' => 'text-line',
+                                                      ),
                                   'phone'        => array(
-																												'title' => 'Phone',
-																												'help_text' => 'primary contact number',
-																												'form_element' => 'text-line',
-																												'validation' => '#[0-9-\ ]{7,14}#',
-																											),
+                                                        'title' => 'Phone',
+                                                        'help_text' => 'primary contact number',
+                                                        'form_element' => 'text-line',
+                                                      ),
                                   'email'        => array(
-																												'title' => 'Email',
-																												'form_element' => 'text-line',
-																												'validation' => '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i',
-																												'signup' => 1,
-																											),
+                                                        'title' => 'Email',
+                                                        'form_element' => 'text-line',
+                                                        'validation' => '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i',
+                                                        'signup' => 1,
+                                                      ),
                                   'mailing_list' => array(
-																												'title' => 'Mailing List',
-																												'help_text' => 'do you want to receive our newsletter and occasional announcements?',
-																												'sortable' => 1,
-																												'signup' => 1,
-																												'form_element' => 'checkbox',
-																												'default' => 'Yes',
-																												'values'  => array(
-																																					'Yes',
-																																					'No',
-																																					),
-																												),
+                                                        'title' => 'Mailing List',
+                                                        'help_text' => 'do you want to receive our newsletter and occasional announcements?',
+                                                        'sortable' => 1,
+                                                        'signup' => 1,
+                                                        'form_element' => 'checkbox',
+                                                        'default' => 'Yes',
+                                                        'values'  => array(
+                                                                          'Yes',
+                                                                          'No',
+                                                                          ),
+                                                        ),
                                   );
       self::$admin_fields = array(
                                   'donations'   => array(
-																												'title' => 'Donations Made',
-																												'form_element' => 'text-field', 
-																											),
+                                                        'title' => 'Donations Made',
+                                                        'form_element' => 'text-field',
+                                                      ),
                                   'volunteered' => array(
-																												'title' => 'Time Volunteered',
-																												'form_element' => 'text-field',
-																												'help_text' => 'how much time they have volunteered',
-																											),
-																	
+                                                        'title' => 'Time Volunteered',
+                                                        'form_element' => 'text-field',
+                                                        'help_text' => 'how much time they have volunteered',
+                                                      ),
+
                                   );
       self::$personal_fields = array(
                                   'contact_permission' => array(
-																															'title' => 'Contact Permission',
-																															'help_text' => 'may we contact you? If so, what is the best way?',
-																															'form_element' => 'text-line',
-																															),
-                                  'resources'   			=> array(
-																															'title' => 'Resources Offered',
-																															'form_element' => 'text-field',
-																															'help_text' => 'how are you willing to help?',
-																															),
+                                                              'title' => 'Contact Permission',
+                                                              'help_text' => 'may we contact you? If so, what is the best way?',
+                                                              'form_element' => 'text-line',
+                                                              ),
+                                  'resources'         => array(
+                                                              'title' => 'Resources Offered',
+                                                              'form_element' => 'text-field',
+                                                              'help_text' => 'how are you willing to help?',
+                                                              ),
                                   );
       self::$source_fields = array(
-                                  'where'            	=> array( 				
-																															'title' => 'Location or Event of Signup',
-																															'form_element' => 'text-line',
-																															'persistent' => 1,
-																														),
-                                  'when'              => array( 
-																															'title' => 'Signup Date',
-																															'form_element' => 'text-line',
-																															'persistent' => 1,
-																														),
+                                  'where'             => array(
+                                                              'title' => 'Location or Event of Signup',
+                                                              'form_element' => 'text-line',
+                                                              'persistent' => 1,
+                                                            ),
+                                  'when'              => array(
+                                                              'title' => 'Signup Date',
+                                                              'form_element' => 'text-line',
+                                                              'persistent' => 1,
+                                                            ),
                                   'by'                => array(
-																															'title' => 'Signup Gathered By',
-																															'form_element' => 'text-line',
-																															'persistent' => 1,
-																														),
+                                                              'title' => 'Signup Gathered By',
+                                                              'form_element' => 'text-line',
+                                                              'persistent' => 1,
+                                                            ),
                                   );
 
 
@@ -429,5 +454,5 @@ class PDb_Init
       return Participants_Db::process_form( $default_values, 'insert', true );
 
     }
-		
+
 }

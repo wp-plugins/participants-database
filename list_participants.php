@@ -1,4 +1,7 @@
 <?php
+/**
+ * displays a listing of records in the WP admin
+ */
 // translations strings for buttons
 /* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
 $PDb_i18n = array(

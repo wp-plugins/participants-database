@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.0
+Version: 1.1
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -50,7 +50,7 @@ class Participants_Db {
 	public static $groups_table;
 	
 	// current Db version
-	public static $participants_db_db_version;
+	public static $db_version;
 	
 	// current version of plugin
 	public static $plugin_version;
@@ -105,8 +105,8 @@ class Participants_Db {
 		self::$fields_table = self::$participants_table . '_fields';
 		self::$groups_table = self::$participants_table . '_groups';
 
-		// change this when there is a change to the databases to trigger an update
-		self::$participants_db_db_version = '0.1';
+		// name of the WP option where the current db version is stored
+		self::$db_version = 'PDb_Db_version';
 		
 		// set the plugin version
 		self::$plugin_version = self::_get_plugin_data('Version');
@@ -176,7 +176,7 @@ class Participants_Db {
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
 	
-		if ($wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') == Participants_Db::$participants_table) :
+		if ($wpdb->get_var('SHOW TABLES LIKE "'.Participants_Db::$participants_table.'"') == Participants_Db::$participants_table) :
 		// db integrity check and fix
 		$query = 'SELECT * FROM '.self::$fields_table;
 		$fields = $wpdb->get_results( $query, ARRAY_A );
@@ -195,18 +195,10 @@ class Participants_Db {
 			
 		}
 		endif;// end integrity check and fix
-		
-			
-			
-		
-		
 	
 	}
 	
 	function admin_init() {
-		
-		// set the db version as a WP option
-		if ( is_object( self::$plugin_settings ) ) self::$plugin_settings->update_option('db_version', self::$participants_db_db_version);
 		
 	}
 	
@@ -480,16 +472,16 @@ class Participants_Db {
     global $wpdb;
 
     $sql = "
-      SELECT `name`,`column`
+      SELECT `name`,`admin_column`
       FROM ".self::$fields_table."
-      WHERE `column` > 0";
+      WHERE `admin_column` > 0";
 		
 	 $columns = $wpdb->get_results( $sql, ARRAY_A );
 	 
 	 $column_set = array();
 	 foreach ( $columns as $column ) {
 	 
-		$column_set[ $column[ 'column' ] ] = $column[ 'name' ];
+		$column_set[ $column[ 'admin_column' ] ] = $column[ 'name' ];
 		
 	 }
 	 
@@ -687,8 +679,9 @@ class Participants_Db {
 					break;
 					
 				case 'private_id':
-					if ( empty( $post[ $column_atts->name ] ) )
+					if ( empty( $post['private_id'] ) )
 						$new_value = self::generate_pid();
+						error_log( 'getting PID:'.$new_value );
 					break;
 
 				default :
@@ -817,6 +810,10 @@ class Participants_Db {
    */
   public function generate_pid() {
 
+
+
+    error_log( __METHOD__.' called');
+
     $pid = '';
 
     $chr_source = array(
@@ -828,6 +825,8 @@ class Participants_Db {
       $pid .= $chr_source[array_rand( $chr_source )];
 
     }
+
+    error_log( __METHOD__.' :'.$pid);
 
     // if by chance we've generated a string that has been used before, generate another
     return self::_id_exists( $pid, 'private_id' ) ? self::generate_pid() : $pid;

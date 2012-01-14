@@ -99,7 +99,7 @@ endif; // isset( $_POST['file_upload']
 							</tr>
 						</table>
 						<p><?php printf( __('This means your spreadsheet needs to have %s columns, and the heading in each of those columns needs to match exactly the names above. If there is no data for a particular column, leave it blank, but the header and column must be included in the CSV. The order of the columns doesn&#39;t matter.', Participants_Db::PLUGIN_NAME ),$column_count)?></p>
-						<p><?php _e( '<strong>Note:</strong> Imported records are checked against existing records by email. If a record with an email matching an existing record is imported, the existing record will be updated with the data from the imported record. Blank or missing fields in such an imported record will not overwrite existing data.', Participants_Db::PLUGIN_NAME )?></p>
+						<p><?php _e( '<strong>Note:</strong> Imported records are checked against existing records by email. (Only if "Don&#39;t Allow Duplicate Email Addresses" is checked in the settings) If a record with an email matching an existing record is imported, the existing record will be updated with the data from the imported record. Blank or missing fields in such an imported record will not overwrite existing data.', Participants_Db::PLUGIN_NAME )?></p>
 						<p><input type="submit" value="<?php _e('Get Blank CSV File', Participants_Db::PLUGIN_NAME )?>" style="float:left;margin:0 5px 5px 0" /><?php _e( 'You can download this file, then open it in Open Office, Excel or Google Docs.', Participants_Db::PLUGIN_NAME )?></p>
 					</div>
 				</div>
