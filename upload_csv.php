@@ -19,7 +19,7 @@ $blank_record = array_fill_keys( $column_names, '' );
 $errors = array();
 			
 // if a file upload attempt been made, process it and display the status of the operation
-if( isset( $_POST['file_upload'] ) ) :
+if( isset( $_POST['csv_file_upload'] ) ) :
 
 	$target_path = Participants_Db::$plugin_path . '/uploads/' . basename( $_FILES['uploadedfile']['name']);
 
@@ -27,7 +27,7 @@ if( isset( $_POST['file_upload'] ) ) :
 
 		$errors[] = '<strong>'.sprintf( __('The file %s has been uploaded.', Participants_Db::PLUGIN_NAME ), $_FILES['uploadedfile']['name'] ).'</strong>';
 		
-		$file_name = Participants_Db::$uploads_path.basename( $_FILES['uploadedfile']['name']);
+		$file_name = ABSPATH.Participants_Db::$uploads_path.basename( $_FILES['uploadedfile']['name'] );
 		
 		$insert_error = Participants_Db::insert_from_csv( $file_name );
 
@@ -76,7 +76,7 @@ endif; // isset( $_POST['file_upload']
 			?>
 
 			<form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
-			<input type="hidden" name="filename" value="blank_record" />
+			<input type="hidden" name="filename" value="blank_record.csv" />
 			<input type="hidden" name="source" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
 			<input type="hidden" name="action" value="output CSV" />
 			<input type="hidden" name="CSV type" value="blank" />
@@ -110,8 +110,7 @@ endif; // isset( $_POST['file_upload']
 				<div class="inside">
 						<p><?php _e( 'When you have your spreadsheet properly set up and filled with data, export it as any of the following: "comma-delimited csv", "tab-delimited csv", or just "csv". Save it to your computer then upload it here.', Participants_Db::PLUGIN_NAME )?></p>
 					<form enctype="multipart/form-data" action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="POST">
-						<input type="hidden" name="file_upload" id="file_upload" value="true" />
-						<input type="hidden" name="MAX_FILE_SIZE" value="100000" />
+						<input type="hidden" name="csv_file_upload" id="file_upload" value="true" />
 						<?php _e('Choose .csv file to import:', Participants_Db::PLUGIN_NAME )?> <input name="uploadedfile" type="file" /><br />
 						<input type="submit" class="button-primary" value="<?php _e('Upload File', Participants_Db::PLUGIN_NAME )?>" />
 					</form>

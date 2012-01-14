@@ -51,6 +51,9 @@ class Participants_Db {
 	
 	// current Db version
 	public static $participants_db_db_version;
+	
+	// current version of plugin
+	public static $plugin_version;
 
 	// plugin options name
 	public static $participants_db_options;
@@ -104,6 +107,9 @@ class Participants_Db {
 
 		// change this when there is a change to the databases to trigger an update
 		self::$participants_db_db_version = '0.1';
+		
+		// set the plugin version
+		self::$plugin_version = self::_get_plugin_data('Version');
 
 		// define some locations
 		self::$participants_db_options = self::PLUGIN_NAME.'_options';
@@ -606,7 +612,7 @@ class Participants_Db {
 
 		}
 		
-		if ( ! empty( $_FILES ) ) {
+		if ( ! empty( $_FILES ) && $_POST['csv_file_upload' ] != 'true' ) {
 			
 			foreach ( $_FILES as $fieldname => $attributes ) {
 				
@@ -621,7 +627,7 @@ class Participants_Db {
 			
 		}
 		
-		$options = get_option( self::$plugin_settings );
+		$options = get_option( self::$participants_db_options );
 
 		// check for an existing record with same email so we can at least avoid
 		// inserting a duplicate email address into the database
@@ -678,6 +684,11 @@ class Participants_Db {
 				case 'date_updated':
 				case 'date_recorded':
 					$new_value = false;
+					break;
+					
+				case 'private_id':
+					if ( empty( $post[ $column_atts->name ] ) )
+						$new_value = self::generate_pid();
 					break;
 
 				default :
@@ -1026,6 +1037,7 @@ class Participants_Db {
 			
 		 $header_row = array();
 		 $data = array();	
+		 $filename = isset( $_POST['filename'] ) ? $_POST['filename'] : '';
 
 		 switch ( $_POST['CSV_type'] ) :
 
@@ -1039,7 +1051,7 @@ class Participants_Db {
 				$i = 2;// number of blank rows to create
 				
 				while ( $i > 0 ) {
-					$data[] = array_fill_keys( $fields, '' );
+					$data[] = array_fill_keys( $header_row, '' );
 					$i--;
 				}
 				break;
@@ -1059,11 +1071,6 @@ class Participants_Db {
 				break;
 			 
 		 endswitch;// CSV type
-		 
-		// error_log( __METHOD__.' filename '.$filename.' data '.print_r( $data, true ).' fields '.print_r( $fields, true ) );
-		 
-
-		$filename = isset( $_POST['filename'] ) ? $_POST['filename'] : '';
 		
 		if ( ! empty( $filename ) ) {
 			
@@ -1075,7 +1082,7 @@ class Participants_Db {
 			
 			// output the data lines
 			foreach( $data as $line ) {
-				fputcsv( $output, $line );
+				fputcsv( $output, $line, ',', '"' );
 			}
 			
 			fclose( $output );
@@ -1276,13 +1283,12 @@ class Participants_Db {
 			return sprintf( __('Input file does not exist or path is incorrect.<br />Attempted to load: %s', self::PLUGIN_NAME), basename($src_file) );
 	
 		}
-	
 		
 		$CSV = new parseCSV();
 		
-		$CSV->enclosure = "'";
+		$CSV->enclosure = self::_detect_enclosure( $src_file );
 	
-		$CSV->parse( $src_file );
+		$CSV->auto( $src_file );
 	
 		// build the column names
 		if ( is_array( $CSV->titles ) ) {
@@ -1317,7 +1323,12 @@ class Participants_Db {
 	
 			if ( count( $values ) != count( $column_names) ) {
 	
-				return sprintf( __('The number of items in line %s is incorrect.<br />There are %s and there should be %s.', self::PLUGIN_NAME), $line_num, count( $values ), count( $column_names ) );
+				return sprintf( 
+											 __('The number of items in line %s is incorrect.<br />There are %s and there should be %s.', self::PLUGIN_NAME ),
+											 $line_num, 
+											 count( $values ), 
+											 count( $column_names ) 
+											 );
 	
 			}
 			
@@ -1331,7 +1342,7 @@ class Participants_Db {
 			$line_num++;
 			
 		}
-		return $line_num;
+		return $line_num - 1;
 	}
 	
 	/**
@@ -1342,6 +1353,26 @@ class Participants_Db {
 
     $value = trim( $value, $enclosure );
 
+	}
+	
+	/**
+	 * detect an enclosure character
+	 *
+	 * there's not way to do this 100%, so we will look and fall back to a 
+	 * reasonable assumption if we don't see a clear choice
+	 *
+	 * @param string $csv_file path to a csv file to read and analyze
+	 * return string the best guess enclosure character
+	 */
+	private function _detect_enclosure( $csv_file ) {
+		
+		$csv_text = file_get_contents( $csv_file );
+		
+		$single_quotes = substr_count( $csv_text, "'" );
+		$double_quotes = substr_count( $csv_text, '"' );
+		
+		return $single_quotes >= $double_quotes ? "'" : '"';
+		
 	}
 	
 	/**
@@ -1414,7 +1445,7 @@ class Participants_Db {
   ?>
     <div id="PDb_footer" class="widefat">
       <div class="section">
-        <h4><?php echo self::$plugin_title?><br /><?php _e('WordPress Plugin', self::PLUGIN_NAME )?></h4>
+        <h4><?php echo self::$plugin_title, ' ', self::$plugin_version ?><br /><?php _e('WordPress Plugin', self::PLUGIN_NAME )?></h4>
         <p><em><?php _e('Helping organizations manage their volunteers, members and participants.', self::PLUGIN_NAME)?></em></p>
       </div>
       <div class="section">
@@ -1427,6 +1458,19 @@ class Participants_Db {
     </div>
     <?php
   }
+	
+	/**
+	 * parses the text header to extract plugin info
+	 */
+	private function _get_plugin_data( $key = 'Name' ) {
+		
+		include ABSPATH.'/wp-admin/includes/plugin.php';
+		
+		$plugin_data = get_plugin_data( __FILE__ );
+		
+		return $plugin_data[ $key ];
+		
+	}
 	
 	
 	

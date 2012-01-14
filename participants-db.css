@@ -8,7 +8,7 @@ body[class*='participants-database'] .widefat td {
   vertical-align:middle;
 }
 body[class*='participants-database']  .widefat tr:nth-child(even) {
-	background-color:#dddddd;
+	background-color:#EDEDED;
 }
 .participants_db input[type='text'] {
 	width: 300px;

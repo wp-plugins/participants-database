@@ -6,7 +6,7 @@ Requires at least: 2.8.4
 Tested up to: 3.3.1
 Stable tag: 0.9.6
 
-Build and maintain a fully customizable database of participants or volunteers with shortcodes for forms, admin backend, custom lists, and CSV support.
+Build and maintain a fully customizable database of participants or volunteers with signup forms, admin backend, custom lists, and CSV support.
 
 == Description ==
 
@@ -25,6 +25,7 @@ This database could be of use to any organization that needs to build and mainta
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
 * email notification and confirmation with secure individual access link
 * searchable, sortable record listings in the WordPress admin
+* many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, etc.
 * export CSV files for interacting with other databases, mass email, print records
 * import CSV files to add large numbers of records from spreadsheets such as Open Office or Google Docs
 
@@ -67,7 +68,8 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 4. Place [pdb_record] in your blog posts and pages to show the signup form
 5. Additonal features and instructions can be found on the help tab of the plugin's settings page
 
-=[Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/)=
+**Using the Plugin:**
+[Plugin use insructions](http://wordpress.org/extend/plugins/participants-database/other_notes/)
 
 == Frequently Asked Questions ==
 
@@ -109,29 +111,6 @@ If someone does not have the private link to edit their record, they can sign up
 
 It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the [pdb_record] shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
 
-== Other Notes ==
-
-= Using the Plugin =
-
-This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
-
-To collect signups on your website there are two shortcodes: [pdb_signup] and [pdb_record]. Use the [pdb_signup] one to give people a way to add their name to your list. You can customize which fields they need to fill in. [pdb_record] displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want.
-
-This way, your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
-
-When they sign in, they will be sent an email with a private link to their full record. This page is where the second [pdb_record] shortcode goes.
-
-**Quick Start Instructions:**
-
-1. Go to the "manage fields" page and set up the fields you want to use for your database. You can also change this later, but it's best to have it all set up before you really start adding records.
-2. While you are setting up your fields, look at the "signup" column. This is where you choose which fields the site visitor will have to fill out in order to sign up. The email field is required in order to email them a link to come back and fill out their full record. If you don't want them to do that, you don't have to include the email field in the signup form. You can also turn the email sending off in the settings.
-3. Put the [pdb_signup] shortcode wherever you want your signup form to appear. 
-4. Put the [pdb_record] shortcode on the page where you want them to fill out their full record. You must go to the plugin settings page and put the slug to this page in the "Participant Record Page" field. The "slug" is the unique name of the page; it is the last part of the permalink, everything after the last / in the permalink.
-5. When someone signs up, an email is sent to them with a private link to their record so they can fill out all the fields you want them to. This is why you need to tell the plugin where your [pdb_record] shortcode is. You can define which fields they will see there on the "manage fields" page.
-6. Go to the plugin settings page to set up the emails. There are both user and admin emails sent on a signup, and you can determine the content of the emails and also whether to send them and to whom.
-
-Of course, records can be entered in the backend by a user with "editor" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file.
-
 == Screenshots ==
 
 1. Managing Database fields: this is where you set up your database fields and all attributes for each field
@@ -143,6 +122,7 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 = 0.1 =
 * internationalization on all display strings
 * added image upload field
+* CSV export and import functions are more robust
 
 = 0.9.6 =
 * added ability to change group name
@@ -190,3 +170,32 @@ Of course, records can be entered in the backend by a user with "editor" or abov
 = 0.7 =
 * Initial version
 * No internationalization
+
+== Upgrade Notice ==
+
+= 1.0 =
+Major upgrade includes enhanced functionality, internationalization, and a new image upload field
+
+= 0.9.6 =
+Important upgrade fixes 2 bugs and provides improved functionality.
+
+== Using the Plugin ==
+
+This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
+
+To collect signups on your website there are two shortcodes: [pdb_signup] and [pdb_record]. Use the [pdb_signup] one to give people a way to add their name to your list. You can customize which fields they need to fill in. [pdb_record] displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want.
+
+This way, your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
+
+When they sign in, they will be sent an email with a private link to their full record. This page is where the second [pdb_record] shortcode goes.
+
+**Quick Start Instructions:**
+
+1. Go to the "manage fields" page and set up the fields you want to use for your database. You can also change this later, but it's best to have it all set up before you really start adding records.
+2. While you are setting up your fields, look at the "signup" column. This is where you choose which fields the site visitor will have to fill out in order to sign up. The email field is required in order to email them a link to come back and fill out their full record. If you don't want them to do that, you don't have to include the email field in the signup form. You can also turn the email sending off in the settings.
+3. Put the [pdb_signup] shortcode wherever you want your signup form to appear.
+4. Put the [pdb_record] shortcode on the page where you want them to fill out their full record. You must go to the plugin settings page and put the slug to this page in the "Participant Record Page" field. The "slug" is the unique name of the page; it is the last part of the permalink, everything after the last / in the permalink.
+5. When someone signs up, an email is sent to them with a private link to their record so they can fill out all the fields you want them to. This is why you need to tell the plugin where your [pdb_record] shortcode is. You can define which fields they will see there on the "manage fields" page.
+6. Go to the plugin settings page to set up the emails. There are both user and admin emails sent on a signup, and you can determine the content of the emails and also whether to send them and to whom.
+
+Of course, records can be entered in the backend by a user with "editor" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file.
