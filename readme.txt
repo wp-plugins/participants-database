@@ -119,7 +119,7 @@ It's also possible to send them the link again in an email, but the plugin does 
 
 == Changelog ==
 
-= 0.1 =
+= 1.0 =
 * internationalization on all display strings
 * added image upload field
 * CSV export and import functions are more robust
