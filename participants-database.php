@@ -687,8 +687,7 @@ class Participants_Db {
 					break;
 					
 				case 'private_id':
-					if ( empty( $post[ $column_atts->name ] ) )
-						$new_value = self::generate_pid();
+					$new_value = empty( $post['private_id'] ) ? self::generate_pid() : $post['private_id'];
 					break;
 
 				default :
