@@ -1464,7 +1464,8 @@ class Participants_Db {
 	 */
 	private function _get_plugin_data( $key = 'Name' ) {
 		
-		include ABSPATH.'/wp-admin/includes/plugin.php';
+		if ( ! function_exists( 'get_plugin_data' ) )
+			include ABSPATH.'/wp-admin/includes/plugin.php';
 		
 		$plugin_data = get_plugin_data( __FILE__ );
 		
