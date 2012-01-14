@@ -66,7 +66,9 @@ if ( isset( $_POST['action'] ) ) {
 
       foreach( $_POST as $name => $row ) {
 
-          // remove the fields we won't be updating
+					// make sure name is legal
+					$row['name'] = PDb_make_name( $row['name'] );
+
           $wpdb->update( Participants_Db::$groups_table, $row, array( 'name'=> $name ) );
 
       }
@@ -184,7 +186,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	<ul>
 		<?php
 		foreach ( $groups as $group ) {
-			echo '<li><a href="#'.$group.'">'.ucwords( str_replace( '_',' ',$group ) ).'</a></li>';
+			echo '<li><a href="#'.$group.'" id="tab_'.$group.'">'.ucwords( str_replace( '_',' ',$group ) ).'</a></li>';
 		}
 		echo '<li><a href="#field_groups">'.__('Field Groups',Participants_Db::PLUGIN_NAME ).'</a></li>';
     echo '<li><a href="#help">'.__('Help',Participants_Db::PLUGIN_NAME ).'</a></li>';
@@ -312,9 +314,9 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	endforeach; // groups
 	
 	// build the groups edit panel
-	$groups = Participants_Db::get_groups();
+	$groups = Participants_Db::get_groups( '`order`,`display`,`name`,`title`,`description`' );
 	?>
-	<div id="field_groups">
+	<div id="field_groups" class="manage-fields-wrap">
 		<form id="manage_field_groups" method="post">
 		<input type="hidden" name="action" value="<?php echo $PDb_i18n['update groups']?>" />
 		<h3><?php _e('Edit / Add / Remove Field Groups',Participants_Db::PLUGIN_NAME )?></h3>
@@ -329,18 +331,20 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		
 		?>
 		</p>
-		<table class="wp-list-table widefat fixed manage-fields" cellspacing="0" >
+		<table class="wp-list-table widefat fixed manage-fields manage-field-groups" cellspacing="0" >
 		<thead>
 			<tr>
-				<th scope="col" class="delete"><span><?php echo PDb_header( __('delete',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
+				<th scope="col" class="column vertical-title"><span><?php echo PDb_header( __('fields',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
+        <th scope="col" class="delete vertical-title"><span><?php echo PDb_header( __('delete',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
 			<?php
 			foreach ( current( $groups ) as $column => $value ) {
 
-				// skip non-editable columns
-				if ( in_array( $column, array( 'id', 'name' ) ) ) continue;
+				$column_class = in_array( $column, array( 'order', 'display' ) ) ? $column.' vertical-title' : $column;
+				
 				?>
-				<th scope="col" class="<?php echo $column?>"><span><?php echo PDb_header( $column ) ?></span></th>
+				<th scope="col" class="<?php echo $column_class?>"><span><?php echo PDb_header( $column ) ?></span></th>
 				<?php
+				
 			}
 			?>
 			</tr>
@@ -354,6 +358,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 			
 			?>
 			<tr>
+      <td id="field_count_<?php echo $group?>"><?php echo $group_count?></td>
 			<td><a href="<?php echo $group_count?>" name="delete_<?php echo $group?>" class="delete" ref="group"></a></td>
 			<?php
 			foreach( $group_values as $column => $value  ) {
@@ -364,11 +369,6 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 				
 				switch ( $column ) {
 					
-					case 'id':
-					case 'name':
-						// jump out of the switch
-						continue 2;
-						
 					case 'display':
 						$type = 'checkbox';
 						$options = array( 1, 0 );

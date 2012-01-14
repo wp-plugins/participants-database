@@ -2,11 +2,11 @@
 // translations strings for buttons
 /* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
 $PDb_i18n = array(
-  'delete_checked' => __( 'Delete checked', Participants_Db::PLUGIN_NAME ),
-  'change' => __( 'Change', Participants_Db::PLUGIN_NAME ),
-  'sort' => __( 'Sort', Participants_Db::PLUGIN_NAME ),
-  'filter' => __( 'Filter', Participants_Db::PLUGIN_NAME ),
-  'clear' => __( 'Clear', Participants_Db::PLUGIN_NAME ),
+  'delete_checked' => _x( 'Delete Checked', 'submit button label', Participants_Db::PLUGIN_NAME ),
+  'change' => _x( 'Change', 'submit button label', Participants_Db::PLUGIN_NAME ),
+  'sort' => _x( 'Sort', 'submit button label', Participants_Db::PLUGIN_NAME ),
+  'filter' => _x( 'Filter', 'submit button label', Participants_Db::PLUGIN_NAME ),
+  'clear' => _x( 'Clear', 'submit button label', Participants_Db::PLUGIN_NAME ),
   );
 // process all the general list actions first
 if ( isset( $_POST['action'] ) && $_POST['action']=='list_action' ) {
@@ -15,10 +15,11 @@ if ( isset( $_POST['action'] ) && $_POST['action']=='list_action' ) {
 		
 		case $PDb_i18n['delete_checked']:
 	
-			$pattern = count( $_POST['pid'] ) > 1 ? 'in ( %s )' : '= %s';
-			$value = implode( ',',$_POST['pid'] );
+			$count = count( $_POST['pid'] );
+	
+			$pattern = $count > 1 ? 'IN ( '.trim( str_repeat( '%s,', $count ), ',' ).' )' : '= %s';
 			$sql = "DELETE FROM ".Participants_Db::$participants_table." WHERE id ".$pattern;
-			$wpdb->query( $wpdb->prepare( $sql, $value ) );
+			$wpdb->query( $wpdb->prepare( $sql, $_POST['pid'] ) );
 			break;
 			
 		case $PDb_i18n['change']:
@@ -73,12 +74,12 @@ $options = get_option( Participants_Db::$participants_db_options );
 
 // set the pagination object
 $pagination = new Pagination( array(
-																		'link'          => $_SERVER['REQUEST_URI'].'&p=%s',
+																		'link'          => PDb_get_page_URI().'&p=%s',
 																		'page'          => isset( $_GET['p'] ) ? $_GET['p'] : '1',
 																		'size'          => $options['list_limit'],
 																		'total_records' => Participants_Db::get_num_records(),
-																		'wrap_tag'      => '',
-																		'wrap_tag_close'=> '',
+																		'wrap_tag'      => '<div class="pagination"><label>'._x('Page', 'page number indicator', Participants_Db::PLUGIN_NAME ).':</label> ',
+																		'wrap_tag_close'=> '</div>',
 																		));
 
 // get the number of records returned
@@ -272,11 +273,10 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
 		?>
     </table>
   </form>
-  <div class="pagination"><label><?php _e('Page', Participants_Db::PLUGIN_NAME )?>:</label> 
     <?php
+		// output the pagination controls
 		$pagination->links();
 		?>
-  </div>
   <fieldset class="widefat">
   <h3><?php _e('Export CSV', Participants_Db::PLUGIN_NAME )?></h3>
     <form method="post">
@@ -299,3 +299,24 @@ $participants = $wpdb->get_results( $list_query.' '.$pagination->getLimitSql(), 
   </fieldset>
   <?php Participants_Db::plugin_footer(); ?>
 </div>
+<?php
+function PDb_get_page_URI() {
+	
+	$URI_parts = explode('?',$_SERVER['REQUEST_URI']);
+	
+	if ( empty( $URI_parts[1] ) ) return $URI_parts[0];
+	
+	parse_str( $URI_parts[1], $values );
+	
+	$get = '';
+	
+	foreach( $values as $key => $value ) {
+		
+		// strip out the 'p' value
+		if ( $key != 'p' ) $get .= $key.'='.$value.'&';
+		
+	}
+	
+	return $URI_parts[0].'?'.trim( $get, '&' );
+	
+}

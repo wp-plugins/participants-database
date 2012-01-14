@@ -242,11 +242,11 @@ class Pagination
 		}
 
 		if ($loopStart != 1){
-			$output .= sprintf('<li class="disabledpage"><a href="' . $link . '">&#171;</a></li>', '1');
+			$output .= sprintf('<li class="disabledpage"><a href="' . $link . '">'.__('First',Participants_Db::PLUGIN_NAME ).'</a></li>', '1');
 		}
 		
 		if ($currentPage > 1){
-			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">Previous</a></li>', $currentPage - 1);
+			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">'.__('Previous',Participants_Db::PLUGIN_NAME ).'</a></li>', $currentPage - 1);
 		}
 		
 		for ($i = $loopStart; $i <= $loopEnd; $i++)
@@ -259,11 +259,11 @@ class Pagination
 		}
 
 		if ($currentPage < $totalPages){
-			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">Next</a></li>', $currentPage + 1);
+			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">'.__('Next',Participants_Db::PLUGIN_NAME ).'</a></li>', $currentPage + 1);
 		}
 		
 		if ($loopEnd != $totalPages){
-			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">&#187;</a></li>', $totalPages);
+			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">'.__('Last',Participants_Db::PLUGIN_NAME ).'</a></li>', $totalPages);
 		}
 
 		return $this->wrap_tag . '<ul>' . $output . '</ul>' . $this->wrap_tag_close;

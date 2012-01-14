@@ -39,7 +39,7 @@ $section = '';
 <?php
 if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$validation_errors->get_error_html();
 ?>
-<form method="post" action="<?php echo $_SERVER['REQUEST_URI']?>">
+<form method="post" action="<?php echo $_SERVER['REQUEST_URI']?>" enctype="multipart/form-data" >
 	<?php 
 	FormElement::print_hidden_fields( array(
 																					'action' => $action, 
@@ -49,7 +49,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$v
 																					) );
 																					
 	// get the columns and output form
-	$type = Participants_Db::backend_user() ? 'backend' : 'frontend';
+	$type = is_admin() ? 'backend' : 'frontend';
 	foreach ( Participants_db::get_column_atts( $type ) as $column ) :
 
     $id_line = '';
