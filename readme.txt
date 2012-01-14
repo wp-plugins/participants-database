@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team
 Requires at least: 2.8.4
 Tested up to: 3.3.1
-Stable tag: 0.9.6
+Stable tag: 1.0
 
 Build and maintain a fully customizable database of participants or volunteers with signup forms, admin backend, custom lists, and CSV support.
 
@@ -174,7 +174,7 @@ It's also possible to send them the link again in an email, but the plugin does 
 == Upgrade Notice ==
 
 = 1.0 =
-Major upgrade includes enhanced functionality, internationalization, and a new image upload field
+Major upgrade includes internationalization, improvements to CSV import/export, and a new image upload field.
 
 = 0.9.6 =
 Important upgrade fixes 2 bugs and provides improved functionality.
