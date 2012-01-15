@@ -57,6 +57,10 @@ if ( isset( $_POST['action'] ) ) {
 				}
 
 			}
+		
+			// load the default record with the default values
+			Participants_Db::update_default_record();
+			
 			break;
 
     case $PDb_i18n['update groups']:
@@ -220,7 +224,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 			<?php
 			foreach( $attribute_columns as $attribute_column ) {
 				
-				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'column', 'import', 'signup', 'display' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
+				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'admin_column', 'display_column', 'import', 'signup', 'display' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
 				
 				?>
 				<th scope="col" class="<?php echo $column_class?>"><span><?php echo PDb_header( $attribute_column ) ?></span></th>
@@ -334,7 +338,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<table class="wp-list-table widefat fixed manage-fields manage-field-groups" cellspacing="0" >
 		<thead>
 			<tr>
-				<th scope="col" class="column vertical-title"><span><?php echo PDb_header( __('fields',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
+				<th scope="col" class="fields vertical-title"><span><?php echo PDb_header( __('fields',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
         <th scope="col" class="delete vertical-title"><span><?php echo PDb_header( __('delete',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
 			<?php
 			foreach ( current( $groups ) as $column => $value ) {
@@ -439,7 +443,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 //
 function PDb_header( $string ) {
 
-	return ucwords( str_replace( array( '_' ), array( ' ' ), $string ) );
+	return ucwords( str_replace( array( '_' ), array( "<br />\r" ), $string ) );
 
 }
 function PDb_make_name( $string ) {

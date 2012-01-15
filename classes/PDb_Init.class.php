@@ -144,8 +144,7 @@ class PDb_Init
 
             $datatype = Participants_Db::set_datatype( $defaults['form_element'] );
 
-            $sql .= '`'.$name.'` '.$datatype.' NULL,
-  ';
+            $sql .= '`'.$name.'` '.$datatype.' NULL, ';
 
           }
 
@@ -208,7 +207,7 @@ class PDb_Init
         }
 
         // create the default record
-        $this->_set_default_record();
+        $this->set_default_record();
 
       endif;// end of the fresh install
 
@@ -234,6 +233,21 @@ class PDb_Init
           update_option( Participants_Db::$db_version, '0.2' );
 
         }
+				
+				// load some preset values into new column
+				$values = array( 
+												'first_name' => 1,
+												'last_name'  => 2,
+												'city'       => 3,
+												'state'      => 4 
+												);
+				foreach( $values as $field => $value ) {
+					$wpdb->update( 
+												Participants_Db::$fields_table,
+												array('display_column' => $value ),
+												array( 'name' => $field )
+												);
+				}
 
       }
       
@@ -327,6 +341,7 @@ class PDb_Init
                                                         'validation' => 'yes',
                                                         'sortable' => 1,
                                                         'admin_column' => 1,
+                                                        'display_column' => 1,
                                                         'signup' => 1
                                                         ),
                                   'last_name'    => array(
@@ -335,6 +350,7 @@ class PDb_Init
                                                         'validation' => 'yes',
                                                         'sortable' => 1,
                                                         'admin_column' => 2,
+                                                        'display_column' => 2,
                                                         'signup' => 1
                                                         ),
                                   'address'      => array(
@@ -347,10 +363,12 @@ class PDb_Init
                                                         'persistent' => 1,
                                                         'form_element' => 'text-line',
                                                         'admin_column' => 3,
+                                                        'display_column' => 3,
                                                       ),
                                   'state'        => array(
                                                         'title' => 'State',
                                                         'form_element' => 'text-line',
+                                                        'display_column' => 4,
                                                       ),
                                   'country'      => array(
                                                         'title' => 'Country',
@@ -431,7 +449,9 @@ class PDb_Init
     }
 
     // create the default record
-    private function _set_default_record() {
+    public function set_default_record() {
+			
+			if ( ! is_array( self::$field_groups ) ) self::_define_init_arrays();
 
       $default_values = array();
       $fields = array();

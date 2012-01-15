@@ -169,13 +169,13 @@ div.manage-fields-wrap {
 .manage-fields th.sortable {
 	/*padding:7px 7px 8px;*/
 }
-.id, .order, .persistent, .sortable, .column, .import {
+.id, .order, .persistent, .sortable, .admin_column, .display_column, .import {
 	text-align:center;
 }
 th.id, th.order, th.persistent, th.sortable, th.import, th.delete, th.signup {
 	width:25px;
 }
-th.column, th.display {
+th.admin_column, th.display_column, th.display {
 	width:40px;
 }
 th.form_element {
@@ -200,7 +200,13 @@ th.validation, th.title, th.default, th.group {
 	display:block;
 	width:20px;
 	height:20px;
-	line-height: 0.5;
+	line-height: 1;
+	position:relative;
+	top:0;
+	left:0;
+}
+.manage-fields th.admin_column span, .manage-fields th.display_column span {
+	left:18px;
 }
 .manage-fields input, 
 .manage-fields textarea {
@@ -217,6 +223,10 @@ th.validation, th.title, th.default, th.group {
 }
 .manage-field-groups th.name {
 	width:160px;
+}
+
+.manage-field-groups th.fields {
+	width:30px;
 }
 .manage-field-groups td[id^='field_count'] {
 	text-align:center;

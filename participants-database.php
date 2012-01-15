@@ -144,7 +144,7 @@ class Participants_Db {
     register_uninstall_hook( __FILE__, array( 'PDb_Init', 'on_uninstall' ) );
 
 
-    // define the list of read only columns
+    // define the list of internal columns
     if ($wpdb->get_var('show tables like "'.Participants_Db::$groups_table.'"') == Participants_Db::$groups_table) {
 			
       self::$internal_columns = array();
@@ -537,6 +537,11 @@ class Participants_Db {
 
 				$where = 'WHERE g.display = 1 ';
 				break;
+				
+			case 'readonly':
+			
+				$where = 'WHERE v.group = "internal"';
+				break;
 
 			case 'new':
 			case 'backend':
@@ -604,7 +609,7 @@ class Participants_Db {
 
 		}
 		
-		if ( ! empty( $_FILES ) && $_POST['csv_file_upload' ] != 'true' ) {
+		if ( ! empty( $_FILES ) && @$_POST['csv_file_upload' ] != 'true' ) {
 			
 			foreach ( $_FILES as $fieldname => $attributes ) {
 				
@@ -679,9 +684,7 @@ class Participants_Db {
 					break;
 					
 				case 'private_id':
-					if ( empty( $post['private_id'] ) )
-						$new_value = self::generate_pid();
-						error_log( 'getting PID:'.$new_value );
+					$new_value = empty( $post['private_id'] ) ? self::generate_pid() : $post['private_id'];
 					break;
 
 				default :
@@ -810,10 +813,6 @@ class Participants_Db {
    */
   public function generate_pid() {
 
-
-
-    error_log( __METHOD__.' called');
-
     $pid = '';
 
     $chr_source = array(
@@ -825,8 +824,6 @@ class Participants_Db {
       $pid .= $chr_source[array_rand( $chr_source )];
 
     }
-
-    error_log( __METHOD__.' :'.$pid);
 
     // if by chance we've generated a string that has been used before, generate another
     return self::_id_exists( $pid, 'private_id' ) ? self::generate_pid() : $pid;
@@ -898,7 +895,7 @@ class Participants_Db {
 	 $last_record = get_transient( self::$last_record );
 	 //delete_transient( self::$last_record );
 	 
-	 //error_log( __METHOD__.' last record='.$last_record );
+	 //error_log( __METHOD__.' last record='.$last_record );,
 
 	 // is this an initial entry? i.e. are there no persistent values to carry over
 	 if ( $last_record == self::$id_base_number ) return $participant_record;
@@ -919,7 +916,22 @@ class Participants_Db {
 	 
 	 return $participant_record;
 	 
-  }
+	}
+	
+	/**
+	 * updates the default record with new field defaults
+	 */
+	public function update_default_record() {
+		
+		foreach ( self::get_column_atts( 'all' ) as $column ) {
+			
+			$post[ $column->name ] = $column->default !== NULL ? $column->default : '';
+			
+		}
+		
+		self::process_form( $post, 'update', self::$id_base_number );
+		
+	}
 	
 	// adds a blank field type record
 	public function add_blank_field( $atts ) {
@@ -1106,22 +1118,20 @@ class Participants_Db {
 	 
   }
   
-  // sets any read-only fields
-  public function get_readonly( $column ) {
+  /**
+	 * gets an array of readonly fields
+	 *
+	 * @return array
+	 */
+  public function get_readonly() {
+		
+		$fields = array();
   
-	 $readonly = false;
-	 
-	 if (
-		  in_array( $column, self::$internal_columns )
-		  or 
-		  ( ! self::backend_user() && in_array( $column, array( ) ) ) // place any read-only fields for the frontend user in this array
-		  ) {
-		  
-		$readonly = true;// ' readonly="readonly" ';
-		
-	 }
-		
-	 return $readonly;
+		foreach( self::get_column_atts( 'readonly' ) as $column ) 
+			
+			$fields[] = $column->name;
+			
+		return $fields;
 		
   }
   
@@ -1181,7 +1191,8 @@ class Participants_Db {
 			case 'order':
 				return array( 'type'=>'drag-sort' );
 			
-			case 'column':
+			case 'admin_column':
+			case 'display_column':
 				return array( 'type'=>'text', 'size'=>'2' );
 			
 			// all the booleans

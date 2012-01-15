@@ -26,6 +26,8 @@ if ( $participant_id == Participants_Db::$id_base_number ) {
 // if this returns false, we have an invlaid ID; do nothing
 if ( $participant_values = Participants_Db::get_participant( $participant_id ) ) :
 
+if ( $participant_id == Participants_Db::$id_base_number ) $participant_values = Participants_Db::set_initial_record($participant_values);
+
 //get the groups info
 $groups = Participants_Db::get_groups();
 
@@ -37,7 +39,12 @@ $section = '';
 <div class="wrap edit-participant">
 <h2><?php echo $page_title?></h2>
 <?php
-if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$validation_errors->get_error_html();
+if ( is_object( Participants_Db::$validation_errors ) ) {
+	
+	echo Participants_Db::$validation_errors->get_error_html();
+	
+}
+
 ?>
 <form method="post" action="<?php echo $_SERVER['REQUEST_URI']?>" enctype="multipart/form-data" >
 	<?php 
@@ -50,6 +57,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$v
 																					
 	// get the columns and output form
 	$type = is_admin() ? 'backend' : 'frontend';
+	$readonly_columns = Participants_Db::get_readonly();
 	foreach ( Participants_db::get_column_atts( $type ) as $column ) :
 
     $id_line = '';
@@ -78,7 +86,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$v
 		<td id="<?php echo $column->name?>">
 		<?php
 		
-		$readonly = Participants_Db::get_readonly( $column->name ) ? array( 'readonly' => 'readonly' ) : NULL;
+		$readonly = in_array( $column->name, $readonly_columns )  ? array( 'readonly' => 'readonly' ) : NULL;
 
 		$value = isset( $participant_values[ $column->name ] ) ? Participants_Db::unserialize_array( $participant_values[ $column->name ] ) : '';
 		$value = ( isset( $_POST[ $column->name ] ) ? $_POST[ $column->name ] : $value );

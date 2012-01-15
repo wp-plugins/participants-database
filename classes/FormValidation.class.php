@@ -37,6 +37,9 @@ class FormValidation {
 		$this->error_style = $options['field_error_style'];
 
 	}
+	
+	function __destruct() {
+  }
 
 	/**
 	 * validates a field submitted to the main database
@@ -161,7 +164,7 @@ class FormValidation {
 
 			}
 
-			$error_CSS[] = '#'.$field.' '.$element;
+			if ( $element ) $error_CSS[] = '#'.$field.' '.$element;
 
 			switch ( $error ) {
 
@@ -182,6 +185,8 @@ class FormValidation {
 			}
 
 		endforeach;// $this->errors
+		
+		$this->errors = array();
 
 		return $this->_error_html( $error_CSS, $error_messages );
 
