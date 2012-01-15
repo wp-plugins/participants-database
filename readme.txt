@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team
 Requires at least: 2.8.4
 Tested up to: 3.3.1
-Stable tag: 1.0
+Stable tag: 1.0.1
 
 Build and maintain a fully customizable database of participants or volunteers with signup forms, admin backend, custom lists, and CSV support.
 
@@ -119,6 +119,9 @@ It's also possible to send them the link again in an email, but the plugin does 
 
 == Changelog ==
 
+= 1.0.1 =
+* fix to issue with new records private id not getting assigned
+
 = 1.0 =
 * internationalization on all display strings
 * added image upload field
@@ -172,6 +175,9 @@ It's also possible to send them the link again in an email, but the plugin does 
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Bug fix for incorrect private id assignment 
 
 = 1.0 =
 Major upgrade includes internationalization, improvements to CSV import/export, and a new image upload field.
