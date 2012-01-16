@@ -34,7 +34,7 @@ This database could be of use to any organization that needs to build and mainta
 
 The heart of this plugin is the participants database, which is completely configurable. It comes pre-filled with standard fields such as name, address, phone, etc., but you can define any fields you want, including the type of field, validation, help text and a print title for each field. Fields are also organized into groups so large amounts of information can be better managed, and long forms broken up into logical sections.
 
-Fields can be defined as text-lines, text-areas, single and multiple-select dropdowns, checkboxes or radio buttons. Each field has its own validation which can be required, not required, or validated with a regular expression.
+Fields can be defined as text-lines, text-areas, single and multiple-select dropdowns, checkboxes, radio buttons or image uploads. Each field has its own validation which can be required, not required, or validated with a regular expression.
 
 **Sign Up Form**
 
@@ -50,9 +50,13 @@ For your backend users, the ability to edit and enter new records is provided. T
 
 The backend form is set up for rapid manual entry of multiple records, such as after a signup drive, doorbelling, or public event.
 
+**List Display**
+
+Display the list on your website with the [pdb_list] shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages.
+
 **Import/Export Records**
 
-All records can be exported as a CSV-formatted text file that can be read by spreadsheet applications and used for mass email campaigns, hard-copy lists, and other applications. The records exported can be filtered by column values: for instance, only people who have consented to receive a newsletter will be included. Records may also be sorted by any column.
+All records can be exported as a CSV-formatted text file that can be read by spreadsheet applications and used for mass email campaigns, hard-copy lists, and other applications. The records exported can be filtered by column values: for instance, only people who have consented to receive a newsletter will be included. Records may also be sorted by any column. Which fields are included in the export/import is determined by the "import" column of the field definition.
 
 Records can also be mass-imported with a CSV file, allowing you to use existing lists from spreadsheets, or for offline compilation of records using a spreadsheet such as Open Office or Google Docs. A blank spreadsheet can be exported from the plugin to get people started in entering records offline.
 
@@ -92,6 +96,12 @@ An individual record can be edited on the frontend of your website by someone wh
 
 OK, just assign all the fields you want them to fill out to the signup form (this is done in the "manage fields" page). That form can be as big as you want. Then, remove the private link from the email they get when they sign up.
 
+= How do I let people upload an image? =
+
+Go to the "manage database fields" page and create a new field for your image. Give it a descriptive name like "avatar" or something. Click "add field" and when your new field appears, set the "field type" to "image upload" Be sure to check "signup" if you want it to appear in the signup form. When the form is presented to the user, they will be allowed to upload an image. There are a couple of settings that affect image uploads, including a file size limit.
+
+It is possible to have multiple images per record, just add more image fields.
+
 = When someone signs up, are they now users on my WordPress site? =
 
 No, these signups and records are separate from people who can register on your site as users. If there are things only registered users can do (such as a forum or comments), they will have to register or sign in as usual.
@@ -111,6 +121,10 @@ You can control which groups of fields show up in the frontend record edit scree
 If someone does not have the private link to edit their record, they can sign up again with the same email address if "Don't Allow Duplicate Email Addresses" is checked in the plugin settings. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address. 
 
 It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the [pdb_record] shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
+
+= Can they upload files too? =
+
+No, only image files are supported for now, primarily for security reasons.
 
 == Screenshots ==
 
