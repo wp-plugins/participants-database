@@ -82,7 +82,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 ?>
 
 	<tr class="<?php echo $column->form_element?>">
-		<th><?php echo $column->title?></th>
+		<th><?php echo htmlspecialchars(stripslashes($column->title),ENT_QUOTES,"UTF-8",false)?></th>
 		<td id="<?php echo $column->name?>">
 		<?php
 		

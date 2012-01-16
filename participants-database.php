@@ -175,6 +175,7 @@ class Participants_Db {
 		// define our shortcodes
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
+		add_shortcode( 'pdb_list', array( 'PDb_List','initialize' ) );
 	
 		if ($wpdb->get_var('SHOW TABLES LIKE "'.Participants_Db::$participants_table.'"') == Participants_Db::$participants_table) :
 		// db integrity check and fix
@@ -233,8 +234,9 @@ class Participants_Db {
 			__('List Participants', self::PLUGIN_NAME ),
 			__('List Participants', self::PLUGIN_NAME ), 
 			'edit_pages',
-			self::$plugin_page.'-list_participants', 
-			array( __CLASS__, 'include_admin_file' ) 
+			self::$plugin_page.'-list_participants',
+			array( 'PDb_List','initialize' )
+			/*array( __CLASS__, 'include_admin_file' )*/ 
 			);
 		
 		$addpage = add_submenu_page(
@@ -324,6 +326,7 @@ class Participants_Db {
 			'delete_confirm' => '<h4>Delete the "{name}" {thing}?</h4>',
 		) );
 	}
+		
 
 	// callback for plugin admin subpages
 	// grabs the name from the request and includes the file to display the page
@@ -348,7 +351,8 @@ class Participants_Db {
 
 		// at present, there are no attributes
 		$vars = shortcode_atts( array(
-		), $atts );
+                                  'class' => 'PDb-record'
+                                  ), $atts );
 		
 		if ( isset( $_GET['pid'] ) ) {
 
@@ -357,9 +361,12 @@ class Participants_Db {
       if ( $participant_id ) {
         ?>
         <style type="text/css"><?php include 'participants-db.css' ?></style>
+        <div class="<?php echo $vars['class']?>">
         <?php
 
         include 'edit_participant.php';
+
+        ?></div><?php
 			
       }
     }
@@ -464,28 +471,35 @@ class Participants_Db {
 		return $return;
 	 
 	}
-	
-	// gets the column and column order for participant listing
-	// returns a sorted array, omitting any non-displyed columns
-	public function get_list_display_columns() {
+
+	/**
+	 * gets the column and column order for participant listing
+	 * returns a sorted array, omitting any non-displyed columns
+	 *
+	 * @param string $set selects the set of columns to get:
+	 *                    admin or display (frontend)
+	 *
+	 * @return array of column names, ordered and indexed by the set order
+	 */
+	public function get_list_display_columns( $set = 'admin_column' ) {
 	
     global $wpdb;
 
     $sql = "
-      SELECT `name`,`admin_column`
+      SELECT `name`,`".$set."`
       FROM ".self::$fields_table."
-      WHERE `admin_column` > 0";
+      WHERE `".$set."` > 0";
 		
 	 $columns = $wpdb->get_results( $sql, ARRAY_A );
 	 
 	 $column_set = array();
 	 foreach ( $columns as $column ) {
 	 
-		$column_set[ $column[ 'admin_column' ] ] = $column[ 'name' ];
+		$column_set[ $column[ $set ] ] = $column[ 'name' ];
 		
 	 }
 	 
-	 if ( self::$plugin_settings->get_option( 'show_pid' ) ) $column_set[0] = 'private_id';
+	 if ( $set == 'admin_column' && self::$plugin_settings->get_option( 'show_pid' ) ) $column_set[0] = 'private_id';
 	 
 	 ksort( $column_set );
 	 
@@ -1068,16 +1082,23 @@ class Participants_Db {
 				break;
 
 			case 'participant list':
-			 
-				// build the import header row
-				foreach ( self::get_columns() as $column ) {
-					$header_row[] = $column['Field'];
-				}
-				$data['header'] = $header_row;
 
 				global $wpdb;
 
-				$data += self::_prepare_CSV_rows( $wpdb->get_results( rawurldecode( $_POST['query'] ), ARRAY_A ) );
+				$import_columns = '';
+
+				foreach ( self::get_column_atts( 'import' ) as $column ) {
+
+          $import_columns .= sprintf( '`%s`,',$column->name );
+          $header_row[] = $column->name;
+
+        }
+
+        $data['header'] = $header_row;
+
+				$query = str_replace( '*', ' '.trim( $import_columns, ',' ).' ', rawurldecode( $_POST['query'] ) );
+
+				$data += self::_prepare_CSV_rows( $wpdb->get_results( $query, ARRAY_A ) );
 				
 				break;
 			 

@@ -33,7 +33,7 @@
  * @copyright  2011, 2012 xnau webdesign
  * @license    GPL2
  * @version    Release: 1.2
- * @link       https://code.google.com/p/participants-database/
+ * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
 /*  Copyright 2011, 2012 Roland Barker xnau webdesign  (email : webdesign@xnau.com)

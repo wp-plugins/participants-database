@@ -23,6 +23,7 @@ This database could be of use to any organization that needs to build and mainta
 * both front-end and back-end versions of the forms
 * shortcode for inserting a configurable sign-up short form into WordPress pages, posts, etc.
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
+* shortcode for displaying the list on the site
 * email notification and confirmation with secure individual access link
 * searchable, sortable record listings in the WordPress admin
 * many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, etc.
@@ -119,6 +120,15 @@ It's also possible to send them the link again in an email, but the plugin does 
 
 == Changelog ==
 
+= 1.1 =
+* added list display shortcode
+* added database upgrade code
+* database to version 0.2
+* added display column setting for frontend list display
+* improved handling of quotes and apostrophes in names and titles
+* changed CSV export to export only selected columns
+* added 'class' parameter to signup and record shortcodes
+
 = 1.0.1 =
 * fix to issue with new records private id not getting assigned
 
@@ -176,6 +186,9 @@ It's also possible to send them the link again in an email, but the plugin does 
 
 == Upgrade Notice ==
 
+= 1.1 =
+Huge upgrade includes new list display shorcode, more control over CSV exporting, minor improvements all around
+
 = 1.0.1 =
 Bug fix for incorrect private id assignment 
 
@@ -194,6 +207,10 @@ To collect signups on your website there are two shortcodes: [pdb_signup] and [p
 This way, your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
 
 When they sign in, they will be sent an email with a private link to their full record. This page is where the second [pdb_record] shortcode goes.
+
+If you want to display the list on your website, place the [pdb_list] shortcode on any page or post. Long lists can be paginated. The fields that get displayed is set on the fields management page under the "display" column. The display can be customized with additional parameters:
+* list-limit - sets the number of records to list per page (defaults to the plugin setting value)
+* class - lets you set the CSS class of the container (defaults to 'participants-database')
 
 **Quick Start Instructions:**
 

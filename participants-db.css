@@ -1,4 +1,6 @@
 @charset "UTF-8";
+@import url("pdb-list.css");
+
 /* Participants DB CSS */
 .edit-participant .helptext, .participants_db .helptext {
 	text-align:left;
@@ -114,7 +116,13 @@ table.spreadsheet {
 body[class*='participants-database'] .text-block {
   max-width: 35em;
 }
-
+#delete_button.unarmed {
+	opacity:0.5;
+}
+#delete_button.armed {
+	border: 1px solid rgba(204, 0, 0, 0.5);
+  box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
+}
 
 /* ERRORS */
 div.error {
@@ -124,34 +132,6 @@ div.error {
 }
 div.error p {
 	margin:0;
-}
-
-/* PAGINATION */
-div.pagination {
-	overflow:auto;
-}
-.pagination ul {
-	margin:0;
-}
-.pagination li.currentpage, .pagination a {
-	float:left;
-	margin: 0 3px;
-	padding: 1px 5px;
-	border: 1px solid #aaa;
-	border-radius: 2px;
-}
-.pagination li.currentpage:first-child, .pagination li:first-child a {
-	margin-left:0;
-}
-.pagination a {
-	text-decoration:none;
-}
-.pagination a:hover, .pagination li.currentpage {
-	background-color: #cccccc;
-}
-.pagination label {    
-	float: left;
-	margin: 8px 6px 0 0;
 }
 
 /* manage fields */

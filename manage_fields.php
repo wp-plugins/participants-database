@@ -5,10 +5,12 @@
 // translations strings for buttons
 /* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
 $PDb_i18n = array(
-  'update fields' => __( 'Update Fields', Participants_Db::PLUGIN_NAME ),
-  'update groups' => __( 'Update Groups', Participants_Db::PLUGIN_NAME ),
-  'add field'     => __( 'Add Field',     Participants_Db::PLUGIN_NAME ),
-  'add group'     => __( 'Add Group',     Participants_Db::PLUGIN_NAME ),
+  'update fields'   => __( 'Update Fields', Participants_Db::PLUGIN_NAME ),
+  'update groups'   => __( 'Update Groups', Participants_Db::PLUGIN_NAME ),
+  'add field'       => __( 'Add Field',     Participants_Db::PLUGIN_NAME ),
+  'add group'       => __( 'Add Group',     Participants_Db::PLUGIN_NAME ),
+	'new field title' => __( 'new field title',     Participants_Db::PLUGIN_NAME ),
+	'new group title' => __( 'new group title',     Participants_Db::PLUGIN_NAME ),
   );
 // process form submission
 $error_msgs = array();
@@ -80,44 +82,35 @@ if ( isset( $_POST['action'] ) ) {
 
 		// add a new blank field
 		case $PDb_i18n['add field']:
-			if ( false === strpos($_POST['title'],'new field') ) {
 
-				// use the wp function to clear out any irrelevant POST values
-				$atts = shortcode_atts( array( 
-																			'name'  => PDb_make_name( $_POST['title'] ),
-																			'title' => $_POST['title'], 
-															 				'group' => $_POST['group'],
-																			'order' => $_POST['order'],
-																			'validation' => 'no',
-																			),
-															 $_POST
-															 );
-				Participants_Db::add_blank_field( $atts );
-			} else {
-				$error_msgs[] = __('You must give your new field a name before adding it.',Participants_Db::PLUGIN_NAME );
-			}
+			// use the wp function to clear out any irrelevant POST values
+			$atts = shortcode_atts( array( 
+																		'name'  => PDb_make_name( stripslashes($_POST['title']) ),
+																		'title' => htmlspecialchars( stripslashes($_POST['title']),ENT_QUOTES, "UTF-8", false ),//PDb_prep_title($_POST['title']),  
+																		'group' => $_POST['group'],
+																		'order' => $_POST['order'],
+																		'validation' => 'no',
+																		),
+														 $_POST
+														 );
+			Participants_Db::add_blank_field( $atts );
 			break;
 
 		// add a new blank field
 		case $PDb_i18n['add group']:
-			if ( false === strpos($_POST['group_title'],'new group') ) {
 
-				global $wpdb;
-				$wpdb->hide_errors();
-				
-				$atts = array(
-											'name'  => PDb_make_name( $_POST['group_title'] ),
-											'title' => $_POST['group_title'],
-											'order' => $_POST['group_order'],
-				);
-															 
-				$wpdb->insert( Participants_Db::$groups_table, $atts );
+			global $wpdb;
+			$wpdb->hide_errors();
+			
+			$atts = array(
+										'name'  => PDb_make_name( $_POST['group_title'] ),
+										'title' => htmlspecialchars( stripslashes($_POST['group_title']),ENT_QUOTES, "UTF-8", false ),
+										'order' => $_POST['group_order'],
+			);
+														 
+			$wpdb->insert( Participants_Db::$groups_table, $atts );
 
-				if ( $wpdb->last_error ) $error_msgs[] = PDb_parse_db_error( $wpdb->last_error, $_POST['action'] );
-				
-			} else {
-				$error_msgs[] = __('You must give your new group a name before adding it.',Participants_Db::PLUGIN_NAME );
-			}
+			if ( $wpdb->last_error ) $error_msgs[] = PDb_parse_db_error( $wpdb->last_error, $_POST['action'] );
 			break;
 			
 		case 'delete_field':
@@ -201,12 +194,12 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	?>
 	<div id="<?php echo $group?>" class="manage-fields-wrap" >
 		<form id="manage_<?php echo $group?>_fields" method="post">
-		<h3><?php echo ucwords( str_replace( '_',' ',$group ) ), __('Field Groups',Participants_Db::PLUGIN_NAME )?></h3>
+		<h3><?php echo ucwords( str_replace( '_',' ',$group ) ),' ', __('Fields',Participants_Db::PLUGIN_NAME )?></h3>
 		<p>
 		<?php
 		// "add field" functionality
-		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add field'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button' ) ) );
-		FormElement::print_element( array( 'type'=>'text', 'name'=>'title','value'=>__('new field name',Participants_Db::PLUGIN_NAME ).'&hellip;','attributes'=>array('onclick'=>"this.value=''",'class'=>'add_field') ) );
+		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add field'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button', 'onclick'=>'return false;') ) );
+		FormElement::print_element( array( 'type'=>'text', 'name'=>'title','value'=>$PDb_i18n['new field title'].'&hellip;','attributes'=>array('onfocus'=>"this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",'class'=>'add_field') ) );
 
 		// number of rows in the group
 		$num_group_rows = count( $database_rows[ $group ] );
@@ -278,7 +271,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 						$element_atts = array_merge( Participants_Db::get_edit_field_type( $attribute_column ),
 																					array(
 																								'name'=>'row_'.$database_row[ 'id' ].'['.$attribute_column.']',
-																								'value'=> $value,
+																								'value'=> htmlspecialchars(stripslashes($value),ENT_QUOTES,"UTF-8",false),
 																								) );
 					?>
 					<td class="<?php echo $attribute_column?>"><?php FormElement::print_element( $element_atts )  ?></td>
@@ -328,8 +321,8 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<?php
 		
 		// "add group" functionality
-		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add group'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button' ) ) );
-		FormElement::print_element( array( 'type'=>'text', 'name'=>'group_title','value'=>__('new group name',Participants_Db::PLUGIN_NAME ).'&hellip;','attributes'=>array('onclick'=>"this.value=''",'class'=>'add_field') ) );
+		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add group'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button', 'onclick'=>'return false;' ) ) );
+		FormElement::print_element( array( 'type'=>'text', 'name'=>'group_title','value'=>$PDb_i18n['new group title'].'&hellip;','attributes'=>array('onfocus'=>"this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",'class'=>'add_field') ) );
 		$next_order = count( $groups ) + 1;
 		FormElement::print_hidden_fields( array( 'group_order'=>$next_order ) );
 		
@@ -448,7 +441,7 @@ function PDb_header( $string ) {
 }
 function PDb_make_name( $string ) {
 
-	return strtolower(str_replace( array( ' ','-'),'_', $string ) );
+	return strtolower(str_replace( array( ' ','-',"'",'"'),array('_','_','',''), stripslashes( $string ) ) );
 	
 }
 function PDb_trim_array( $array ) {
@@ -498,5 +491,14 @@ function PDb_parse_db_error( $error, $context ) {
 
 	}
 
+}
+
+function PDb_prep_title( $title ) {
+	
+	$needle = array( '"',"'",'\\' );
+	$replace = array( '&quot;','&#039;','');
+	
+	return str_replace( $needle, $replace, $title );
+	
 }
 ?>

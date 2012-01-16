@@ -1,0 +1,36 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.PDb-list-image {
+	width:auto;
+	height:2em;
+}
+
+/* PAGINATION */
+div.pagination {
+	overflow:auto;
+}
+.pagination ul {
+	margin:0;
+	list-style:none;
+}
+.pagination li.currentpage, .pagination a {
+	float:left;
+	margin: 0 3px;
+	padding: 1px 5px;
+	border: 1px solid #aaa;
+	border-radius: 2px;
+}
+.pagination li.currentpage:first-child, .pagination li:first-child a {
+	margin-left:0;
+}
+.pagination a {
+	text-decoration:none;
+}
+.pagination a:hover, .pagination li.currentpage {
+	background-color: #cccccc;
+}
+.pagination label {    
+	float: left;
+	margin: 8px 6px 0 0;
+}

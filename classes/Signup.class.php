@@ -96,6 +96,7 @@ class Signup {
 		$atts = shortcode_atts( array(
 																			'title'   => '',
 																			'captcha' => 'none',
+																			'class' => 'signup',
 																			),
 														$params );
 														
@@ -116,8 +117,6 @@ class Signup {
 						( isset( $_GET['pid'] ) && false === Participants_Db::get_participant_id( $_GET['pid'] ) ) 
 					 )
 				{
-					
-					error_log( 'check PID='.Participants_Db::get_participant_id( $_GET['pid'] ) );
 	
 			// no submission; output the form
 			$this->_form( $atts );
@@ -144,7 +143,7 @@ class Signup {
 	// prints a signup form
 	private function _form( $atts ) {
 		?>
-		<div class="signup" >
+		<div class="<?php echo $atts['class']?>" >
 		<?php
 
 			if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$validation_errors->get_error_html();
