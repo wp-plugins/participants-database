@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team
 Requires at least: 2.8.4
 Tested up to: 3.3.1
-Stable tag: 1.0.1
+Stable tag: 1.1
 
 Build and maintain a fully customizable database of participants or volunteers with signup forms, admin backend, custom lists, and CSV support.
 
@@ -135,7 +135,7 @@ No, only image files are supported for now, primarily for security reasons.
 == Changelog ==
 
 = 1.1 =
-* added list display shortcode
+* added list display shortcode [pdb_list]
 * added database upgrade code
 * database to version 0.2
 * added display column setting for frontend list display
@@ -201,7 +201,7 @@ No, only image files are supported for now, primarily for security reasons.
 == Upgrade Notice ==
 
 = 1.1 =
-Huge upgrade includes new list display shorcode, more control over CSV exporting, minor improvements all around
+Major upgrade includes new list display shorcode, more control over CSV exporting and minor improvements all around
 
 = 1.0.1 =
 Bug fix for incorrect private id assignment 
@@ -235,4 +235,4 @@ If you want to display the list on your website, place the [pdb_list] shortcode 
 5. When someone signs up, an email is sent to them with a private link to their record so they can fill out all the fields you want them to. This is why you need to tell the plugin where your [pdb_record] shortcode is. You can define which fields they will see there on the "manage fields" page.
 6. Go to the plugin settings page to set up the emails. There are both user and admin emails sent on a signup, and you can determine the content of the emails and also whether to send them and to whom.
 
-Of course, records can be entered in the backend by a user with "editor" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file.
+Of course, records can be entered in the backend by a user with "edit posts" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file.
