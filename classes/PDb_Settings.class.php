@@ -112,6 +112,17 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'       =>'record_updated_message',
+        'title'      =>__('Record Updated Message', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __("the message shown when a record form has be successfully submitted", Participants_Db::PLUGIN_NAME ),
+          'value'      => __('Your information has been updated:', Participants_Db::PLUGIN_NAME ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
         'name'       =>'field_error_style',
         'title'      =>__('Field Error Style', Participants_Db::PLUGIN_NAME ),
         'group'      => 'main',

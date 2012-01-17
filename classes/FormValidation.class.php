@@ -12,6 +12,9 @@ class FormValidation {
 	private $invalid_message;
 	private $empty_message;
 	private $error_style;
+	
+	// holds the class name we give the container: error or message
+	private $error_class;
 
 	/**
 	 * instantiates the form validation object
@@ -101,7 +104,7 @@ class FormValidation {
 
 		foreach ( $this->errors as $field => $error ) :
 
-			$error_CSS[] = '#'.$field.' input[type="text"], #'.$field.' textarea';
+			if ( ! empty( $field ) ) $error_CSS[] = '#'.$field.' input[type="text"], #'.$field.' textarea';
 
 			switch ( $error ) {
 
@@ -171,16 +174,19 @@ class FormValidation {
 				case 'empty':
 
 					$error_messages[] = sprintf( $this->empty_message, $field_atts->title );
+					$this->error_class = 'pdb-error';
 					break;
 
 				case 'invalid':
 
 					$error_messages[] = sprintf( $this->invalid_message, $field_atts->title );
+					$this->error_class = 'pdb-error';
 					break;
 
 				default:
 				
 					$error_messages[] = $error;
+					$this->error_class = 'pdb-message';
 
 			}
 
@@ -208,9 +214,9 @@ class FormValidation {
 	 */
 	private function _error_html( $error_CSS, $error_messages ) {
 
-		$output = '<style type="text/css">'.implode( ', ',$error_CSS ).'{ '.$this->error_style.' }</style>';
+		if ( ! empty ( $error_CSS ) ) $output = '<style type="text/css">'.implode( ', ',$error_CSS ).'{ '.$this->error_style.' }</style>';
 
-		$output .= '<div class="error"><p>'.implode( '</p><p>', $error_messages ).'</p></div>';
+		$output .= '<div class="'.$this->error_class.'"><p>'.implode( '</p><p>', $error_messages ).'</p></div>';
 
 		return $output;
 

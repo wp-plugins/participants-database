@@ -37,7 +37,7 @@ get_currentuserinfo();
 $section = '';
 ?>
 <div class="wrap edit-participant">
-<h2><?php echo $page_title?></h2>
+<?php if ( is_admin() ) : ?><h2><?php echo $page_title?></h2><?php endif ?>
 <?php
 if ( is_object( Participants_Db::$validation_errors ) ) {
 	

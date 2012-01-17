@@ -71,6 +71,9 @@ class PDb_List
 		// are we showing the backend form or frontend?
 		self::$backend = is_admin();
 		
+		// begin buffering the output of the plugin
+		if ( ! self::$backend ) ob_start();
+		
 		self::_setup_i18n();
     
     $options = get_option( Participants_Db::$participants_db_options );
@@ -149,6 +152,9 @@ class PDb_List
       echo '</div>';
 
     }
+		
+		// if called by a shortcode, return the buffer contents
+		if ( ! self::$backend ) return ob_get_clean();
 			
 	}
 	

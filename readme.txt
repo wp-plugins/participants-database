@@ -134,6 +134,11 @@ No, only image files are supported for now, primarily for security reasons.
 
 == Changelog ==
 
+= 1.1.1 =
+* fixed shortcode content placement issues
+* added feedback message for successfully submitted [pdb_record] form
+* added plugin setting for the feedback message
+
 = 1.1 =
 * added list display shortcode [pdb_list]
 * added database upgrade code
@@ -199,6 +204,9 @@ No, only image files are supported for now, primarily for security reasons.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Bigfix primarily addesses content placement issues with shortcodes
 
 = 1.1 =
 Major upgrade includes new list display shorcode, more control over CSV exporting and minor improvements all around

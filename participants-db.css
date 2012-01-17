@@ -124,13 +124,18 @@ body[class*='participants-database'] .text-block {
   box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
 }
 
-/* ERRORS */
-div.error {
+/* ERRORS / MESSAGES */
+div.pdb-error {
 		padding:4px 7px;
     background-color: #FFEBE8;
 		box-shadow:0 0 6px #CC0000 inset;
 }
-div.error p {
+div.pdb-message {
+		padding:4px 7px;
+    background-color: #C4F092;
+		box-shadow:0 0 6px #2DAA00 inset;
+}
+div.pdb-error p, div.pdb-message p {
 	margin:0;
 }
 

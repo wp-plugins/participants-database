@@ -56,6 +56,9 @@ class Signup {
 
 	// error messages
 	private $errors = array();
+	
+	// holds the output for the shortcode
+	private $output;
 
 	// methods
 	//
@@ -140,8 +143,17 @@ class Signup {
 		
 	}
 	
+	public function print_form( $params ) {
+		
+		$signup = new Signup( $params );
+		
+		return $signup->output;
+		
+	}
+	
 	// prints a signup form
 	private function _form( $atts ) {
+		ob_start();
 		?>
 		<div class="<?php echo $atts['class']?>" >
 		<?php
@@ -200,12 +212,14 @@ class Signup {
 			</form>
 		</div>
 		<?php
+		$this->output = ob_get_clean();
 	}
 	
 	/**
 	 * prints a thank you note
 	 */
 	private function _thanks() {
+		ob_start();
 		?>
 		<div class="signup">
 		<?php
@@ -213,6 +227,7 @@ class Signup {
 		?>
 		</div>
 		<?php
+		$this->output = ob_get_clean();
 		
 	}
 	
