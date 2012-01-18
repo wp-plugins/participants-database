@@ -104,7 +104,7 @@ class FormValidation {
 
 		foreach ( $this->errors as $field => $error ) :
 
-			if ( ! empty( $field ) ) $error_CSS[] = '#'.$field.' input[type="text"], #'.$field.' textarea';
+			if ( ! empty( $field ) ) $error_CSS[] = '#'.Participants_Db::$css_prefix.$field.' input[type="text"], #'.Participants_Db::$css_prefix.$field.' textarea';
 
 			switch ( $error ) {
 
@@ -158,7 +158,7 @@ class FormValidation {
 					$element = 'input';
 					break;
 					
-				case 'file-upload':
+				case 'image-upload':
 					$element = 'input';
 					break;
 
@@ -167,7 +167,7 @@ class FormValidation {
 
 			}
 
-			if ( $element ) $error_CSS[] = '#'.$field.' '.$element;
+			if ( $element ) $error_CSS[] = '#'.Participants_Db::$css_prefix.$field.' '.$element;
 
 			switch ( $error ) {
 
@@ -186,7 +186,7 @@ class FormValidation {
 				default:
 				
 					$error_messages[] = $error;
-					$this->error_class = 'pdb-message';
+					$this->error_class = empty( $field ) ? 'pdb-message' :'pdb-error' ;
 
 			}
 

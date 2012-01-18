@@ -1,11 +1,8 @@
 @charset "UTF-8";
 @import url("pdb-list.css");
+@import url("pdb-record.css");
 
 /* Participants DB CSS */
-.edit-participant .helptext, .participants_db .helptext {
-	text-align:left;
-	vertical-align:top;
-}
 body[class*='participants-database'] .widefat td {
   vertical-align:middle;
 }
@@ -26,15 +23,6 @@ body[class*='participants-database'] input[type=checkbox] {
 .pdb-signup th {
 	width:200px;
 }
-.edit-participant textarea, 
-.participants_db textarea, 
-.participants_db input[type='text'], 
-.edit-participant  input[type='text'], 
-.edit-participant  input[type='checkbox'], 
-.edit-participant .multicheckbox label {
-	float:left;
-	margin-right:10px;
-}
 fieldset.widefat,
 #PDb_footer {
   padding:7px;
@@ -46,10 +34,6 @@ fieldset.widefat,
   width:280px;
   float:left;
   margin:0 18px;
-}
-.edit-participant  input[type='checkbox'] {
-	position:relative;
-	top:4px;
 }
 input[readonly] {
 	border:none;
@@ -64,44 +48,11 @@ body[class*='participants-database'] a.delete {
 body[class*='participants-database'] .form-table {
 	margin-bottom:4em;
 }
-.edit-participant h3 {
-	margin-top: 2em;
-	margin-bottom: 1em;
-}
-.edit-participant .helptext {
-	display:block;
-	width:100%;
-}
+
 .wp-admin .edit-participant .helptext {
 	display:inline;
 }
-.edit-participant .submit-buttons {
-	border:none;
-}
-.edit-participant .form-table th {
-	width:195px;
-	vertical-align:top;
-	padding-top: 1ex;
-}
-.edit-participant .form-table h3 {
-	margin-top:0;
-	margin-bottom:0;
-}
-.edit-participant .uploaded-image {
-	width:auto;
-	height:85px;
-	float:left;
-	margin-right:10px;
-}
-.selectother label {
-	float: left;
-  margin: 0 3px;
-}
-.selectother {
-	border: 1px solid #DDDDDD;
-	overflow: auto;
-	padding: 2px 5px;
-}
+
 body[class*='participants-database'] .selectother input[type=text] {
 	width:50px;
 }
@@ -122,21 +73,6 @@ body[class*='participants-database'] .text-block {
 #delete_button.armed {
 	border: 1px solid rgba(204, 0, 0, 0.5);
   box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
-}
-
-/* ERRORS / MESSAGES */
-div.pdb-error {
-		padding:4px 7px;
-    background-color: #FFEBE8;
-		box-shadow:0 0 6px #CC0000 inset;
-}
-div.pdb-message {
-		padding:4px 7px;
-    background-color: #C4F092;
-		box-shadow:0 0 6px #2DAA00 inset;
-}
-div.pdb-error p, div.pdb-message p {
-	margin:0;
 }
 
 /* manage fields */

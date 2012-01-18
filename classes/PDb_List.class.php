@@ -61,7 +61,7 @@ class PDb_List
 	static $params;
 	
 	/**
-	 * initializes and outputs the list for the backend
+	 * initializes and outputs the list for the backend or frontend
 	 *
 	 * @param array $atts display customization parameters
 	 *                    from the shortcode
@@ -78,6 +78,7 @@ class PDb_List
     
     $options = get_option( Participants_Db::$participants_db_options );
 
+    // set the list limit value; this can be overridden by the shortcode atts later
     self::$page_list_limit = ( ! isset( $_POST['list_limit'] ) or ! is_numeric( $_POST['list_limit'] ) or $_POST['list_limit'] < 1 ) ? $options['list_limit'] : $_POST['list_limit'];
     
     self::$registration_page_url = get_bloginfo('url').'/'.( isset( $options['registration_page'] ) ? $options['registration_page'] : '' );
@@ -96,9 +97,10 @@ class PDb_List
 		
 		// process delete and items-per-page form submissions
 		if ( self::$backend ) self::_process_general();
+		// or include the stylesheet if on the frontend
 		else echo '<link media="all" type="text/css" href="'.plugins_url( Participants_Db::PLUGIN_NAME.'/pdb-list.css' ).'" rel="stylesheet">';
 		
-		// process any search/filter terms and build the main query
+		// process any search/filter/sort terms and build the main query
 		$submit = isset( $_POST['submit'] ) ? $_POST['submit'] : '';
 		self::_process_search( $submit );
 		
@@ -130,6 +132,7 @@ class PDb_List
 		// print the sorting/filtering forms
 		self::_sort_filter_forms( self::_sort_filter_mode() );
 
+    // add the delete and items-per-page controls for the backend
 		if ( self::$backend ) self::_general_list_form_top();
 		
 		// print the main table
@@ -177,7 +180,7 @@ class PDb_List
 		
 		foreach( $values as $key => $value ) {
 			
-			// strip out the 'p' value
+			// strip out the page value
 			if ( $key != self::$list_page ) $get .= $key.'='.$value.'&';
 			
 		}
@@ -188,8 +191,8 @@ class PDb_List
 	
 	
 	/**	
-	 * processes all the general list actions
-	 * thses are only available in the admin
+	 * processes all the general list actions: delete and  set items-per-page;
+	 * these are only available in the admin
 	 */
 	private function _process_general() {
 		
@@ -235,7 +238,8 @@ class PDb_List
 			case self::$i18n['filter']:
 			
 				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table;
-				
+
+				// define the delimiter for use with LIKE operators
 				$delimiter = ( false !== stripos( $_POST['operator'], 'LIKE' ) ? '%' : '' );
 				
 				if ( $_POST['where_clause'] != 'none' ) {
@@ -482,7 +486,7 @@ class PDb_List
    <table class="wp-list-table widefat fixed pages" cellspacing="0" >
       <?php
 		// template for printing the registration page link in the admin
-		$PID_pattern = '<td><a href="'.self::$registration_page_url.'?pid=%1$s">%1$s</a></td>';
+		$PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
 			
     // template for printing a header item
 		$head_pattern = '<th class="%2$s" scope="col">%1$s</th>';
@@ -544,7 +548,11 @@ class PDb_List
 
           }
 
-          if ( $column == 'private_id' ) printf( $PID_pattern, Participants_Db::prepare_value( $display_value ) );
+          if ( $column == 'private_id' ) printf( 
+																								$PID_pattern, 
+																								Participants_Db::prepare_value( $display_value ), 
+																								Participants_Db::get_record_link( $display_value ) 
+																								);
 
           else printf( $col_pattern, Participants_Db::prepare_value( $display_value ) );
 

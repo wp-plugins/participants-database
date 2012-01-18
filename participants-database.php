@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.1.1
+Version: 1.1.2
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -80,6 +80,9 @@ class Participants_Db {
   
   // a list of all the form element types available
   public static $element_types;
+	
+	// this is can be prefixed on CSS classes or id to keep a namespace
+	public static $css_prefix = 'pdb_';
 
 	// holds the form validation errors
 	public static $validation_errors;
@@ -176,6 +179,7 @@ class Participants_Db {
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
 		add_shortcode( 'pdb_list', array( 'PDb_List','initialize' ) );
+		
 	
 		if ($wpdb->get_var('SHOW TABLES LIKE "'.Participants_Db::$participants_table.'"') == Participants_Db::$participants_table) :
 		// db integrity check and fix
@@ -201,6 +205,17 @@ class Participants_Db {
 	
 	function admin_init() {
 		
+		$options = get_option( self::$participants_db_options );
+		
+		// if the setting was made in previous versions and is a slug, convert it to a post ID
+		if ( ! is_numeric( $options['registration_page'] ) ) {
+			
+			$options['registration_page'] = self::_get_ID_by_slug( $options['registration_page'] );
+			
+			update_option( self::$participants_db_options, $options );
+			
+		}
+		
 	}
 	
 	public function init() {
@@ -218,7 +233,7 @@ class Participants_Db {
 		
 		// intialize the plugin settings
 		// we do this here because we need the object for the plugin menus
-		self::$plugin_settings = new PDb_Settings( self::$participants_db_options );
+		self::$plugin_settings = new PDb_Settings();
 
 		// define the plugin admin menu pages
 	  add_menu_page(
@@ -362,7 +377,7 @@ class Participants_Db {
 				
 				ob_start();
         ?>
-        <style type="text/css"><?php include 'participants-db.css' ?></style>
+        <style type="text/css"><?php include 'PDb-record.css' ?></style>
         <div class="<?php echo $vars['class']?>">
         <?php
 
@@ -1455,7 +1470,7 @@ class Participants_Db {
 		
 		if ( $file['size'] > $options[ 'image_upload_limit' ] * 1024 ) {
 			
-			self::$validation_errors->add_error( $name, sprintf( __('The image you tried to upload is too large. The file must be smaller than %sK.'), self::PLUGIN_NAME ), $options[ 'image_upload_limit' ] );
+			self::$validation_errors->add_error( $name, sprintf( __('The image you tried to upload is too large. The file must be smaller than %sK.', self::PLUGIN_NAME ), $options[ 'image_upload_limit' ] ) );
 			
 			return false;
 			
@@ -1471,11 +1486,47 @@ class Participants_Db {
 		
 		else return get_bloginfo('wpurl').DIRECTORY_SEPARATOR.$options['image_upload_location'].$new_filename;
 	
-	} 
+	}
 	
+	/**
+	 * builds a record edit link
+	 *
+	 * @param string $PID private id value
+	 * @return string private record URI
+	 */
+	public function get_record_link( $PID ) {
+		
+		$options = get_option( self::$participants_db_options );
+		
+		// if the setting was made in previous versions and is a slug, convert it to a post ID
+		if ( ! is_numeric( $options['registration_page'] ) ) {
+			
+			$options['registration_page'] = self::_get_ID_by_slug( $options['registration_page'] );
+			
+			update_option( self::$participants_db_options, $options );
+			
+		}
+		
+		$page_link = get_page_link( $options['registration_page'] );
+		
+		$delimiter = false !== strpos( $page_link, '?' ) ? '&' : '?';
+		
+		return $page_link.$delimiter.'pid='.$PID;
+		
+	}
 	
-	
-	
+	/**
+	 * gets the ID of a page given it's slug
+	 *
+	 * this is to provide backwards-compatibility with previous versions that used a page-slug to point to the [pdb_record] page.
+	 */
+	private function _get_ID_by_slug( $page_slug ) {
+		
+    $page = get_page_by_path( $page_slug );
+		
+    return is_object( $page ) ? $page->ID : false;
+		
+	}
 	
 
 	/**

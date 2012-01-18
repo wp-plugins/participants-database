@@ -131,7 +131,9 @@ class Signup {
 			// load the values from the newly-submitted record
 			$this->_load_participant( $submission_id );
 			
-			$this->registration_page = get_bloginfo('url').'/'.( isset( $options['registration_page'] ) ? $options['registration_page'] : '' ).'?pid='.$this->participant['private_id'];
+			
+			
+			$this->registration_page = Participants_Db::get_record_link( $this->participant['private_id'] );
 			
 			// print the thank you note
 			$this->_thanks();
@@ -142,7 +144,16 @@ class Signup {
 		}
 		
 	}
-	
+
+	/**
+	 * prints a signup form called by a shortcode
+	 *
+	 * this function is called statically to instantiate the Signup object,
+	 * which captures the output and returns it for display
+	 *
+	 * @param array $params parameters passed by the shortcode
+	 * @return string form HTML
+	 */
 	public function print_form( $params ) {
 		
 		$signup = new Signup( $params );

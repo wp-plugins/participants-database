@@ -134,6 +134,11 @@ No, only image files are supported for now, primarily for security reasons.
 
 == Changelog ==
 
+= 1.1.2 = 
+* fixed private record link for sites using query links
+* changed "registration page" setting from text entry to page list dropdown
+
+
 = 1.1.1 =
 * fixed shortcode content placement issues
 * added feedback message for successfully submitted [pdb_record] form
@@ -205,6 +210,9 @@ No, only image files are supported for now, primarily for security reasons.
 
 == Upgrade Notice ==
 
+= 1.1.2 =
+Upgrade fixes private record link for sites using query links
+
 = 1.1.1 =
 Bigfix primarily addesses content placement issues with shortcodes
 
@@ -239,7 +247,7 @@ If you want to display the list on your website, place the [pdb_list] shortcode 
 1. Go to the "manage fields" page and set up the fields you want to use for your database. You can also change this later, but it's best to have it all set up before you really start adding records.
 2. While you are setting up your fields, look at the "signup" column. This is where you choose which fields the site visitor will have to fill out in order to sign up. The email field is required in order to email them a link to come back and fill out their full record. If you don't want them to do that, you don't have to include the email field in the signup form. You can also turn the email sending off in the settings.
 3. Put the [pdb_signup] shortcode wherever you want your signup form to appear.
-4. Put the [pdb_record] shortcode on the page where you want them to fill out their full record. You must go to the plugin settings page and put the slug to this page in the "Participant Record Page" field. The "slug" is the unique name of the page; it is the last part of the permalink, everything after the last / in the permalink.
+4. Put the [pdb_record] shortcode on the page where you want them to fill out their full record. You must go to the plugin settings page and select this page in the "Participant Record Page" dropdown.
 5. When someone signs up, an email is sent to them with a private link to their record so they can fill out all the fields you want them to. This is why you need to tell the plugin where your [pdb_record] shortcode is. You can define which fields they will see there on the "manage fields" page.
 6. Go to the plugin settings page to set up the emails. There are both user and admin emails sent on a signup, and you can determine the content of the emails and also whether to send them and to whom.
 

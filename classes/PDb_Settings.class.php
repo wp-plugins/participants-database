@@ -7,9 +7,9 @@
  */
 class PDb_Settings extends Plugin_Settings {
 
-  function __construct( $setting_label = false ) {
+  function __construct() {
 
-    $this->WP_setting = false === $setting_label ? 'participants-database_settings' : $setting_label;
+    $this->WP_setting = Participants_Db::$participants_db_options ;
 
     // define the settings sections
     // no need to worry about the namespace, it will be prefixed
@@ -83,9 +83,10 @@ class PDb_Settings extends Plugin_Settings {
         'group'      =>'main',
         'options'    =>array
 					(
-          'type'       =>'text',
+          'type'       =>'dropdown',
           /* translators: don't translate words in brackets [] */
-          'help_text'  => __('the slug of the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
+          'help_text'  => __('the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
+					'options'    => $this->_get_pagelist(),
           )
         );
 
@@ -290,6 +291,22 @@ class PDb_Settings extends Plugin_Settings {
         );
 
   }
+	
+	private function _get_pagelist() {
+		
+		$pagelist = array();
+		
+		$pages = get_pages( array() );
+		
+		foreach( $pages as $page ) {
+			
+			$pagelist[ $page->post_name ] = $page->ID;
+		
+		}
+		
+		return $pagelist;
+		
+	}
 
   /**
    * displays a settings page form using the WP Settings API
