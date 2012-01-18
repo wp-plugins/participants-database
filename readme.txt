@@ -137,6 +137,7 @@ No, only image files are supported for now, primarily for security reasons.
 = 1.1.2 = 
 * fixed private record link for sites using query links
 * changed "registration page" setting from text entry to page list dropdown
+* split CSS files so only the needed rules are loaded by shortcodes
 
 
 = 1.1.1 =
