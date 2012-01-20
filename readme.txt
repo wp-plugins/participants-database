@@ -126,6 +126,10 @@ It's also possible to send them the link again in an email, but the plugin does 
 
 No, only image files are supported for now, primarily for security reasons.
 
+= I'm seeing strange characters in my CSV export. What's going on? =
+
+The plugin exports it's CSV files in "UTF-8" format. Make sure the program you're using to read the file knows this...it should detect it automatically, but can fail under some circumstances. Often this can be set on the import screen of the spreadsheet program when you open the CSV.
+
 == Screenshots ==
 
 1. Managing Database fields: this is where you set up your database fields and all attributes for each field
