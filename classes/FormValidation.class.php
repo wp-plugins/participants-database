@@ -215,6 +215,8 @@ class FormValidation {
 	private function _error_html( $error_CSS, $error_messages ) {
 
 		if ( ! empty ( $error_CSS ) ) $output = '<style type="text/css">'.implode( ', ',$error_CSS ).'{ '.$this->error_style.' }</style>';
+		
+		else $output = '';
 
 		$output .= '<div class="'.$this->error_class.'"><p>'.implode( '</p><p>', $error_messages ).'</p></div>';
 

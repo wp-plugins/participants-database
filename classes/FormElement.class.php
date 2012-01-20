@@ -95,6 +95,9 @@ class FormElement {
   // holds current indent level
   private $indent;
   
+  // holds the internationaliztion strings
+  private $i18n;
+  
   /**
    * instantiates a FormElement object
 	 * 
@@ -143,6 +146,10 @@ class FormElement {
       
     }
     
+    $this->i18n = array(
+    					'other' => _x('other', 'indicates a write-in choice', Participants_Db::PLUGIN_NAME ),
+    					);
+    
     $this->attributes = $params['attributes'];
     
     // transfers the class attribute if it's set in the attributes array
@@ -158,6 +165,9 @@ class FormElement {
 
     // clear the output array
     $this->output = array();
+
+    // set the proper type for the value property
+    $this->_condition_value_property();
 
     // build the element by calling the type's method
     switch ( $this->type ) :
@@ -386,7 +396,7 @@ class FormElement {
     if ( isset( $this->attributes['other'] ) ) {
       $otherlabel = $this->attributes['other'];
       unset( $this->attributes['other'] );
-    } else $otherlabel = 'Other';
+    } else $otherlabel = $this->i18n['other'];
     
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
@@ -480,13 +490,14 @@ class FormElement {
    */
   private function _select_other( $type = 'radio' ) {
     
+    // determine the label for the other field
     if ( isset( $this->attributes['other'] ) ) {
       $otherlabel = $this->attributes['other'];
       unset( $this->attributes['other'] );
-    } else $otherlabel = 'other';
+    } else $otherlabel = $this->i18n['other'];
     
     // make a unique prefix for the function
-    $js_prefix = $this->_prep_js_string($this->name).'_';
+    $js_prefix = $this->_prep_js_string($this->name)/*.'_'*/;
     
     $this->attributes['onChange'] = $js_prefix.'SelectOther(this)';
     
@@ -498,11 +509,13 @@ class FormElement {
     
     // add the "other" option
     $this->_addline( '<label for="'.$this->name.'">' );
-    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="other" ' . $this->_set_selected( $this->options, $this->value, 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
+    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="other" ' . $this->_set_selected( $this->options, $this->value['other'], 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
     $this->_addline( $otherlabel.':' );
-    // build the text input element
-    $this->_addline( '<input type="text" id="' . $this->name . '_other" name="' . $this->name . ( $type == 'checkbox' ? '[]' : '' ) . '" value="' . $this->value . '" onClick="' . $js_prefix . 'SetOther()" >' );
     $this->_addline( '</label>', -1 );
+    
+    // build the text input element
+
+    $this->_addline( '<input type="text" id="' . $this->name . '_other" name="' . $this->name . ( $type == 'checkbox' ? '[other]' : '' ) . '" value="' . $this->value['other'] . '" onClick="' . $js_prefix . 'SetOther()" >' );
     
     
     // close the container
@@ -515,15 +528,18 @@ class FormElement {
     var otherfield=document.getElementById("'.$js_prefix.'_other");
     var otherselect=document.getElementById("'.$js_prefix.'_otherselect");
     if ( otherselect.checked ) {
-      otherfield.name="'. $this->name . ( $type == 'checkbox' ? '[]' : '' ) . '";
+      otherfield.name="'. $this->name . ( $type == 'checkbox' ? '[other]' : '' ) . '";
+      otherselect.name = "temp";
       otherfield.select();
     } else {
       otherfield.name="temp";
+      otherselect.name = "other";
       otherfield.value=""; 
     }
   }
   function '.$js_prefix.'SetOther() {
     document.getElementById("'.$js_prefix.'_otherselect").checked=true;
+    '.$js_prefix.'SelectOther();
   }
   window.onload='.$js_prefix.'SelectOther();
 </script>
@@ -717,6 +733,38 @@ class FormElement {
 	 */ 
   
   /**
+   * converts the field value to the proper type for the element
+   *
+   * if the value property an array (this can happen if the value of the field
+   * was formerly set by an element that stores an array) and the element needs
+   * a string we grab the first value, if it comes in as a string and the element
+   * is a multi-value element, we make the property an array
+   *
+   */
+  private function _condition_value_property() {
+  
+    // the type will contain the string 'multi' if it has an array as a value
+    if ( false === strpos( $this->type, 'multi' ) ) {
+
+      $this->value = is_array( $this->value ) ? current( $this->value ) : $this->value;
+      
+    } else {
+
+      $this->value = ! is_array( $this->value ) ? array( $this->value ) : $this->value;
+      
+      // if we're doing an "other" element, make sure there is an 'other' element to the array
+      if ( false !== strpos( $this->type, 'other' ) && ! isset( $this->value['other'] ) ) {
+      
+      	$this->value['other'] = '';
+      	
+      }
+
+    }
+
+  }
+    
+  
+  /**
    * adds a class name to the class property
    */
   public function add_class( $classname ) {
@@ -800,12 +848,11 @@ class FormElement {
 	 *
 	 * not at all perfect, but we just need to accomplish a match, so it would 
 	 * only fail if the difference between two terms was only within the 
-	 * excluded characters. Since the terms are code values and not language 
-	 * strings, I think we're OK.
+	 * excluded characters. We're not actually changing any stored data here.
    */
   private function _prep_comp_string( $string ) {
 
-    return preg_replace( '/[^a-zA-Z0-9\p{L}&#;!=]/', '' , $string );
+    return preg_replace( '/[^a-zA-Z0-9\p{L}&#;!=]/', '' , htmlspecialchars_decode( (string) $string, ENT_QUOTES ) );
 
   }
 
@@ -824,14 +871,26 @@ class FormElement {
 
   /**
 	 * sets the select states for a multi-select element
+	 *
+	 * cycles through the available selects or chackboxes and sets the selected
+	 * attribute if there is a match to an element of the array of stored values
+	 * for the field
+	 *
+	 * @param string  $element_value   the value of one select of a multi-select
+	 * @param array   $new_value_array the array of stored or inputted values
+	 * @param string  $attribute       the name of the "selected" attribute for the element
+	 * @param boolean $state           true to check for a match or false for a non-match
+	 * @return string                  the attribute string for the element
 	 */
-	private function _set_multi_selected( $element_value, $new_value, $attribute = 'selected', $state = true ) {
+	private function _set_multi_selected( $element_value, $new_value_array, $attribute = 'selected', $state = true ) {
 		
-		$new_values = $this->_prep_comp_array( $new_value );
+		$prepped_new_value_array = $this->_prep_comp_array( $new_value_array );
 		
-    // error_log( __METHOD__.' checking value:'.$this->_prep_comp_string($element_value).' against:'.print_r($new_values,true).' state:'.( in_array( $this->_prep_comp_string( $element_value ), $new_values )?'true':'false').' setting: '.$attribute );
+		$prepped_string = $this->_prep_comp_string($element_value);
+		
+    if (WP_DEBUG) error_log( __METHOD__.' checking value:'.$prepped_string.'('.$element_value.')'.' against:'.print_r($prepped_new_value_array,true).' state:'.( in_array( $prepped_string, $prepped_new_value_array)?'true':'false').' setting: '.$attribute );
 			
-		if ( $state === in_array( $this->_prep_comp_string( $element_value ), $new_values ) ) return  sprintf( ' %1$s="%1$s" ', $attribute );
+		if ( $state === in_array( $prepped_string, $prepped_new_value_array ) ) return  sprintf( ' %1$s="%1$s" ', $attribute );
 		
 		else return '';
 		

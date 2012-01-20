@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.1.2
+Version: 1.1.3
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -208,7 +208,7 @@ class Participants_Db {
 		$options = get_option( self::$participants_db_options );
 		
 		// if the setting was made in previous versions and is a slug, convert it to a post ID
-		if ( ! is_numeric( $options['registration_page'] ) ) {
+		if ( isset( $options['registration_page'] ) && ! is_numeric( $options['registration_page'] ) ) {
 			
 			$options['registration_page'] = self::_get_ID_by_slug( $options['registration_page'] );
 			
@@ -407,7 +407,15 @@ class Participants_Db {
 	// if not, a default list of attributes is retrieved
 	//
 	// returns data object
-  public function get_field_atts( $field, $atts = '*' ) {
+  public function get_field_atts( $field = false, $atts = '*' ) {
+		
+		if ( ! $field ) {
+			
+			$return = new stdClass;
+			$return->form_element = '';
+			return $return;
+			
+		}
 
 	 global $wpdb;
 	 
@@ -636,12 +644,10 @@ class Participants_Db {
 				$action = 'insert';
 			
 			}
-			
-			// error_log( __METHOD__.' default record: '.$action );
 
 		}
 		
-		if ( ! empty( $_FILES ) && @$_POST['csv_file_upload' ] != 'true' ) {
+		if ( ! empty( $_FILES ) && ! isset( $_POST['csv_file_upload' ] ) ) {
 			
 			foreach ( $_FILES as $fieldname => $attributes ) {
 				
@@ -695,14 +701,11 @@ class Participants_Db {
     // gather the submit values and add them to the query
 		foreach ( self::get_column_atts() as $column_atts ) :
 
-			// skip any fields not included in the post array and have no default value
-			if ( ! isset( $post[ $column_atts->name ] ) && NULL === $column_atts->default ) continue;
-
 			// the validation object is only instantiated when this method is called
 			// by a form submission
-			if ( is_object( self::$validation_errors ) && isset( $post[ $column_atts->name ] ) ) {
+			if ( is_object( self::$validation_errors ) ) {
 
-				self::$validation_errors->validate( $post[ $column_atts->name ], $column_atts );
+				self::$validation_errors->validate( ( isset( $post[ $column_atts->name ] ) ? $post[ $column_atts->name ] : '' ), $column_atts );
 
 			}
 
@@ -722,21 +725,26 @@ class Participants_Db {
 				default :
 				if ( empty( $post[ $column_atts->name ] ) ) {
 				
-					$new_value = $column_atts->default;
+					$new_value = empty( $column_atts->default ) ? NULL : $column_atts->default;
+					
+				} elseif ( NULL === $post[ $column_atts->name ] ) {
+				
+					$new_value = NULL;
 					
 				} else {
 				
-					$new_value = is_array( $post[ $column_atts->name ] ) ? serialize( $post[ $column_atts->name ] ) : $post[ $column_atts->name ];
+					$new_value = is_array( $post[ $column_atts->name ] ) ? self::_prepare_array_mysql( $post[ $column_atts->name ] ) : self::_prepare_string_mysql( $post[ $column_atts->name ] );
 					
 				}
 
 			}
 			
 			// add the column and value to the sql
-			if ( false !== $new_value && ! empty( $new_value ) ) {
+			if ( false !== $new_value ) {
 			
-				$new_values[] = $new_value;
-				$columns[] =  "`".$column_atts->name."` = %s";
+				// insert a true NULL if the field is NULL
+				if ( NULL !== $new_value ) $new_values[] = $new_value;
+				$columns[] =  "`".$column_atts->name."` = ".( NULL === $new_value ? "NULL" : "%s" );
 				
 			}
 		
@@ -756,6 +764,8 @@ class Participants_Db {
 
 		// add the WHERE clause
 		$sql .= $where;
+		
+		if ( WP_DEBUG ) error_log( __METHOD__.' storing record sql='.$sql.' values:'.print_r( $new_values, true ) );
 
 		$wpdb->query( $wpdb->prepare( $sql, $new_values ) );
 
@@ -890,6 +900,38 @@ class Participants_Db {
 
   }
 	
+  /*
+   * prepares an array for storage in the database
+   *
+   * @param array $array
+   * @return string prepped array in serialized form
+   */
+  private function _prepare_array_mysql( $array ) {
+
+    $prepped_array = array();
+
+    foreach( $array as $key => $value ) {
+
+      $prepped_array[ $key ] = self::_prepare_string_mysql( $value );
+
+    }
+
+    return serialize( $prepped_array );
+
+  }
+
+  /**
+   * prepares a string for storage
+   *
+   * gets the string ready by getting rid of slashes and converting quotes and
+   * other indesirables to HTML entities
+   */
+  private function _prepare_string_mysql( $string ) {
+
+    return htmlspecialchars( stripslashes( $string ), ENT_QUOTES, 'utf-8' );
+
+  }
+	
 	
 	
 	// unserialize if necessary
@@ -957,7 +999,7 @@ class Participants_Db {
 		
 		foreach ( self::get_column_atts( 'all' ) as $column ) {
 			
-			$post[ $column->name ] = $column->default !== NULL ? $column->default : '';
+			$post[ $column->name ] = empty( $column->default ) ? NULL : $column->default;
 			
 		}
 		
@@ -1077,7 +1119,7 @@ class Participants_Db {
 				break;
 
 			case 'Submit' :
-				wp_redirect( get_admin_url().'/admin.php?page='.self::PLUGIN_NAME.'-list_participants&id='.$participant_id);
+				wp_redirect( get_admin_url().'admin.php?page='.self::PLUGIN_NAME.'-list_participants&id='.$participant_id);
 
 			default :
 
@@ -1311,8 +1353,14 @@ class Participants_Db {
 		$output = array();
 		
 		foreach( $raw_array as $key => $value ) {
-			
-			$output[ $key ] = is_serialized( $value ) ? implode( ', ', unserialize( $value ) ) : $value;
+
+      // flatten arrays
+      if ( is_serialized( $value ) )
+
+        $value = implode( ', ', unserialize( $value ) );
+
+			// decode HTML entities
+			$output[ $key ] = html_entity_decode( $value, ENT_QUOTES, "utf-8" );
 			
 		}
 		
@@ -1415,8 +1463,9 @@ class Participants_Db {
 	/**
 	 * detect an enclosure character
 	 *
-	 * there's not way to do this 100%, so we will look and fall back to a 
-	 * reasonable assumption if we don't see a clear choice
+	 * there's no way to do this 100%, so we will look and fall back to a
+	 * reasonable assumption if we don't see a clear choice: simply whichever
+	 * of the two most common enclosure characters is more numerous is returned
 	 *
 	 * @param string $csv_file path to a csv file to read and analyze
 	 * return string the best guess enclosure character
@@ -1497,6 +1546,9 @@ class Participants_Db {
 	public function get_record_link( $PID ) {
 		
 		$options = get_option( self::$participants_db_options );
+		
+		// if the setting is not yet set, don't try to build a link
+		if ( ! isset( $options['registration_page'] ) || empty( $options['registration_page'] ) ) return '';
 		
 		// if the setting was made in previous versions and is a slug, convert it to a post ID
 		if ( ! is_numeric( $options['registration_page'] ) ) {

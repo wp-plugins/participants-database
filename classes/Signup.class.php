@@ -168,11 +168,13 @@ class Signup {
 		?>
 		<div class="<?php echo $atts['class']?>" >
 		<?php
+		
+		$participant_values = Participants_Db::get_participant( Participants_Db::$id_base_number );
 
 			if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$validation_errors->get_error_html();
 
 			?>
-			<form method="post" action="<?php echo $_SERVER['REQUEST_URI']?>">
+			<form method="post" action="<?php echo $_SERVER['REQUEST_URI']?>"  enctype="multipart/form-data" >
 				<?php
 				FormElement::print_hidden_fields( array( 'action'=>'signup' ) );
 				?>
@@ -194,7 +196,7 @@ class Signup {
 
 						FormElement::print_element( array(
 																							'type'       => $column->form_element,
-																							'value'      => ( isset( $_POST[ $column->name ] ) ? $_POST[ $column->name ] : $value ),
+																							'value'      => ( isset( $_POST[ $column->name ] ) ? esc_html(stripslashes($_POST[ $column->name ])) : $value ),
 																							'name'       => $column->name,
 																							'options'    => $column->values,
 																							) );

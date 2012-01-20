@@ -134,6 +134,12 @@ No, only image files are supported for now, primarily for security reasons.
 
 == Changelog ==
 
+= 1.1.3 =
+* fixed bug with default values not preloading into the signup form
+* improved handling of quotes in form fields
+* better forms security
+* better handing of array values and select settings for multi-select form elements
+
 = 1.1.2 = 
 * fixed private record link for sites using query links
 * changed "registration page" setting from text entry to page list dropdown

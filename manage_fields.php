@@ -463,7 +463,7 @@ function PDb_prep_values_array( $array ) {
 
   foreach ( $array as $element ) {
 
-    $return[] = htmlentities( trim( $element ), ENT_COMPAT, "UTF-8", false  );
+    $return[] = htmlentities( trim( stripslashes( $element ) ), ENT_QUOTES, "UTF-8", false  );
 
   }
 

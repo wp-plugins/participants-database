@@ -88,8 +88,19 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 		
 		$readonly = in_array( $column->name, $readonly_columns )  ? array( 'readonly' => 'readonly' ) : NULL;
 
+		// get the existing value if any
 		$value = isset( $participant_values[ $column->name ] ) ? Participants_Db::unserialize_array( $participant_values[ $column->name ] ) : '';
-		$value = ( isset( $_POST[ $column->name ] ) ? $_POST[ $column->name ] : $value );
+		
+		// replace it with the new value if provided
+		if ( isset( $_POST[ $column->name ] ) ) {
+			
+			if ( is_array( $_POST[ $column->name ] ) ) $value = $_POST[ $column->name ];
+			
+			else $value = esc_html( stripslashes( $_POST[ $column->name ] ) );
+			
+		}
+		
+		// format the date if it's a date field
 		$value = ( 'date' == $column->form_element ? date( get_option( 'date_format' ).' '.get_option( 'time_format' ), strtotime( $value ) ) : $value );
 		// 
 		FormElement::print_element( array(

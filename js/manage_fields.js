@@ -1,7 +1,12 @@
 jQuery(document).ready(function($){
 
   // flag the row as changed
-  $('table.manage-fields input, table.manage-fields textarea, table.manage-fields select').change(function(el) {
+  $('table.manage-fields input, table.manage-fields textarea').focus(function(el) {
+    var matches = $(this).attr('name').match(/row_(\d+)\[/);
+    $('#status_'+matches[1]).attr('value','changed');
+  });
+	// flag the row as changed
+  $('table.manage-fields select').change(function(el) {
     var matches = $(this).attr('name').match(/row_(\d+)\[/);
     $('#status_'+matches[1]).attr('value','changed');
   });

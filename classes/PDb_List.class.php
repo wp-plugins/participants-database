@@ -544,17 +544,17 @@ class PDb_List
 
             default:
 
-              $display_value = $value[ $column ];
+              $display_value = esc_html($value[ $column ]);
 
           }
 
           if ( $column == 'private_id' ) printf( 
 																								$PID_pattern, 
-																								Participants_Db::prepare_value( $display_value ), 
+																								$display_value, 
 																								Participants_Db::get_record_link( $display_value ) 
 																								);
 
-          else printf( $col_pattern, Participants_Db::prepare_value( $display_value ) );
+          else printf( $col_pattern, $display_value );
 
         } ?>
       </tr>
