@@ -217,6 +217,9 @@ No, only image files are supported for now, primarily for security reasons.
 
 == Upgrade Notice ==
 
+= 1.1.3 =
+Important upgrade fixes a couple of bugs, better input values handing for forms and enhanced forms security
+
 = 1.1.2 =
 Upgrade fixes private record link for sites using query links
 
