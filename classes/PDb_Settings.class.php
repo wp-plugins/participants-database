@@ -16,6 +16,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->sections = array(
                             'main' => __('General Settings', Participants_Db::PLUGIN_NAME ),
                             'signup' => __('Signup Form Settings', Participants_Db::PLUGIN_NAME ),
+                            'record' => __('Record Form Settings', Participants_Db::PLUGIN_NAME ),
                             );
 
     // run the parent class initialization to finish setting up the class 
@@ -78,19 +79,6 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
-        'name'       =>'registration_page',
-        'title'      =>__('Participant Record Page', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'main',
-        'options'    =>array
-					(
-          'type'       =>'dropdown',
-          /* translators: don't translate words in brackets [] */
-          'help_text'  => __('the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
-					'options'    => $this->_get_pagelist(),
-          )
-        );
-
-    $this->plugin_settings[] = array(
         'name'       =>'empty_field_message',
         'title'      =>__('Missing Field Error Message', Participants_Db::PLUGIN_NAME ),
         'group'      =>'main',
@@ -109,17 +97,6 @@ class PDb_Settings extends Plugin_Settings {
           'type'       =>'text',
           'help_text'  => __("the message shown when a field's value does not pass the validation test", Participants_Db::PLUGIN_NAME ),
           'value'      => __('The %s field appears to be incorrect.', Participants_Db::PLUGIN_NAME ),
-          )
-        );
-
-    $this->plugin_settings[] = array(
-        'name'       =>'record_updated_message',
-        'title'      =>__('Record Updated Message', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'main',
-        'options'    =>array(
-          'type'       =>'text',
-          'help_text'  => __("the message shown when a record form has be successfully submitted", Participants_Db::PLUGIN_NAME ),
-          'value'      => __('Your information has been updated:', Participants_Db::PLUGIN_NAME ),
           )
         );
 
@@ -287,6 +264,81 @@ class PDb_Settings extends Plugin_Settings {
           'help_text'   => __('notification email body'),
 					/* translators: don't translate words in brackets[] */
           'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>'),
+          )
+        );
+		
+		// record form settings
+
+    $this->plugin_settings[] = array(
+        'name'       =>'registration_page',
+        'title'      =>__('Participant Record Page', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'record',
+        'options'    =>array
+					(
+          'type'       =>'dropdown',
+          /* translators: don't translate words in brackets [] */
+          'help_text'  => __('the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
+					'options'    => $this->_get_pagelist(),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       => 'show_group_descriptions',
+        'title'      => __('Show Group Descriptions', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'record',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('Show the group description under each group title in the record form.', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'record_updated_message',
+        'title'      =>__('Record Updated Message', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'record',
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __("the message shown when a record form has be successfully submitted", Participants_Db::PLUGIN_NAME ),
+          'value'      => __('Your information has been updated:', Participants_Db::PLUGIN_NAME ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       => 'send_record_update_notify_email',
+        'title'      => __('Send Record Form Update Notification Email', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'record',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('Send an email notification that a record has been updated.', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'record_update_email_subject',
+        'title'      =>__('Record Update Email Subject', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'record',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('subject line for the record update notification email', Participants_Db::PLUGIN_NAME ),
+          'value'       => sprintf( __("A record has just been updated on %s", Participants_Db::PLUGIN_NAME ), get_bloginfo('name') ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'record_update_email_body',
+        'title'      =>__('Record Update Notification Email', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'record',
+        'options'    => array(
+          'type'        =>'text-field',
+					/* translators: don't translate words in brackets[] */
+          'help_text'   => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. Also available are [date] which will add the date and time of the update', Participants_Db::PLUGIN_NAME ),
+          'value'       =>__('<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] [last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</li><li>Phone: [phone]</li><li>Email: [email]</li></ul>', Participants_Db::PLUGIN_NAME ),
           )
         );
 

@@ -34,6 +34,8 @@ $groups = Participants_Db::get_groups();
 // get the current user's info
 get_currentuserinfo();
 
+$options = get_option( self::$participants_db_options );
+
 $section = '';
 ?>
 <div class="wrap edit-participant">
@@ -69,11 +71,12 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 </table>
 <?php
 		  } elseif ( Participants_Db::backend_user() ) {
-        $id_line = '<tr><th>ID</th><td>'.($participant_id == Participants_Db::$id_base_number ? '(new record)' : $participant_id ).'</td></tr>';
+        $id_line = '<tr><th>'._x('ID','abbreviation for "identification"',Participants_Db::PLUGIN_NAME).'</th><td>'.($participant_id == Participants_Db::$id_base_number ? _x('(new record)','indicates a new record is being entered',Participants_Db::PLUGIN_NAME) : $participant_id ).'</td></tr>';
 		  }
 		  $section = $column->group
 ?>
 <h3><?php echo $groups[$section]['title']?></h3>
+<?php if ( $options['show_group_descriptions'] ) echo '<p class="'.Participants_Db::$css_prefix.'group-description">'.$groups[$section]['description'].'</p>' ?>
 <table class="form-table">
 <?php
 		  

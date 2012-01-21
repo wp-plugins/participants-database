@@ -160,7 +160,7 @@ foreach( $groups as $group ) {
 // get an array of the field attributes
 $attribute_columns = $wpdb->get_col_info( 'name' );
 // remove read-only fields
-foreach( array( 'id','name' ) as $item ) {
+foreach( array( 'id'/*,'name'*/ ) as $item ) {
 	unset( $attribute_columns[ array_search( $item, $attribute_columns ) ] );
 }
 // this script updates a hidden field when a row is edited so we don't have to update the whole database on submit
@@ -240,7 +240,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 					<td>
 					<?php
 					// add the hidden fields
-					foreach( array( 'id','name' ) as $attribute_column ) {
+					foreach( array( 'id'/*,'name'*/ ) as $attribute_column ) {
 	
 						$value = Participants_Db::prepare_value( $database_row[ $attribute_column ] );
 	

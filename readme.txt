@@ -138,6 +138,12 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 
 == Changelog ==
 
+= 1.2 =
+* added email notifications for record updates
+* new settings layout with new group for record edit form
+* added ability to display the group description in the record edit form
+* error message for record form called with invalid ID
+
 = 1.1.3 =
 * fixed bug with default values not preloading into the signup form
 * improved handling of quotes in form fields

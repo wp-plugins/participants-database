@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.1.3
+Version: 1.2
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -387,7 +387,7 @@ class Participants_Db {
 				
 				return ob_get_clean();
 			
-      }
+      } else echo '<p>'.__('There is no record for this ID.', Participants_Db::PLUGIN_NAME ).'</p>';
     }
 		
 	}
@@ -1103,6 +1103,22 @@ class Participants_Db {
 			
 			self::$validation_errors->add_error( '', $options['record_updated_message'] );
 			
+			if ( $options['send_record_update_notify_email'] ) {
+				
+				$sent = wp_mail( 
+													$options['email_signup_notify_addresses'], 
+													$options['record_update_email_subject'], 
+													self::proc_tags( $options['record_update_email_body'], $participant_id ), 
+													sprintf(
+														'From: %2$s <%1$s>%3$s',
+														$options['receipt_from_address'],
+														$options['receipt_from_name'],
+														"\r\n"
+													)
+												);
+				
+			}
+			
 			return;
 			
 		}
@@ -1293,7 +1309,7 @@ class Participants_Db {
 			
 			// all the text fields
 			case 'name':
-				return array( 'type'=>'hidden' );
+				return array( 'type'=>'text','attributes'=>array('readonly'=>'readonly') );
 				
 			case 'title':
 			case 'default':
@@ -1578,6 +1594,61 @@ class Participants_Db {
 		
     return is_object( $page ) ? $page->ID : false;
 		
+	}
+	
+	/**
+	* replace the tags in text messages
+	*
+	* returns the text with the values replacing the tags
+	* all tags use the column name as the key string 
+	* also includes and processes the [record_link]  and [date] tags
+	*
+	* @param  string  $text           the text containing tags to be replaced with 
+	*                                 values from the db
+	* @param  int     $participant_id the record id to use
+	* @param  string  $mode           the column subset to use
+	* @return string                  text with the tags replaced by the data
+	*/
+	public function proc_tags( $text, $participant_id, $mode = 'frontend'  ) {
+		
+		$participant = self::get_participant( $participant_id );
+
+		$tags = array();
+		$values = array();
+
+		foreach( self::get_column_atts( $mode ) as $column ) {
+
+			$tags[] = '['.$column->name.']';
+
+			$values[] = $participant[$column->name];
+
+		}
+		
+		$options = get_option( self::$participants_db_options );
+
+		// add the "record_link" tag
+		$tags[] = '[record_link]';
+		$values[] = $options['registration_page'];
+		
+		// add the date tag
+		$tags[] = '[date]';
+		$values[] = date( get_option( 'date_format ' ) );
+				
+
+		$placeholders = array();
+		
+		for ( $i = 1; $i <= count( $tags ); $i++ ) {
+
+			$placeholders[] = '%'.$i.'$s';
+
+		}
+
+		// replace the tags with variables
+		$pattern = str_replace( $tags, $placeholders, $text );
+		
+		// replace the variables with strings
+		return vsprintf( $pattern, $values );
+
 	}
 	
 

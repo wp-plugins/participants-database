@@ -102,7 +102,7 @@ th.admin_column, th.display_column, th.display {
 th.form_element {
 	width:130px;
 }
-th.validation, th.title, th.default, th.group {
+th.validation, th.title, th.default, th.group, th.name {
 	width:8%;
 }
 #field_groups th.title {
