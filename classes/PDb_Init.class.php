@@ -283,7 +283,6 @@ class PDb_Init
 
     private function _uninstall()
     {
-        error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
 
         global $wpdb;
 
@@ -294,6 +293,9 @@ class PDb_Init
         // remove options
         delete_option( Participants_Db::$participants_db_options );
 				delete_option( Participants_Db::$db_version );
+				
+        error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
+        
     }
 
     /**

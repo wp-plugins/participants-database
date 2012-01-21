@@ -57,6 +57,9 @@ class PDb_List
 	// holds the columns to display in the list
 	static $display_columns;
 
+	// holds th list of sortable columns
+	static $sortables;
+
 	// holds the parameters for a shortcode-called display of the list
 	static $params;
 	
@@ -84,6 +87,8 @@ class PDb_List
     self::$registration_page_url = get_bloginfo('url').'/'.( isset( $options['registration_page'] ) ? $options['registration_page'] : '' );
 
     self::$display_columns = Participants_Db::get_list_display_columns( self::$backend ? 'admin_column' : 'display_column' );
+
+    self::$sortables = Participants_Db::get_sortables();
 
     // define the default settings for the shortcode
     $shortcode_defaults = array(
@@ -241,6 +246,8 @@ class PDb_List
 
 				// define the delimiter for use with LIKE operators
 				$delimiter = ( false !== stripos( $_POST['operator'], 'LIKE' ) ? '%' : '' );
+
+				$sortby = isset( $_POST['sortBy'] ) ? mysql_real_escape_string($_POST['sortBy']) : current( self::$sortables );
 				
 				if ( $_POST['where_clause'] != 'none' ) {
 					
@@ -253,7 +260,7 @@ class PDb_List
 					
 				}
 				
-				self::$list_query .= ' ORDER BY '.mysql_real_escape_string($_POST['sortBy']).' '.mysql_real_escape_string($_POST['ascdesc']);
+				self::$list_query .= ' ORDER BY '.$sortby.' '.mysql_real_escape_string($_POST['ascdesc']);
 		
 				// go back to the first page to display the newly sorted/filtered list
 				$_GET[ self::$list_page ] = 1;
@@ -337,7 +344,7 @@ class PDb_List
   <div class="wrap">
     <h2><?php echo Participants_Db::$plugin_title?></h2>
     <h3><?php printf( _n( 'List Participants: %s record found, sorted by:', 'List Participants: %s records found, sorted by:', self::$num_records ), self::$num_records )?> 
-		<?php echo isset( $_POST['sortBy'] ) ? Participants_Db::column_title( $_POST['sortBy'] ) : Participants_Db::column_title( 'last_name' ) ?>.</h3>
+		<?php echo isset( $_POST['sortBy'] ) ? Participants_Db::column_title( $_POST['sortBy'] ) : Participants_Db::column_title( current( self::$sortables ) ) ?>.</h3>
     <?php
 	}
 
@@ -424,8 +431,8 @@ class PDb_List
 			$element = array(
 											 'type'		=> 'dropdown',
 											 'name'		=> 'sortBy',
-											 'value'	=>	isset( $_POST['sortBy'] ) ? $_POST['sortBy'] : 'last_name',
-											 'options'	=> Participants_Db::get_sortables(),
+											 'value'	=>	isset( $_POST['sortBy'] ) ? $_POST['sortBy'] : current( self::$sortables ),
+											 'options'	=> self::$sortables,
 											 );
       FormElement::print_element( $element );
 			

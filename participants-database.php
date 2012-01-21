@@ -558,9 +558,14 @@ class Participants_Db {
 
 		switch ( $filter ) {
 
-			case 'signup':
+      case 'signup':
 
-				$where = 'WHERE v.signup = 1 ';
+        $where = 'WHERE v.signup = 1 ';
+        break;
+
+			case 'sortable':
+
+				$where = 'WHERE v.sortable = 1 ';
 				break;
 
 			case 'import':
