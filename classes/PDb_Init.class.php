@@ -77,13 +77,14 @@ class PDb_Init
 
     private function _activate()
     {
-      // define the arrays for loading the initial db records
-      $this->_define_init_arrays();
 
       global $wpdb;
 
       // fresh install: install the tables if they don't exist
       if ($wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') != Participants_Db::$participants_table) :
+      
+      // define the arrays for loading the initial db records
+      $this->_define_init_arrays();
 
         // create the field values table
         $sql = 'CREATE TABLE '.Participants_Db::$fields_table.' (
@@ -95,7 +96,7 @@ class PDb_Init
           `group` VARCHAR(30) NOT NULL,
           `help_text` TEXT NULL,
           `form_element` TINYTEXT NULL,
-          `values` TEXT NULL,
+          `values` LONGTEXT NULL,
           `validation` TINYTEXT NULL,
           `display_column` INT(3) DEFAULT 0,
           `admin_column` INT(3) DEFAULT 0,
@@ -250,6 +251,28 @@ class PDb_Init
 				}
 
       }
+
+      if ( '0.2' == get_option( Participants_Db::$db_version ) ) {
+
+        /*
+         * updates version 0.2 database to 0.3
+         *
+         * modifying the 'values' column of the fields table to allow for larger
+         * select option lists
+         */
+
+        $sql = "ALTER TABLE ".Participants_Db::$fields_table." MODIFY COLUMN `values` LONGTEXT NULL DEFAULT NULL";
+
+        if ( false !== $wpdb->query( $sql ) ) {
+
+          // set the version number this step brings the db to
+          update_option( Participants_Db::$db_version, '0.3' );
+
+        }
+
+      }
+
+      error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
       
     }
 

@@ -143,6 +143,8 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 * new settings layout with new group for record edit form
 * added ability to display the group description in the record edit form
 * error message for record form called with invalid ID
+* more space provided for form element select options
+* database version to 0.3
 
 = 1.1.3 =
 * fixed bug with default values not preloading into the signup form

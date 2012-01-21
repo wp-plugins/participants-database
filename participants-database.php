@@ -387,7 +387,7 @@ class Participants_Db {
 				
 				return ob_get_clean();
 			
-      } else echo '<p>'.__('There is no record for this ID.', Participants_Db::PLUGIN_NAME ).'</p>';
+      } else return '<p>'.__('There is no record for this ID.', Participants_Db::PLUGIN_NAME ).'</p>';
     }
 		
 	}
