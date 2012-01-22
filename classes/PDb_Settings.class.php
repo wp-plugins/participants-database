@@ -199,7 +199,6 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text-field',
-					/* translators: don't translate words in brackets[] */
           'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. Placing the [record_link] here is not recommended.', Participants_Db::PLUGIN_NAME ),
 					/* translators: the %s will be the name of the website */
           'value'       =>sprintf( __('<p>Thank you, [first_name] for signing up with %s.</p><p>You may complete your registration with additional information or update your information by visiting this link at any time: <a href="[record_link]">[record_link]</a>.</p>', Participants_Db::PLUGIN_NAME ),get_bloginfo('name') ),
@@ -213,7 +212,6 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array(
           'type'        =>'text-field',
           'help_text'   => __('Note to display on the web page after someone has submitted a signup form. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link].', Participants_Db::PLUGIN_NAME ),
-					/* translators: don't translate words in brackets[] */
           'value'       =>__('<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting the link provided in the email.</p>', Participants_Db::PLUGIN_NAME ),
           )
         );
@@ -262,7 +260,6 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array(
           'type'        =>'text-field',
           'help_text'   => __('notification email body'),
-					/* translators: don't translate words in brackets[] */
           'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>'),
           )
         );
@@ -276,7 +273,6 @@ class PDb_Settings extends Plugin_Settings {
         'options'    =>array
 					(
           'type'       =>'dropdown',
-          /* translators: don't translate words in brackets [] */
           'help_text'  => __('the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
 					'options'    => $this->_get_pagelist(),
           )
@@ -336,8 +332,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'record',
         'options'    => array(
           'type'        =>'text-field',
-					/* translators: don't translate words in brackets[] */
-          'help_text'   => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. Also available are [date] which will add the date and time of the update', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. (The field name is under the "name" column on the "Manage Database Fields" page.)  Also available is [date] which will show the date and time of the update', Participants_Db::PLUGIN_NAME ),
           'value'       =>__('<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] [last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</li><li>Phone: [phone]</li><li>Email: [email]</li></ul>', Participants_Db::PLUGIN_NAME ),
           )
         );
@@ -371,6 +366,9 @@ class PDb_Settings extends Plugin_Settings {
     ?>
     <div class="wrap participants_db settings-class">
       <h2><?php echo Participants_Db::$plugin_title?> <?php _e('Settings', Participants_Db::PLUGIN_NAME )?></h2>
+      <ul>
+      <?php foreach ( $this->sections as $id => $title ) printf('<li><a href="#%s">%s</a></li>',Participants_Db::make_anchor( $id ), $title ); ?>
+      </ul>
 
       <?php parent::show_settings_form() ?>
 
@@ -378,5 +376,20 @@ class PDb_Settings extends Plugin_Settings {
     <?php
 
   }
+	
+	
+	/**
+	 * displays a section subheader
+	 *
+	 * note: the header is displayed by WP; this is only what would go under that
+	 */
+	public function options_section( $section ) {
+		
+		$name = Participants_db::make_anchor( end( explode( '_',$section['id'] ) ) );
+		
+		return printf('<a id="%1$s" name="%1$s" class="%2$s" ></a>', $name, Participants_Db::$css_prefix.'anchor' );
+	
+	}
 
 }
+?>

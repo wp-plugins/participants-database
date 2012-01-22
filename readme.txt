@@ -78,7 +78,7 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 
 == Frequently Asked Questions ==
 
-= Where do I put the shortcode? =
+= How do I get the form to display? Where does the shortcode go? =
 
 Put the [pdb_signup] shortcode where you want your signup form to go.
 

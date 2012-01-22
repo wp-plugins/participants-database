@@ -74,6 +74,10 @@ body[class*='participants-database'] .text-block {
 	border: 1px solid rgba(204, 0, 0, 0.5);
   box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
 }
+.participants_db.settings-class .pdb_anchor {
+	position:relative;
+	top:-5em;
+}
 
 /* manage fields */
 div.manage-fields-wrap {

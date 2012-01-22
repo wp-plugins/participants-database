@@ -535,7 +535,12 @@ class Participants_Db {
 	 
 	}
   
-  // gets an associative array of all column names and types
+  /**
+	 * gets an associative array of all main database column names and types
+	 * 
+	 * columns in this database remain even after they've been deleted from the fields database, so we 
+	 * don't use the results of this func for anything that only uses active columns
+	 */
   public function get_columns() {
   
 		global $wpdb;
@@ -1654,6 +1659,15 @@ class Participants_Db {
 		// replace the variables with strings
 		return vsprintf( $pattern, $values );
 
+	}
+	
+	/**
+	 * makes a title legal to use in anchor tag
+	 */
+	public function make_anchor( $title ) {
+		
+		return str_replace( ' ','', preg_replace( '#^[0-9]*#','',strtolower( $title ) ) );
+		
 	}
 	
 
