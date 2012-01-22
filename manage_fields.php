@@ -148,20 +148,26 @@ if ( isset( $_POST['action'] ) ) {
 // get the defined groups
 $groups = Participants_Db::get_groups( 'name' );
 // remove the internal group
-unset( $groups[ array_search( 'internal', $groups ) ] );
+//unset( $groups[ array_search( 'internal', $groups ) ] );
+$attribute_columns = array();
 
 // get an array with all the defined fields
 foreach( $groups as $group ) {
 	
-	$sql = "SELECT * FROM " . Participants_Db::$fields_table . ' WHERE `group` = "'.$group.'" ORDER BY `order` ';
+	// only display these columns for internal group
+	$select_columns = ( $group === 'internal' ? '`id`,`order`,`name`,`admin_column`,`sortable`,`import`' : '*' ); 
+	
+	$sql = "SELECT $select_columns FROM " . Participants_Db::$fields_table . ' WHERE `group` = "'.$group.'" ORDER BY `order` ';
 	$database_rows[$group] =  $wpdb->get_results( $sql, ARRAY_A );
 	
-}
-// get an array of the field attributes
-$attribute_columns = $wpdb->get_col_info( 'name' );
-// remove read-only fields
-foreach( array( 'id'/*,'name'*/ ) as $item ) {
-	unset( $attribute_columns[ array_search( $item, $attribute_columns ) ] );
+	// get an array of the field attributes
+	$attribute_columns[$group] = $wpdb->get_col_info( 'name' );
+	
+	// remove read-only fields
+	foreach( array( 'id'/*,'name'*/ ) as $item ) {
+		unset( $attribute_columns[$group][ array_search( $item, $attribute_columns ) ] );
+	}
+	
 }
 // this script updates a hidden field when a row is edited so we don't have to update the whole database on submit
 // second bit disables the submit on return behavior
@@ -197,10 +203,13 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<h3><?php echo ucwords( str_replace( '_',' ',$group ) ),' ', __('Fields',Participants_Db::PLUGIN_NAME )?></h3>
 		<p>
 		<?php
+		if ( 'internal' !== $group ) :
 		// "add field" functionality
 		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add field'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button', 'onclick'=>'return false;') ) );
 		FormElement::print_element( array( 'type'=>'text', 'name'=>'title','value'=>$PDb_i18n['new field title'].'&hellip;','attributes'=>array('onfocus'=>"this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",'class'=>'add_field') ) );
-
+		
+		endif; // skip internal groups
+		
 		// number of rows in the group
 		$num_group_rows = count( $database_rows[ $group ] );
 		
@@ -213,9 +222,14 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<table class="wp-list-table widefat fixed manage-fields" cellspacing="0" >
 		<thead>
 			<tr>
+      <?php if ( 'internal' !== $group ) : ?>
 				<th scope="col" class="delete vertical-title"><span><?php echo PDb_header( 'delete' ) ?></span></th>
 			<?php
-			foreach( $attribute_columns as $attribute_column ) {
+			endif; // internal group test
+			
+			foreach( $attribute_columns[ $group ] as $attribute_column ) {
+				
+				if ( 'internal' == $group && in_array( $attribute_column, array( 'order' ) ) ) continue;
 				
 				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'admin_column', 'display_column', 'import', 'signup', 'display' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
 				
@@ -230,15 +244,17 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 			<?php
 			if ( $num_group_rows < 1 ) { // there are no rows in this group to show
 			?>
-			<tr><td colspan="<?php echo count( $attribute_columns ) + 1 ?>"><?php _e('No fields in this group',Participants_Db::PLUGIN_NAME )?></td></tr>
+			<tr><td colspan="<?php echo count( $attribute_columns[ $group ] ) + 1 ?>"><?php _e('No fields in this group',Participants_Db::PLUGIN_NAME )?></td></tr>
 			<?php
 			} else {
 				// add the rows of the group
 				foreach( $database_rows[$group] as $database_row ) :
 				?>
 				<tr id="db_row_<?php echo $database_row[ 'id' ]?>">
+        	<?php if ( 'internal' !== $group ) : ?>
 					<td>
 					<?php
+					endif; // hidden field test
 					// add the hidden fields
 					foreach( array( 'id'/*,'name'*/ ) as $attribute_column ) {
 	
@@ -258,13 +274,16 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 																'name'=>'row_'.$database_row[ 'id' ].'[status]',
 																'attributes' => array( 'id'=>'status_'.$database_row[ 'id' ] ),
 																) );
-					?>
+					if ( 'internal' !== $group ) : ?>
 						<a href="#" name="delete_<?php echo $database_row[ 'id' ]?>" class="delete" ref="field"></a>
 					</td>
 					<?php
+					endif;// internal group test
 	
 					// list the fields for editing
-					foreach( $attribute_columns as $attribute_column ) :
+					foreach( $attribute_columns[$group] as $attribute_column ) :
+					
+						if ( 'internal' == $group && in_array( $attribute_column, array( 'order' ) ) ) continue;
 	
 						$value = Participants_Db::prepare_value( $database_row[ $attribute_column ] );
 	

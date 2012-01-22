@@ -19,9 +19,12 @@ class PDb_Settings extends Plugin_Settings {
                             'record' => __('Record Form Settings', Participants_Db::PLUGIN_NAME ),
                             );
 
+
     // run the parent class initialization to finish setting up the class 
     parent::__construct( __CLASS__, $this->WP_setting, $this->sections );
 
+    $this->submit_button = __('Save Plugin Settings', Participants_Db::PLUGIN_NAME );
+    
     // define the individual settings
     $this->_define_settings();
 

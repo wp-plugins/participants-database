@@ -330,10 +330,13 @@ class PDb_Init
                             'date_recorded'  => array(
                                                     'title' => 'Date Recorded',
                                                     'form_element'=>'date',
+																										'admin_column'=>'100',
+																										'sortable'=>1,
                                                     ),
                             'date_updated'   => array(
                                                     'title' => 'Date Updated',
                                                     'form_element'=>'date',
+																										'sortable'=>1,
                                                     ),
                             );
 

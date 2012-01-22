@@ -6,7 +6,7 @@ jQuery(document).ready(function($){
     $('#status_'+matches[1]).attr('value','changed');
   });
 	// flag the row as changed
-  $('table.manage-fields select').change(function(el) {
+  $('table.manage-fields select, table.manage-fields input[type=checkbox]').change(function(el) {
     var matches = $(this).attr('name').match(/row_(\d+)\[/);
     $('#status_'+matches[1]).attr('value','changed');
   });

@@ -25,6 +25,7 @@ This database could be of use to any organization that needs to build and mainta
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
 * shortcode for displaying the list on the site
 * email notification and confirmation with secure individual access link
+* email notification when a user edits a record
 * searchable, sortable record listings in the WordPress admin
 * many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, etc.
 * export CSV files for interacting with other databases, mass email, print records
@@ -137,6 +138,10 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.2.1 =
+* timestamps can now be displayed in the admin record list
+* added "internal" group tab to control display and export of internal fields
 
 = 1.2 =
 * added email notifications for record updates

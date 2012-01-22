@@ -38,7 +38,7 @@ class Plugin_Settings {
   private $submit_class;
 
   // label for the submit button
-  private $submit_button;
+  protected $submit_button;
 
   /**
    * constructor
@@ -65,7 +65,7 @@ class Plugin_Settings {
     $this->help_text_wrap = '<span class="helptext">%s</span>';
     $this->submit_wrap = '<p class="submit">%s</p>';
     $this->submit_class = 'button-primary';
-    $this->submit_button = esc_attr('Save Settings');
+    $this->submit_button = 'Save Settings';
 
     // define a default settings section so that setting up sections is optional
     $this->sections = false === $sections ? array( 'main' => 'General Settings' ) : (array) $sections;

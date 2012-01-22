@@ -109,6 +109,12 @@ th.form_element {
 th.validation, th.title, th.default, th.group, th.name {
 	width:8%;
 }
+#internal th.name {
+	width:100%;
+}
+#internal table.manage-fields {
+	width: 300px;
+}
 #field_groups th.title {
 	width:auto;
 }
