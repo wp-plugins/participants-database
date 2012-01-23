@@ -239,6 +239,12 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 
 == Upgrade Notice ==
 
+= 1.2.1 =
+Important feature upgrade includes an option to send users to a different page after signing up, and several other major enhancements for the backend
+
+= 1.2 =
+Major upgrade adds a couple of minor features including email notifications for user record updates
+
 = 1.1.3 =
 Important upgrade fixes a couple of bugs, better input values handing for forms and enhanced forms security
 
