@@ -312,7 +312,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      =>'record',
         'options'    =>array(
           'type'       =>'text',
-          'help_text'  => __("the message shown when a record form has be successfully submitted", Participants_Db::PLUGIN_NAME ),
+          'help_text'  => __("the message shown when a record form has been successfully submitted", Participants_Db::PLUGIN_NAME ),
           'value'      => __('Your information has been updated:', Participants_Db::PLUGIN_NAME ),
           )
         );
