@@ -26,16 +26,16 @@ class Plugin_Settings {
   protected $plugin_settings;
 
   // settings page slug
-  private $settings_page;
+  protected $settings_page;
 
   // help text wrap HTML
-  private $help_text_wrap;
+  protected $help_text_wrap;
 
   // wrapper HTML for the settings page submit button
-  private $submit_wrap;
+  protected $submit_wrap;
 
   // classname for the submit button
-  private $submit_class;
+  protected $submit_class;
 
   // label for the submit button
   protected $submit_button;

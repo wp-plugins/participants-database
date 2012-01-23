@@ -182,6 +182,14 @@ a.dragger {
 	margin-top : 2px;
 }
 
+/* SETTINGS PAGE */
+.settings-class textarea {
+	float:left;
+	margin-right:10px;
+	height:140px;
+	width:300px;
+}
+
 /*   UI TABS   */
 
 /* hide before tabs kicks in */

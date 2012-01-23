@@ -17,6 +17,9 @@ class Signup {
 
 	// holds the column attributes for columns assigned to the signup
 	private $signup_columns;
+	
+	// holds the target page for the submission
+	private $submission_page;
 
 	// holds the recipient values after a form submission
 	private $recipient;
@@ -94,12 +97,25 @@ class Signup {
 		                               $options['receipt_from_name'],
 		                               "\r\n"
 		                               );
+		
+		if ( ! isset( $options['signup_thanks_page'] ) ) {
+			
+			// the signup thanks page is not set up
+			
+			$this->submission_page = $_SERVER['REQUEST_URI'];
+			
+		} else {
+			
+			$this->submission_page = get_page_link( $options['signup_thanks_page'] );
+			
+		}
 
 
 		$atts = shortcode_atts( array(
 																			'title'   => '',
 																			'captcha' => 'none',
 																			'class' => 'signup',
+																			'type' => 'signup',
 																			),
 														$params );
 														
@@ -110,27 +126,38 @@ class Signup {
 		// do we have a submission?
 		if ( false === $submission_id ) {
 
-				// no submission
-				// if the signup and edit record shortcodes are on the same page, we check to see which one we will show:
-				// if no private id is included in the URI, we show the signup form; also
-				// if there is a private id in the URI, we check to see if it's valid; if not, show the signup form
+				/*
+				 * no submission: do we show the signup form?
+				 *
+				 * yes if there's no valid PID in the GET string
+				 * but not if we're actually showing a [pdb_signup_thanks] shortcode 
+				 * and there's no submission
+				 *
+				 * this is because we use the same code for both shortcodes
+				 *
+				 * we will get a no-show if we end up here with a valid PID, but 
+				 * there's no [pdb_record] shortcode there.
+				 */
 				if (
-						! isset( $_GET['pid'] )
-						||
-						( isset( $_GET['pid'] ) && false === Participants_Db::get_participant_id( $_GET['pid'] ) ) 
+						( 
+						 ! isset( $_GET['pid'] )
+						 ||
+						 ( isset( $_GET['pid'] ) && false === Participants_Db::get_participant_id( $_GET['pid'] ) ) 
+						)
+						&&
+						$atts['type'] != 'thanks'
 					 )
 				{
 	
-			// no submission; output the form
-			$this->_form( $atts );
+					// no submission; output the form
+					$this->_form( $atts );
 			
 				}
 			
-		} else {
+		} elseif ( $submission_id ) {
 
 			// load the values from the newly-submitted record
 			$this->_load_participant( $submission_id );
-			
 			
 			
 			$this->registration_page = Participants_Db::get_record_link( $this->participant['private_id'] );
@@ -174,9 +201,9 @@ class Signup {
 			if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$validation_errors->get_error_html();
 
 			?>
-			<form method="post" action="<?php echo $_SERVER['REQUEST_URI']?>"  enctype="multipart/form-data" >
+			<form method="post" action="<?php echo $this->submission_page ?>"  enctype="multipart/form-data" >
 				<?php
-				FormElement::print_hidden_fields( array( 'action'=>'signup' ) );
+				FormElement::print_hidden_fields( array( 'action'=>'signup', 'source'=>Participants_Db::PLUGIN_NAME, 'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ) ) );
 				?>
 				<table class="form-table pdb-signup">
 			<?php
@@ -234,7 +261,7 @@ class Signup {
 	private function _thanks() {
 		ob_start();
 		?>
-		<div class="signup">
+		<div class="signup signup-thanks">
 		<?php
 		echo $this->_proc_tags( $this->thanks_message );
 		?>

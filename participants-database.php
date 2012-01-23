@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.2
+Version: 1.2.1
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -178,6 +178,7 @@ class Participants_Db {
 		// define our shortcodes
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
+		add_shortcode( 'pdb_signup_thanks', array( __CLASS__, 'print_signup_thanks_form' ) );
 		add_shortcode( 'pdb_list', array( 'PDb_List','initialize' ) );
 		
 	
@@ -313,6 +314,7 @@ class Participants_Db {
 
 		// add any js scripts needed for the admin pages
     add_action( 'admin_print_scripts-' . $managepage, array( __CLASS__, 'manage_fields_scripts' ));
+    add_action( 'admin_print_scripts-' . $settingspage, array( __CLASS__, 'settings_scripts' ));
 		
 	}
 	
@@ -340,6 +342,14 @@ class Participants_Db {
 			'must_remove' => '<h4>You must remove all fields from the {name} group before deleting it.</h4>',
 			'delete_confirm' => '<h4>Delete the "{name}" {thing}?</h4>',
 		) );
+	}
+
+	public function settings_scripts() {
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'jquery-ui-core' );
+		wp_enqueue_script( 'jquery-ui-tabs' );
+		wp_register_script( 'settings_script', plugins_url( 'js/settings.js', __FILE__ ) );
+		wp_enqueue_script( 'settings_script' );
 	}
 		
 
@@ -396,6 +406,17 @@ class Participants_Db {
 	 * prints a signup form
 	 */
 	public function print_signup_form( $params ) {
+
+		return Signup::print_form( $params );
+		
+	}
+	
+	/**
+	 * prints the signup thanks form
+	 */
+	public function print_signup_thanks_form( $params ) {
+		
+		$params['type'] = 'thanks';
 
 		return Signup::print_form( $params );
 		
@@ -1081,6 +1102,8 @@ class Participants_Db {
   
 	// processes any POST requests for the submitted edit page
   public function process_page_request() {
+			
+		$options = get_option( self::$participants_db_options );
 
 		// only process POST arrays from this plugin's pages
 		if ( ! isset( $_POST['source'] ) or $_POST['source'] != self::PLUGIN_NAME or ! isset( $_POST['action'] ) ) return NULL;
@@ -1108,8 +1131,6 @@ class Participants_Db {
 
 		// if we are submitting from the frontend, we're done
     if ( ! is_admin() ) {
-			
-			$options = get_option( self::$participants_db_options );
 			
 			self::$validation_errors->add_error( '', $options['record_updated_message'] );
 			

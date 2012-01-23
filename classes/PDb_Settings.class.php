@@ -151,6 +151,18 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'       =>'signup_thanks_page',
+        'title'      =>__('Signup Thanks Page', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'signup',
+        'options'    =>array
+					(
+          'type'       =>'dropdown',
+          'help_text'  => __('after they singup, send them to this page for a thank you message. This page is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have to do that if you have them go back to the same page.', Participants_Db::PLUGIN_NAME ),
+					'options'    => $this->_get_pagelist(),
+          )
+        );
+
+    $this->plugin_settings[] = array(
         'name'       => 'send_signup_receipt_email',
         'title'      => __('Send Signup Response Email', Participants_Db::PLUGIN_NAME ),
         'group'      => 'signup',
@@ -202,7 +214,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text-field',
-          'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. Placing the [record_link] here is not recommended.', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link].', Participants_Db::PLUGIN_NAME ),
 					/* translators: the %s will be the name of the website */
           'value'       =>sprintf( __('<p>Thank you, [first_name] for signing up with %s.</p><p>You may complete your registration with additional information or update your information by visiting this link at any time: <a href="[record_link]">[record_link]</a>.</p>', Participants_Db::PLUGIN_NAME ),get_bloginfo('name') ),
           )
@@ -214,7 +226,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text-field',
-          'help_text'   => __('Note to display on the web page after someone has submitted a signup form. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link].', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('Note to display on the web page after someone has submitted a signup form. Can include HTML, placeholders:[first_name],[last_name],[email], etc. They must be fields that are present in the signup form.', Participants_Db::PLUGIN_NAME ),
           'value'       =>__('<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting the link provided in the email.</p>', Participants_Db::PLUGIN_NAME ),
           )
         );
@@ -369,11 +381,33 @@ class PDb_Settings extends Plugin_Settings {
     ?>
     <div class="wrap participants_db settings-class">
       <h2><?php echo Participants_Db::$plugin_title?> <?php _e('Settings', Participants_Db::PLUGIN_NAME )?></h2>
-      <ul>
-      <?php foreach ( $this->sections as $id => $title ) printf('<li><a href="#%s">%s</a></li>',Participants_Db::make_anchor( $id ), $title ); ?>
-      </ul>
-
-      <?php parent::show_settings_form() ?>
+      <form action="options.php" method="post">
+        <div class="ui-tabs">
+          <ul class="ui-tabs-nav">
+          <?php foreach ( $this->sections as $id => $title ) printf('<li><a href="#%s">%s</a></li>',Participants_Db::make_anchor( $id ), $title ); ?>
+          </ul>
+          <?php
+  
+          settings_fields( $this->WP_setting );
+  
+          do_settings_sections( $this->settings_page );
+					
+					?>
+        </div>
+          
+          <?php
+  
+          $args = array(
+                        'type'  => 'submit',
+                        'class' => $this->submit_class,
+                        'value' => $this->submit_button,
+                        'name'  => 'submit',
+                        );
+  
+          printf( $this->submit_wrap, FormElement::get_element( $args ) );
+  
+          ?>
+      </form>
 
     </div>
     <?php

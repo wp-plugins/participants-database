@@ -18,18 +18,20 @@ This database could be of use to any organization that needs to build and mainta
 
 **Some of the features of the Participants Database Plugin:**
 
-* fully configurable database for holding any kind of information about people
+* fully configurable database for holding any kind of information about people (or anything, really!)
 * customizable forms for collecting and maintaining records
 * both front-end and back-end versions of the forms
 * shortcode for inserting a configurable sign-up short form into WordPress pages, posts, etc.
+* completing the sign-up form can direct visitors to another page for a thank you message or reward
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
-* shortcode for displaying the list on the site
+* shortcode for displaying the list on the site, including the ability to select and order columns to display
 * email notification and confirmation with secure individual access link
 * email notification when a user edits a record
 * searchable, sortable record listings in the WordPress admin
 * many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, etc.
 * export CSV files for interacting with other databases, mass email, print records
 * import CSV files to add large numbers of records from spreadsheets such as Open Office or Google Docs
+* form can be organized into groups of fields, making long forms easier to navigate and fill out
 
 **Database**
 
@@ -142,6 +144,9 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 = 1.2.1 =
 * timestamps can now be displayed in the admin record list
 * added "internal" group tab to control display and export of internal fields
+* signup form "thanks" page can now be any page
+* new shortcode [pdb_signup_thanks] to display signup thank you message
+* better organized settings page
 
 = 1.2 =
 * added email notifications for record updates
@@ -279,3 +284,9 @@ If you want to display the list on your website, place the [pdb_list] shortcode 
 6. Go to the plugin settings page to set up the emails. There are both user and admin emails sent on a signup, and you can determine the content of the emails and also whether to send them and to whom.
 
 Of course, records can be entered in the backend by a user with "edit posts" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file.
+
+**Setting Up the Signup Form "Thank You" Page**
+
+To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the [pdb_signup_thanks] shotcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
+
+It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.
