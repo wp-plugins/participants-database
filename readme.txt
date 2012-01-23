@@ -290,3 +290,11 @@ Of course, records can be entered in the backend by a user with "edit posts" or 
 To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the [pdb_signup_thanks] shotcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
 
 It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.
+
+**Showing the List on Your Website**
+
+You can use the [pdb_list] shortcode to show the records on your site. Just put the shortcode where you want it to show up. You can set the number of records to show per page (yes, it's paginated!) with the 'list-limit' setting, also the CSS class to wrap the table in with the 'class' setting...like this: [pdb_list list-limit=10 class=memberlist]
+
+Which columns get included is determined on the fields management page, just set the "display_column" value to order the columns as you like.
+
+If you want to get tricky with the CSS, each header column has a class name the corresponds to the name of the field, you can use CSS to lay out the listing exactly as you want.
