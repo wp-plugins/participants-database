@@ -27,9 +27,6 @@ class PDb_List
 	// holds the main query for building the list
 	static $list_query;
 	
-	// holds the filtering parameters
-	static $list_filter;
-	 
 	// translations strings for buttons
 	static $i18n;
 	
@@ -99,12 +96,6 @@ class PDb_List
                                       'search'      => 'false',
                                       'list-limit'  => self::$page_list_limit,
                                       'class'       => 'participants-database',
-																			'sortBy'      => 'last_name',
-																			'where_clause'=> 'last_name',
-																			'value'       => '',
-																			'operator'    => 'LIKE',
-																			'ascdesc'     => 'ASC',
-																			'filter_mode' => ''
                                       );
 
     self::$params = shortcode_atts( $shortcode_defaults, $atts );
@@ -115,27 +106,7 @@ class PDb_List
 		else echo '<link media="all" type="text/css" href="'.plugins_url( Participants_Db::PLUGIN_NAME.'/pdb-list.css' ).'" rel="stylesheet">';
 		
 		// process any search/filter/sort terms and build the main query
-		$submit = isset( $_POST['submit'] ) ? $_POST['submit'] : self::$params['filter_mode'];
-		if ( empty( $atts ) ) {
-			
-			self::$list_filter = array(
-																							 'sortBy'       => self::set_filter_param( 'sortBy', 'last_name' ),
-																							 'where_clause' => self::set_filter_param( 'where_clause', 'last_name' ),
-																							 'value'        => self::set_filter_param( 'value' ),
-																							 'operator'     => self::set_filter_param( 'operator', 'LIKE' ),
-																							 'ascdesc'      => self::set_filter_param( 'ascdesc', 'ASC' ),
-																							 );
-		} else {
-			// merge the $_POST array filter terms with the incoming shortcode vars to build the filter terms
-			self::$list_filter = shortcode_atts( array(
-																								 'sortBy'       => self::set_filter_param( 'sortBy', 'last_name' ),
-																								 'where_clause' => self::set_filter_param( 'where_clause', 'last_name' ),
-																								 'value'        => self::set_filter_param( 'value' ),
-																								 'operator'     => self::set_filter_param( 'operator', 'LIKE' ),
-																								 'ascdesc'      => self::set_filter_param( 'ascdesc', 'ASC' ),
-																								 ), self::$params
-																					);
-		}
+		$submit = isset( $_POST['submit'] ) ? $_POST['submit'] : '';
 		self::_process_search( $submit );
 		
 		// get the $wpdb object
@@ -274,13 +245,13 @@ class PDb_List
 				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table;
 
 				// define the delimiter for use with LIKE operators
-				$delimiter = ( false !== stripos( self::$list_filter['operator'], 'LIKE' ) ? '%' : '' );
+				$delimiter = ( false !== stripos( $_POST['operator'], 'LIKE' ) ? '%' : '' );
 
-				$sortby = isset( self::$list_filter['sortBy'] ) ? self::$list_filter['sortBy'] : current( self::$sortables );
+				$sortby = isset( $_POST['sortBy'] ) ? mysql_real_escape_string($_POST['sortBy']) : current( self::$sortables );
 				
-				if ( self::$list_filter['where_clause'] != 'none' ) {
+				if ( $_POST['where_clause'] != 'none' ) {
 					
-					self::$list_query .= ' WHERE `'.self::$list_filter['where_clause'].'` '.self::$list_filter['operator']." '".$delimiter.self::$list_filter['value'].$delimiter."' ";
+					self::$list_query .= ' WHERE `'.mysql_real_escape_string($_POST['where_clause']).'` '.mysql_real_escape_string($_POST['operator'])." '".$delimiter.mysql_real_escape_string($_POST['value']).$delimiter."' ";
 					self::$list_query .= ' AND '.$skip_default;
 					
 				} else {
@@ -289,7 +260,7 @@ class PDb_List
 					
 				}
 				
-				self::$list_query .= ' ORDER BY '.$sortby.' '.self::$list_filter['ascdesc'];
+				self::$list_query .= ' ORDER BY '.$sortby.' '.mysql_real_escape_string($_POST['ascdesc']);
 		
 				// go back to the first page to display the newly sorted/filtered list
 				$_GET[ self::$list_page ] = 1;
@@ -681,15 +652,6 @@ class PDb_List
       return self::$params['search'] == 'true' ? ( $mode == 'sort' ? 'both' : 'filter' ) : $mode ;
 
     }
-		
-		/**
-		 * sets a filter parameter
-		 */
-		private function set_filter_param( $param, $default = '' ) {
-			
-			return isset( $_POST[$param] ) ? mysql_real_escape_string( $_POST[$param] ) : $default;
-		
-		}
 		
 		/**
 		 * sets up the internationalization strings

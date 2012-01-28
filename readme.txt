@@ -144,7 +144,7 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 = 1.2.2 =
 * added option to show groups and group descriptions in signup form
 * fixed bug in signup form submissions that contain multi-select form fields
-* It is now possible to edit the titles of the internal fields
+* it is now possible to edit the titles of the internal fields
 
 = 1.2.1 =
 * timestamps can now be displayed in the admin record list
@@ -243,6 +243,9 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.2.2 =
+Minor bugfix and feature upgrade; added ability to show groups and group descriptions in the signup form; multiselects in signup form bug fixed
 
 = 1.2.1 =
 Important feature upgrade includes an option to send users to a different page after signing up, and several other major enhancements for the backend
