@@ -17,6 +17,12 @@ class Signup {
 
 	// holds the column attributes for columns assigned to the signup
 	private $signup_columns;
+
+	// groups titles and descriptions
+	private $groups;
+	
+	// the currently active group
+	private $current_group;
 	
 	// holds the target page for the submission
 	private $submission_page;
@@ -61,7 +67,7 @@ class Signup {
 	private $errors = array();
 	
 	// holds the output for the shortcode
-	private $output;
+	private $output = '';
 
 	// methods
 	//
@@ -110,6 +116,11 @@ class Signup {
 			
 		}
 
+		if ( $options['signup_show_group_descriptions'] ) {
+
+      $this->groups = Participants_Db::get_groups( '`name`,`title`,`description`' );
+
+    } else $this->groups = false;
 
 		$atts = shortcode_atts( array(
 																			'title'   => '',
@@ -213,17 +224,38 @@ class Signup {
 
 				// skip the ID column
 				if ( in_array( $column->name, array( 'id', 'private_id' ) ) ) continue;
+				
+				
+				// if we're showing groups, is the group of the next field a new one? If so, show it
+        if ( false !== $this->groups && true === ( $column->group != $this->current_group['name'] ) ) {
+					
+					$this->_print_group_row( $column->group );
+					
+					$this->current_group = $this->groups[ $column->group ];
+					
+				}
+				
 				?>
 					<tr id="<?php echo $column->name?>" class="<?php echo $column->form_element?>">
 						<th><?php echo $column->title?></th>
 						<td>
 						<?php
 
+						// unserialize it if the default is an array
 						$value = isset( $participant_values[ $column->name ] ) ? Participants_Db::unserialize_array( $participant_values[ $column->name ] ) : '';
+						
+						// now get the inputted value and scrub it if it's a string
+						if ( isset( $_POST[ $column->name ] ) ) {
+							
+							if ( is_array( $_POST[ $column->name ] ) ) $value = $_POST[ $column->name ];
+							
+							else $value = esc_html(stripslashes($_POST[ $column->name ]));
+							
+						}
 
 						FormElement::print_element( array(
 																							'type'       => $column->form_element,
-																							'value'      => ( isset( $_POST[ $column->name ] ) ? esc_html(stripslashes($_POST[ $column->name ])) : $value ),
+																							'value'      => $value,
 																							'name'       => $column->name,
 																							'options'    => $column->values,
 																							) );
@@ -245,15 +277,42 @@ class Signup {
 				<?php endif ?>
 					<tr>
 						<td colspan="2" class="submit-buttons">
-							<input class="button-primary" type="submit" value="<?php $options = get_option(Participants_Db::$participants_db_options); echo $options['signup_button_text']?>" name="submit">
+            <?php 
+						$options = get_option(Participants_Db::$participants_db_options);
+						FormElement::print_element( array(
+																							'type'       => 'submit',
+																							'value'      => $options['signup_button_text'],
+																							'name'       => 'submit',
+																							'class'      => 'button-primary',
+																							) );
+						?>
 						</td>
 					</tr>
 				</table>
 			</form>
 		</div>
 		<?php
-		$this->output = ob_get_clean();
+		$this->output .= ob_get_clean();
 	}
+
+	/**
+	 * prints a group row
+	 *
+	 * we use the array index to keep track of which group is current
+	 */
+  private function _print_group_row( $group ) {
+
+    // get the group's info
+    $new_group = $this->groups[ $group ];
+
+    ?>
+    <tr class="signup-group">
+      <td colspan="2">
+      	<?php printf( ( empty( $new_group['description'] ) ? '<h3>%1$s</h3>' : '<h3>%1$s</h3><p>%2$s</p>' ),$new_group['title'], $new_group['description'] )?>
+      </td>
+    </tr>
+    <?php
+  }
 	
 	/**
 	 * prints a thank you note
@@ -268,6 +327,8 @@ class Signup {
 		</div>
 		<?php
 		$this->output = ob_get_clean();
+		
+		unset( $_POST );
 		
 	}
 	

@@ -278,6 +278,19 @@ class PDb_Settings extends Plugin_Settings {
           'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>'),
           )
         );
+
+    $this->plugin_settings[] = array(
+        'name'       => 'signup_show_group_descriptions',
+        'title'      => __('Show Field Groups', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('Show groups and group descriptions in the signup form.', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          )
+        );
 		
 		// record form settings
 

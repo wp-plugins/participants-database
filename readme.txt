@@ -141,6 +141,11 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 
 == Changelog ==
 
+= 1.2.2 =
+* added option to show groups and group descriptions in signup form
+* fixed bug in signup form submissions that contain multi-select form fields
+* It is now possible to edit the titles of the internal fields
+
 = 1.2.1 =
 * timestamps can now be displayed in the admin record list
 * added "internal" group tab to control display and export of internal fields

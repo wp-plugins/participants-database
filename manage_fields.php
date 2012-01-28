@@ -155,7 +155,7 @@ $attribute_columns = array();
 foreach( $groups as $group ) {
 	
 	// only display these columns for internal group
-	$select_columns = ( $group === 'internal' ? '`id`,`order`,`name`,`admin_column`,`sortable`,`import`' : '*' ); 
+	$select_columns = ( $group === 'internal' ? '`id`,`order`,`name`,`title`,`admin_column`,`sortable`,`import`' : '*' ); 
 	
 	$sql = "SELECT $select_columns FROM " . Participants_Db::$fields_table . ' WHERE `group` = "'.$group.'" ORDER BY `order` ';
 	$database_rows[$group] =  $wpdb->get_results( $sql, ARRAY_A );
