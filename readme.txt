@@ -252,7 +252,7 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 == Upgrade Notice ==
 
 = 1.2.3 =
-Feature enhancement upgrade: added filtering and sorting to list shortcode; added an access control setting for editing, adding and viewing records
+Important feature enhancement upgrade: added filtering and sorting to list shortcode; added an access control setting for editing, adding and viewing records; fixed problems with date filtering and sorting
 
 = 1.2.2 =
 Minor bugfix and feature upgrade; added ability to show groups and group descriptions in the signup form; multiselects in signup form bug fixed
