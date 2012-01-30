@@ -24,7 +24,7 @@ This database could be of use to any organization that needs to build and mainta
 * shortcode for inserting a configurable sign-up short form into WordPress pages, posts, etc.
 * completing the sign-up form can direct visitors to another page for a thank you message or reward
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
-* shortcode for displaying the list on the site, including the ability to select and order columns to display
+* shortcode for displaying the list on the site, including the ability to select and order columns to display, sorting and filtering rules to dertermine which records are shown and in what order
 * email notification and confirmation with secure individual access link
 * email notification when a user edits a record
 * searchable, sortable record listings in the WordPress admin

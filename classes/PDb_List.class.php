@@ -265,7 +265,7 @@ class PDb_List
 					case 'LIKE':
 						
 						$operator = 'LIKE';
-						$delimiter = array('%','%');
+						$delimiter = array('"%','%"');
 						break;
 					
 					case 'gt':
@@ -284,31 +284,32 @@ class PDb_List
 						
 				}
 				
-				// if the field searched is a "date" field, convert the search string to a date
-				$field_atts = Participants_Db::get_field_atts( self::$filter['where_clause'] );
-				
-				$value = self::$filter['value']; 
-				
-				if ( $field_atts->form_element == 'date') {
-				
-					$value = strtotime( self::$filter['value'] ); 
-					$delimiter = array( 'CAST(',' AS UNSIGNED)' );
-					
-				}
-				
-				if ( in_array( self::$filter['where_clause'], array( 'date_recorded','date_updated' ) ) ) {
-				
-					$delimiter = array( 'FROM_UNIXTIME(',')' );
-					
-				}
-				
-					
-				
 				if ( self::$filter['where_clause'] != 'none' ) {
+				
+					// if the field searched is a "date" field, convert the search string to a date
+					$field_atts = Participants_Db::get_field_atts( self::$filter['where_clause'] );
 					
-					self::$list_query .= ' WHERE `'.mysql_real_escape_string(self::$filter['where_clause']).'` '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
+					$value = self::$filter['value']; 
 					
-					self::$list_query .= ' AND '.$skip_default;
+					if ( $field_atts->form_element == 'date') {
+					
+						$value = strtotime( self::$filter['value'] ); 
+						if ( empty( $value ) ) {
+							$value = time();
+						}
+						$delimiter = array( 'CAST(',' AS UNSIGNED)' );
+						
+					}
+					
+					if ( in_array( self::$filter['where_clause'], array( 'date_recorded','date_updated' ) ) ) {
+					
+						$delimiter = array( 'FROM_UNIXTIME(',')' );
+						
+					}
+					
+						self::$list_query .= ' WHERE `'.mysql_real_escape_string(self::$filter['where_clause']).'` '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
+						
+						self::$list_query .= ' AND '.$skip_default;
 					
 				} else {
 					
