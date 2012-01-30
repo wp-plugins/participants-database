@@ -17,7 +17,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.10
+ * @version    Release: 2.1.3
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
  
@@ -61,7 +61,13 @@ class PDb_List
 	static $sortables;
 
 	// holds the parameters for a shortcode-called display of the list
-	static $params;
+	static $shortcode_params;
+	
+	// name of the list parameter transient storage
+	static $list_storage = 'PDb_list_filter';
+	
+	// holds the settings for the list filtering and sorting
+	static $filter;
 	
 	/**
 	 * initializes and outputs the list for the backend or frontend
@@ -89,16 +95,21 @@ class PDb_List
     self::$display_columns = Participants_Db::get_list_display_columns( self::$backend ? 'admin_column' : 'display_column' );
 
     self::$sortables = Participants_Db::get_sortables();
+		
+		self::$filter = self::_filter_settings();
 
     // define the default settings for the shortcode
     $shortcode_defaults = array(
                                       'sort'        => 'false',
                                       'search'      => 'false',
-                                      'list-limit'  => self::$page_list_limit,
+                                      'list_limit'  => self::$page_list_limit,
                                       'class'       => 'participants-database',
+																			'filter'      => '',
+																			'orderby'			=> 'last_name',
+																			'order'       => 'asc',
                                       );
 
-    self::$params = shortcode_atts( $shortcode_defaults, $atts );
+    self::$shortcode_params = shortcode_atts( $shortcode_defaults, $atts );
 		
 		// process delete and items-per-page form submissions
 		if ( self::$backend ) self::_process_general();
@@ -107,7 +118,10 @@ class PDb_List
 		
 		// process any search/filter/sort terms and build the main query
 		$submit = isset( $_POST['submit'] ) ? $_POST['submit'] : '';
-		self::_process_search( $submit );
+		if ( self::$backend ) self::_process_search( $submit );
+		else self::_shortcode_query();
+		
+		if ( WP_DEBUG ) error_log( __METHOD__.' query= '.self::$list_query );
 		
 		// get the $wpdb object
 		global $wpdb;
@@ -119,7 +133,7 @@ class PDb_List
 		self::$pagination = new Pagination( array(
 																	'link'          => self::get_page_link( $_SERVER['REQUEST_URI'] ),
 																	'page'          => isset( $_GET[ self::$list_page ] ) ? $_GET[ self::$list_page ] : '1',
-																	'size'          => self::$page_list_limit,
+																	'size'          => self::$shortcode_params['list_limit'],
 																	'total_records' => self::$num_records,
 																	'wrap_tag'      => '<div class="pagination"><label>'._x('Page', 'noun; page number indicator', Participants_Db::PLUGIN_NAME ).':</label> ',
 																	'wrap_tag_close'=> '</div>',
@@ -243,15 +257,57 @@ class PDb_List
 			case self::$i18n['filter']:
 			
 				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table;
-
-				// define the delimiter for use with LIKE operators
-				$delimiter = ( false !== stripos( $_POST['operator'], 'LIKE' ) ? '%' : '' );
-
-				$sortby = isset( $_POST['sortBy'] ) ? mysql_real_escape_string($_POST['sortBy']) : current( self::$sortables );
 				
-				if ( $_POST['where_clause'] != 'none' ) {
+				$delimiter = array("'","'");
+
+				switch (self::$filter['operator']){
 					
-					self::$list_query .= ' WHERE `'.mysql_real_escape_string($_POST['where_clause']).'` '.mysql_real_escape_string($_POST['operator'])." '".$delimiter.mysql_real_escape_string($_POST['value']).$delimiter."' ";
+					case 'LIKE':
+						
+						$operator = 'LIKE';
+						$delimiter = array('%','%');
+						break;
+					
+					case 'gt':
+					
+						$operator = '>';
+						break;
+						
+					case 'lt':
+					
+						$operator = '<';
+						break;
+						
+					default:
+					
+						$operator = self::$filter['operator'];
+						
+				}
+				
+				// if the field searched is a "date" field, convert the search string to a date
+				$field_atts = Participants_Db::get_field_atts( self::$filter['where_clause'] );
+				
+				$value = self::$filter['value']; 
+				
+				if ( $field_atts->form_element == 'date') {
+				
+					$value = strtotime( self::$filter['value'] ); 
+					$delimiter = array( 'CAST(',' AS UNSIGNED)' );
+					
+				}
+				
+				if ( in_array( self::$filter['where_clause'], array( 'date_recorded','date_updated' ) ) ) {
+				
+					$delimiter = array( 'FROM_UNIXTIME(',')' );
+					
+				}
+				
+					
+				
+				if ( self::$filter['where_clause'] != 'none' ) {
+					
+					self::$list_query .= ' WHERE `'.mysql_real_escape_string(self::$filter['where_clause']).'` '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
+					
 					self::$list_query .= ' AND '.$skip_default;
 					
 				} else {
@@ -260,7 +316,7 @@ class PDb_List
 					
 				}
 				
-				self::$list_query .= ' ORDER BY '.$sortby.' '.mysql_real_escape_string($_POST['ascdesc']);
+				self::$list_query .= ' ORDER BY `'.mysql_real_escape_string(self::$filter['sortBy']).'` '.mysql_real_escape_string(self::$filter['ascdesc']);
 		
 				// go back to the first page to display the newly sorted/filtered list
 				$_GET[ self::$list_page ] = 1;
@@ -269,15 +325,90 @@ class PDb_List
 				
 			case self::$i18n['clear'] :
 			
-				unset( $_POST['value'], $_POST['where_clause'] );
+				self::$filter['value'] = '';
+				self::$filter['where_clause'] = 'none';
 		
 				// go back to the first page
 				$_GET[ self::$list_page ] = 1;
 				
 			default:
 			
-				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table.' WHERE '.$skip_default.' ORDER BY last_name';
+				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table.' WHERE '.$skip_default.' ORDER BY `'.mysql_real_escape_string(self::$filter['sortBy']).'` '.mysql_real_escape_string(self::$filter['ascdesc']);
 				
+		}
+		
+	}
+	
+	/**
+	 * processes shortcode filters and sorts to build the listing query
+	 *
+	 */
+	private function _shortcode_query() {
+
+    // add this to the query to remove the default record
+    $skip_default = ' `id` != '.Participants_Db::$id_base_number;
+		
+		// if we've got a valid orderby, use it.
+		$orderby = Participants_Db::is_column( self::$shortcode_params['orderby'] ) ? self::$shortcode_params['orderby'] : current( self::$sortables );
+			
+		$order = in_array( strtoupper( self::$shortcode_params['order'] ), array( 'ASC', 'DESC' ) ) ? strtoupper( self::$shortcode_params['order'] ) : 'ASC';
+		
+		self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table.' WHERE '.$skip_default.' ORDER BY `'.$orderby.'` '.$order;
+		
+		$where_clause = '';
+		
+		if ( isset( self::$shortcode_params['filter'] ) ) {
+			
+			$statements = explode( '&', html_entity_decode(self::$shortcode_params['filter']) );
+			
+			foreach ( $statements as $statement ) {
+				
+				$operator = preg_match( '#(\S+)(\>|\<|=|!)(\S+)#', str_replace(' ','', $statement ), $matches );
+				
+				if ( $operator === 0 ) return;// no valid operator; just use the default query
+				
+				// get the parts
+				list( $string, $column, $op_char, $target ) = $matches;
+				
+				if ( ! Participants_Db::is_column( $column ) ) return;// not a valid column; just use the default query
+				
+				$field_atts = Participants_Db::get_field_atts( $column );
+				
+				$delimiter = array('"','"');
+				
+				// if we're dealing with a date element, the target value needs to be conditioned to
+				// get a correct comparison
+				if ( $field_atts->form_element == 'date' ) {
+				
+					$target = strtotime( $target );
+					$delimiter = array( 'CAST(',' AS UNSIGNED)' );
+					
+				}
+				
+				// get the proper operator
+				switch ( $op_char ) {
+					
+					case '=':
+						$operator = 'LIKE';
+						$delimiter = array('%','%');
+						break;
+					
+					case '!':
+						$operator = '!=';
+						break;
+						
+					default:
+						$operator = $op_char;
+						
+				}
+				
+				// build the where clause
+				$where_clause .= '`'.$column.'` '.$operator.' '.$delimiter[0].$target.$delimiter[1].' AND ';
+				
+			}// foreach $statements
+			
+			self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table.' WHERE '.$where_clause.$skip_default.' ORDER BY `'.$orderby.'` '.$order;
+			
 		}
 		
 	}
@@ -344,7 +475,7 @@ class PDb_List
   <div class="wrap">
     <h2><?php echo Participants_Db::$plugin_title?></h2>
     <h3><?php printf( _n( 'List Participants: %s record found, sorted by:', 'List Participants: %s records found, sorted by:', self::$num_records ), self::$num_records )?> 
-		<?php echo isset( $_POST['sortBy'] ) ? Participants_Db::column_title( $_POST['sortBy'] ) : Participants_Db::column_title( current( self::$sortables ) ) ?>.</h3>
+		<?php echo Participants_Db::column_title( self::$filter['sortBy'] ) ?>.</h3>
     <?php
 	}
 
@@ -357,7 +488,7 @@ class PDb_List
     printf('<a name="%1$s" id="%1$s" ></a>',self::$list_anchor);
 
     ?>
-    <div class="<?php echo self::$params['class'] ?>">
+    <div class="<?php echo self::$shortcode_params['class'] ?>">
     <?php
     
 
@@ -387,7 +518,7 @@ class PDb_List
 			$filter_columns = array( '('.__('show all', Participants_Db::PLUGIN_NAME ).')' => 'none' );
 			foreach ( Participants_db::get_column_atts() as $column ) {
 				
-				if ( in_array( $column->name, Participants_Db::$internal_columns ) ) continue;
+				if ( in_array( $column->name, array( 'id','private_id' ) ) ) continue;
 				
 				$filter_columns[ $column->title ] = $column->name;
 				
@@ -396,7 +527,7 @@ class PDb_List
 			$element = array(
 											 'type'		=> 'dropdown',
 											 'name'		=> 'where_clause',
-											 'value'	=>	isset( $_POST['where_clause'] ) ? $_POST['where_clause'] : 'none',
+											 'value'	=>	self::$filter['where_clause'],
 											 'options'	=> $filter_columns,
 											 );
       FormElement::print_element( $element );
@@ -406,17 +537,19 @@ class PDb_List
        $element = array(
                         'type'     => 'dropdown',
                         'name'     => 'operator',
-                        'value'    => isset( $_POST['operator'] ) ? $_POST['operator'] : 'LIKE',
+                        'value'    => self::$filter['operator'],
                         'options'  => array(
                                           __('is', Participants_Db::PLUGIN_NAME )         => '=',
                                           __('is not', Participants_Db::PLUGIN_NAME )     => '!=',
                                           __('contains', Participants_Db::PLUGIN_NAME )   => 'LIKE',
                                           __('doesn&#39;t contain', Participants_Db::PLUGIN_NAME )  => 'NOT LIKE',
+                                          __('is greater than', Participants_Db::PLUGIN_NAME )  => 'gt',
+                                          __('is less than', Participants_Db::PLUGIN_NAME )  => 'lt',
                                           ),
                         );
       FormElement::print_element( $element );
       ?>
-      <input id="participant_search_term" type="text" name="value" value="<?php echo @$_POST['value'] ?>">
+      <input id="participant_search_term" type="text" name="value" value="<?php echo @self::$filter['value'] ?>">
       <input name="submit" type="submit" value="<?php echo self::$i18n['filter']?>">
       <input name="submit" type="submit" value="<?php echo self::$i18n['clear']?>">
     </fieldset>
@@ -431,7 +564,7 @@ class PDb_List
 			$element = array(
 											 'type'		=> 'dropdown',
 											 'name'		=> 'sortBy',
-											 'value'	=>	isset( $_POST['sortBy'] ) ? $_POST['sortBy'] : current( self::$sortables ),
+											 'value'	=>	self::$filter['sortBy'],
 											 'options'	=> self::$sortables,
 											 );
       FormElement::print_element( $element );
@@ -439,7 +572,7 @@ class PDb_List
 			$element = array(
 											 'type'		=> 'radio',
 											 'name'		=> 'ascdesc',
-											 'value'	=>	isset( $_POST['ascdesc'] ) ? $_POST['ascdesc'] : 'asc',
+											 'value'	=>	self::$filter['ascdesc'],
 											 'options'	=> array(
 											                    __('Ascending', Participants_Db::PLUGIN_NAME )  => 'asc',
 											                    __('Descending', Participants_Db::PLUGIN_NAME ) => 'desc'
@@ -539,7 +672,7 @@ class PDb_List
         foreach ( self::$display_columns as $column ) {
 
 					// get the form element value for the field
-          $column_atts = Participants_Db::get_field_atts( $column, 'form_element' );
+          $column_atts = Participants_Db::get_field_atts( $column, '`form_element`,`default`' );
 
 					// this is where we place form-element-specific text transformations for display
           switch ( $column_atts->form_element ) {
@@ -548,10 +681,17 @@ class PDb_List
 
               $display_value = self::$backend ? basename( $value[ $column ] ) : '<img class="PDb-list-image" src="'.$value[ $column ].'" />';
               break;
+							
+						case 'date':
+							
+							$time = preg_match( '#^[0-9]+$#', $value[ $column ] ) > 0 ? (int) $value[ $column ] : strtotime( $value[ $column ] );
+              $display_value = date( get_option('date_format','r'), $time );
+							
+							break;
 
             default:
 
-              $display_value = esc_html($value[ $column ]);
+              $display_value = NULL == $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
 
           }
 
@@ -647,11 +787,49 @@ class PDb_List
       // until we get this working:
       else return 'none';
 
-      $mode = self::$params['sort'] == 'true' ? 'sort' : 'none';
+      $mode = self::$shortcode_params['sort'] == 'true' ? 'sort' : 'none';
 
-      return self::$params['search'] == 'true' ? ( $mode == 'sort' ? 'both' : 'filter' ) : $mode ;
+      return self::$shortcode_params['search'] == 'true' ? ( $mode == 'sort' ? 'both' : 'filter' ) : $mode ;
 
     }
+		
+		/**
+		 * set sort/filter properties
+		 *
+		 * this gets progressive overrides for the values: first, from the defaults,
+		 * then from values stored in a transient, then from submitted vlues in the
+		 * POST array
+		 *
+		 * we use WP's 'shortcode_atts' function because it is a convenient way to
+		 * merge and trim arrays
+		 */
+		private function _filter_settings() {
+			
+			$default_values = array(
+															'where_clause' => 'none',
+															'sortBy'       => current( self::$sortables ),
+															'value'        => '',
+															'operator'     => 'LIKE',
+															'ascdesc'      => 'asc'
+															);
+															
+			
+			$stored_values = unserialize( get_transient( self::$list_storage ) );
+			
+			// if we got stored values, merge them with the defaults
+			if ( is_array( $stored_values ) ) $values = shortcode_atts( $default_values, $stored_values );
+			else $values = $default_values;
+			
+			// now merge them with the $_POST array so if there are any new values coming in, they're included
+			$values = shortcode_atts( $values, $_POST );
+			
+			// store them
+			set_transient( self::$list_storage, serialize( $values ) );
+			
+			return $values;
+			
+		}
+		
 		
 		/**
 		 * sets up the internationalization strings

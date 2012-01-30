@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.2.2
+Version: 1.2.3
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -235,6 +235,8 @@ class Participants_Db {
 		// intialize the plugin settings
 		// we do this here because we need the object for the plugin menus
 		self::$plugin_settings = new PDb_Settings();
+		
+		$options = get_option( self::$participants_db_options ); 
 
 		// define the plugin admin menu pages
 	  add_menu_page(
@@ -249,7 +251,7 @@ class Participants_Db {
 			self::PLUGIN_NAME, 
 			__('List Participants', self::PLUGIN_NAME ),
 			__('List Participants', self::PLUGIN_NAME ), 
-			'edit_pages',
+			$options['record_edit_capability'],
 			self::$plugin_page.'-list_participants',
 			array( 'PDb_List','initialize' )
 			/*array( __CLASS__, 'include_admin_file' )*/ 
@@ -259,7 +261,7 @@ class Participants_Db {
 			self::PLUGIN_NAME,  
 			__('Add Participant', self::PLUGIN_NAME ), 
 			__('Add Participant', self::PLUGIN_NAME ),
-			'edit_pages', 
+			$options['record_edit_capability'], 
 			self::$plugin_page.'-edit_participant', 
 			array( __CLASS__, 'include_admin_file' ) 
 			);
@@ -295,7 +297,7 @@ class Participants_Db {
 			'', 
 			__('Edit Record', self::PLUGIN_NAME ), 
 			__('Edit Record', self::PLUGIN_NAME ), 
-			'edit_pages', 
+			$options['record_edit_capability'], 
 			self::$plugin_page.'_edit_participant'
 			);
 
@@ -495,7 +497,20 @@ class Participants_Db {
 	// get the names of all the sortable fields
 	public function get_sortables() {
 		
-	 return self::get_subset( 'sortable' );
+	 global $wpdb;
+
+		$sql = "
+			SELECT `name`,`title`
+			FROM ".self::$fields_table."
+			WHERE `sortable` > 0";
+
+		$result = $wpdb->get_results( $sql, ARRAY_N );
+
+		// get the 2nd dimension of the array
+		$return = array();
+		foreach( $result as $item ) $return[$item[1]] = $item[0];
+
+		return $return;
 	 
 	}
 
@@ -571,6 +586,27 @@ class Participants_Db {
 		return $wpdb->get_results($sql, ARRAY_A);
 	 
   }
+	
+	/**
+	 * chacks a string against known columns to validate input
+	 */
+	public function is_column( $string ) {
+		
+		$columns_info = Participants_Db::get_columns();
+		
+		$columns = array();
+		
+		foreach ( $columns_info as $column_data ) {
+			
+			$columns[] = $column_data['Field'];
+			
+		}
+		
+		return in_array( $string, $columns );
+		
+	}
+		
+		
 
 	/**
 	 * gets the field attributes as filtered by the type of form to display
@@ -762,9 +798,20 @@ class Participants_Db {
 				
 					$new_value = NULL;
 					
-				} else {
+				} elseif ( is_array( $post[ $column_atts->name ] ) ) {
 				
-					$new_value = is_array( $post[ $column_atts->name ] ) ? self::_prepare_array_mysql( $post[ $column_atts->name ] ) : self::_prepare_string_mysql( $post[ $column_atts->name ] );
+					$new_value = self::_prepare_array_mysql( $post[ $column_atts->name ] );
+					
+				} elseif ( $column_atts->form_element == 'date' ) {
+					
+					// date values are now stored as unix timestamps-- duh!
+					$date = strtotime( $post[ $column_atts->name ] );
+				
+					$new_value = $date ? $date : NULL ;
+					
+				} else {
+					
+					$new_value = self::_prepare_string_mysql( $post[ $column_atts->name ] );
 					
 				}
 

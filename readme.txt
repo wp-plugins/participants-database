@@ -141,6 +141,13 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 
 == Changelog ==
 
+= 1.2.3 =
+* added access level control setting for records
+* added filtering and sorting to the [pdb_list] shortcode
+* fixed documentation error for list shortcode: the list limit parameter must be labeled 'list_limit', not 'list-limit'
+* improved handling of date values
+* added greater than and less than operators to record list filters
+
 = 1.2.2 =
 * added option to show groups and group descriptions in signup form
 * fixed bug in signup form submissions that contain multi-select form fields
@@ -244,6 +251,9 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 
 == Upgrade Notice ==
 
+= 1.2.3 =
+Feature enhancement upgrade: added filtering and sorting to list shortcode; added an access control setting for editing, adding and viewing records
+
 = 1.2.2 =
 Minor bugfix and feature upgrade; added ability to show groups and group descriptions in the signup form; multiselects in signup form bug fixed
 
@@ -307,8 +317,24 @@ It's also possible to use this feature to make filling out the signup form requi
 
 **Showing the List on Your Website**
 
-You can use the [pdb_list] shortcode to show the records on your site. Just put the shortcode where you want it to show up. You can set the number of records to show per page (yes, it's paginated!) with the 'list-limit' setting, also the CSS class to wrap the table in with the 'class' setting...like this: [pdb_list list-limit=10 class=memberlist]
+You can use the [pdb_list] shortcode to show the records on your site. Just put the shortcode where you want it to show up. You can set the number of records to show per page (yes, it's paginated!) with the 'list-limit' setting, also the CSS class to wrap the table in with the 'class' setting...like this: [pdb_list list_limit=10 class=memberlist]
 
 Which columns get included is determined on the fields management page, just set the "display_column" value to order the columns as you like.
 
+You can now filter and sort the list that is displayed with 3 new variables in the shortcode: see the next section.
+
 If you want to get tricky with the CSS, each header column has a class name the corresponds to the name of the field, you can use CSS to lay out the listing exactly as you want.
+
+**Filtering which Records Get Shown with the List Shortcode**
+
+There are 3 new parameters for the [pdb_list] shortcode that allows you to determine which records get shown. It's a little complicated, but here's how you do it.
+
+There is a parameter called 'filter' which determines which records to show. The general format of the parameter is this: *field* *operator* *value* So for instance if you wanted to show all records from the state of New York, you would put [pdb_record filter='state=NY'] just like that. "state" is the field (it must match exactly the field name as listed on the mange database fields page in the plugin) "=" is the operator and "NY" is the value. The filter is grabbing all records where the state is NY.
+
+The operators can be '=', '!', '<', '>' only. '!' means "NOT", so if you wanted everything except a certain value. '<' and '>' mean "less than" and "greater than" and can be used to compare values, like this: [pdb_list filter='last_name>k' ] That would give you all the records where the last name began with any letter coming after 'k' in the alphabet.
+
+You can use more than one filter by stringing them together like this: [pdb_record filter='last_name>c&last_name<h' ] This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
+
+To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date vaules should be a regular date string like this: [pdb_record filter='date>jan3,2012'] It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
+
+One application for this is to allow you to control whether a record gets displayed, giving you an approval process for new records. Create an administrative field (one that is not displayed or edited on the frontend) called "approved" that is a checkbox. Put this (without the quotes) in the values: 'yes,no' with a default value of 'no'. Then put this in the shortcode: [pdb_list filter='approved=yes'] Now, only records that have been approved will be included in the list display. You may need to do something like this if you get a problem with spam, for instance.

@@ -137,6 +137,18 @@ class PDb_Settings extends Plugin_Settings {
           )
         );
 
+    $this->plugin_settings[] = array(
+        'name'       =>'record_edit_capability',
+        'title'      =>__('Record Edit Access Level', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'        =>'dropdown',
+          'help_text'   => __('sets the user access level for adding, editing and listing records. (fields management and plugin settings always require admin level access)', Participants_Db::PLUGIN_NAME ),
+          'value'       => 'edit_others_posts',
+					'options'     => array( 'Author'=>'edit_posts','Editor'=>'edit_others_posts','Admin'=>'manage_options' ),
+          )
+        );
+
     // signup form settings
 
     $this->plugin_settings[] = array(

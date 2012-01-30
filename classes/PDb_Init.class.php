@@ -16,7 +16,7 @@
 class PDb_Init
 {
     // this is the current db version
-    const VERSION = '0.2';
+    const VERSION = '0.4';
 
     // arrays for building default field set
     public static $internal_fields;
@@ -272,13 +272,85 @@ class PDb_Init
 
       }
 
+      if ( '0.3' == get_option( Participants_Db::$db_version ) ) {
+
+        /*
+         * updates version 0.3 database to 0.4
+				 *
+         * changing the 'when' field to a date field
+         * exchanging all the PHP string date values to UNIX timestamps in all form_element = 'date' fields
+				 *
+         */
+				
+				// change the 'when' field to a date field
+				$wpdb->update( Participants_Db::$fields_table, array( 'form_element' => 'date' ), array( 'name' => 'when', 'form_element' => 'text-line' ) );
+				 
+				//
+				$date_fields = $wpdb->get_results( 'SELECT f.name FROM '.Participants_Db::$fields_table.' f WHERE f.form_element = "date"', ARRAY_A );
+         		
+         		$df_string = '';
+         		
+         		foreach( $date_fields as $date_field ) {
+         		
+         			if ( ! in_array( $date_field['name'], array( 'date_recorded', 'date_updated' ) ) ) 
+         				$df_string .= ',`'.$date_field['name'].'` ';
+         		}
+         			
+				// skip updating the Db if there's nothing to update
+        if ( ! empty( $df_string ) ) :
+         			
+					$query = '
+						
+						SELECT `id`'.$df_string.'
+						FROM '.Participants_Db::$participants_table;
+					
+					$fields = $wpdb->get_results( $query, ARRAY_A );
+					
+					
+					// now that we have all the date field values, convert them to N=UNIX timestamps
+					foreach( $fields as $row ) {
+						
+						$id = $row['id'];
+						unset( $row['id'] );
+						
+						$update_row = array();
+						
+						foreach ( $row as $field => $original_value ) {
+							
+							if ( empty( $original_value ) ) continue 2;
+							
+							// if it's already a timestamp, we don't try to convert
+							$value = preg_match('#^[0-9]+$#',$original_value) > 0 ? $original_value : strtotime( $original_value );
+							
+							// if strtotime fails, revert to original value
+							$update_row[ $field ] = ( false === $value ? $original_value : $value );
+							
+						}
+						
+						$wpdb->update( 
+														Participants_Db::$participants_table, 
+														$update_row, 
+														array( 'id' => $id ) 
+													);
+						
+					}
+				
+				endif;
+				
+				// set the version number this step brings the db to
+				update_option( Participants_Db::$db_version, '0.4' );
+
+      }
+
       error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
       
     }
 
     private function _deactivate()
     {
-        error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
+        delete_transient( PDb_List::$list_storage );
+				
+				error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
     }
 
     private function _uninstall()
@@ -463,7 +535,7 @@ class PDb_Init
                                                             ),
                                   'when'              => array(
                                                               'title' => 'Signup Date',
-                                                              'form_element' => 'text-line',
+                                                              'form_element' => 'date',
                                                               'persistent' => 1,
                                                             ),
                                   'by'                => array(
