@@ -55,7 +55,7 @@ The backend form is set up for rapid manual entry of multiple records, such as a
 
 **List Display**
 
-Display the list on your website with the [pdb_list] shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages.
+Display the list on your website with the [pdb_list] shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order.
 
 **Import/Export Records**
 
@@ -317,7 +317,7 @@ It's also possible to use this feature to make filling out the signup form requi
 
 **Showing the List on Your Website**
 
-You can use the [pdb_list] shortcode to show the records on your site. Just put the shortcode where you want it to show up. You can set the number of records to show per page (yes, it's paginated!) with the 'list-limit' setting, also the CSS class to wrap the table in with the 'class' setting...like this: [pdb_list list_limit=10 class=memberlist]
+You can use the [pdb_list] shortcode to show the records on your site. Just put the shortcode where you want it to show up. You can set the number of records to show per page (yes, it's paginated!) with the 'list_limit' setting, also the CSS class to wrap the table in with the 'class' setting...like this: [pdb_list list_limit=10 class=memberlist]
 
 Which columns get included is determined on the fields management page, just set the "display_column" value to order the columns as you like.
 
