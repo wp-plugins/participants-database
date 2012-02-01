@@ -391,7 +391,7 @@ class PDb_List
 					
 					case '=':
 						$operator = 'LIKE';
-						$delimiter = array('%','%');
+						$delimiter = array('"%','%"');
 						break;
 					
 					case '!':

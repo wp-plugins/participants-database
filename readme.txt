@@ -141,6 +141,9 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 
 == Changelog ==
 
+= 1.2.4 =
+* fixed bug in [pdb_list] shorcode display filter
+
 = 1.2.3 =
 * added access level control setting for records
 * added filtering and sorting to the [pdb_list] shortcode
@@ -250,6 +253,9 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.2.4 =
+Bugfix for pdb_list shortcode, filtering with equality was failing under some circumstances
 
 = 1.2.3 =
 Important feature enhancement upgrade: added filtering and sorting to list shortcode; added an access control setting for editing, adding and viewing records; fixed problems with date filtering and sorting
