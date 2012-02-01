@@ -335,13 +335,13 @@ If you want to get tricky with the CSS, each header column has a class name the 
 
 There are 3 new parameters for the [pdb_list] shortcode that allows you to determine which records get shown. It's a little complicated, but here's how you do it.
 
-There is a parameter called 'filter' which determines which records to show. The general format of the parameter is this: *field* *operator* *value* So for instance if you wanted to show all records from the state of New York, you would put [pdb_record filter='state=NY'] just like that. "state" is the field (it must match exactly the field name as listed on the mange database fields page in the plugin) "=" is the operator and "NY" is the value. The filter is grabbing all records where the state is NY.
+There is a parameter called 'filter' which determines which records to show. The general format of the parameter is this: *field* *operator* *value* So for instance if you wanted to show all records from the state of New York, you would put [pdb_list filter='state=NY'] just like that. "state" is the field (it must match exactly the field name as listed on the mange database fields page in the plugin) "=" is the operator and "NY" is the value. The filter is grabbing all records where the state is NY.
 
 The operators can be '=', '!', '<', '>' only. '!' means "NOT", so if you wanted everything except a certain value. '<' and '>' mean "less than" and "greater than" and can be used to compare values, like this: [pdb_list filter='last_name>k' ] That would give you all the records where the last name began with any letter coming after 'k' in the alphabet.
 
-You can use more than one filter by stringing them together like this: [pdb_record filter='last_name>c&last_name<h' ] This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
+You can use more than one filter by stringing them together like this: [pdb_list filter='last_name>c&last_name<h' ] This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
 
-To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date vaules should be a regular date string like this: [pdb_record filter='date>jan3,2012'] It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
+To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date vaules should be a regular date string like this: [pdb_list filter='date>jan3,2012'] It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
 
 **Approving Records for Public Display**
 
