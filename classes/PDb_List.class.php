@@ -17,7 +17,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 2.1.3
+ * @version    Release: 1.2.4
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
  
