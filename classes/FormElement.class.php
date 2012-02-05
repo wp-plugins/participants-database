@@ -148,6 +148,7 @@ class FormElement {
     
     $this->i18n = array(
     					'other' => _x('other', 'indicates a write-in choice', Participants_Db::PLUGIN_NAME ),
+							'linktext' => __( 'Link Text', Participants_Db::PLUGIN_NAME )
     					);
     
     $this->attributes = $params['attributes'];
@@ -213,6 +214,10 @@ class FormElement {
       case 'multi-select-other':
         $this->_select_other_multi();
         break;
+				
+			case 'link':
+				$this->_link_field();
+				break;
 
       case 'drag-sort':
         $this->_drag_sort();
@@ -555,6 +560,39 @@ class FormElement {
     $this->_select_other( 'checkbox' );
     
   }
+	
+	/**
+	 * builds a link form element
+	 *
+	 * stores an array: first element is the URL the optional second the link text
+	 */
+	private function _link_field( $linktext = true ) {
+		
+		$title = false;
+		
+		if ( false !== strpos( $this->value, ',' ) || true === $linktext ) {
+			
+			$parts = explode( ',', $this->value, 2 );
+			
+			if ( count( $parts ) < 2 ) $parts[1] = $parts[0];
+		
+			list( $url, $title ) = $parts;
+			
+			$this->_addline( '<div class="link-element">' );
+			
+		} else $url = $this->value;
+		
+		$this->_addline( $this->_input_tag( 'text', $url, false, (bool) $title !== false ) );
+		
+		if ( $title !== false)  {
+		
+			$this->_addline( '<label for="'.$this->name.'">'.$this->i18n['linktext'].'</label>'.$this->_input_tag( 'text', $title, false, true ).'</div>' );
+			
+		}
+		
+	}
+																			
+		
 
   /**
    * builds a drag-sort element

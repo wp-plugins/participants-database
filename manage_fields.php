@@ -155,7 +155,7 @@ $attribute_columns = array();
 foreach( $groups as $group ) {
 	
 	// only display these columns for internal group
-	$select_columns = ( $group === 'internal' ? '`id`,`order`,`name`,`title`,`admin_column`,`sortable`,`import`' : '*' ); 
+	$select_columns = ( $group === 'internal' ? '`id`,`order`,`name`,`title`,`admin_column`,`sortable`,`CSV`' : '*' );
 	
 	$sql = "SELECT $select_columns FROM " . Participants_Db::$fields_table . ' WHERE `group` = "'.$group.'" ORDER BY `order` ';
 	$database_rows[$group] =  $wpdb->get_results( $sql, ARRAY_A );
@@ -231,7 +231,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 				
 				if ( 'internal' == $group && in_array( $attribute_column, array( 'order' ) ) ) continue;
 				
-				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'admin_column', 'display_column', 'import', 'signup', 'display' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
+				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'admin_column', 'display_column', 'CSV', 'signup', 'display' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
 				
 				?>
 				<th scope="col" class="<?php echo $column_class?>"><span><?php echo PDb_header( $attribute_column ) ?></span></th>

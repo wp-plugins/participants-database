@@ -59,7 +59,7 @@ Display the list on your website with the [pdb_list] shortcode. You can determin
 
 **Import/Export Records**
 
-All records can be exported as a CSV-formatted text file that can be read by spreadsheet applications and used for mass email campaigns, hard-copy lists, and other applications. The records exported can be filtered by column values: for instance, only people who have consented to receive a newsletter will be included. Records may also be sorted by any column. Which fields are included in the export/import is determined by the "import" column of the field definition.
+All records can be exported as a CSV-formatted text file that can be read by spreadsheet applications and used for mass email campaigns, hard-copy lists, and other applications. The records exported can be filtered by column values: for instance, only people who have consented to receive a newsletter will be included. Records may also be sorted by any column. Which fields are included in the export/import is determined by the "CSV" column of the field definition.
 
 Records can also be mass-imported with a CSV file, allowing you to use existing lists from spreadsheets, or for offline compilation of records using a spreadsheet such as Open Office or Google Docs. A blank spreadsheet can be exported from the plugin to get people started in entering records offline.
 
@@ -133,6 +133,12 @@ No, only image files are supported for now, primarily for security reasons.
 
 The plugin exports it's CSV files in "UTF-8" format. Make sure the program you're using to read the file knows this...it should detect it automatically, but can fail under some circumstances. Often this can be set on the import screen of the spreadsheet program when you open the CSV.
 
+= Is the private link to an individual record secure? =
+
+It is what I would call "reasonably secure" in other words, the private code in the link is not easily guessed. It can be sent in an email, which is not secure, but emails getting compromised is not that much a risk for most of us. The level of security is reasonable for the kind of information it is designed to store.
+
+Therefore, this plugin is *absolutely not* for the storage of any kind of information requiring good security such as credit card numbers, passwords, social security numbers, etc. And I certainly couldn't be held liable if someone were to irresponsibly use the plugin for such a purpose.
+
 == Screenshots ==
 
 1. Managing Database fields: this is where you set up your database fields and all attributes for each field
@@ -140,6 +146,13 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.2.5 =
+* added "link" form element for storing a link with link text
+* added "make link" setting to make URLs clickable
+* changed "import" field definition column to more appropriate "CSV"
+* fixed display bug with array data from multi-select form elements
+* fixed documentation error in [pdb_list] filtering section
 
 = 1.2.4 =
 * fixed bug in [pdb_list] shorcode display filter
@@ -253,6 +266,9 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.2.5 =
+Feature enhancement upgrade allowing clickable links in list presentation; also a couple of bug fixes and corrections
 
 = 1.2.4 =
 Bugfix for pdb_list shortcode, filtering with equality was failing under some circumstances

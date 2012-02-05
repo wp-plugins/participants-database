@@ -149,6 +149,20 @@ class PDb_Settings extends Plugin_Settings {
           )
         );
 
+    $this->plugin_settings[] = array(
+        'name'       =>'make_links',
+        'title'      =>__('Make Links Clickable', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('if a field looks like a link (begins with "http") make it clickable', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+		
+
     // signup form settings
 
     $this->plugin_settings[] = array(

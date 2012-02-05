@@ -69,6 +69,9 @@ class PDb_List
 	// holds the settings for the list filtering and sorting
 	static $filter;
 	
+	// holds plugin options array
+	static $options;
+	
 	/**
 	 * initializes and outputs the list for the backend or frontend
 	 *
@@ -85,12 +88,12 @@ class PDb_List
 		
 		self::_setup_i18n();
     
-    $options = get_option( Participants_Db::$participants_db_options );
+    self::$options = get_option( Participants_Db::$participants_db_options );
 
     // set the list limit value; this can be overridden by the shortcode atts later
-    self::$page_list_limit = ( ! isset( $_POST['list_limit'] ) or ! is_numeric( $_POST['list_limit'] ) or $_POST['list_limit'] < 1 ) ? $options['list_limit'] : $_POST['list_limit'];
+    self::$page_list_limit = ( ! isset( $_POST['list_limit'] ) or ! is_numeric( $_POST['list_limit'] ) or $_POST['list_limit'] < 1 ) ? self::$options['list_limit'] : $_POST['list_limit'];
     
-    self::$registration_page_url = get_bloginfo('url').'/'.( isset( $options['registration_page'] ) ? $options['registration_page'] : '' );
+    self::$registration_page_url = get_bloginfo('url').'/'.( isset( self::$options['registration_page'] ) ? self::$options['registration_page'] : '' );
 
     self::$display_columns = Participants_Db::get_list_display_columns( self::$backend ? 'admin_column' : 'display_column' );
 
@@ -589,7 +592,7 @@ class PDb_List
 	}
 
 	/**
-	 * prints the general list form controls for the admin lising
+	 * prints the general list form controls for the admin lising: deleting and items-per-page selector
 	 */
 	private function _general_list_form_top() { ?>
 
@@ -678,21 +681,52 @@ class PDb_List
 					// this is where we place form-element-specific text transformations for display
           switch ( $column_atts->form_element ) {
 
-            case 'image-upload':
+           case 'image-upload':
 
               $display_value = self::$backend ? basename( $value[ $column ] ) : '<img class="PDb-list-image" src="'.$value[ $column ].'" />';
               break;
 							
-						case 'date':
+					 case 'date':
 							
 							$time = preg_match( '#^[0-9]+$#', $value[ $column ] ) > 0 ? (int) $value[ $column ] : strtotime( $value[ $column ] );
               $display_value = date( get_option('date_format','r'), $time );
 							
 							break;
+							
+					 case 'multi-select-other':
+					 case 'multi-checkbox':
+					 
+					 		$display_value = is_serialized( $value[ $column ] ) ? implode( ', ', unserialize( $value[ $column ] ) ) : $value[ $column ];
+							break;
+					 
+					 case 'link':
+					 
+              if ( is_serialized( $value[ $column ] ) ) {
 
-            default:
+                $params = unserialize( $value[ $column ] );
 
-              $display_value = NULL == $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
+              } else {
+
+                // in case we got old unserialized data in there
+                $params = array_fill( 0, 2, $value[ $column ] );
+
+              }
+
+              $display_value = Participants_Db::make_link( $params[0], $params[1] );
+
+              break;
+
+           default:
+					 
+					 		if ( self::$options['make_links'] ) {
+								
+								$display_value = Participants_Db::make_link( $value[ $column ] );
+								
+							} else {
+
+               $display_value = NULL == $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
+							 
+							}
 
           }
 

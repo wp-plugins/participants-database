@@ -137,6 +137,7 @@ class Participants_Db {
                                  'multi-checkbox',
                                  'select-other',
                                  'multi-select-other',
+																 'link',
 																 'image-upload'
                                  );
 		
@@ -630,9 +631,9 @@ class Participants_Db {
 				$where = 'WHERE v.sortable = 1 ';
 				break;
 
-			case 'import':
+			case 'CSV':
 
-				$where = 'WHERE v.import = 1 ';
+				$where = 'WHERE v.CSV = 1 ';
 				break;
 
 			case 'all':
@@ -1232,7 +1233,7 @@ class Participants_Db {
 			 case 'blank':
 
 				// add the header row
-				foreach ( self::get_column_atts( 'import' ) as $column ) $header_row[] = $column->name;
+				foreach ( self::get_column_atts( 'CSV' ) as $column ) $header_row[] = $column->name;
 				$data[] = $header_row;
 
 				$i = 2;// number of blank rows to create
@@ -1249,7 +1250,7 @@ class Participants_Db {
 
 				$import_columns = '';
 
-				foreach ( self::get_column_atts( 'import' ) as $column ) {
+				foreach ( self::get_column_atts( 'CSV' ) as $column ) {
 
           $import_columns .= sprintf( '`%s`,',$column->name );
           $header_row[] = $column->name;
@@ -1381,7 +1382,7 @@ class Participants_Db {
 			// all the booleans
 			case 'persistent':
 			case 'sortable':
-			case 'import':
+			case 'CSV':
 			case 'signup':
 				return array( 'type'=>'checkbox', 'options'=> array( 1, 0 ) );
 			
@@ -1501,7 +1502,7 @@ class Participants_Db {
 
 			foreach ( self::get_column_atts() as $column ) {
 			
-				if ( $column->import ) $column_names[] = $column->name;
+				if ( $column->CSV ) $column_names[] = $column->name;
 			
 			}
 			
@@ -1574,6 +1575,31 @@ class Participants_Db {
 		return $single_quotes >= $double_quotes ? "'" : '"';
 		
 	}
+	
+	/**
+	 * outputs a link in specified format
+	 * 
+	 * @param string $link the URI
+	 * @param string $title the clickable text (optional)
+	 * @param string $template the format of the link (optional)
+	 *
+	 * @return string HTML or HTML-escaped string (if it's not a link)
+	 */
+	public function make_link( $link, $title = '', $template = false ) {
+
+    // if it's not really a link don't wrap it
+    if ( 0 !== stripos( $link, 'http' ) ) return esc_html( $link );
+		
+		// default template for links
+		$linktemplate = $template === false ? '<a href="%1$s" target="_blank" >%2$s</a>' : $template;
+		
+		$title = empty( $title ) ? str_replace( array('http://', 'https://' ), '', $link ) : $title;
+		
+		//construct the link
+		return sprintf( $linktemplate, $link, $title );
+		
+	}
+	
 	
 	/**
 	 * handles file uploads

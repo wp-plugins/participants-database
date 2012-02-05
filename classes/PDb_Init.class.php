@@ -342,6 +342,25 @@ class PDb_Init
 
       }
 
+      if ( '0.4' == get_option( Participants_Db::$db_version ) ) {
+
+        /*
+         * updates version 0.4 database to 0.5
+         *
+         * modifying the "import" column to be named more appropriately "CSV"
+         */
+
+        $sql = "ALTER TABLE ".Participants_Db::$fields_table." CHANGE COLUMN `import` `CSV` TINYINT(1)";
+
+        if ( false !== $wpdb->query( $sql ) ) {
+
+          // set the version number this step brings the db to
+          update_option( Participants_Db::$db_version, '0.5' );
+
+        }
+
+      }
+
       error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
       
     }

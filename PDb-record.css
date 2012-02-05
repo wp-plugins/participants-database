@@ -8,7 +8,8 @@
 .participants_db input[type='text'],
 .edit-participant  input[type='text'],
 .edit-participant  input[type='checkbox'],
-.edit-participant .multicheckbox label {
+.multicheckbox label,
+.link-element label {
   float:left;
   margin-right:10px;
 }

@@ -94,10 +94,10 @@ div.manage-fields-wrap {
 .manage-fields th.sortable {
 	/*padding:7px 7px 8px;*/
 }
-.id, .order, .persistent, .sortable, .admin_column, .display_column, .import {
+.id, .order, .persistent, .sortable, .admin_column, .display_column, .CSV {
 	text-align:center;
 }
-th.id, th.order, th.persistent, th.sortable, th.import, th.delete, th.signup {
+th.id, th.order, th.persistent, th.sortable, th.CSV, th.delete, th.signup {
 	width:25px;
 }
 th.admin_column, th.display_column, th.display {

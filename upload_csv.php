@@ -7,7 +7,7 @@ $status = 'updated';
 
 foreach ( Participants_Db::get_column_atts() as $column ) {
 
-	if ( $column->import ) $column_names[] = $column->name;
+	if ( $column->CSV ) $column_names[] = $column->name;
 
 }
 
@@ -83,7 +83,7 @@ endif; // isset( $_POST['file_upload']
 				<div class="postbox">
 					<h3><?php _e('1. Prepare a spreadsheet file with the correct format:', Participants_Db::PLUGIN_NAME )?></h3>
 					<div class="inside">
-						<p><?php _e('To properly import your membership data, the columns in your spreadsheet must match exactly the columns in the database. Currently, the columns are as follows:', Participants_Db::PLUGIN_NAME )?></p>
+						<p><?php _e('To properly import your membership data, the columns in your spreadsheet must match exactly the columns in the database. Currently, the CSV import columns are as follows:', Participants_Db::PLUGIN_NAME )?></p>
 						<table class="spreadsheet">
 							<tr>
 							<?php
