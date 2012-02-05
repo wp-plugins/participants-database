@@ -1289,6 +1289,35 @@ class Participants_Db {
 		
 		return $data;
 		 
+		 case 'signup' :
+		 
+			// instantiate the validation object if it doesn't exist
+			if ( ! is_object( Participants_Db::$validation_errors ) ) Participants_Db::$validation_errors = new FormValidation();
+	
+			/* if someone signs up with an email that already exists, we update that
+			 * record rather than let them create a new record. This gives us a method
+			 * for dealing with people who have lost their access link, they just sign
+			 * up again with the same email, and their access link will be emailed to
+			 * them. This is handled by the Participants_Db::process_form method.
+			 */
+	
+			$_POST['private_id'] = Participants_Db::generate_pid();
+			 
+		 	// only go to the thanks page if we have no errors
+		 	$_POST['id'] = Participants_Db::process_form( $_POST, 'insert' );
+		 
+		 	if ( false !== $_POST['id']  ) {
+				
+				$conj = false !== strpos( $_POST['thanks_page'], '?' ) ? '&' : '?' ;
+					
+				wp_redirect( $_POST['thanks_page'].$conj.'id='.$_POST['id'] );
+				
+				exit;
+				
+			}
+			
+			return;
+			 
 	 endswitch; // $_POST['action']
 	 
   }
