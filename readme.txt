@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team
 Requires at least: 2.8.4
 Tested up to: 3.3.1
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 
 Build and maintain a fully customizable database of participants or volunteers with signup forms, admin backend, custom lists, and CSV support.
 
@@ -121,7 +121,7 @@ You can control which groups of fields show up in the frontend record edit scree
 
 = What if someone loses their private link? =
 
-If someone does not have the private link to edit their record, they can sign up again with the same email address if "Don't Allow Duplicate Email Addresses" is checked in the plugin settings. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address. 
+If someone does not have the private link to edit their record, they can sign up again with the same email address if "Don't Allow Duplicate Email Addresses" is checked in the plugin settings. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address.
 
 It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the [pdb_record] shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
 
@@ -138,6 +138,12 @@ The plugin exports it's CSV files in "UTF-8" format. Make sure the program you'r
 It is what I would call "reasonably secure" in other words, the private code in the link is not easily guessed. It can be sent in an email, which is not secure, but emails getting compromised is not that much a risk for most of us. The level of security is reasonable for the kind of information it is designed to store.
 
 Therefore, this plugin is *absolutely not* for the storage of any kind of information requiring good security such as credit card numbers, passwords, social security numbers, etc. And I certainly couldn't be held liable if someone were to irresponsibly use the plugin for such a purpose.
+
+= Can I make links in records clickable? =
+
+Yes, there is a plugin setting called "Make Links Clickable" that scans the fields looking for something that starts with "http" it will then wrap that in a link tag so it will be clickable.
+
+Even better than that, there is a new form field type called "link" that lets people fill in a URL and also give it a text label such as "My Website" that will click to the URL.
 
 == Screenshots ==
 
@@ -190,7 +196,7 @@ Therefore, this plugin is *absolutely not* for the storage of any kind of inform
 * better forms security
 * better handing of array values and select settings for multi-select form elements
 
-= 1.1.2 = 
+= 1.1.2 =
 * fixed private record link for sites using query links
 * changed "registration page" setting from text entry to page list dropdown
 * split CSS files so only the needed rules are loaded by shortcodes
@@ -298,7 +304,7 @@ Bigfix primarily addesses content placement issues with shortcodes
 Major upgrade includes new list display shorcode, more control over CSV exporting and minor improvements all around
 
 = 1.0.1 =
-Bug fix for incorrect private id assignment 
+Bug fix for incorrect private id assignment
 
 = 1.0 =
 Major upgrade includes internationalization, improvements to CSV import/export, and a new image upload field.
@@ -316,9 +322,16 @@ This way, your site visitors can sign up with only a name and email (for instanc
 
 When they sign in, they will be sent an email with a private link to their full record. This page is where the second [pdb_record] shortcode goes.
 
-If you want to display the list on your website, place the [pdb_list] shortcode on any page or post. Long lists can be paginated. The fields that get displayed is set on the fields management page under the "display" column. The display can be customized with additional parameters:
-* list-limit - sets the number of records to list per page (defaults to the plugin setting value)
+If you want to display the list on your website, place the [pdb_list] shortcode on any page or post. Long lists can be paginated. The fields that get displayed is set on the fields management page under the "display" column.
+
+The display can be customized with additional parameters:
+
+* list_limit - sets the number of records to list per page (defaults to the plugin setting value)
 * class - lets you set the CSS class of the container (defaults to 'participants-database')
+* filter - lets you determine which records are shown (see the usage notes for an explanation)
+* sortby - order the list by one of the columns
+* order - determines whether the list is ordered in ascending (asc) or descending (desc) order
+
 
 **Quick Start Instructions:**
 
