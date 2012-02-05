@@ -704,6 +704,8 @@ class PDb_List
               if ( is_serialized( $value[ $column ] ) ) {
 
                 $params = unserialize( $value[ $column ] );
+								
+								if ( count( $params ) < 2 ) $params[1] = $params[0];
 
               } else {
 
