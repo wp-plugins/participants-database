@@ -1161,135 +1161,164 @@ class Participants_Db {
 		// instantiate the validation object
 		self::$validation_errors = new FormValidation();
 
-	 switch ( $_POST['action'] ) :
+		switch ( $_POST['action'] ) :
 
-		case 'update':
-		case 'insert':
-
-		$participant_id = isset( $_POST['id'] ) ? $_POST['id'] : ( isset( $_GET['id'] ) ? $_GET['id'] : self::$id_base_number );
-
-		$participant_id = self::process_form( $_POST, $_POST['action'], $participant_id );
-
-		if ( false === $participant_id ) {
-
-      // we have errors; go back to form and show errors
-      return;
-
-    }
-
-		// if we are submitting from the frontend, we're done
-    if ( ! is_admin() ) {
+			case 'update':
+			case 'insert':
+		
+				$participant_id = isset( $_POST['id'] ) ? $_POST['id'] : ( isset( $_GET['id'] ) ? $_GET['id'] : self::$id_base_number );
 			
-			self::$validation_errors->add_error( '', $options['record_updated_message'] );
+				$participant_id = self::process_form( $_POST, $_POST['action'], $participant_id );
 			
-			if ( $options['send_record_update_notify_email'] ) {
+				if ( false === $participant_id ) {
+			
+					// we have errors; go back to form and show errors
+					return;
+			
+				}
+			
+				// if we are submitting from the frontend, we're done
+				if ( ! is_admin() ) {
+					
+					self::$validation_errors->add_error( '', $options['record_updated_message'] );
+					
+					if ( $options['send_record_update_notify_email'] ) {
+						
+						$sent = wp_mail( 
+															$options['email_signup_notify_addresses'], 
+															$options['record_update_email_subject'], 
+															self::proc_tags( $options['record_update_email_body'], $participant_id ), 
+															sprintf(
+																'From: %2$s <%1$s>%3$s',
+																$options['receipt_from_address'],
+																$options['receipt_from_name'],
+																"\r\n"
+															)
+														);
+						
+					}
+					
+					return;
+					
+				}
+			
+				// redirect according to which submit button was used
+				switch ( $_POST['submit'] ) {
+			
+					case 'Apply' :
+						wp_redirect( get_admin_url().'admin.php?page='.self::PLUGIN_NAME.'-edit_participant&id='.$participant_id );
+						break;
+			
+					case 'Next' :
+						wp_redirect( get_admin_url().'admin.php?page='.self::PLUGIN_NAME.'-edit_participant' );
+						break;
+			
+					case 'Submit' :
+						wp_redirect( get_admin_url().'admin.php?page='.self::PLUGIN_NAME.'-list_participants&id='.$participant_id);
+			
+					default :
+			
+				}
+				break;
+			
+		 case 'output CSV':
 				
-				$sent = wp_mail( 
-													$options['email_signup_notify_addresses'], 
-													$options['record_update_email_subject'], 
-													self::proc_tags( $options['record_update_email_body'], $participant_id ), 
-													sprintf(
-														'From: %2$s <%1$s>%3$s',
-														$options['receipt_from_address'],
-														$options['receipt_from_name'],
-														"\r\n"
-													)
-												);
+			 $header_row = array();
+			 $data = array();	
+			 $filename = isset( $_POST['filename'] ) ? $_POST['filename'] : '';
+		
+		 	 switch ( $_POST['CSV_type'] ) :
+		
+				 // create a blank data array
+				 case 'blank':
+		
+					// add the header row
+					foreach ( self::get_column_atts( 'CSV' ) as $column ) $header_row[] = $column->name;
+					$data[] = $header_row;
+		
+					$i = 2;// number of blank rows to create
+					
+					while ( $i > 0 ) {
+						$data[] = array_fill_keys( $header_row, '' );
+						$i--;
+					}
+					break;
+		
+				case 'participant list':
+		
+					global $wpdb;
+		
+					$import_columns = '';
+		
+					foreach ( self::get_column_atts( 'CSV' ) as $column ) {
+		
+						$import_columns .= sprintf( '`%s`,',$column->name );
+						$header_row[] = $column->name;
+		
+					}
+		
+					$data['header'] = $header_row;
+		
+					$query = str_replace( '*', ' '.trim( $import_columns, ',' ).' ', rawurldecode( $_POST['query'] ) );
+		
+					$data += self::_prepare_CSV_rows( $wpdb->get_results( $query, ARRAY_A ) );
+					
+					break;
+				 
+			endswitch;// CSV type
+			
+			if ( ! empty( $filename ) ) {
+				
+			 // create a file pointer connected to the output stream
+				$output = fopen('php://output', 'w');
+				
+				header('Content-type: application/csv'); // Content-Type: text/csv; charset=utf-8
+				header('Content-Disposition: attachment; filename="'.$filename.'"');
+				
+				// output the data lines
+				foreach( $data as $line ) {
+					fputcsv( $output, $line, ',', '"' );
+				}
+				
+				fclose( $output );
+				
+				// we must terminate the script to prevent additional output being added to the CSV file
+				exit;
+				
+			}
+			
+			return $data;
+			
+		 case 'signup' :
+		 
+			// instantiate the validation object if it doesn't exist
+			if ( ! is_object( Participants_Db::$validation_errors ) ) Participants_Db::$validation_errors = new FormValidation();
+	
+			/* if someone signs up with an email that already exists, we update that
+			 * record rather than let them create a new record. This gives us a method
+			 * for dealing with people who have lost their access link, they just sign
+			 * up again with the same email, and their access link will be emailed to
+			 * them. This is handled by the Participants_Db::process_form method.
+			 */
+	
+			$_POST['private_id'] = Participants_Db::generate_pid();
+			 
+		 	// only go to the thanks page if we have no errors
+		 	$_POST['id'] = Participants_Db::process_form( $_POST, 'insert' );
+		 
+		 	if ( false !== $_POST['id']  ) {
+				
+				$conj = false !== strpos( $_POST['thanks_page'], '?' ) ? '&' : '?' ;
+					
+				wp_redirect( $_POST['thanks_page'].$conj.'id='.$_POST['id'] );
+				
+				exit;
 				
 			}
 			
 			return;
-			
-		}
-
-		// redirect according to which submit button was used
-		switch ( $_POST['submit'] ) {
-
-			case 'Apply' :
-				wp_redirect( get_admin_url().'admin.php?page='.self::PLUGIN_NAME.'-edit_participant&id='.$participant_id );
-				break;
-
-			case 'Next' :
-				wp_redirect( get_admin_url().'admin.php?page='.self::PLUGIN_NAME.'-edit_participant' );
-				break;
-
-			case 'Submit' :
-				wp_redirect( get_admin_url().'admin.php?page='.self::PLUGIN_NAME.'-list_participants&id='.$participant_id);
-
-			default :
-
-		}
-		break;
-		
-	 case 'output CSV':
-			
-		 $header_row = array();
-		 $data = array();	
-		 $filename = isset( $_POST['filename'] ) ? $_POST['filename'] : '';
-
-		 switch ( $_POST['CSV_type'] ) :
-
-			 // create a blank data array
-			 case 'blank':
-
-				// add the header row
-				foreach ( self::get_column_atts( 'CSV' ) as $column ) $header_row[] = $column->name;
-				$data[] = $header_row;
-
-				$i = 2;// number of blank rows to create
-				
-				while ( $i > 0 ) {
-					$data[] = array_fill_keys( $header_row, '' );
-					$i--;
-				}
-				break;
-
-			case 'participant list':
-
-				global $wpdb;
-
-				$import_columns = '';
-
-				foreach ( self::get_column_atts( 'CSV' ) as $column ) {
-
-          $import_columns .= sprintf( '`%s`,',$column->name );
-          $header_row[] = $column->name;
-
-        }
-
-        $data['header'] = $header_row;
-
-				$query = str_replace( '*', ' '.trim( $import_columns, ',' ).' ', rawurldecode( $_POST['query'] ) );
-
-				$data += self::_prepare_CSV_rows( $wpdb->get_results( $query, ARRAY_A ) );
-				
-				break;
 			 
-		 endswitch;// CSV type
-		
-		if ( ! empty( $filename ) ) {
-			
-		 // create a file pointer connected to the output stream
-			$output = fopen('php://output', 'w');
-			
-			header('Content-type: application/csv'); // Content-Type: text/csv; charset=utf-8
-			header('Content-Disposition: attachment; filename="'.$filename.'"');
-			
-			// output the data lines
-			foreach( $data as $line ) {
-				fputcsv( $output, $line, ',', '"' );
-			}
-			
-			fclose( $output );
-			
-			// we must terminate the script to prevent additional output being added to the CSV file
-			exit;
-			
-		}
-		
-		return $data;
-		 
-	 endswitch; // $_POST['action']
+		endswitch; // $_POST['action']
 	 
   }
   

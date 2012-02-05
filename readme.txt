@@ -159,6 +159,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 * changed "import" field definition column to more appropriate "CSV"
 * fixed display bug with array data from multi-select form elements
 * fixed documentation error in [pdb_list] filtering section
+* fixed skipped validation on thanks page redirect to new page
 
 = 1.2.4 =
 * fixed bug in [pdb_list] shorcode display filter
@@ -274,7 +275,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 == Upgrade Notice ==
 
 = 1.2.5 =
-Feature enhancement upgrade allowing clickable links in list presentation; also a couple of bug fixes and corrections
+Important bug fix and feature enhancement upgrade allowing clickable links in list presentation
 
 = 1.2.4 =
 Bugfix for pdb_list shortcode, filtering with equality was failing under some circumstances

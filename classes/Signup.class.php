@@ -131,10 +131,11 @@ class Signup {
 														$params );
 														
 		$this->captcha_type = $atts['captcha'];
-
-		$submission_id = $this->process_submit();
 		
-		// do we have a submission?
+		
+		// if we're coming back from a successful form submission, the id of the new record will be present
+		$submission_id = isset( $_GET['id'] ) ? $_GET['id'] : false ;
+	
 		if ( false === $submission_id ) {
 
 				/*
@@ -208,13 +209,21 @@ class Signup {
 		<?php
 		
 		$participant_values = Participants_Db::get_participant( Participants_Db::$id_base_number );
+		
+		$action = 'action="'.$this->submission_page.'"';
 
-			if ( is_object( Participants_Db::$validation_errors ) ) echo Participants_Db::$validation_errors->get_error_html();
+		if ( is_object( Participants_Db::$validation_errors ) ) {
+			
+			echo Participants_Db::$validation_errors->get_error_html();
+			
+			$action = '';
+			
+		}
 
 			?>
-			<form method="post" action="<?php echo $this->submission_page ?>"  enctype="multipart/form-data" >
+			<form method="post" enctype="multipart/form-data" >
 				<?php
-				FormElement::print_hidden_fields( array( 'action'=>'signup', 'source'=>Participants_Db::PLUGIN_NAME, 'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ) ) );
+				FormElement::print_hidden_fields( array( 'action'=>'signup', 'source'=>Participants_Db::PLUGIN_NAME, 'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ), 'thanks_page' => $this->submission_page ) );
 				?>
 				<table class="form-table pdb-signup">
 			<?php
@@ -326,6 +335,7 @@ class Signup {
 		?>
 		</div>
 		<?php
+		
 		$this->output = ob_get_clean();
 		
 		unset( $_POST );
@@ -387,35 +397,6 @@ class Signup {
 
 		if ( false === $sent ) error_log( __METHOD__.' sending returned false' );
 
-	}
-
-	/**
-	 * processes the submit
-	 *
-	 * this is going to take the relevant items from the $_POST array, validate
-	 * them, store them in an object property and call the appropriate display
-	 * method
-	 *
-	 * @return false or ID of new successful registration
-	 */
-	public function process_submit() {
-		
-		if ( !isset( $_POST['submit'] ) || $_POST['action'] != 'signup' ) return false;
-		
-		// instantiate the validation object
-		Participants_Db::$validation_errors = new FormValidation();
-
-		/* if someone signs up with an email that already exists, we update that
-		 * record rather than let them create a new record. This gives us a method
-		 * for dealing with people who have lost their access link, they just sign
-		 * up again with the same email, and their access link will be emailed to
-		 * them. This is handled by the Participants_Db::process_form method.
-		 */
-
-		$_POST['private_id'] = Participants_Db::generate_pid();
-		
-		return Participants_Db::process_form( $_POST, 'insert' ) ;
-		
 	}
 
 	// replace the tags in text messages
