@@ -330,7 +330,7 @@ The display can be customized with additional parameters:
 * list_limit - sets the number of records to list per page (defaults to the plugin setting value)
 * class - lets you set the CSS class of the container (defaults to 'participants-database')
 * filter - lets you determine which records are shown (see the usage notes for an explanation)
-* sortby - order the list by one of the columns
+* orderby - order the list by one of the columns
 * order - determines whether the list is ordered in ascending (asc) or descending (desc) order
 
 
