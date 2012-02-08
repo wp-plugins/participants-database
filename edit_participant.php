@@ -108,7 +108,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 		
 			$time = preg_match( '#^[0-9]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
 		
-			$value = date( get_option( 'date_format' ).' '.get_option( 'time_format' ), $time );
+			$value = date( get_option( 'date_format' )/*.' '.get_option( 'time_format' )*/, $time );
 			
 		}
 		// 
