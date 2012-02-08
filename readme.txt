@@ -277,6 +277,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Upgrade Notice ==
 
+= 1.2.6 =
+Fix display issue with blank date fields  
+
 = 1.2.5 =
 Important bug fix and feature enhancement upgrade allowing clickable links in list presentation
 
