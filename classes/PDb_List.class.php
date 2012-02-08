@@ -688,8 +688,12 @@ class PDb_List
 							
 					 case 'date':
 							
-							$time = preg_match( '#^[0-9]+$#', $value[ $column ] ) > 0 ? (int) $value[ $column ] : strtotime( $value[ $column ] );
-              $display_value = date( get_option('date_format','r'), $time );
+							if ( ! empty( $value[ $column ] ) ) {
+							
+								$time = preg_match( '#^[0-9]+$#', $value[ $column ] ) > 0 ? (int) $value[ $column ] : strtotime( $value[ $column ] );
+								$display_value = date( get_option('date_format','r'), $time );
+								
+							}
 							
 							break;
 							

@@ -153,6 +153,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.2.6 =
+* bug fix for blank dates resolving to UNIX time 0
+
 = 1.2.5 =
 * added "link" form element for storing a link with link text
 * added "make link" setting to make URLs clickable
