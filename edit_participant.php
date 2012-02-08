@@ -106,9 +106,9 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 		// format the date if it's a date field
 		if ( 'date' == $column->form_element ) {
 		
-			$time = preg_match( '#^[0-9]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
-		
-			$value = date( get_option( 'date_format' ).' '.get_option( 'time_format' ), $time );
+				$time = preg_match( '#^[0-9]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
+			
+				$value = date( get_option( 'date_format' ).' '.get_option( 'time_format' ), $time );
 			
 		}
 		// 
