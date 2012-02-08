@@ -153,6 +153,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.2.7 =
+* bug fix: attempting to validate main form fields while on signup form
+
 = 1.2.6 =
 * bug fix for blank dates resolving to UNIX time 0
 
@@ -276,6 +279,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.2.7 =
+Fix validation errors on signup form when record form fields are required
 
 = 1.2.6 =
 Fix display issue with blank date fields  
