@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.2.6
+Version: 1.2.7
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -766,8 +766,10 @@ class Participants_Db {
     $new_value = false;
     $columns = array();
 
+    $column_set = ( isset( $post['action'] ) && $post['action'] == 'signup' ? 'signup' : 'new' );
+
     // gather the submit values and add them to the query
-		foreach ( self::get_column_atts() as $column_atts ) :
+		foreach ( self::get_column_atts( $column_set ) as $column_atts ) :
 
 			// the validation object is only instantiated when this method is called
 			// by a form submission
