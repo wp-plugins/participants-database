@@ -153,6 +153,10 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.2.8 =
+* fixed bug with some databases not getting updated
+* added setting for display text on record form
+
 = 1.2.7 =
 * bug fix: attempting to validate main form fields while on signup form
 
@@ -279,6 +283,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.2.8 =
+minor upgrade (new button text settings for record form) and bugfix (csv exports failing on some installations)
 
 = 1.2.7 =
 Fix validation errors on signup form when record form fields are required

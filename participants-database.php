@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.2.7
+Version: 1.2.8
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -1395,7 +1395,7 @@ class Participants_Db {
 	 * @param string $field name of the field
 	 * @return array contains parameters to use in instantiating the FormElement object
 	 */
-	public function get_edit_field_type( $field ) {
+	 public function get_edit_field_type( $field ) {
 		
 		switch ( $field ) :
 			
@@ -1417,13 +1417,9 @@ class Participants_Db {
 			case 'signup':
 				return array( 'type'=>'checkbox', 'options'=> array( 1, 0 ) );
 			
-			// all the text fields
+			// field names can't be edited
 			case 'name':
 				return array( 'type'=>'text','attributes'=>array('readonly'=>'readonly') );
-				
-			case 'title':
-			case 'default':
-				return array( 'type'=>'text' );
 			
 			// all the text-area fields
 			case 'values':
@@ -1442,9 +1438,16 @@ class Participants_Db {
 				// these options are defined on the "settings" page
 				return array( 'type' => 'dropdown', 'options'=> self::get_groups('name') );
 				
+			case 'link':
+				
+			case 'title':
+			default:
+				return array( 'type'=>'text' );
+				
 		endswitch;
 		
 	}
+	
 	
 	/**
 	 * prepares a set of rows for CSV output

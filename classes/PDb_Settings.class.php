@@ -172,7 +172,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('text shown on the button to sign up', Participants_Db::PLUGIN_NAME ),
-          'value'       => __('Sign Up', Participants_Db::PLUGIN_NAME ),
+          'value'       => _x('Sign Up','the text on a button to submit a signup form', Participants_Db::PLUGIN_NAME ),
           )
         );
 
@@ -329,6 +329,30 @@ class PDb_Settings extends Plugin_Settings {
           'type'       =>'dropdown',
           'help_text'  => __('the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
 					'options'    => $this->_get_pagelist(),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'save_changes_label',
+        'title'      =>__('Save Changes Label', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'record',
+        'options'    =>array
+					(
+          'type'       =>'text',
+          'help_text'  => __('label for the save changes button on the record form', Participants_Db::PLUGIN_NAME ),
+					'value'			 => __('Save Your Changes', Participants_Db::PLUGIN_NAME ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'save_changes_button',
+        'title'      =>__('Save Button Text', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'record',
+        'options'    =>array
+					(
+          'type'       =>'text',
+          'help_text'  => __('text on the "save" button', Participants_Db::PLUGIN_NAME ),
+					'value'			 => _x('Save','a label for a button to save a form', Participants_Db::PLUGIN_NAME ),
           )
         );
 

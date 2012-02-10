@@ -135,7 +135,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
   <table class="form-table">
     <?php if ( is_admin() ) : ?>
     <tr>
-      <th><h3>Save the Record</h3></th>
+      <th><h3><?php _e('Save the Record', Participants_Db::PLUGIN_NAME )?></h3></th>
       <td class="submit-buttons"><input class="button-primary" type="submit" value="Submit" name="submit">
         <input class="button-primary" type="submit" value="Apply" name="submit">
         <input class="button-primary" type="submit" value="Next" name="submit">
@@ -146,9 +146,9 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
     </tr>
     <?php else : ?>
     <tr>
-      <th><h3><?php _e('Save Your Changes', Participants_Db::PLUGIN_NAME )?></h3></th>
+      <th><h3><?php echo $options['save_changes_label']?></h3></th>
       <td class="submit-buttons">
-        <input class="button-primary" type="submit" value="Save" name="save">
+        <input class="button-primary" type="submit" value="<?php echo $options['save_changes_button']?>" name="save">
         <input name="submit" type="hidden" value="Apply">
       </td>
     </tr>

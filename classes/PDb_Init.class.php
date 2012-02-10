@@ -16,7 +16,7 @@
 class PDb_Init
 {
     // this is the current db version
-    const VERSION = '0.4';
+    const VERSION = '0.5';
 
     // arrays for building default field set
     public static $internal_fields;
@@ -101,7 +101,7 @@ class PDb_Init
           `display_column` INT(3) DEFAULT 0,
           `admin_column` INT(3) DEFAULT 0,
           `sortable` BOOLEAN DEFAULT 0,
-          `import` BOOLEAN DEFAULT 0,
+          `CSV` BOOLEAN DEFAULT 0,
           `persistent` BOOLEAN DEFAULT 0,
           `signup` BOOLEAN DEFAULT 0,
           UNIQUE KEY  ( `name` ),
