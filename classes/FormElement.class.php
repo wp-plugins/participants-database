@@ -32,7 +32,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, 2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.2
+ * @version    Release: 1.3
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -657,6 +657,8 @@ class FormElement {
 		$this->_addline( $this->print_hidden_fields( array( 'MAX_FILE_SIZE'=>$max_size ) ) );
 		
 		$this->_addline( $this->_input_tag( 'file' ) );
+		
+		$this->_addline( $this->print_hidden_fields( array( $this->name=>$this->value ) ) );
 		
 	}
 

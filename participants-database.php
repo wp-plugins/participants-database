@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.2.8
+Version: 1.2.8.1
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -724,7 +724,14 @@ class Participants_Db {
 				// place the path to the file in the field value
 				$filepath = self::_handle_file_upload( $fieldname, $attributes );
 				
-				if ( false !== $filepath ) $post[ $fieldname ] = $filepath;
+				if ( false !== $filepath ) {
+					
+					$post[ $fieldname ] = $filepath;
+					
+					// make sure the old value isn't there to override the new one
+					unset( $_POST[ $fieldname ] );
+					
+				}
 				
 			}
 			

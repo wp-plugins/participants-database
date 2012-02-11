@@ -153,6 +153,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.2.8.1 =
+* fixed bug where image files are not saved with record in some cases
+
 = 1.2.8 =
 * fixed bug with some databases not getting updated
 * added setting for display text on record form
@@ -283,6 +286,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.2.8.1 =
+bugfux update fixing images not saving sometimes
 
 = 1.2.8 =
 minor upgrade (new button text settings for record form) and bugfix (csv exports failing on some installations)
