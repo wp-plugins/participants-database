@@ -174,7 +174,7 @@ class PDb_Init
 
             $defaults['name'] = $name;
             $defaults['group'] = $group;
-            $defaults['import'] = 'main' == $group ? 1 : 0;
+            $defaults['CSV'] = 'main' == $group ? 1 : 0;
             $defaults['order'] = $i;
             $defaults['validation'] = isset( $defaults['validation'] ) ? $defaults['validation'] : 'no';
 
