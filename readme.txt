@@ -153,6 +153,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.2.8.2 =
+* bugfix for bobbled databse update to 0.5
+
 = 1.2.8.1 =
 * fixed bug where image files are not saved with record in some cases
 
@@ -286,6 +289,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.2.8.2 =
+very important fix for all installations that installed at or after 1.2.5 
 
 = 1.2.8.1 =
 bugfux update fixing images not saving sometimes

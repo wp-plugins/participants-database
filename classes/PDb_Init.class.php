@@ -79,9 +79,11 @@ class PDb_Init
     {
 
       global $wpdb;
+			
+			
 
       // fresh install: install the tables if they don't exist
-      if ($wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') != Participants_Db::$participants_table) :
+      if ( $wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') != Participants_Db::$participants_table ) :
       
       // define the arrays for loading the initial db records
       $this->_define_init_arrays();
@@ -174,7 +176,7 @@ class PDb_Init
 
             $defaults['name'] = $name;
             $defaults['group'] = $group;
-            $defaults['import'] = 'main' == $group ? 1 : 0;
+            $defaults['CSV'] = 'main' == $group ? 1 : 0;
             $defaults['order'] = $i;
             $defaults['validation'] = isset( $defaults['validation'] ) ? $defaults['validation'] : 'no';
 
@@ -360,7 +362,46 @@ class PDb_Init
         }
 
       }
+			
+			/* this fixes an error I made in the 0.5 DB update
+			*/
+			if ( '0.5' == get_option( Participants_Db::$db_version ) && false === Participants_Db::get_participant() ) {
+				
+				// define the arrays for loading the initial db records
+      	$this->_define_init_arrays();
+				
+				// load the default values into the database
+        $i = 0;
+        unset( $defaults );
+        foreach( array_keys( self::$field_groups ) as $group ) {
 
+          foreach( self::${$group.'_fields'} as $name => $defaults ) {
+
+            $defaults['name'] = $name;
+            $defaults['group'] = $group;
+            $defaults['CSV'] = 'main' == $group ? 1 : 0;
+            $defaults['order'] = $i;
+            $defaults['validation'] = isset( $defaults['validation'] ) ? $defaults['validation'] : 'no';
+
+            if ( isset( $defaults['values'] ) && is_array( $defaults['values'] ) ) {
+
+              $defaults['values'] = serialize( $defaults['values'] );
+
+            }
+
+            $wpdb->insert( Participants_Db::$fields_table, $defaults );
+
+            $i++;
+
+          }
+
+        }
+				
+				// create the default record
+        $this->set_default_record();
+				
+			}
+				
       error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
       
     }
@@ -443,7 +484,7 @@ class PDb_Init
       //   column - column in the list view and order (missing or 0 for not used)
       //   persistent - is the field persistent from one entry to the next (for
       //                convenience while entering multiple records)
-      //   import - is the field one to be imported or exported
+      //   CSV - is the field one to be imported or exported
       //   validation - if the field needs to be validated, use this regex or just
       //               yes for a value that must be filled in
       //   form_element - the element to use in the form--defaults to
