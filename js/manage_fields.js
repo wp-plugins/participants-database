@@ -29,7 +29,7 @@ jQuery(document).ready(function($){
   // set up the delete functionality
 
   // set up the click function
-  $('a.delete').click(function (e) { // if a user clicks on the "delete" image
+  $('.manage-fields a.delete').click(function (e) { // if a user clicks on the "delete" image
 
     //prevent the default browser behavior when clicking
     e.preventDefault();
