@@ -57,6 +57,10 @@ The backend form is set up for rapid manual entry of multiple records, such as a
 
 Display the list on your website with the [pdb_list] shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order.
 
+**Record Display**
+
+Each individual record can be displayed usinf a shortcode and accessed by the ID if the record. A template file formats the output of the shortcode. A plugin setting determines how a link to the individual record may be placed on the list of records.
+
 **Import/Export Records**
 
 All records can be exported as a CSV-formatted text file that can be read by spreadsheet applications and used for mass email campaigns, hard-copy lists, and other applications. The records exported can be filtered by column values: for instance, only people who have consented to receive a newsletter will be included. Records may also be sorted by any column. Which fields are included in the export/import is determined by the "CSV" column of the field definition.
@@ -152,6 +156,15 @@ Even better than that, there is a new form field type called "link" that lets pe
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.3 =
+* added individual record shortcode using template
+* several bugfixes: link element, textareas with links
+* better HTML on list display table
+* setting to add marker to title of required fields
+* added option to use WYSIWYG editor on text areas (for logged-in WP users only)
+* list shortcode can now specify which columns (fields) to show
+* dates before 1970 now work
 
 = 1.2.8.2 =
 * bugfix for bobbled databse update to 0.5
@@ -290,6 +303,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Upgrade Notice ==
 
+= 1.3 =
+Major feature upgrade with several fixes and enhancements-- see the changelog
+
 = 1.2.8.2 =
 very important fix for all installations that installed at or after 1.2.5 
 
@@ -386,7 +402,7 @@ It's also possible to use this feature to make filling out the signup form requi
 
 You can use the [pdb_list] shortcode to show the records on your site. Just put the shortcode where you want it to show up. You can set the number of records to show per page (yes, it's paginated!) with the 'list_limit' setting, also the CSS class to wrap the table in with the 'class' setting...like this: [pdb_list list_limit=10 class=memberlist]
 
-Which columns get included is determined on the fields management page, just set the "display_column" value to order the columns as you like.
+Which columns get included is determined on the fields management page, just set the "display_column" value to order the columns as you like. You can alos set the columns to display in the shortcode by including a list of the names (not Titles!) of the fields you want to show in the order you want to show them: [pdb_list fields="last_name, city, email, photo"]
 
 You can now filter and sort the list that is displayed with 3 new variables in the shortcode: see the next section.
 
@@ -407,3 +423,7 @@ To correctly compare dates, the field *must* be defined as a date field form ele
 **Approving Records for Public Display**
 
 One application for the list filtering option allows you to control whether a record gets displayed, giving you an approval process for new records. Create an administrative field (one that is not displayed or edited on the frontend) called "approved" that is a checkbox. Put this (without the quotes) in the values for the field: 'yes,no' with a default value of 'no'. Then put this in the shortcode: [pdb_list filter='approved=yes'] Now, only records that have been approved will be included in the list display. You may need to do something like this if you get a problem with spam, for instance.
+
+**Showing an Individual Record on Your Website**
+
+To show an individual record on the website, use the [pdb_single] shortcode. You must include the id of the record in the URL, so there must be 'pdb=1333' at the end of the page URL. The '1333' in this example would be the actual id number of the record you want to show.

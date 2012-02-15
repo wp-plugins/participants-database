@@ -148,7 +148,7 @@ class FormElement {
     
     $this->i18n = array(
     					'other' => _x('other', 'indicates a write-in choice', Participants_Db::PLUGIN_NAME ),
-							'linktext' => __( 'Link Text', Participants_Db::PLUGIN_NAME )
+							'linktext' => _x( 'Link Text','indicates the text to be clicked to go to another web page', Participants_Db::PLUGIN_NAME )
     					);
     
     $this->attributes = $params['attributes'];
@@ -168,7 +168,7 @@ class FormElement {
     $this->output = array();
 
     // set the proper type for the value property
-    $this->_condition_value_property();
+    //$this->_condition_value_property();
 
     // build the element by calling the type's method
     switch ( $this->type ) :
@@ -441,7 +441,7 @@ class FormElement {
     } else {
       otherselect.name="'. $this->name . '";
       otherfield.name="temp";
-      otherfield.value="";
+      otherfield.value=otherselect.options[otherselect.selectedIndex].text==""?"('.$otherlabel.')":"";
     }
   }
   function '.$js_prefix.'SetOther() {
@@ -450,6 +450,7 @@ class FormElement {
     otherselect.selectedIndex=otherselect.length-1;
     otherfield.name="'. $this->name . '";
     otherselect.name="temp";
+		otherfield.value="";
   }
   window.onload='.$js_prefix.'SelectOther();
 </script>
@@ -477,6 +478,8 @@ class FormElement {
    */
   private function _multi_checkbox() {
 
+		$this->value = (array) $this->value;
+
     $this->_addline( '<div class="multicheckbox"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . '>' );
     $this->indent++;
 
@@ -494,6 +497,9 @@ class FormElement {
    * @param string $type can be either 'radio' or 'checkbox' (for a multi-select element)
    */
   private function _select_other( $type = 'radio' ) {
+    
+		$this->value = (array) $this->value;
+		if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
     
     // determine the label for the other field
     if ( isset( $this->attributes['other'] ) ) {
@@ -514,7 +520,7 @@ class FormElement {
     
     // add the "other" option
     $this->_addline( '<label for="'.$this->name.'">' );
-    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="other" ' . $this->_set_selected( $this->options, $this->value['other'], 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
+    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( $this->options, $this->value['other'], 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
     $this->_addline( $otherlabel.':' );
     $this->_addline( '</label>', -1 );
     
@@ -772,37 +778,6 @@ class FormElement {
 	 * UTILITY FUNCTIONS
 	 */ 
   
-  /**
-   * converts the field value to the proper type for the element
-   *
-   * if the value property an array (this can happen if the value of the field
-   * was formerly set by an element that stores an array) and the element needs
-   * a string we grab the first value, if it comes in as a string and the element
-   * is a multi-value element, we make the property an array
-   *
-   */
-  private function _condition_value_property() {
-  
-    // the type will contain the string 'multi' if it has an array as a value
-    if ( false === strpos( $this->type, 'multi' ) ) {
-
-      $this->value = is_array( $this->value ) ? current( $this->value ) : $this->value;
-      
-    } else {
-
-      $this->value = ! is_array( $this->value ) ? array( $this->value ) : $this->value;
-      
-      // if we're doing an "other" element, make sure there is an 'other' element to the array
-      if ( false !== strpos( $this->type, 'other' ) && ! isset( $this->value['other'] ) ) {
-      
-      	$this->value['other'] = '';
-      	
-      }
-
-    }
-
-  }
-    
   
   /**
    * adds a class name to the class property

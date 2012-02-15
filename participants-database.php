@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.2.8.2
+Version: 1.3
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -170,6 +170,7 @@ class Participants_Db {
 
 		// set the email content type to HTML
 		add_filter('wp_mail_content_type',create_function('', 'return "text/html";'));
+		add_filter('query_vars', array( __CLASS__, 'register_queryvars') );
 
 		// set the WP hooks to finish setting up the plugin
 		add_action( 'init', array( __CLASS__, 'init') );
@@ -181,6 +182,7 @@ class Participants_Db {
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
 		add_shortcode( 'pdb_signup_thanks', array( __CLASS__, 'print_signup_thanks_form' ) );
 		add_shortcode( 'pdb_list', array( 'PDb_List','initialize' ) );
+		add_shortcode( 'pdb_single', array( __CLASS__, 'show_record' ) );
 		
 	
 		if ($wpdb->get_var('SHOW TABLES LIKE "'.Participants_Db::$participants_table.'"') == Participants_Db::$participants_table) :
@@ -371,6 +373,16 @@ class Participants_Db {
 		
 	}
 	
+	// register all the GET variables we want to use
+	public function register_queryvars( $qvars ) {
+		
+		// 'pdb' is used bye the pdb_show shortcode
+		$qvars[] = 'pdb';
+		
+		return $qvars;
+		
+	}
+	
 	// plays out a record edit screeen for a participant
 	// it requires the use of a link with an id number
 	// low security on entry becuase we don't require that they establish an
@@ -404,6 +416,61 @@ class Participants_Db {
     }
 		
 	}
+	
+	/**
+	 * displays a single record using a shortcode called with the record ID
+	 *
+	 * the shorcode is looking for a get variable called 'r'
+	 *
+	 * this is an experimental version of the function using a template to display the form
+	 */
+  public function show_record( $atts ) {
+
+    /*
+     * the template attribut selects the template file
+     * the term attribute selects the term to use to look up the record
+     * this should be a unique identifier, but if it's not it will show a series of records
+     */
+    $vars = shortcode_atts( array(
+                                  'template' => 'default',
+                                  'term'     => 'id',
+                                  'class'    => 'PDb-single'
+                                  ), $atts );
+
+    if ( isset( $_GET['pdb'] ) ) {
+
+      $ids = self::_get_participant_id_by_term( $vars['term'], $_GET['pdb'] );
+
+      $template = self::$plugin_path.'/templates/pdb-single-'.$vars['template'].'.php';
+
+      if ( ! file_exists( $template ) ) {
+        error_log( __METHOD__.' template not found: '.$template );
+        return '<p>Missing Template</p>';
+      }
+
+      ob_start();
+
+      ?><style type="text/css"><?php include 'PDb-record.css' ?></style><?php
+
+      foreach( (array) $ids as $id ) :
+
+        if ( self::_id_exists( $id ) ) {
+          ?>
+          <div class="<?php echo $vars['class']?>">
+          
+            <?php include $template ?>
+            
+          </div><?php
+
+        } else echo '<p>'.sprintf( __( 'No record found for %s.', Participants_Db::PLUGIN_NAME ), $id ).'</p>';
+
+      endforeach;// cycle through ids
+
+      return ob_get_clean();
+      
+    }
+
+  }
 	
 	/**
 	 * prints a signup form
@@ -589,17 +656,23 @@ class Participants_Db {
   }
 	
 	/**
-	 * chacks a string against known columns to validate input
+	 * checks a string against active columns to validate input
 	 */
 	public function is_column( $string ) {
 		
-		$columns_info = Participants_Db::get_columns();
+		global $wpdb;
+		
+		$sql = "SELECT f.name 
+		        FROM ".self::$fields_table." f 
+						WHERE f.group != 'internal'";
+		
+		$columns_info = $wpdb->get_results( $sql, ARRAY_N );
 		
 		$columns = array();
 		
 		foreach ( $columns_info as $column_data ) {
 			
-			$columns[] = $column_data['Field'];
+			$columns[] = $column_data[0];
 			
 		}
 		
@@ -662,6 +735,103 @@ class Participants_Db {
 		$sql = 'SELECT v.*, g.order FROM '.self::$fields_table.' v INNER JOIN '.self::$groups_table.' g ON v.group = g.name '.$where.' ORDER BY g.order, v.order';
 		
 		return $wpdb->get_results( $sql, OBJECT_K );
+		
+	}
+	
+  /**
+   * builds an object of all participant values structured by groups and columns
+   */
+	public function single_record_fields( $id, $exclude = '' ) {
+
+    global $wpdb;
+
+    // get the groups object
+    $sql = 'SELECT g.title, g.name, g.description  FROM '.self::$groups_table.' g WHERE g.display = 1 ORDER BY `order` ASC';
+
+    $groups = $wpdb->get_results( $sql, OBJECT_K );
+
+    if ( is_array( $exclude ) ) {
+
+      $excludes = "AND v.name NOT IN ('".implode( "','", $exclude )."') ";
+
+    } else $excludes = '';
+
+    // add the columns to each group
+    foreach( $groups as $group ) {
+
+      $group->fields = $wpdb->get_results( 'SELECT v.name, v.title, v.form_element 
+                                            FROM '.self::$fields_table.' v
+                                            WHERE v.group = "'.$group->name.'"
+                                            '.$excludes.'
+                                            ORDER BY v.order
+                                            ', OBJECT_K );
+
+      // now get the participant value for the field
+      foreach( $group->fields as $field ) {
+
+        $field->value = current( $wpdb->get_row( "SELECT `".$field->name."`
+                                         FROM ".self::$participants_table."
+                                         WHERE `id` = '".$id."'", ARRAY_N ) );
+
+      } // fields
+
+    }// groups
+
+    return $groups;
+
+	}
+	
+	/**
+	 * prepares a field value for display
+	 *
+	 * @param string $value        the raw value of the field
+	 * @param string $form_element the form element type of the field
+	 * @return string
+	 */
+	public function prep_field_for_display( $value, $form_element ) {
+		
+		switch ( $form_element ) :
+              
+			case 'image-upload' :
+			
+				$return = '<img src="'.$value.'" />';
+				break;
+				
+			case 'date' :
+			
+				$return = empty( $value ) ? '' : date( get_option( 'date_format' ), $value );
+				break;
+				
+			case 'multi-checkbox' :
+			case 'multi-select-other' :
+			
+				$return = implode( ', ', (array) Participants_Db::unserialize_array( $value ) );
+				break;
+				
+			case 'link' :
+			
+				if ( ! is_array( $value ) ) { 
+				
+					$return = '';
+					break;
+					
+				}
+			
+				$linkdata = Participants_Db::unserialize_array( $value );
+				
+				if ( 2 > count( $linkdata ) ) $lindata[1] = $linkdata[0];
+			
+				$return = vsprintf('<a href="%1$s">%2$s</a>', $linkdata );
+				break;
+				
+			default :
+			
+				$return = $value;
+				
+		endswitch;
+		
+		return $return;
+		
 		
 	}
 	
@@ -819,6 +989,10 @@ class Participants_Db {
 				
 					$new_value = $date ? $date : NULL ;
 					
+        } elseif ( self::backend_user() && 'textarea' == $column_atts->form_element && $options['rich_text_editor'] ) {
+
+          $new_value = $post[ $column_atts->name ];
+
 				} else {
 					
 					$new_value = self::_prepare_string_mysql( $post[ $column_atts->name ] );
@@ -1626,10 +1800,24 @@ class Participants_Db {
 	 *
 	 * @return string HTML or HTML-escaped string (if it's not a link)
 	 */
-	public function make_link( $link, $title = '', $template = false ) {
+	public function make_link( $link, $title = '', $template = false, $get = false ) {
 
     // if it's not really a link don't wrap it
-    if ( 0 !== stripos( $link, 'http' ) ) return esc_html( $link );
+    if ( 0 !== stripos( $link, 'http' ) && false === $get ) return esc_html( $link );
+
+    if ( false !== $get && is_array( $get ) ) {
+
+        $link .= false !== strpos( '?', $link ) ? '&' : '?';
+
+        foreach( $get as $name => $value ) {
+
+          $link .= rawurlencode($name).'='.rawurlencode($value).'&';
+
+        }
+
+        $link = rtrim( $link, '&' );
+
+    }
 		
 		// default template for links
 		$linktemplate = $template === false ? '<a href="%1$s" target="_blank" >%2$s</a>' : $template;

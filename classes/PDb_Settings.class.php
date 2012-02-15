@@ -162,6 +162,67 @@ class PDb_Settings extends Plugin_Settings {
           ),
         );
 		
+    $this->plugin_settings[] = array(
+        'name'       =>'single_record_page',
+        'title'      =>__('Single Record Page', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array
+          (
+          'type'       =>'dropdown',
+          'help_text'  => __('this is the page where the [pdb_single] shortcode is located.', Participants_Db::PLUGIN_NAME ),
+          'options'    => $this->_get_pagelist(),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'single_record_link_field',
+        'title'      =>__('Single Record Link Field', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array
+          (
+          'type'       =>'dropdown',
+          'help_text'  => __('select the field on which to put a link to the single record. Leave blank or set to "none" for no link.', Participants_Db::PLUGIN_NAME ),
+          'options'    => $this->_get_display_columns(),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'mark_required_fields',
+        'title'      =>__('Mark Required Fields', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('mark the title of required fields?', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'required_field_marker',
+        'title'      =>__('Required Field Marker', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'       => 'text-field',
+          'help_text'  => __('html added to field title for required fields if selected above (the %s is replaced by the name of the field)', Participants_Db::PLUGIN_NAME ),
+          'value'      => '%s<span class="reqd">*</span>',
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'rich_text_editor',
+        'title'      =>__('Use Rich Text Editor', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('enable the rich text editor on textarea fields (works only for logged-in WP users)', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+		
 
     // signup form settings
 
@@ -432,6 +493,22 @@ class PDb_Settings extends Plugin_Settings {
 		return $pagelist;
 		
 	}
+
+	private function _get_display_columns() {
+
+    $columnlist = array(  __('None', Participants_Db::PLUGIN_NAME ) => 'none' );
+
+    $columns = Participants_Db::get_column_atts( 'frontend' );
+
+    foreach( $columns as $column ) {
+
+      if ( 'text-line' == $column->form_element ) $columnlist[ $column->title ] = $column->name;
+
+    }
+
+    return $columnlist;
+
+  }
 
   /**
    * displays a settings page form using the WP Settings API

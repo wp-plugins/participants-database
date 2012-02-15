@@ -85,8 +85,14 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 ?>
 
 	<tr class="<?php echo $column->form_element?>">
-		<th><?php echo htmlspecialchars(stripslashes($column->title),ENT_QUOTES,"UTF-8",false)?></th>
-		<td id="<?php echo Participants_Db::$css_prefix.$column->name?>">
+    <?php
+    $column_title = htmlspecialchars(stripslashes($column->title),ENT_QUOTES,"UTF-8",false);
+    if ( $options['mark_required_fields'] && $column->validation != 'no' ) {
+      $column_title = sprintf( $options['required_field_marker'], $column_title );
+    }
+    ?>
+		<th><?php echo $column_title ?></th>
+		<td id="<?php echo Participants_Db::$css_prefix.$column->name?>" >
 		<?php
 		
 		$readonly = in_array( $column->name, $readonly_columns )  ? array( 'readonly' => 'readonly' ) : NULL;
@@ -99,6 +105,8 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 			
 			if ( is_array( $_POST[ $column->name ] ) ) $value = $_POST[ $column->name ];
 			
+			elseif  ( Participants_Db::backend_user() && 'textarea' == $column->form_element && $options['rich_text_editor'] ) $value = $_POST[ $column->name ];
+
 			else $value = esc_html( stripslashes( $_POST[ $column->name ] ) );
 			
 		}
@@ -106,19 +114,37 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 		// format the date if it's a date field
 		if ( 'date' == $column->form_element && ! empty( $value ) ) {
 		
-			$time = preg_match( '#^[0-9]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
+			$time = preg_match( '#^[0-9-]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
 		
 			$value = date( get_option( 'date_format' )/*.' '.get_option( 'time_format' )*/, $time );
 			
 		}
-		// 
+
+		if ( Participants_Db::backend_user() && 'textarea' == $column->form_element && $options['rich_text_editor'] ) {
+
+      wp_editor(
+                $value,
+                preg_replace( '#[0-9_-]#', '', Participants_Db::$css_prefix.$column->name ),
+                array(
+                      'media_buttons' => false,
+                      'textarea_name' => $column->name,
+                      'editor_class'  => ( $column->validation != 'no' ? "required-field" : '' ),
+                      )
+                );
+                
+    } else {
+    
 		FormElement::print_element( array(
 																			'type'       => $column->form_element,
 																			'value'      => $value,
 																			'name'       => $column->name,
 																			'options'    => $column->values,
+                                        'class'      => ( $column->validation != 'no' ? "required-field" : '' ),
 																			'attributes' => $readonly,
 																			) );
+
+    }
+    
 		if ( ! empty( $column->help_text ) ) :
 			?>
 			<span class="helptext"><?php echo trim( $column->help_text )?></span>

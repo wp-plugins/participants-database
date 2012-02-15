@@ -110,9 +110,34 @@ class PDb_List
 																			'filter'      => '',
 																			'orderby'			=> 'last_name',
 																			'order'       => 'asc',
+																			'fields'			=> '',
                                       );
 
     self::$shortcode_params = shortcode_atts( $shortcode_defaults, $atts );
+		
+		// allow for an arbitrary fields definition list in the shortcode
+		if ( ! empty( self::$shortcode_params['fields'] ) ) {
+			
+			$raw_list = explode( ',', str_replace( array( "'",'"',' ',"\r" ), '', self::$shortcode_params['fields'] ) );
+			
+			if ( is_array( $raw_list ) ) :
+			
+				//clear the array
+				self::$display_columns = array();
+			
+				foreach( $raw_list as $column ) {
+					
+					if ( Participants_Db::is_column( $column ) ) {
+				
+						self::$display_columns[] = $column;
+						
+					}
+					
+				}
+				
+			endif;
+			
+		}
 		
 		// process delete and items-per-page form submissions
 		if ( self::$backend ) self::_process_general();
@@ -300,7 +325,7 @@ class PDb_List
 						if ( empty( $value ) ) {
 							$value = time();
 						}
-						$delimiter = array( 'CAST(',' AS UNSIGNED)' );
+						$delimiter = array( 'CAST(',' AS SIGNED)' );
 						
 					}
 					
@@ -385,7 +410,7 @@ class PDb_List
 				if ( $field_atts->form_element == 'date' ) {
 				
 					$target = strtotime( $target );
-					$delimiter = array( 'CAST(',' AS UNSIGNED)' );
+					$delimiter = array( 'CAST(',' AS SIGNED)' );
 					
 				}
 				
@@ -660,6 +685,7 @@ class PDb_List
       </tfoot>
       <?php
       endif; // table footer row ?>
+      <tbody>
       <?php
 			// output the main list
       foreach ( self::$participants as $value ) {
@@ -722,9 +748,26 @@ class PDb_List
 
               break;
 
-           default:
+           case 'textarea':
+
+              if ( ! empty( $value[ $column ] ) ) $display_value = '<span class="textarea">' . $value[ $column ] . '</span>';
+              break;
+
+           case 'text-line':
+
+              if (
+                    isset( self::$options['single_record_link_field'] )
+										&&
+										$column == self::$options['single_record_link_field']
+                    &&
+                    ! empty( self::$options['single_record_page'] )
+                  ) {
+								
+								$page_link = get_page_link( self::$options['single_record_page'] );
+
+                $display_value = Participants_Db::make_link( $page_link, $value[ $column ], '<a href="%1$s" >%2$s</a>', array( 'pdb'=>$value['id'] ) );
 					 
-					 		if ( self::$options['make_links'] ) {
+              } elseif ( self::$options['make_links'] ) {
 								
 								$display_value = Participants_Db::make_link( $value[ $column ] );
 								
@@ -733,6 +776,12 @@ class PDb_List
                $display_value = NULL == $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
 							 
 							}
+
+							break;
+
+           default:
+					 
+					 		$display_value = NULL == $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
 
           }
 
@@ -746,13 +795,16 @@ class PDb_List
 
         } ?>
       </tr>
-      <?php }
+      <?php } ?>
+    </tbody>
 
-    else : // if there are no records to show; do this
+    <?php else : // if there are no records to show; do this
     	?>
+      <tbody>
       <tr>
         <td><?php _e('No records found', Participants_Db::PLUGIN_NAME )?></td>
       </tr>
+      </tbody>
       <?php
      endif; // participants array
      ?>
