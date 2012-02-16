@@ -10,8 +10,10 @@ jQuery(document).ready(function($) {
 				$(this).addClass("ui-tabs-hide");
 		});
 		var wrapclass = $('.wrap').attr('class');
-		$(".ui-tabs").tabs({ fx: { opacity: "toggle", duration: "fast" } }).bind( 'tabsselect', function( event,ui) {
-																							
+		$(".ui-tabs").tabs({ 
+											 fx: { opacity: "show",  duration: "fast" },
+											 cookie: { expires:1 } 
+											 }).bind( 'tabsselect', function( event,ui) {
 																							var activeclass = $(ui.tab).attr('href').replace( /^#/, '');
 																							$(".wrap").removeClass().addClass( wrapclass+" "+activeclass );
 																							});

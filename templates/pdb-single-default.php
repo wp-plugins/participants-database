@@ -55,13 +55,15 @@ $exclude = array();
       <?php // this prints out all the fields in the group
 			foreach( $group->fields as $field ) : 
               
-          $value = Participants_Db::prep_field_for_display( $field->value, $field->form_element );    
+          $value = Participants_Db::prep_field_for_display( $field->value, $field->form_element );
+					
+					$empty_class = empty( $value ) ? 'blank-field' : '';
       
       ?>
       
-      <dt class="<?php echo $field->name?>"><?php echo $field->title ?></dt>
+      <dt class="<?php echo $field->name.' '.$empty_class?>"><?php echo $field->title ?></dt>
       
-      <dd class="<?php echo $field->name?>"><?php echo $value ?></dd>
+      <dd class="<?php echo $field->name.' '.$empty_class?>"><?php echo $value ?></dd>
   
     	<?php endforeach; // end of the fields loop ?>
     

@@ -353,6 +353,8 @@ class Participants_Db {
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'jquery-ui-core' );
 		wp_enqueue_script( 'jquery-ui-tabs' );
+		wp_register_script( 'cookie', plugins_url( 'js/jquery.cookie.js', __FILE__ ) );
+		wp_enqueue_script( 'cookie' );
 		wp_register_script( 'settings_script', plugins_url( 'js/settings.js', __FILE__ ) );
 		wp_enqueue_script( 'settings_script' );
 	}
@@ -746,7 +748,12 @@ class Participants_Db {
     global $wpdb;
 
     // get the groups object
-    $sql = 'SELECT g.title, g.name, g.description  FROM '.self::$groups_table.' g WHERE g.display = 1 ORDER BY `order` ASC';
+    $sql = '
+		        SELECT g.title, g.name, g.description  
+		        FROM '.self::$groups_table.' g 
+						WHERE g.display = 1 
+						ORDER BY `order` ASC
+						';
 
     $groups = $wpdb->get_results( $sql, OBJECT_K );
 
@@ -810,18 +817,18 @@ class Participants_Db {
 				
 			case 'link' :
 			
-				if ( ! is_array( $value ) ) { 
+				$linkdata = Participants_Db::unserialize_array( $value );
+			
+				if ( ! is_array( $linkdata ) ) { 
 				
 					$return = '';
 					break;
 					
 				}
-			
-				$linkdata = Participants_Db::unserialize_array( $value );
 				
 				if ( 2 > count( $linkdata ) ) $lindata[1] = $linkdata[0];
 			
-				$return = vsprintf('<a href="%1$s">%2$s</a>', $linkdata );
+				$return = vsprintf( ( empty( $linkdata[0] ) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>' ), $linkdata );
 				break;
 				
 			default :
@@ -1662,15 +1669,39 @@ class Participants_Db {
 		
 		$output = array();
 		
+		// get the column attributes
+		$columns = self::get_column_atts('CSV');
+		
+		// iterate through the object as we iterate through the array
+		$column = current( $columns );
+		
 		foreach( $raw_array as $key => $value ) {
-
-      // flatten arrays
-      if ( is_serialized( $value ) )
-
-        $value = implode( ', ', unserialize( $value ) );
+				
+			// process any other value types
+			switch ( $column->form_element ) {
+				
+				case 'date':
+				
+					if ( ! empty( $value ) ) {
+				
+						$value = date( get_option( 'date_format' ), $value );
+						break;
+						
+					}
+					
+				default:
+				
+					// flatten arrays
+					if ( is_serialized( $value ) )
+		
+						$value = implode( ', ', unserialize( $value ) );
+				
+			}
 
 			// decode HTML entities
 			$output[ $key ] = html_entity_decode( $value, ENT_QUOTES, "utf-8" );
+			
+			$column = next( $columns );
 			
 		}
 		

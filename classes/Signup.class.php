@@ -68,6 +68,9 @@ class Signup {
 	
 	// holds the output for the shortcode
 	private $output = '';
+	
+	// plugin options array
+	private $options;
 
 	// methods
 	//
@@ -87,24 +90,24 @@ class Signup {
 
 		$this->signup_columns = Participants_db::get_column_atts( 'signup' );
 
-		$options = get_option( Participants_Db::$participants_db_options );
+		$this->options = get_option( Participants_Db::$participants_db_options );
 
-		$this->send_reciept = $options['send_signup_receipt_email'];
-		$this->send_notification = $options['send_signup_notify_email'];
-		$this->notify_recipients = $options['email_signup_notify_addresses'];
-		$this->notify_subject = $options['email_signup_notify_subject'];
-		$this->notify_body = $options['email_signup_notify_body'];
-		$this->receipt_subject = $options['signup_receipt_email_subject'];
-		$this->receipt_body = $options['signup_receipt_email_body'];
-		$this->thanks_message = $options['signup_thanks'];
+		$this->send_reciept = $this->options['send_signup_receipt_email'];
+		$this->send_notification = $this->options['send_signup_notify_email'];
+		$this->notify_recipients = $this->options['email_signup_notify_addresses'];
+		$this->notify_subject = $this->options['email_signup_notify_subject'];
+		$this->notify_body = $this->options['email_signup_notify_body'];
+		$this->receipt_subject = $this->options['signup_receipt_email_subject'];
+		$this->receipt_body = $this->options['signup_receipt_email_body'];
+		$this->thanks_message = $this->options['signup_thanks'];
 		$this->email_header = sprintf(
 		                               'From: %2$s <%1$s>%3$s',
-		                               $options['receipt_from_address'],
-		                               $options['receipt_from_name'],
+		                               $this->options['receipt_from_address'],
+		                               $this->options['receipt_from_name'],
 		                               "\r\n"
 		                               );
 		
-		if ( ! isset( $options['signup_thanks_page'] ) ) {
+		if ( ! isset( $this->options['signup_thanks_page'] ) ) {
 			
 			// the signup thanks page is not set up
 			
@@ -112,11 +115,11 @@ class Signup {
 			
 		} else {
 			
-			$this->submission_page = get_page_link( $options['signup_thanks_page'] );
+			$this->submission_page = get_page_link( $this->options['signup_thanks_page'] );
 			
 		}
 
-		if ( $options['signup_show_group_descriptions'] ) {
+		if ( $this->options['signup_show_group_descriptions'] ) {
 
       $this->groups = Participants_Db::get_groups( '`name`,`title`,`description`' );
 
@@ -246,7 +249,13 @@ class Signup {
 				
 				?>
 					<tr id="<?php echo $column->name?>" class="<?php echo $column->form_element?>">
-						<th><?php echo $column->title?></th>
+						<?php
+            $column_title = $column->title;
+            if ( $this->options['mark_required_fields'] && $column->validation != 'no' ) {
+              $column_title = sprintf( $this->options['required_field_marker'], $column_title );
+            }
+            ?>
+						<th><?php echo $column_title?></th>
 						<td>
 						<?php
 
@@ -267,6 +276,7 @@ class Signup {
 																							'value'      => $value,
 																							'name'       => $column->name,
 																							'options'    => $column->values,
+                                      				'class'      => ( $column->validation != 'no' ? "required-field" : '' ),
 																							) );
 						if ( ! empty( $column->help_text ) ) :
 							?>
@@ -287,10 +297,9 @@ class Signup {
 					<tr>
 						<td colspan="2" class="submit-buttons">
             <?php 
-						$options = get_option(Participants_Db::$participants_db_options);
 						FormElement::print_element( array(
 																							'type'       => 'submit',
-																							'value'      => $options['signup_button_text'],
+																							'value'      => $this->options['signup_button_text'],
 																							'name'       => 'submit',
 																							'class'      => 'button-primary',
 																							) );

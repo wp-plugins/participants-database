@@ -574,11 +574,9 @@ class FormElement {
 	 */
 	private function _link_field( $linktext = true ) {
 		
-		$title = false;
-		
-		if ( false !== strpos( $this->value, ',' ) || true === $linktext ) {
+		if ( true === $linktext ) {
 			
-			$parts = explode( ',', $this->value, 2 );
+			$parts = is_serialized( $this->value ) ? unserialize( $this->value ) : (array) $this->value;
 			
 			if ( count( $parts ) < 2 ) $parts[1] = $parts[0];
 		
@@ -588,9 +586,15 @@ class FormElement {
 			
 		} else $url = $this->value;
 		
-		$this->_addline( $this->_input_tag( 'text', $url, false, (bool) $title !== false ) );
+		$url = empty( $url ) ? '(URL)' : $url; 
 		
-		if ( $title !== false)  {
+		$this->attributes['onclick'] = "this.value=this.value=='(URL)'?'':this.value";
+		
+		$this->_addline( $this->_input_tag( 'text', $url, false, $linktext ) );
+		
+		unset( $this->attributes['onclick'] );
+		
+		if ( true === $linktext )  {
 		
 			$this->_addline( '<label for="'.$this->name.'">'.$this->i18n['linktext'].'</label>'.$this->_input_tag( 'text', $title, false, true ).'</div>' );
 			

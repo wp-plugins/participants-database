@@ -139,7 +139,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 																			'value'      => $value,
 																			'name'       => $column->name,
 																			'options'    => $column->values,
-                                        'class'      => ( $column->validation != 'no' ? "required-field" : '' ),
+                                      'class'      => ( $column->validation != 'no' ? "required-field" : '' ),
 																			'attributes' => $readonly,
 																			) );
 
