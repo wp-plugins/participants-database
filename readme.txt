@@ -53,6 +53,8 @@ For your backend users, the ability to edit and enter new records is provided. T
 
 The backend form is set up for rapid manual entry of multiple records, such as after a signup drive, doorbelling, or public event.
 
+For textarea fields, a rich-text editor will be used if enabled in the settings.
+
 **List Display**
 
 Display the list on your website with the [pdb_list] shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order.

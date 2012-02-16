@@ -998,7 +998,7 @@ class Participants_Db {
 					
         } elseif ( self::backend_user() && 'textarea' == $column_atts->form_element && $options['rich_text_editor'] ) {
 
-          $new_value = $post[ $column_atts->name ];
+          $new_value = stripslashes($post[ $column_atts->name ]);
 
 				} else {
 					
