@@ -993,6 +993,12 @@ class Participants_Db {
 					
 					// date values are now stored as unix timestamps-- duh!
 					$date = strtotime( $post[ $column_atts->name ] );
+					
+					/*
+					 * bugfix: if the site is using date formats with just numerals and separators (3/4/01) then strtotime can misinterpret dates and return false
+					 *
+					 * I want to set up a date format setting then interpret the date using the setting with the PHP function DateTime::createFromFormat
+					 */
 				
 					$new_value = $date ? $date : NULL ;
 					
@@ -1682,10 +1688,10 @@ class Participants_Db {
 				
 				case 'date':
 				
-					if ( ! empty( $value ) ) {
+					if ( ! empty( $value ) && is_numeric( $value ) ) {
 				
-						$value = date( get_option( 'date_format' ), $value );
-						break;
+							$value = date( get_option( 'date_format' ), $value );
+							break;
 						
 					}
 					

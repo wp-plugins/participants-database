@@ -716,7 +716,7 @@ class PDb_List
 							
 							if ( ! empty( $value[ $column ] ) ) {
 							
-								$time = preg_match( '#^[0-9]+$#', $value[ $column ] ) > 0 ? (int) $value[ $column ] : strtotime( $value[ $column ] );
+								$time = preg_match( '#^[0-9-]+$#', $value[ $column ] ) > 0 ? (int) $value[ $column ] : strtotime( $value[ $column ] );
 								$display_value = date( get_option('date_format','r'), $time );
 								
 							} else $display_value = '';
