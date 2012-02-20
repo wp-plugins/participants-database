@@ -1834,6 +1834,7 @@ class Participants_Db {
 	 * @param string $link the URI
 	 * @param string $title the clickable text (optional)
 	 * @param string $template the format of the link (optional)
+	 * @param array  $get an array of name=>value pairs to include in the get string
 	 *
 	 * @return string HTML or HTML-escaped string (if it's not a link)
 	 */
@@ -1844,7 +1845,7 @@ class Participants_Db {
 
     if ( false !== $get && is_array( $get ) ) {
 
-        $link .= false !== strpos( '?', $link ) ? '&' : '?';
+        $link .= false !== strpos( $link, '?' ) ? '&' : '?';
 
         foreach( $get as $name => $value ) {
 
