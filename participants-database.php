@@ -224,7 +224,7 @@ class Participants_Db {
 	
 	public function init() {
 
-    load_plugin_textdomain( self::PLUGIN_NAME, false, basename(dirname(__FILE__) ) );
+    load_plugin_textdomain( self::PLUGIN_NAME, false, dirname( plugin_basename( __FILE__ ) ).'/languages/' );
 
     self::$plugin_title = __('Participants Database', self::PLUGIN_NAME );
 
