@@ -17,7 +17,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.2.4
+ * @version    Release: 1.3.1
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
  
@@ -392,7 +392,7 @@ class PDb_List
 			
 			foreach ( $statements as $statement ) {
 				
-				$operator = preg_match( '#(\S+)(\>|\<|=|!)(\S+)#', str_replace(' ','', $statement ), $matches );
+				$operator = preg_match( '#(\S+)(\>|\<|=|!|~)(\S+)#', str_replace(' ','', $statement ), $matches );
 				
 				if ( $operator === 0 ) return;// no valid operator; just use the default query
 				
@@ -417,7 +417,7 @@ class PDb_List
 				// get the proper operator
 				switch ( $op_char ) {
 					
-					case '=':
+					case '~':
 						$operator = 'LIKE';
 						$delimiter = array('"%','%"');
 						break;
@@ -710,6 +710,21 @@ class PDb_List
            case 'image-upload':
 
               $display_value = self::$backend ? basename( $value[ $column ] ) : '<img class="PDb-list-image" src="'.$value[ $column ].'" />';
+					 
+					 		if (
+                    isset( self::$options['single_record_link_field'] )
+										&&
+										$column == self::$options['single_record_link_field']
+                    &&
+                    ! empty( self::$options['single_record_page'] )
+                  ) {
+								
+								$page_link = get_page_link( self::$options['single_record_page'] );
+
+                $display_value = Participants_Db::make_link( $page_link, $display_value, '<a href="%1$s" >%2$s</a>', array( 'pdb'=>$value['id'] ) );
+								
+							}
+							
               break;
 							
 					 case 'date':
@@ -751,6 +766,7 @@ class PDb_List
            case 'textarea':
 
               if ( ! empty( $value[ $column ] ) ) $display_value = '<span class="textarea">' . $value[ $column ] . '</span>';
+							else $display_value = '';
               break;
 
            case 'text-line':

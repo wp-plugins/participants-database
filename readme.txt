@@ -159,6 +159,12 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.3.1 =
+* fixed error in make_link method cusing broken links in installations not using rewrites
+* added Italian translation
+* removed 'internal' from list of possible field group assignments
+* added 'like' operator to list filter
+
 = 1.3 =
 * added individual record shortcode using template
 * several bugfixes: link element, textareas with links
@@ -305,6 +311,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Upgrade Notice ==
 
+= 1.3.1 =
+Bugfix for sites not using rewrites; Added Italian translation
+
 = 1.3 =
 Major feature upgrade with several fixes and enhancements-- see the changelog
 
@@ -416,9 +425,9 @@ There are 3 new parameters for the [pdb_list] shortcode that allows you to deter
 
 There is a parameter called 'filter' which determines which records to show. The general format of the parameter is this: *field* *operator* *value* So for instance if you wanted to show all records from the state of New York, you would put [pdb_list filter='state=NY'] just like that. "state" is the field (it must match exactly the field name as listed on the mange database fields page in the plugin) "=" is the operator and "NY" is the value. The filter is grabbing all records where the state is NY.
 
-The operators can be '=', '!', '<', '>' only. '!' means "NOT", so if you wanted everything except a certain value. '<' and '>' mean "less than" and "greater than" and can be used to compare values, like this: [pdb_list filter='last_name>k' ] That would give you all the records where the last name began with any letter coming after 'k' in the alphabet.
+The operators can be '=', '!', '<', '>' and '~' only. '!' means "NOT", so if you wanted everything except a certain value. '<' and '>' mean "less than" and "greater than" and can be used to compare values, like this: [pdb_list filter='last_name>k' ] That would give you all the records where the last name began with any letter coming after 'k' in the alphabet. The '=' operator looks for a strict match, and the '~' looks for a string inside the value. Careful with this one, it can give unexpected results.
 
-You can use more than one filter by stringing them together like this: [pdb_list filter='last_name>c&last_name<h' ] This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
+You can use more than one filter by stringing them together like this: [pdb_list filter='last_name>c&last_name<h' ] (note ampersand between filter statements) This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
 
 To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date vaules should be a regular date string like this: [pdb_list filter='date>jan3,2012'] It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
 
@@ -429,3 +438,7 @@ One application for the list filtering option allows you to control whether a re
 **Showing an Individual Record on Your Website**
 
 To show an individual record on the website, use the [pdb_single] shortcode. You must include the id of the record in the URL, so there must be 'pdb=1333' at the end of the page URL. The '1333' in this example would be the actual id number of the record you want to show.
+
+You can put a link to the single record in the participant list by defining the page on which the [pdb_single] is placed, and the column where you want the link to appear. In the plugin settings, general settings tab, look for "Single Record Page": set that to the page where your [pdb_single] shortcode is. Then, go to "Single Record Link Field" and choose which field will be the link to the single record page. You can set the link on any text field or an image field. If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW".
+
+If you are good with CSS, you can easily make the link look like a button.

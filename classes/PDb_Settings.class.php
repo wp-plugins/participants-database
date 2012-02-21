@@ -502,7 +502,7 @@ class PDb_Settings extends Plugin_Settings {
 
     foreach( $columns as $column ) {
 
-      if ( 'text-line' == $column->form_element ) $columnlist[ $column->title ] = $column->name;
+      if ( in_array( $column->form_element, array( 'text-line', 'image-upload' ) ) ) $columnlist[ $column->title ] = $column->name;
 
     }
 

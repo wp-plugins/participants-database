@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.3
+Version: 1.3.1
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -526,11 +526,13 @@ class Participants_Db {
   }
 
 	// get the groups info
-  public function get_groups( $column = '*' ) {
+  public function get_groups( $column = '*', $exclude = '' ) {
 
 		global $wpdb;
+		
+		$where = empty( $exclude ) ? '' : ' WHERE `name` != "'.$exclude.'" ';
 
-		$sql = 'SELECT '.$column.' FROM '.self::$groups_table.' ORDER BY `order`,`name` ASC';
+		$sql = 'SELECT '.$column.' FROM '.self::$groups_table.$where.' ORDER BY `order`,`name` ASC';
 		
 		// are we looking for only one column?
 		// if so, flatten the array
@@ -1630,7 +1632,7 @@ class Participants_Db {
 			
 			case 'group':
 				// these options are defined on the "settings" page
-				return array( 'type' => 'dropdown', 'options'=> self::get_groups('name') );
+				return array( 'type' => 'dropdown', 'options'=> self::get_groups('name', 'internal') );
 				
 			case 'link':
 				
