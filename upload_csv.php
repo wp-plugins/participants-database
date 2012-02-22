@@ -21,15 +21,13 @@ $errors = array();
 // if a file upload attempt been made, process it and display the status of the operation
 if( isset( $_POST['csv_file_upload'] ) ) :
 
-	$target_path = Participants_Db::$plugin_path . '/uploads/' . basename( $_FILES['uploadedfile']['name']);
+	$target_path = ABSPATH.Participants_Db::$plugin_options['image_upload_location'] . basename( $_FILES['uploadedfile']['name']);
 
 	if( false !== move_uploaded_file( $_FILES['uploadedfile']['tmp_name'], $target_path ) ) {
 
 		$errors[] = '<strong>'.sprintf( __('The file %s has been uploaded.', Participants_Db::PLUGIN_NAME ), $_FILES['uploadedfile']['name'] ).'</strong>';
 		
-		$file_name = ABSPATH.Participants_Db::$uploads_path.basename( $_FILES['uploadedfile']['name'] );
-		
-		$insert_error = Participants_Db::insert_from_csv( $file_name );
+		$insert_error = Participants_Db::insert_from_csv( $target_path );
 
 		if ( is_numeric( $insert_error ) ) {
 
