@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team
 Requires at least: 2.8.4
 Tested up to: 3.3.1
-Stable tag: 1.3
+Stable tag: 1.3.1
 
 Build and maintain a fully customizable database of participants or volunteers with signup forms, admin backend, custom lists, and CSV support.
 
@@ -161,7 +161,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 = 1.3.1 =
 * fixed error in make_link method cusing broken links in installations not using rewrites
-* added Italian translation
+* added Italian translation by Mario of trevisoeasy.it
 * removed 'internal' from list of possible field group assignments
 * added 'like' operator to list filter
 
@@ -312,7 +312,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 == Upgrade Notice ==
 
 = 1.3.1 =
-Bugfix for sites not using rewrites; Added Italian translation
+Bugfix for sites not using rewrites; Added Italian translation; some minor feature enhancements
 
 = 1.3 =
 Major feature upgrade with several fixes and enhancements-- see the changelog
