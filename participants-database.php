@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.3.1
+Version: 1.3.2
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -119,8 +119,8 @@ class Participants_Db {
 		self::$plugin_page = self::PLUGIN_NAME;
 		self::$plugin_url = WP_PLUGIN_URL.'/'.self::PLUGIN_NAME;
 		self::$plugin_path = dirname(__FILE__);
-		// this is relative to the plugin
-		self::$uploads_path = 'wp-content/plugins/'.self::PLUGIN_NAME.'/uploads/';
+		// this is relative to the WP install
+		self::$uploads_path = 'wp-content/uploads/'.self::PLUGIN_NAME.'/';
 		
 		// hard-code some image file extensions
 		self::$allowed_extensions = array( 'jpg','jpeg','gif','png' );
@@ -422,9 +422,12 @@ class Participants_Db {
 	/**
 	 * displays a single record using a shortcode called with the record ID
 	 *
-	 * the shorcode is looking for a get variable called 'r'
+	 * the shorcode is looking for a get variable called 'pdb'
 	 *
-	 * this is an experimental version of the function using a template to display the form
+	 * @param array $atts array of shortcode variables
+	 *                 template - name of the template file to use: pdb-single-{template}.php
+	 *                 term     - the term to index the record by, defaults to the ID
+	 *                 class    - classname of the wrapper div
 	 */
   public function show_record( $atts ) {
 
@@ -442,12 +445,18 @@ class Participants_Db {
     if ( isset( $_GET['pdb'] ) ) {
 
       $ids = self::_get_participant_id_by_term( $vars['term'], $_GET['pdb'] );
+			
+			$template = get_stylesheet_directory().'/templates/pdb-single-'.$vars['template'].'.php';
+			
+			if ( ! file_exists( $template ) ) {
 
-      $template = self::$plugin_path.'/templates/pdb-single-'.$vars['template'].'.php';
+      	$template = self::$plugin_path.'/templates/pdb-single-default.php';
 
-      if ( ! file_exists( $template ) ) {
+			} elseif ( ! file_exists( $template ) ) {
+				
         error_log( __METHOD__.' template not found: '.$template );
-        return '<p>Missing Template</p>';
+        return '<p>'._x('Missing Template', 'message to show if the plugin cannot find the template', self::PLUGIN_NAME ).'</p>';
+				
       }
 
       ob_start();
@@ -1879,6 +1888,14 @@ class Participants_Db {
 	 */ 
 	private function _handle_file_upload( $name, $file ) {
 		
+		$options = get_option( self::$participants_db_options );
+		
+		if ( ! is_dir( ABSPATH.$options['image_upload_location'] ) ) {
+		
+			if ( false === self::_make_uploads_dir( $options['image_upload_location'] ) ) return false;
+			
+		}
+		
 		if ( ! is_uploaded_file( $file['tmp_name'] ) ) {
 			
 			self::$validation_errors->add_error( $name, __('There is something wrong with the file you tried to upload. Try another.', self::PLUGIN_NAME ) );
@@ -1904,8 +1921,6 @@ class Participants_Db {
                      array("_", ""), 
                      trim( $file['name'] ) ); 
 		
-		$options = get_option( self::$participants_db_options );
-		
 		if ( $file['size'] > $options[ 'image_upload_limit' ] * 1024 ) {
 			
 			self::$validation_errors->add_error( $name, sprintf( __('The image you tried to upload is too large. The file must be smaller than %sK.', self::PLUGIN_NAME ), $options[ 'image_upload_limit' ] ) );
@@ -1924,6 +1939,31 @@ class Participants_Db {
 		
 		else return get_bloginfo('wpurl').DIRECTORY_SEPARATOR.$options['image_upload_location'].$new_filename;
 	
+	}
+	
+	/**
+	 * attempt to create the uploads directory
+	 *
+	 * sets an error if it fails
+	 */
+	private function _make_uploads_dir( $dir ) {
+		
+		$savedmask = umask(0);
+		
+		if ( false === mkdir( ABSPATH.$dir, 0755, true ) ) {
+			
+			self::$validation_errors->add_error( $name, sprintf( __('The uploads directory (%s) could not be created.', self::PLUGIN_NAME ), $dir )  );
+			
+			umask( $savedmask ); 
+			
+			return false;
+			
+		}
+			
+		umask( $savedmask ); 
+		
+		return true;
+		
 	}
 	
 	/**

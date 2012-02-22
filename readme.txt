@@ -159,8 +159,13 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.3.2 =
+* moved templates and image uploads defaults out of the plugin directory
+* updated instructions for using singe-record templates
+
+
 = 1.3.1 =
-* fixed error in make_link method cusing broken links in installations not using rewrites
+* fixed error in make_link method causing broken links in installations not using rewrites
 * added Italian translation by Mario of trevisoeasy.it
 * removed 'internal' from list of possible field group assignments
 * added 'like' operator to list filter
@@ -376,9 +381,9 @@ Important upgrade fixes 2 bugs and provides improved functionality.
 
 This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
 
-To collect signups on your website there are two shortcodes: [pdb_signup] and [pdb_record]. Use the [pdb_signup] one to give people a way to add their name to your list. You can customize which fields they need to fill in. [pdb_record] displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want.
+To collect signups on your website use this shortcode: [pdb_signup]. The shortcode will generate a short form to give people a way to add their name to your list. You can customize which fields they need to fill in. [pdb_record] displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want. The [pdb_record] form is only available when accessed using a private link because it allows a user to edit their won record.This link can be provided in an email and is also visible in the admin listing of records.
 
-This way, your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
+The idea is your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
 
 When they sign in, they will be sent an email with a private link to their full record. This page is where the second [pdb_record] shortcode goes.
 
@@ -443,3 +448,15 @@ To show an individual record on the website, use the [pdb_single] shortcode. You
 You can put a link to the single record in the participant list by defining the page on which the [pdb_single] is placed, and the column where you want the link to appear. In the plugin settings, general settings tab, look for "Single Record Page": set that to the page where your [pdb_single] shortcode is. Then, go to "Single Record Link Field" and choose which field will be the link to the single record page. You can set the link on any text field or an image field. If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW".
 
 If you are good with CSS, you can easily make the link look like a button.
+
+**Single Record Templates**
+
+One of the parameters of the [pdb_single] shortcode is "template" With this, you can define a template that determines how the record is displayed. In the plugin directory in a directory called "templates" is a file called "pdb-single-default.php" if you do not specify a custom template, this file will be used. 
+
+To make a custom template, copy this file to your own theme directory into a directory called "templates" and give it a new name like "pdb-single-mytemplate.php" This will be used if you call the shortcode with [pdb_single template="mytemplate"]. If there is a directory by that name already in your theme directory, just put the template file in there with anything else that might be in there.
+
+In this template file is an array that can be used to prevent any fields from displaying. Let's say you wanted to exclude the city, state and postcode. In that case the array would be filled with those names like this:
+
+$exclude = array('city','state','postcode');
+
+These fields will now be excluded from the display. The template offers many other opportunities to customize the output of the [pdb_single] shortcode to match your theme.
