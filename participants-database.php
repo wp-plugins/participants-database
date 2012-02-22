@@ -58,6 +58,8 @@ class Participants_Db {
 	// plugin options name
 	public static $participants_db_options;
 	
+	public static $plugin_options;
+	
 	// holds the plugin settings object
 	public static $plugin_settings;
 	
@@ -121,6 +123,8 @@ class Participants_Db {
 		self::$plugin_path = dirname(__FILE__);
 		// this is relative to the WP install
 		self::$uploads_path = 'wp-content/uploads/'.self::PLUGIN_NAME.'/';
+		
+		self::$plugin_options = get_option( self::$participants_db_options );
 		
 		// hard-code some image file extensions
 		self::$allowed_extensions = array( 'jpg','jpeg','gif','png' );
@@ -812,7 +816,7 @@ class Participants_Db {
               
 			case 'image-upload' :
 			
-				$return = '<img src="'.$value.'" />';
+				$return = '<img src="'.self::get_image_uri( $value ).'" />';
 				break;
 				
 			case 'date' :
@@ -850,6 +854,21 @@ class Participants_Db {
 		
 		return $return;
 		
+		
+	}
+	
+	/**
+	 * returns a path to the defined image location
+	 *
+	 * can also deal with a path saved before 1.3.2 which included the whole path
+	 */
+	public function get_image_uri( $filename ) {
+		
+		if ( ! file_exists( $filename ) ) {
+					
+			return get_bloginfo('wpurl').DIRECTORY_SEPARATOR.self::$plugin_options['image_upload_location'].basename( $filename );
+			
+		} else return $filename;
 		
 	}
 	
@@ -1937,7 +1956,12 @@ class Participants_Db {
 			
 		}
 		
-		else return get_bloginfo('wpurl').DIRECTORY_SEPARATOR.$options['image_upload_location'].$new_filename;
+		/*
+		 * as of 1.3.2 we save the image as filename only; the image is retrieved from 
+		 * the directory defined in the plugin setting using the self::get_image function
+		 */
+		
+		else return /*get_bloginfo('wpurl').DIRECTORY_SEPARATOR.$options['image_upload_location'].*/$new_filename;
 	
 	}
 	

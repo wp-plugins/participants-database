@@ -118,6 +118,10 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 		
 			$value = date( get_option( 'date_format' )/*.' '.get_option( 'time_format' )*/, $time );
 			
+		} elseif ( 'image-upload' == $column->form_element && ! empty( $value ) ) {
+			
+			$value = Participants_Db::get_image_uri( $value );
+			
 		}
 
 		if ( Participants_Db::backend_user() && 'textarea' == $column->form_element && $options['rich_text_editor'] ) {

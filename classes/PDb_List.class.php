@@ -709,7 +709,7 @@ class PDb_List
 
            case 'image-upload':
 
-              $display_value = self::$backend ? basename( $value[ $column ] ) : '<img class="PDb-list-image" src="'.$value[ $column ].'" />';
+              $display_value = self::$backend ? basename( $value[ $column ] ) : '<img class="PDb-list-image" src="'.Participants_Db::get_image_uri( $value[ $column ] ).'" />';
 					 
 					 		if (
                     isset( self::$options['single_record_link_field'] )

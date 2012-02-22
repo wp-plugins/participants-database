@@ -120,7 +120,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'main',
         'options'    =>array(
           'type'        => 'text',
-          'help_text'   => __("this defines where the uploaded files will go, relative to the WordPress root. Don't put it in the plugin folder, the images will get deleted when the plugin is updated.", Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __("this defines where the uploaded files will go, relative to the WordPress root.<br />Don't put it in the plugin folder, the images could get deleted when the plugin is updated.", Participants_Db::PLUGIN_NAME ),
           'value'       => Participants_Db::$uploads_path,
           )
         );

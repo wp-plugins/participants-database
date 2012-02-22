@@ -162,6 +162,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 = 1.3.2 =
 * moved templates and image uploads defaults out of the plugin directory
 * updated instructions for using singe-record templates
+* image files are now stored as filenames only to allow portability; backward compatibility provided for
 
 
 = 1.3.1 =
@@ -317,6 +318,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Upgrade Notice ==
 
+= 1.3.2 =
+Fixes for several minor issues; image files are now portable
+
 = 1.3.1 =
 Bugfix for sites not using rewrites; Added Italian translation
 
@@ -460,3 +464,9 @@ In this template file is an array that can be used to prevent any fields from di
 $exclude = array('city','state','postcode');
 
 These fields will now be excluded from the display. The template offers many other opportunities to customize the output of the [pdb_single] shortcode to match your theme.
+
+**Image Uploads**
+
+Images can now be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'Image Upload Location' setting will always determine the location for the images.
+
+IMPORTANT: Don't store images in the plugin directory (as was the default before version 1.3.2) they could be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
