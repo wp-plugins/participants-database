@@ -694,8 +694,8 @@ class PDb_List
         <?php // print delete check
         if ( self::$backend ) : ?>
         <td>
-          <a href="admin.php?page=<?php echo Participants_Db::PLUGIN_NAME ?>-edit_participant&action=edit&id=<?= $value['id']?>"><?php _e( 'Edit', Participants_Db::PLUGIN_NAME )?></a> |
-          <input type="checkbox" name="pid[]" value="<?= $value['id']?>" onClick="addSelects( this.checked )">
+          <a href="admin.php?page=<?php echo Participants_Db::PLUGIN_NAME ?>-edit_participant&action=edit&id=<?php echo $value['id']?>"><?php _e( 'Edit', Participants_Db::PLUGIN_NAME )?></a> |
+          <input type="checkbox" name="pid[]" value="<?php echo $value['id']?>" onClick="addSelects( this.checked )">
         </td>
         <?php endif; // delete check
 

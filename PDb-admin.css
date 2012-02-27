@@ -7,6 +7,6 @@
 #toplevel_page_participants-database img {
 	visibility:hidden;
 }
-.wp-editor-wrap {
+.participants-database_page_participants-database-edit_participant .wp-editor-wrap {
   width: 500px;
 }

@@ -400,6 +400,10 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 						$type = 'drag-sort';
 						break;
 						
+					case 'name':
+						$type = 'text';
+						$attributes = array('readonly'=>'readonly');
+						
 					default:
 						$type = 'text';
 						

@@ -159,6 +159,13 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.3.3 =
+* HTML emails can be switched off in settings; possible confict with other plugins
+* fixed broken link to image on some systems
+* fixed plugin CSS affecting rich text fields on other admin pages
+* removed PHP short open code in list class file
+* group name (not title) is no longer changeable: it caused orphaned fields to disappear
+
 = 1.3.2 =
 * moved templates and image uploads defaults out of the plugin directory
 * updated instructions for using singe-record templates
@@ -317,6 +324,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.3.3 =
+Bug fix release affecting several minor problems: image path; email plugin conflicts; admin CSS; group name change issues
 
 = 1.3.2 =
 Fixes for several minor issues; image files are now portable

@@ -222,6 +222,19 @@ class PDb_Settings extends Plugin_Settings {
           'options'     => array( 1, 0 ),
           ),
         );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'html_email',
+        'title'      =>__('Send HTML Email', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('use rich text in plugin emails? If you turn this off, be sure to remove all HTML tags from the email body settings for the plugin.', Participants_Db::PLUGIN_NAME ),
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
 		
 
     // signup form settings
