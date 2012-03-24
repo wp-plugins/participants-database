@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the Participants Database package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Participants Database 1.3\n"
+"Project-Id-Version: Participants Database 1.3.4\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/participants-database\n"
-"POT-Creation-Date: 2012-02-20 20:43:38+00:00\n"
+"POT-Creation-Date: 2012-03-24 22:15:44+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,136 +22,140 @@ msgctxt "indicates the text to be clicked to go to another web page"
 msgid "Link Text"
 msgstr ""
 
-#: classes/PDb_List.class.php:166
+#: classes/PDb_List.class.php:171
 msgctxt "noun; page number indicator"
 msgid "Page"
 msgstr ""
 
-#: classes/PDb_List.class.php:451
+#: classes/PDb_List.class.php:483
 msgid "Do you really want to delete the selected record?"
 msgstr ""
 
-#: classes/PDb_List.class.php:451
+#: classes/PDb_List.class.php:483
 msgid "Do you really want to delete the selected records?"
 msgstr ""
 
-#: classes/PDb_List.class.php:506
+#: classes/PDb_List.class.php:538
 msgid "List Participants: %s record found, sorted by:"
 msgid_plural "List Participants: %s records found, sorted by:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: classes/PDb_List.class.php:544
+#: classes/PDb_List.class.php:577
 msgid "Show only records with"
 msgstr ""
 
-#: classes/PDb_List.class.php:547
+#: classes/PDb_List.class.php:579
+msgid "Search"
+msgstr ""
+
+#: classes/PDb_List.class.php:583
 msgid "show all"
 msgstr ""
 
-#: classes/PDb_List.class.php:571
+#: classes/PDb_List.class.php:608
 msgid "is"
 msgstr ""
 
-#: classes/PDb_List.class.php:572
+#: classes/PDb_List.class.php:609
 msgid "is not"
 msgstr ""
 
-#: classes/PDb_List.class.php:573
+#: classes/PDb_List.class.php:610
 msgid "contains"
 msgstr ""
 
-#: classes/PDb_List.class.php:574
+#: classes/PDb_List.class.php:611
 msgid "doesn&#39;t contain"
 msgstr ""
 
-#: classes/PDb_List.class.php:575
+#: classes/PDb_List.class.php:612
 msgid "is greater than"
 msgstr ""
 
-#: classes/PDb_List.class.php:576
+#: classes/PDb_List.class.php:613
 msgid "is less than"
 msgstr ""
 
-#: classes/PDb_List.class.php:590
+#: classes/PDb_List.class.php:630
 msgid "Sort by"
 msgstr ""
 
-#: classes/PDb_List.class.php:606
+#: classes/PDb_List.class.php:646
 msgid "Ascending"
 msgstr ""
 
-#: classes/PDb_List.class.php:607
+#: classes/PDb_List.class.php:647
 msgid "Descending"
 msgstr ""
 
-#: classes/PDb_List.class.php:640
+#: classes/PDb_List.class.php:681
 msgid "Show %s items per page."
 msgstr ""
 
-#: classes/PDb_List.class.php:697
+#: classes/PDb_List.class.php:738
 msgid "Edit"
 msgstr ""
 
-#: classes/PDb_List.class.php:805
+#: classes/PDb_List.class.php:863
 msgid "No records found"
 msgstr ""
 
-#: classes/PDb_List.class.php:823
+#: classes/PDb_List.class.php:881
 msgid "Export CSV"
 msgstr ""
 
-#. translators: date format, (see http:php.net/date) must output valid string
-#. for filename
-#: classes/PDb_List.class.php:831
-msgid "M-d-Y"
-msgstr ""
-
-#: classes/PDb_List.class.php:836
+#: classes/PDb_List.class.php:893
 msgid "File Name"
 msgstr ""
 
-#: classes/PDb_List.class.php:838
+#: classes/PDb_List.class.php:895
 msgid "Download CSV for this list"
 msgstr ""
 
-#: classes/PDb_List.class.php:841
+#: classes/PDb_List.class.php:898
 msgid ""
 "This will download the whole list of participants that match your search "
 "terms, and in the order specified by the sort. The export will include "
-"records on all list pages."
+"records on all list pages. The fields included in the export are defined in "
+"the \"CSV\" column on the Manage Database Fields page."
 msgstr ""
 
 #. translators: uses the check symbol in a phrase that means "check all"
-#: classes/PDb_List.class.php:857
+#: classes/PDb_List.class.php:914
 msgid "&#10004; all"
 msgstr ""
 
 #. translators: the following 5 strings are used in logic matching, please test
 #. after translating in case special characters cause problems
-#: classes/PDb_List.class.php:934
+#: classes/PDb_List.class.php:1040
 msgctxt "submit button label"
 msgid "Delete Checked"
 msgstr ""
 
-#: classes/PDb_List.class.php:935
+#: classes/PDb_List.class.php:1041
 msgctxt "submit button label"
 msgid "Change"
 msgstr ""
 
-#: classes/PDb_List.class.php:936
+#: classes/PDb_List.class.php:1042
 msgctxt "submit button label"
 msgid "Sort"
 msgstr ""
 
-#: classes/PDb_List.class.php:937
+#: classes/PDb_List.class.php:1043
 msgctxt "submit button label"
 msgid "Filter"
 msgstr ""
 
-#: classes/PDb_List.class.php:938
+#: classes/PDb_List.class.php:1044
 msgctxt "submit button label"
 msgid "Clear"
+msgstr ""
+
+#: classes/PDb_List.class.php:1045
+msgctxt "search button label"
+msgid "Search"
 msgstr ""
 
 #: classes/PDb_Settings.class.php:17
@@ -238,13 +242,14 @@ msgid "border: 1px solid red"
 msgstr ""
 
 #: classes/PDb_Settings.class.php:119
-msgid "Image Upload Location"
+msgid "File Upload Location"
 msgstr ""
 
 #: classes/PDb_Settings.class.php:123
 msgid ""
 "this defines where the uploaded files will go, relative to the WordPress "
-"root."
+"root.<br />Don't put it in the plugin folder, the images and files could get "
+"deleted when the plugin is updated."
 msgstr ""
 
 #: classes/PDb_Settings.class.php:130
@@ -270,7 +275,9 @@ msgid "Make Links Clickable"
 msgstr ""
 
 #: classes/PDb_Settings.class.php:159
-msgid "if a field looks like a link (begins with \"http\") make it clickable"
+msgid ""
+"if a \"text-line\" field looks like a link (begins with \"http\") make it "
+"clickable"
 msgstr ""
 
 #: classes/PDb_Settings.class.php:167
@@ -319,73 +326,87 @@ msgid ""
 "users)"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:231
+#: classes/PDb_Settings.class.php:228
+msgid "Send HTML Email"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:233
+msgid ""
+"use rich text in plugin emails? If you turn this off, be sure to remove all "
+"HTML tags from the email body settings for the plugin."
+msgstr ""
+
+#: classes/PDb_Settings.class.php:241
+msgid "Strict Date Format"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:257
 msgid "Signup Button Text"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:235
+#: classes/PDb_Settings.class.php:261
 msgid "text shown on the button to sign up"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:236
+#: classes/PDb_Settings.class.php:262
 msgctxt "the text on a button to submit a signup form"
 msgid "Sign Up"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:242
+#: classes/PDb_Settings.class.php:268
 msgid "Signup Thanks Page"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:247
+#: classes/PDb_Settings.class.php:273
 msgid ""
 "after they singup, send them to this page for a thank you message. This page "
 "is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have "
 "to do that if you have them go back to the same page."
 msgstr ""
 
-#: classes/PDb_Settings.class.php:254
+#: classes/PDb_Settings.class.php:280
 msgid "Send Signup Response Email"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:259
+#: classes/PDb_Settings.class.php:285
 msgid "Send a receipt email to people who sign up"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:267
+#: classes/PDb_Settings.class.php:293
 msgid "Signup Email From Address"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:271
+#: classes/PDb_Settings.class.php:297
 msgid ""
 "the \"From\" address on signup receipt emails. If the recipient hits \"reply"
 "\", their reply will go to this address"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:278
+#: classes/PDb_Settings.class.php:304
 msgid "Signup Email From Name"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:282
+#: classes/PDb_Settings.class.php:308
 msgid "the \"From\" name on signup receipt emails."
 msgstr ""
 
-#: classes/PDb_Settings.class.php:289
+#: classes/PDb_Settings.class.php:315
 msgid "Signup Response Email Subject"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:293
+#: classes/PDb_Settings.class.php:319
 msgid "subject line for the signup response email"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:294
+#: classes/PDb_Settings.class.php:320
 msgid "You've just signed up on %s"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:300
+#: classes/PDb_Settings.class.php:326
 msgid "Signup Response Email"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:304
+#: classes/PDb_Settings.class.php:330
 msgid ""
 "Body of the email a visitor gets when they sign up. It includes a link "
 "([record_link]) back to their record so they can fill it out. Can include "
@@ -393,7 +414,7 @@ msgid ""
 msgstr ""
 
 #. translators: the %s will be the name of the website
-#: classes/PDb_Settings.class.php:306
+#: classes/PDb_Settings.class.php:332
 msgid ""
 "<p>Thank you, [first_name] for signing up with %s.</p><p>You may complete "
 "your registration with additional information or update your information by "
@@ -401,18 +422,18 @@ msgid ""
 "</p>"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:312
+#: classes/PDb_Settings.class.php:338
 msgid "Signup Thanks Message"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:316
+#: classes/PDb_Settings.class.php:342
 msgid ""
 "Note to display on the web page after someone has submitted a signup form. "
 "Can include HTML, placeholders:[first_name],[last_name],[email], etc. They "
 "must be fields that are present in the signup form."
 msgstr ""
 
-#: classes/PDb_Settings.class.php:317
+#: classes/PDb_Settings.class.php:343
 msgid ""
 "<p>Thank you, [first_name] for signing up!</p><p>You will receive an email "
 "acknowledgement shortly. You may complete your registration with additional "
@@ -420,136 +441,136 @@ msgid ""
 "email.</p>"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:323
+#: classes/PDb_Settings.class.php:349
 msgid "Send Signup Notification Email"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:328
+#: classes/PDb_Settings.class.php:354
 msgid "Send an email notification that a signup has occurred."
 msgstr ""
 
-#: classes/PDb_Settings.class.php:337
+#: classes/PDb_Settings.class.php:363
 msgid "Signup Notification Recipients"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:341
+#: classes/PDb_Settings.class.php:367
 msgid "comma-separated list of email addresses to send signup notifications to"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:348
+#: classes/PDb_Settings.class.php:374
 msgid "Signup Notification Email Subject"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:352
+#: classes/PDb_Settings.class.php:378
 msgid "subject of the notification email"
 msgstr ""
 
 #. translators: the %s will be the name of the website
-#: classes/PDb_Settings.class.php:354
+#: classes/PDb_Settings.class.php:380
 msgid "New signup on %s"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:360
+#: classes/PDb_Settings.class.php:386
 msgid "Signup Notification Email"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:364
+#: classes/PDb_Settings.class.php:390
 msgid "notification email body"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:365
+#: classes/PDb_Settings.class.php:391
 msgid ""
 "<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]"
 "</li><li>Email: [email]</li></ul>"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:371
+#: classes/PDb_Settings.class.php:397
 msgid "Show Field Groups"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:376
+#: classes/PDb_Settings.class.php:402
 msgid "Show groups and group descriptions in the signup form."
 msgstr ""
 
-#: classes/PDb_Settings.class.php:386
+#: classes/PDb_Settings.class.php:412
 msgid "Participant Record Page"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:391
+#: classes/PDb_Settings.class.php:417
 msgid ""
 "the page where your participant record ([pdb_record] shortcode) is displayed"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:398
+#: classes/PDb_Settings.class.php:424
 msgid "Save Changes Label"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:403
+#: classes/PDb_Settings.class.php:429
 msgid "label for the save changes button on the record form"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:404
+#: classes/PDb_Settings.class.php:430
 msgid "Save Your Changes"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:410
+#: classes/PDb_Settings.class.php:436
 msgid "Save Button Text"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:415
+#: classes/PDb_Settings.class.php:441
 msgid "text on the \"save\" button"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:416
+#: classes/PDb_Settings.class.php:442
 msgctxt "a label for a button to save a form"
 msgid "Save"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:422
+#: classes/PDb_Settings.class.php:448
 msgid "Show Group Descriptions"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:427
+#: classes/PDb_Settings.class.php:453
 msgid "Show the group description under each group title in the record form."
 msgstr ""
 
-#: classes/PDb_Settings.class.php:435
+#: classes/PDb_Settings.class.php:461
 msgid "Record Updated Message"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:439
+#: classes/PDb_Settings.class.php:465
 msgid "the message shown when a record form has been successfully submitted"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:440
+#: classes/PDb_Settings.class.php:466
 msgid "Your information has been updated:"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:446
+#: classes/PDb_Settings.class.php:472
 msgid "Send Record Form Update Notification Email"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:451
+#: classes/PDb_Settings.class.php:477
 msgid "Send an email notification that a record has been updated."
 msgstr ""
 
-#: classes/PDb_Settings.class.php:459
+#: classes/PDb_Settings.class.php:485
 msgid "Record Update Email Subject"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:463
+#: classes/PDb_Settings.class.php:489
 msgid "subject line for the record update notification email"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:464
+#: classes/PDb_Settings.class.php:490
 msgid "A record has just been updated on %s"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:470
+#: classes/PDb_Settings.class.php:496
 msgid "Record Update Notification Email"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:474
+#: classes/PDb_Settings.class.php:500
 msgid ""
 "Body of the the email sent when a user updates their record. Any field from "
 "the form can be included by using a replacement code of the form: "
@@ -558,19 +579,19 @@ msgid ""
 "Also available is [date] which will show the date and time of the update"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:475
+#: classes/PDb_Settings.class.php:501
 msgid ""
 "<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] "
 "[last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</"
 "li><li>Phone: [phone]</li><li>Email: [email]</li></ul>"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:499
+#: classes/PDb_Settings.class.php:525
 msgid "None"
 msgstr ""
 
-#: classes/PDb_Settings.class.php:523 participants-database.php:292
-#: participants-database.php:293
+#: classes/PDb_Settings.class.php:549 participants-database.php:318
+#: participants-database.php:319
 msgid "Settings"
 msgstr ""
 
@@ -608,11 +629,11 @@ msgctxt "indicates a new record is being entered"
 msgid "(new record)"
 msgstr ""
 
-#: edit_participant.php:164
+#: edit_participant.php:172
 msgid "Save the Record"
 msgstr ""
 
-#: edit_participant.php:171
+#: edit_participant.php:179
 msgid ""
 "<strong>Submit:</strong> save record and return to list<br><strong>Apply:</"
 "strong> save record and continue with same record<br><strong>Next:</strong> "
@@ -621,65 +642,65 @@ msgstr ""
 
 #. translators: these strings are used in logic matching, please test after
 #. translating in case special characters cause problems
-#: manage_fields.php:8
+#: manage_fields.php:9
 msgid "Update Fields"
 msgstr ""
 
-#: manage_fields.php:9
+#: manage_fields.php:10
 msgid "Update Groups"
 msgstr ""
 
-#: manage_fields.php:10
+#: manage_fields.php:11
 msgid "Add Field"
 msgstr ""
 
-#: manage_fields.php:11
+#: manage_fields.php:12
 msgid "Add Group"
 msgstr ""
 
-#: manage_fields.php:12
+#: manage_fields.php:13
 msgid "new field title"
 msgstr ""
 
-#: manage_fields.php:13
+#: manage_fields.php:14
 msgid "new group title"
 msgstr ""
 
-#: manage_fields.php:177 participants-database.php:274
-#: participants-database.php:275
+#: manage_fields.php:198 participants-database.php:300
+#: participants-database.php:301
 msgid "Manage Database Fields"
 msgstr ""
 
-#: manage_fields.php:187 manage_fields.php:194
+#: manage_fields.php:208 manage_fields.php:215
 msgid "Field Groups"
 msgstr ""
 
-#: manage_fields.php:195
+#: manage_fields.php:216
 msgid "Help"
 msgstr ""
 
-#: manage_fields.php:203
+#: manage_fields.php:224
 msgid "Fields"
 msgstr ""
 
-#: manage_fields.php:247
+#: manage_fields.php:268
 msgid "No fields in this group"
 msgstr ""
 
-#: manage_fields.php:338
+#: manage_fields.php:362
 msgid "Edit / Add / Remove Field Groups"
 msgstr ""
 
-#: manage_fields.php:353
+#: manage_fields.php:377
 msgid "fields"
 msgstr ""
 
-#: manage_fields.php:354
+#: manage_fields.php:378
 msgid "delete"
 msgstr ""
 
-#: manage_fields.php:504
-msgid "The group was not added. Your new group must have a unique name."
+#: manage_fields.php:557
+msgid "The %1$s was not added. Your new %1$s must have a unique name."
 msgstr ""
 
 #: manage_fields_help.php:4
@@ -892,92 +913,107 @@ msgid ""
 "that is presented with the [PDb_signup] shortcode."
 msgstr ""
 
-#. #-#-#-#-#  plugin.pot (Participants Database 1.3)  #-#-#-#-#
+#. #-#-#-#-#  plugin.pot (Participants Database 1.3.4)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: participants-database.php:229
+#: participants-database.php:233
 msgid "Participants Database"
 msgstr ""
 
-#: participants-database.php:255 participants-database.php:256
+#: participants-database.php:281 participants-database.php:282
 msgid "List Participants"
 msgstr ""
 
-#: participants-database.php:265 participants-database.php:266
+#: participants-database.php:291 participants-database.php:292
 msgid "Add Participant"
 msgstr ""
 
-#: participants-database.php:283 participants-database.php:284
-#: upload_csv.php:64
+#: participants-database.php:309 participants-database.php:310
+#: upload_csv.php:76
 msgid "Import CSV File"
 msgstr ""
 
-#: participants-database.php:301 participants-database.php:302
+#: participants-database.php:327 participants-database.php:328
 msgid "Edit Record"
 msgstr ""
 
 #. translators: don't translate the words in brackets {}
-#: participants-database.php:417
+#: participants-database.php:465
 msgid "There is no record for this ID."
 msgstr ""
 
-#: participants-database.php:467
+#: participants-database.php:506
+msgctxt "message to show if the plugin cannot find the template"
+msgid "Missing Template"
+msgstr ""
+
+#: participants-database.php:524
 msgid "No record found for %s."
 msgstr ""
 
+#: participants-database.php:1103
+msgid ""
+"The date for \"%s\" was invalid. Please input the date with the exact format "
+"shown"
+msgstr ""
+
 #. translators: the %s will be the name of the file
-#: participants-database.php:1735
+#: participants-database.php:1868
 msgid ""
 "Input file does not exist or path is incorrect.<br />Attempted to load: %s"
 msgstr ""
 
-#: participants-database.php:1779
+#: participants-database.php:1912
 msgid ""
 "The number of items in line %s is incorrect.<br />There are %s and there "
 "should be %s."
 msgstr ""
 
-#: participants-database.php:1787
+#: participants-database.php:1920
 msgid "Number of values does not match number of columns"
 msgstr ""
 
-#: participants-database.php:1881
+#: participants-database.php:2033
 msgid ""
 "There is something wrong with the file you tried to upload. Try another."
 msgstr ""
 
-#: participants-database.php:1892
+#: participants-database.php:2044
 msgid "You may only upload image files like JPEGs, GIFs or PNGs."
 msgstr ""
 
-#: participants-database.php:1908
+#: participants-database.php:2058
 msgid ""
 "The image you tried to upload is too large. The file must be smaller than "
 "%sK."
 msgstr ""
 
-#: participants-database.php:1916
+#: participants-database.php:2066
 msgid "The file could not be saved."
 msgstr ""
 
-#: participants-database.php:2043
+#: participants-database.php:2092
+msgid "The uploads directory (%s) could not be created."
+msgstr ""
+
+#: participants-database.php:2261
 msgid "WordPress Plugin"
 msgstr ""
 
-#: participants-database.php:2044
+#: participants-database.php:2262
 msgid ""
 "Helping organizations manage their volunteers, members and participants."
 msgstr ""
 
-#: participants-database.php:2047
+#: participants-database.php:2265
 msgid "Developed by"
 msgstr ""
 
-#: participants-database.php:2048
+#: participants-database.php:2266
 msgid ""
 "Suggestions or crticisms of this plugin? I&#39;d love to hear them: email "
 msgstr ""
 
-#: participants-database.php:2051
+#: participants-database.php:2269
 msgid ""
 "Please consider contributing to the continued support and development of "
 "this software by visiting %1$sthis plugin&#39;s page,%3$s giving the plugin "
@@ -985,44 +1021,44 @@ msgid ""
 "Thanks!"
 msgstr ""
 
-#: upload_csv.php:28
+#: upload_csv.php:35
 msgid "The file %s has been uploaded."
 msgstr ""
 
-#: upload_csv.php:36
+#: upload_csv.php:41
 msgid "record imported"
 msgid_plural "records imported"
 msgstr[0] ""
 msgstr[1] ""
 
-#: upload_csv.php:40
+#: upload_csv.php:45
 msgid "Zero records imported."
 msgstr ""
 
-#: upload_csv.php:45
+#: upload_csv.php:50
 msgid "Error occured while trying to add the data to the database"
 msgstr ""
 
-#: upload_csv.php:53
+#: upload_csv.php:58
 msgid "There was an error uploading the file."
 msgstr ""
 
-#: upload_csv.php:54
+#: upload_csv.php:59
 msgid "Destination"
 msgstr ""
 
-#: upload_csv.php:84
+#: upload_csv.php:96
 msgid "1. Prepare a spreadsheet file with the correct format:"
 msgstr ""
 
-#: upload_csv.php:86
+#: upload_csv.php:98
 msgid ""
 "To properly import your membership data, the columns in your spreadsheet "
 "must match exactly the columns in the database. Currently, the CSV import "
 "columns are as follows:"
 msgstr ""
 
-#: upload_csv.php:101
+#: upload_csv.php:113
 msgid ""
 "This means your spreadsheet needs to have %s columns, and the heading in "
 "each of those columns needs to match exactly the names above. If there is no "
@@ -1030,7 +1066,7 @@ msgid ""
 "leave it out entirely. The order of the columns doesn&#39;t matter."
 msgstr ""
 
-#: upload_csv.php:102
+#: upload_csv.php:114
 msgid ""
 "<strong>Note:</strong> Imported records are checked against existing records "
 "by email. (Only if \"Don&#39;t Allow Duplicate Email Addresses\" is checked "
@@ -1040,32 +1076,32 @@ msgid ""
 "overwrite existing data."
 msgstr ""
 
-#: upload_csv.php:103
+#: upload_csv.php:115
 msgid "Get Blank CSV File"
 msgstr ""
 
-#: upload_csv.php:103
+#: upload_csv.php:115
 msgid ""
 "You can download this file, then open it in Open Office, Excel or Google "
 "Docs."
 msgstr ""
 
-#: upload_csv.php:109
+#: upload_csv.php:121
 msgid "2. Upload the .csv file"
 msgstr ""
 
-#: upload_csv.php:111
+#: upload_csv.php:123
 msgid ""
 "When you have your spreadsheet properly set up and filled with data, export "
 "it as any of the following: \"comma-delimited csv\", \"tab-delimited csv\", "
 "or just \"csv\". Save it to your computer then upload it here."
 msgstr ""
 
-#: upload_csv.php:114
+#: upload_csv.php:126
 msgid "Choose .csv file to import:"
 msgstr ""
 
-#: upload_csv.php:115
+#: upload_csv.php:127
 msgid "Upload File"
 msgstr ""
 
