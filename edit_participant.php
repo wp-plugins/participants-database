@@ -116,11 +116,15 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 		
 			$time = preg_match( '#^[0-9-]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
 		
-			$value = date( get_option( 'date_format' )/*.' '.get_option( 'time_format' )*/, $time );
+			$value = $time ? date( get_option( 'date_format' )/*.' '.get_option( 'time_format' )*/, $time ) : '';
 			
 		} elseif ( 'image-upload' == $column->form_element && ! empty( $value ) ) {
 			
 			$value = Participants_Db::get_image_uri( $value );
+			
+		} elseif ( in_array( $column->form_element, array( 'multi-select-other','multi-checkbox' ) ) && ! empty( $value ) ) {
+			
+			$value = is_array( $value ) ? $value : explode( ',', $value );
 			
 		}
 
@@ -178,7 +182,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
     <tr>
       <th><h3><?php echo $options['save_changes_label']?></h3></th>
       <td class="submit-buttons">
-        <input class="button-primary" type="submit" value="<?php echo $options['save_changes_button']?>" name="save">
+        <input class="button-primary pdb-submit" type="submit" value="<?php echo $options['save_changes_button']?>" name="save">
         <input name="submit" type="hidden" value="Apply">
       </td>
     </tr>
@@ -187,3 +191,20 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 </form>
 </div>
 <?php endif?>
+<?php /* ?>
+<script type="text/javascript">
+jQuery(document).ready( function($) {
+		$.datepicker.setDefaults({
+														  dateFormat : '<?php echo Participants_Db::get_jqueryUI_date_format() ?>'
+														 });
+		$( ".edit-participant input.date_field" ).each( function() {
+			var datefield = $(this);
+			var fieldname = datefield.attr('name');
+			datefield.datepicker({
+        changeMonth: true,
+        changeYear: true
+      });
+		});
+});
+</script>
+<?php */ ?>

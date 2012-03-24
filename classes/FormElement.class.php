@@ -447,10 +447,12 @@ class FormElement {
   function '.$js_prefix.'SetOther() {
     var otherfield=document.getElementById("' . $js_prefix . '_other");
     var otherselect=document.getElementById("'.$js_prefix.'_otherselect");
+    otherselect.options[otherselect.selectedIndex].removeAttribute("selected");
     otherselect.selectedIndex=otherselect.length-1;
+    otherselect.options[otherselect.length-1].setAttribute("selected","selected");
     otherfield.name="'. $this->name . '";
     otherselect.name="temp";
-		otherfield.value="";
+    return true;
   }
   window.onload='.$js_prefix.'SelectOther();
 </script>

@@ -1,7 +1,7 @@
 jQuery(document).ready(function($){
 
   // flag the row as changed
-  $('table.manage-fields input, table.manage-fields textarea').focus(function(el) {
+  $('table.manage-fields input, table.manage-fields textarea').bind('keyup',function(el) {
     var matches = $(this).attr('name').match(/row_(\d+)\[/);
     $('#status_'+matches[1]).attr('value','changed');
   });

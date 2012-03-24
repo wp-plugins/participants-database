@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.3.3
+Version: 1.3.4
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -98,6 +98,9 @@ class Participants_Db {
 	// these columns are not manually edited
 	public static $internal_columns;
 	
+	// header to include with plugin emails
+	public static $email_headers;
+	
 	public function initialize() {
 
 		// register the class autoloading
@@ -123,8 +126,9 @@ class Participants_Db {
 		self::$plugin_path = dirname(__FILE__);
 		// this is relative to the WP install
 		self::$uploads_path = 'wp-content/uploads/'.self::PLUGIN_NAME.'/';
-		
-		self::$plugin_options = get_option( self::$participants_db_options );
+
+		//self::$plugin_settings = new PDb_Settings();
+		//self::$plugin_options = get_option( self::$participants_db_options );
 		
 		// hard-code some image file extensions
 		self::$allowed_extensions = array( 'jpg','jpeg','gif','png' );
@@ -171,9 +175,7 @@ class Participants_Db {
 		// set the last record value to the initial id
 		// this is used to keep persistent fields as an aid to data entry
 		set_transient( self::$last_record, self::$id_base_number, (1*60*60*24) );
-
-		// set the email content type to HTML
-		if ( 0 != self::$plugin_options['html_email'] ) add_filter('wp_mail_content_type',create_function('', 'return "text/html";'));
+								
 		add_filter('query_vars', array( __CLASS__, 'register_queryvars') );
 
 		// set the WP hooks to finish setting up the plugin
@@ -213,14 +215,12 @@ class Participants_Db {
 	
 	function admin_init() {
 		
-		$options = get_option( self::$participants_db_options );
-		
 		// if the setting was made in previous versions and is a slug, convert it to a post ID
-		if ( isset( $options['registration_page'] ) && ! is_numeric( $options['registration_page'] ) ) {
+		if ( isset( self::$plugin_options['registration_page'] ) && ! is_numeric( self::$plugin_options['registration_page'] ) ) {
 			
-			$options['registration_page'] = self::_get_ID_by_slug( $options['registration_page'] );
+			self::$plugin_options['registration_page'] = self::_get_ID_by_slug( self::$plugin_options['registration_page'] );
 			
-			update_option( self::$participants_db_options, $options );
+			update_option( self::$participants_db_options, self::$plugin_options );
 			
 		}
 		
@@ -232,6 +232,27 @@ class Participants_Db {
 
     self::$plugin_title = __('Participants Database', self::PLUGIN_NAME );
 
+    // set the email content headers
+    if ( ! isset( self::$plugin_options ) ) {
+
+      $options = get_option( self::$participants_db_options );
+
+    } else {
+
+      $options = self::$plugin_options;
+
+    }
+    if ( 0 != $options['html_email'] ) {
+      $type = 'text/html; charset="'.get_option('blog_charset').'"';
+    } else {
+      $type = 'text/plain; charset=us-ascii';
+    }
+    self::$email_headers= "MIME-Version: 1.0\n" .
+                          "From: ".$options['receipt_from_name']." <".$options['receipt_from_address'].">\n" .
+                          "Content-Type: ".$type."\n";
+		
+		self::include_scripts();
+
 		// this processes form submits before any output so that redirects can be used
 		self::process_page_request();
 
@@ -241,10 +262,11 @@ class Participants_Db {
 		
 		// intialize the plugin settings
 		// we do this here because we need the object for the plugin menus
-		self::$plugin_settings = new PDb_Settings();
-		
-		$options = get_option( self::$participants_db_options ); 
+		//self::$plugin_settings = new PDb_Settings();
 
+    self::$plugin_settings = new PDb_Settings();
+    self::$plugin_options = get_option( self::$participants_db_options );
+		
 		// define the plugin admin menu pages
 	  add_menu_page(
 			self::$plugin_title, 
@@ -258,7 +280,7 @@ class Participants_Db {
 			self::PLUGIN_NAME, 
 			__('List Participants', self::PLUGIN_NAME ),
 			__('List Participants', self::PLUGIN_NAME ), 
-			$options['record_edit_capability'],
+			self::$plugin_options['record_edit_capability'],
 			self::$plugin_page.'-list_participants',
 			array( 'PDb_List','initialize' )
 			/*array( __CLASS__, 'include_admin_file' )*/ 
@@ -268,7 +290,7 @@ class Participants_Db {
 			self::PLUGIN_NAME,  
 			__('Add Participant', self::PLUGIN_NAME ), 
 			__('Add Participant', self::PLUGIN_NAME ),
-			$options['record_edit_capability'], 
+			self::$plugin_options['record_edit_capability'],
 			self::$plugin_page.'-edit_participant', 
 			array( __CLASS__, 'include_admin_file' ) 
 			);
@@ -304,7 +326,7 @@ class Participants_Db {
 			'', 
 			__('Edit Record', self::PLUGIN_NAME ), 
 			__('Edit Record', self::PLUGIN_NAME ), 
-			$options['record_edit_capability'], 
+			self::$plugin_options['record_edit_capability'],
 			self::$plugin_page.'_edit_participant'
 			);
 
@@ -316,7 +338,6 @@ class Participants_Db {
     add_action( 'admin_print_styles-' . $addpage , array( __CLASS__, 'admin_style' ) );
     add_action( 'admin_print_styles-' . $managepage , array( __CLASS__, 'admin_style' ) );
     add_action( 'admin_print_styles-' . $uploadpage , array( __CLASS__, 'admin_style' ) );
-    add_action( 'admin_print_styles-' . $editpage , array( __CLASS__, 'admin_style' ) );
 
     // add a global stylesheet to use while the plugin is active
     add_action( 'admin_print_styles', array( __CLASS__, 'global_admin_style' ) );
@@ -324,6 +345,7 @@ class Participants_Db {
 		// add any js scripts needed for the admin pages
     add_action( 'admin_print_scripts-' . $managepage, array( __CLASS__, 'manage_fields_scripts' ));
     add_action( 'admin_print_scripts-' . $settingspage, array( __CLASS__, 'settings_scripts' ));
+    //add_action( 'admin_enqueue_scripts', array( __CLASS__, 'edit_scripts' ));
 		
 	}
 	
@@ -361,6 +383,28 @@ class Participants_Db {
 		wp_enqueue_script( 'cookie' );
 		wp_register_script( 'settings_script', plugins_url( 'js/settings.js', __FILE__ ) );
 		wp_enqueue_script( 'settings_script' );
+	}
+	
+	
+
+	public function edit_scripts() {
+		
+		wp_register_script( 'datepicker', plugins_url( 'js/jquery.datepicker.js', __FILE__ ) );
+		wp_register_script( 'edit_record', plugins_url( 'js/edit.js', __FILE__ ) );
+		
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'jquery-ui-core' );
+		wp_enqueue_script( 'datepicker' );
+		//wp_enqueue_script( 'edit_record' );
+		
+	}
+	
+	// include any JS needed for the front-end
+	public function include_scripts() {
+		
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'frontend', plugins_url( 'js/shortcodes.js', __FILE__ ) );
+		
 	}
 		
 
@@ -680,8 +724,7 @@ class Participants_Db {
 		global $wpdb;
 		
 		$sql = "SELECT f.name 
-		        FROM ".self::$fields_table." f 
-						WHERE f.group != 'internal'";
+		        FROM ".self::$fields_table." f";
 		
 		$columns_info = $wpdb->get_results( $sql, ARRAY_N );
 		
@@ -730,6 +773,11 @@ class Participants_Db {
 
 				$where = '';
 				break;
+
+      case 'frontend_list':
+
+        $where = 'WHERE v.display_column > 0 ';
+        break;
 
 			case 'frontend':
 
@@ -845,6 +893,15 @@ class Participants_Db {
 			
 				$return = vsprintf( ( empty( $linkdata[0] ) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>' ), $linkdata );
 				break;
+				
+      case 'text-line' :
+
+        if ( self::$plugin_options['make_links'] ) {
+
+          $return = self::make_link( $value );
+          break;
+
+        }
 				
 			default :
 			
@@ -1009,7 +1066,12 @@ class Participants_Db {
 					break;
 
 				default :
-				if ( empty( $post[ $column_atts->name ] ) ) {
+				
+				if ( !isset( $post[ $column_atts->name ] ) && $action == 'update' ) {
+					
+					$new_value = false;
+					
+				} elseif ( empty( $post[ $column_atts->name ] ) && $action == 'insert' ) {
 				
 					$new_value = empty( $column_atts->default ) ? NULL : $column_atts->default;
 					
@@ -1023,8 +1085,37 @@ class Participants_Db {
 					
 				} elseif ( $column_atts->form_element == 'date' ) {
 					
-					// date values are now stored as unix timestamps-- duh!
-					$date = strtotime( $post[ $column_atts->name ] );
+					// date values stored as unix timestamps
+					if ( self::$plugin_options['strict_dates'] ) {
+
+            $date = date_create_from_format( get_option( 'date_format' ), $post[ $column_atts->name ] );
+
+            if ( is_array( date_get_last_errors() ) && ! empty( $post[ $column_atts->name ] ) ) {
+
+              $errors = date_get_last_errors();
+
+              if ( $errors['warning_count'] > 0 || $errors['error_count'] > 0 ) {
+
+                $date = false;
+
+                if ( is_object( self::$validation_errors ) ) {
+
+                  self::$validation_errors->add_error( $column_atts->name, sprintf( __('The date for "%s" was invalid. Please input the date with the exact format shown' ), $column_atts->title ) );
+
+                }
+
+              }
+
+            }
+
+            // if we have a valid date, convert to timestamp
+            if ( $date ) $date = date_format( $date, 'U' );
+
+          } else {
+
+            $date = strtotime( $post[ $column_atts->name ] );
+
+          }
 					
 					/*
 					 * bugfix: if the site is using date formats with just numerals and separators (3/4/01) then strtotime can misinterpret dates and return false
@@ -1318,17 +1409,28 @@ class Participants_Db {
 	public function add_blank_field( $atts ) {
 		
 		global $wpdb;
+		$wpdb->hide_errors();
 		
 		$defaults = wp_parse_args( $atts, array( 'form_element'=>'text-line' ) );
 
 		$wpdb->insert( self::$fields_table, $defaults );
+
+		if ( $wpdb->last_error ) {
+
+      if ( WP_DEBUG ) error_log( __METHOD__.' failed to add row '.$atts['name'] );
+		
+      return false;
+
+    }
 		
 		// if this column does not exist in the DB, add it
 		if ( count( $wpdb->get_results( "SHOW COLUMNS FROM `".self::$participants_table."` LIKE '".$defaults['name']."'", ARRAY_A ) ) < 1 ) {
 		
 		if ( false === ( self::_add_db_column( $defaults ) ) ) {
 			
-			error_log( __METHOD__.' failed to add column:'.print_r( $defaults, true ) );
+			if ( WP_DEBUG ) error_log( __METHOD__.' failed to add column:'.print_r( $defaults, true ) );
+
+			return false;
 			
 		}
 		
@@ -1356,13 +1458,11 @@ class Participants_Db {
             case 'multi-select':
             case 'multi-checkbox':
             case 'text-field':
+            case 'textarea':
             $datatype = 'TEXT';
             break;
 
             case 'date':
-            $datatype = 'DATE';
-            break;
-
             case 'checkbox':
             case 'radio':
             case 'dropdown':
@@ -1421,7 +1521,8 @@ class Participants_Db {
 																$options['receipt_from_address'],
 																$options['receipt_from_name'],
 																"\r\n"
-															)
+															),
+															self::$email_headers
 														);
 						
 					}
@@ -1872,8 +1973,11 @@ class Participants_Db {
 	 */
 	public function make_link( $link, $title = '', $template = false, $get = false ) {
 
-    // if it's not really a link don't wrap it
-    if ( 0 !== stripos( $link, 'http' ) && false === $get ) return esc_html( $link );
+    // URL's, emails and the like are case-insensitive
+    $link = strtolower( $link );
+    
+    // if it's not really a link don't wrap it in anchor tag
+    if ( ( 0 !== stripos( $link, 'http' ) && false === $get ) && ! filter_var( $link, FILTER_VALIDATE_EMAIL ) ) return esc_html( $link );
 
     if ( false !== $get && is_array( $get ) ) {
 
@@ -1886,6 +1990,13 @@ class Participants_Db {
         }
 
         $link = rtrim( $link, '&' );
+
+    }
+
+    if ( filter_var( $link, FILTER_VALIDATE_EMAIL ) && 0 !== strpos( $link, 'mailto:' ) ) {
+    
+      $title = $link;
+      $link = 'mailto:'.$link;
 
     }
 		
@@ -1978,7 +2089,7 @@ class Participants_Db {
 		
 		if ( false === mkdir( ABSPATH.$dir, 0755, true ) ) {
 			
-			self::$validation_errors->add_error( $name, sprintf( __('The uploads directory (%s) could not be created.', self::PLUGIN_NAME ), $dir )  );
+			if ( is_object( self::$validation_errors ) ) self::$validation_errors->add_error( $name, sprintf( __('The uploads directory (%s) could not be created.', self::PLUGIN_NAME ), $dir )  );
 			
 			umask( $savedmask ); 
 			
@@ -2098,6 +2209,44 @@ class Participants_Db {
 		return str_replace( ' ','', preg_replace( '#^[0-9]*#','',strtolower( $title ) ) );
 		
 	}
+	
+	/**
+	 * translates the current date format option string to a jQuery UI date format string
+	 *
+	 */
+	function get_jqueryUI_date_format( $PHP_date_format = '' ) {
+		
+			$dateString = empty($PHP_date_format) ? get_option( 'date_format' ) : $PHP_date_format;
+		
+			$pattern = array(
+				
+				//day
+				'd',		//day of the month
+				'j',		//3 letter name of the day
+				'l',		//full name of the day
+				'z',		//day of the year
+				
+				//month
+				'F',		//Month name full
+				'M',		//Month name short
+				'n',		//numeric month no leading zeros
+				'm',		//numeric month leading zeros
+				
+				//year
+				'Y', 		//full numeric year
+				'y'		//numeric year: 2 digit
+			);
+			$replace = array(
+				'dd','d','DD','o',
+				'MM','M','m','mm',
+				'yy','y'
+			);
+			foreach($pattern as &$p)
+			{
+				$p = '/'.$p.'/';
+			}
+			return preg_replace($pattern,$replace,$dateString);
+		}
 	
 
 	/**

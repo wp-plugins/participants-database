@@ -144,12 +144,17 @@ class PDb_List
 		// or include the stylesheet if on the frontend
 		else echo '<link media="all" type="text/css" href="'.plugins_url( Participants_Db::PLUGIN_NAME.'/pdb-list.css' ).'" rel="stylesheet">';
 		
-		// process any search/filter/sort terms and build the main query
-		$submit = isset( $_POST['submit'] ) ? $_POST['submit'] : '';
-		if ( self::$backend ) self::_process_search( $submit );
-		else self::_shortcode_query();
 		
-		if ( WP_DEBUG ) error_log( __METHOD__.' query= '.self::$list_query );
+		
+		// process any search/filter/sort terms and build the main query
+		if( self::$backend ) {
+			
+			$submit = isset( $_POST['submit'] ) ? empty( $_POST['submit'] ) ? '' : $_POST['submit'] : '';
+			self::_process_search( $submit );
+			
+		} else self::_shortcode_query();
+		
+		if ( WP_DEBUG ) error_log( __METHOD__.' list query= '.self::$list_query );
 		
 		// get the $wpdb object
 		global $wpdb;
@@ -283,6 +288,7 @@ class PDb_List
 		
 			case self::$i18n['sort']:
 			case self::$i18n['filter']:
+      case self::$i18n['search']:
 			
 				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table;
 				
@@ -345,6 +351,8 @@ class PDb_List
 					
 				}
 				
+				
+				// add the sorting
 				self::$list_query .= ' ORDER BY `'.mysql_real_escape_string(self::$filter['sortBy']).'` '.mysql_real_escape_string(self::$filter['ascdesc']);
 		
 				// go back to the first page to display the newly sorted/filtered list
@@ -377,14 +385,38 @@ class PDb_List
     // add this to the query to remove the default record
     $skip_default = ' `id` != '.Participants_Db::$id_base_number;
 		
-		// if we've got a valid orderby, use it.
-		$orderby = Participants_Db::is_column( self::$shortcode_params['orderby'] ) ? self::$shortcode_params['orderby'] : current( self::$sortables );
+		// if we've got a valid orderby, use it. Check $_POST first, shortcode second
+		$orderby = isset( $_POST['sortBy'] ) ? $_POST['sortBy'] : self::$shortcode_params['orderby'];
+		$orderby = Participants_Db::is_column( $orderby ) ? $orderby : current( self::$sortables );
+		self::$filter['sortBy'] = $orderby;
 			
-		$order = in_array( strtoupper( self::$shortcode_params['order'] ), array( 'ASC', 'DESC' ) ) ? strtoupper( self::$shortcode_params['order'] ) : 'ASC';
+		$order = isset( $_POST['ascdesc'] ) ? strtoupper( $_POST['ascdesc'] ) : strtoupper( self::$shortcode_params['orderby'] );
+		$order = in_array( $order, array( 'ASC', 'DESC' ) ) ? $order : 'ASC';
+		self::$filter['ascdesc'] = strtolower($order);
 		
 		self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table.' WHERE '.$skip_default.' ORDER BY `'.$orderby.'` '.$order;
 		
+		if  ( isset( $_POST['submit'] ) && $_POST['submit'] == self::$i18n['clear'] ) {
+			
+				self::$filter['value'] = '';
+				self::$filter['where_clause'] = 'none';
+		
+				// go back to the first page
+				$_GET[ self::$list_page ] = 1;
+				
+				return;
+				
+		}
+		
 		$where_clause = '';
+		
+		if( isset( $_POST['value'] ) ) $post_filter = self::_make_filter_statement( $_POST );
+		
+		if ( ! empty( $post_filter ) ) {
+			
+			self::$shortcode_params['filter'] = ! empty( self::$shortcode_params['filter'] ) ? self::$shortcode_params['filter'].'&'.$post_filter : $post_filter;
+			
+		}
 		
 		if ( isset( self::$shortcode_params['filter'] ) ) {
 			
@@ -534,18 +566,22 @@ class PDb_List
 		if ( $mode == 'none' ) return;
 	
 	?>
-	
+	<div class="pdb-searchform">
 	<form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" >
     <input type="hidden" name="action" value="sort">
     
   	<?php if ( in_array( $mode, array( 'filter','both' ) ) ) : ?>
     
     <fieldset class="widefat">
+    <?php if ( self::$backend ) : ?>
     <legend><?php _e('Show only records with', Participants_Db::PLUGIN_NAME )?>:</legend>
+    <?php else : ?>
+    <legend><?php _e('Search', Participants_Db::PLUGIN_NAME )?>:</legend>
+    <?php endif ?>
     <?php
 			//build the list of columns available for filtering
 			$filter_columns = array( '('.__('show all', Participants_Db::PLUGIN_NAME ).')' => 'none' );
-			foreach ( Participants_db::get_column_atts() as $column ) {
+			foreach ( Participants_db::get_column_atts( self::$backend ? 'backend' : 'frontend_list' ) as $column ) {
 				
 				if ( in_array( $column->name, array( 'id','private_id' ) ) ) continue;
 				
@@ -561,6 +597,7 @@ class PDb_List
 											 );
       FormElement::print_element( $element );
 			?>
+			<?php if ( self::$backend ) : ?>
        that
       <?php
        $element = array(
@@ -578,8 +615,11 @@ class PDb_List
                         );
       FormElement::print_element( $element );
       ?>
+      <?php else : ?>
+      <input name="operator" type="hidden" value="LIKE" />
+      <?php endif ?>
       <input id="participant_search_term" type="text" name="value" value="<?php echo @self::$filter['value'] ?>">
-      <input name="submit" type="submit" value="<?php echo self::$i18n['filter']?>">
+      <input name="submit" type="submit" value="<?php echo self::$backend ? self::$i18n['filter'] : self::$i18n['search'] ?>">
       <input name="submit" type="submit" value="<?php echo self::$i18n['clear']?>">
     </fieldset>
     
@@ -613,7 +653,8 @@ class PDb_List
       <input name="submit" type="submit" value="<?php echo self::$i18n['sort'] ?>">
     </fieldset>
     <?php endif ?>
-  </form><?php
+  </form>
+  </div><?php
 	}
 
 	/**
@@ -652,7 +693,7 @@ class PDb_List
 	 */
   private function _main_table( $mode = '' ) { ?>
 
-   <table class="wp-list-table widefat fixed pages" cellspacing="0" >
+   <table class="wp-list-table widefat fixed pages pdb-list" cellspacing="0" >
       <?php
 		// template for printing the registration page link in the admin
 		$PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
@@ -740,6 +781,7 @@ class PDb_List
 							
 					 case 'multi-select-other':
 					 case 'multi-checkbox':
+					 // multi selects are displayed as comma separated lists
 					 
 					 		$display_value = is_serialized( $value[ $column ] ) ? implode( ', ', unserialize( $value[ $column ] ) ) : $value[ $column ];
 							break;
@@ -789,7 +831,7 @@ class PDb_List
 								
 							} else {
 
-               $display_value = NULL == $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
+               $display_value = NULL === $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
 							 
 							}
 
@@ -797,7 +839,7 @@ class PDb_List
 
            default:
 					 
-					 		$display_value = NULL == $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
+					 		$display_value = NULL === $value[ $column ] ? $column_atts->default : esc_html($value[ $column ]);
 
           }
 
@@ -843,9 +885,8 @@ class PDb_List
           <input type="hidden" name="CSV type" value="participant list" />
           <input type="hidden" name="query" value="<?php echo rawurlencode( self::$list_query )?>" />
           <?php
-          /* translators: date format, (see http://php.net/date) must output valid string for filename  */
-          $date_string = __('M-d-Y', Participants_Db::PLUGIN_NAME );
-          $suggested_filename = Participants_Db::PLUGIN_NAME.'-'.date($date_string).'.csv';
+          $date_string = str_replace( array( '/','#','.','\\'),'-',date( get_option( 'date_format' ) ) );
+          $suggested_filename = Participants_Db::PLUGIN_NAME.'-'.$date_string.'.csv';
           $namelength = round( strlen( $suggested_filename ) * 0.9 ) ;
           ?>
           <p>
@@ -854,7 +895,7 @@ class PDb_List
             <input type="submit" name="submit" value="<?php _e( 'Download CSV for this list', Participants_Db::PLUGIN_NAME  )?>" />
           </p>
           <p>
-						<?php _e( 'This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages.', Participants_Db::PLUGIN_NAME  )?>
+						<?php _e( 'This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages. The fields included in the export are defined in the "CSV" column on the Manage Database Fields page.', Participants_Db::PLUGIN_NAME  )?>
           </p>
         </form>
       </fieldset>
@@ -894,7 +935,7 @@ class PDb_List
       if ( self::$backend ) return 'both';
 
       // until we get this working:
-      else return 'none';
+      //else return 'none';
 
       $mode = self::$shortcode_params['sort'] == 'true' ? 'sort' : 'none';
 
@@ -939,6 +980,55 @@ class PDb_List
 			
 		}
 		
+		/**
+		 * takes the $_POST array and constructs a filter statement to add to the list shortcode filter
+		 */
+		private function _make_filter_statement( $post ) {
+			 
+			 if ( ! Participants_Db::is_column( $post['where_clause'] ) ) return '';
+			 
+			 self::$filter['where_clause'] = $post['where_clause'];
+			 
+			 
+			 switch ( $post['operator'] ) {
+				 
+				 case 'LIKE':
+				 
+					$operator = '~';
+					break;
+					
+				case 'NOT LIKE':
+				case '!=':
+				
+					$operator = '!';
+					break;
+				
+				case 'gt':
+				
+					$operator = '>';
+					break;
+					
+				case 'lt':
+				
+					$operator = '<';
+					break;
+					
+				default:
+				
+					$operator = '=';
+					
+			 }
+			 
+			self::$filter['operator'] = $operator;
+			 
+			if ( empty( $post['value'] ) ) return '';
+			
+			self::$filter['value'] = $post['value'];
+			
+			return self::$filter['where_clause'].self::$filter['operator'].self::$filter['value'];
+			
+		}
+		
 		
 		/**
 		 * sets up the internationalization strings
@@ -952,6 +1042,7 @@ class PDb_List
 				'sort' => _x( 'Sort', 'submit button label', Participants_Db::PLUGIN_NAME ),
 				'filter' => _x( 'Filter', 'submit button label', Participants_Db::PLUGIN_NAME ),
 				'clear' => _x( 'Clear', 'submit button label', Participants_Db::PLUGIN_NAME ),
+        'search' => _x( 'Search', 'search button label', Participants_Db::PLUGIN_NAME ),
 			);
 		
 		}

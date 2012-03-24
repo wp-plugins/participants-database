@@ -425,6 +425,9 @@ class PDb_Init
         // remove options
         delete_option( Participants_Db::$participants_db_options );
 				delete_option( Participants_Db::$db_version );
+
+				// clear transients
+				delete_transient( 'pdb_last_record' );
 				
         error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
         

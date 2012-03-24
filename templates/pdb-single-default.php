@@ -48,7 +48,9 @@ $exclude = array();
   
     <h2><?php echo $group->title ?></h2>
     
+    <?php if ( ! empty( $group->description ) ) : ?>
     <h3><?php echo $group->description ?></h3>
+    <?php endif ?>
     
     <dl>
     

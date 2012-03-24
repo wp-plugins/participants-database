@@ -100,12 +100,7 @@ class Signup {
 		$this->receipt_subject = $this->options['signup_receipt_email_subject'];
 		$this->receipt_body = $this->options['signup_receipt_email_body'];
 		$this->thanks_message = $this->options['signup_thanks'];
-		$this->email_header = sprintf(
-		                               'From: %2$s <%1$s>%3$s',
-		                               $this->options['receipt_from_address'],
-		                               $this->options['receipt_from_name'],
-		                               "\r\n"
-		                               );
+		$this->email_header = Participants_Db::$email_headers;
 		
 		if ( ! isset( $this->options['signup_thanks_page'] ) ) {
 			
@@ -169,7 +164,7 @@ class Signup {
 			
 				}
 			
-		} elseif ( $submission_id ) {
+		} elseif ( $submission_id && false === get_transient( 'signup-'.$submission_id ) ) {
 
 			// load the values from the newly-submitted record
 			$this->_load_participant( $submission_id );
@@ -182,6 +177,8 @@ class Signup {
 
 			// send the email receipt and notification
 			$this->_send_email();
+			
+			set_transient( 'signup-'.$submission_id, 'sent' );
 			
 		}
 		
@@ -301,7 +298,7 @@ class Signup {
 																							'type'       => 'submit',
 																							'value'      => $this->options['signup_button_text'],
 																							'name'       => 'submit',
-																							'class'      => 'button-primary',
+																							'class'      => 'button-primary pdb-submit',
 																							) );
 						?>
 						</td>

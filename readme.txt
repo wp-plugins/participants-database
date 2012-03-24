@@ -57,7 +57,7 @@ For textarea fields, a rich-text editor will be used if enabled in the settings.
 
 **List Display**
 
-Display the list on your website with the [pdb_list] shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order.
+Display the list on your website with the [pdb_list] shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order. Optionally, search and sorting controls can be displayed.
 
 **Record Display**
 
@@ -158,6 +158,17 @@ Even better than that, there is a new form field type called "link" that lets pe
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.3.4 =
+* added sort and search field options to [pdb_list] shortcode
+* list shortcode filtering, sorting and display may now use internal fields
+* multi-select array fields may now be exported/imported
+* fixed bug in manage fields where backslashes were removed from regexes
+* uploading CSV files now properly handles missing upload directory
+* front-end edits no longer overwrite admin fields
+* improved handling of linked URL's and email addresses
+* prevent multiple submissions and multiple email notifications
+* "textarea" form element now uses "text" MySQL datatype
 
 = 1.3.3 =
 * HTML emails can be switched off in settings; possible confict with other plugins
@@ -395,22 +406,13 @@ Important upgrade fixes 2 bugs and provides improved functionality.
 
 This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
 
-To collect signups on your website use this shortcode: [pdb_signup]. The shortcode will generate a short form to give people a way to add their name to your list. You can customize which fields they need to fill in. [pdb_record] displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want. The [pdb_record] form is only available when accessed using a private link because it allows a user to edit their won record.This link can be provided in an email and is also visible in the admin listing of records.
+Please read the documentation fully, as this is a complex plugin that can be used in a lot of different ways.
+
+To collect signups on your website use this shortcode: [pdb_signup]. The shortcode will generate a short form to give people a way to add their name to your list. You can customize which fields they need to fill in. [pdb_record] displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want. The [pdb_record] form is only available when accessed using a private link because it allows a user to edit their own record. This link can be provided in an email and is also visible in the admin listing of records.
 
 The idea is your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
 
-When they sign in, they will be sent an email with a private link to their full record. This page is where the second [pdb_record] shortcode goes.
-
-If you want to display the list on your website, place the [pdb_list] shortcode on any page or post. Long lists can be paginated. The fields that get displayed is set on the fields management page under the "display" column.
-
-The display can be customized with additional parameters:
-
-* list_limit - sets the number of records to list per page (defaults to the plugin setting value)
-* class - lets you set the CSS class of the container (defaults to 'participants-database')
-* filter - lets you determine which records are shown (see the usage notes for an explanation)
-* orderby - order the list by one of the columns
-* order - determines whether the list is ordered in ascending (asc) or descending (desc) order
-
+When your site visitors fill out and submit the signup form, they will be sent an email with a private link to their full record. This page is where the [pdb_record] shortcode goes.
 
 **Quick Start Instructions:**
 
@@ -431,17 +433,28 @@ It's also possible to use this feature to make filling out the signup form requi
 
 **Showing the List on Your Website**
 
-You can use the [pdb_list] shortcode to show the records on your site. Just put the shortcode where you want it to show up. You can set the number of records to show per page (yes, it's paginated!) with the 'list_limit' setting, also the CSS class to wrap the table in with the 'class' setting...like this: [pdb_list list_limit=10 class=memberlist]
+You can use the [pdb_list] shortcode to show the records on your site. Just put the shortcode where you want it to show up.
 
-Which columns get included is determined on the fields management page, just set the "display_column" value to order the columns as you like. You can alos set the columns to display in the shortcode by including a list of the names (not Titles!) of the fields you want to show in the order you want to show them: [pdb_list fields="last_name, city, email, photo"]
+Here is the full list of parameters you can use with the [pdb_list] shortcode:
 
-You can now filter and sort the list that is displayed with 3 new variables in the shortcode: see the next section.
+* search - set to 'true' to show a list search field
+* sort - set to 'true' to show a list sort field
+* fields - a comma-separated list of fields to show
+* list_limit - sets the number of records to list per page (defaults to the plugin setting value)
+* class - lets you set the CSS class of the container (defaults to 'participants-database')
+* filter - lets you determine which records are shown (see the usage notes for an explanation)
+* orderby - order the list by one of the columns
+* order - determines whether the list is ordered in ascending (asc) or descending (desc) order
 
-If you want to get tricky with the CSS, each header column has a class name the corresponds to the name of the field, you can use CSS to lay out the listing exactly as you want.
+You can set the number of records to show per page (yes, it's paginated!) with the 'list_limit' setting.
+
+Which columns are shown by the shortcode is set up on the fields management page. For each field there is a value called "display" that determines the order of the columns in your list display. You can also set the columns to display in the shortcode by including a list of the names (not Titles!) of the fields you want to show in the order you want to show them: [pdb_list fields="last_name, city, email, photo"]
+
+If you want to get tricky with the CSS, each header column has a class name that corresponds to the name of the field, you can use CSS to lay out the listing exactly as you want.
 
 **Filtering which Records Get Shown with the List Shortcode**
 
-There are 3 new parameters for the [pdb_list] shortcode that allows you to determine which records get shown. It's a little complicated, but here's how you do it.
+There are 3 parameters for the [pdb_list] shortcode that allow you to determine which records get shown. It's a little complicated, but here's how you do it.
 
 There is a parameter called 'filter' which determines which records to show. The general format of the parameter is this: *field* *operator* *value* So for instance if you wanted to show all records from the state of New York, you would put [pdb_list filter='state=NY'] just like that. "state" is the field (it must match exactly the field name as listed on the mange database fields page in the plugin) "=" is the operator and "NY" is the value. The filter is grabbing all records where the state is NY.
 
@@ -480,3 +493,21 @@ These fields will now be excluded from the display. The template offers many oth
 Images can now be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'Image Upload Location' setting will always determine the location for the images.
 
 IMPORTANT: Don't store images in the plugin directory (as was the default before version 1.3.2) they could be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
+
+**Importing CSV Files**
+
+CSV is a common file format for exporting databases and spreadsheets. You can export a CSV file from your spreadsheet or database and import the records into the plugin. It can be a tricky process, so I'll offer a few hints here on getting it to work.
+
+The import will work most reliably if the CSV file has it's fields delimited by a comma and the text enclosed by double quotes. (this is actually only required for a field that contains a delimiter character) The first row should be a header row containing the column names (which are the same as your field names). The encoding of the file must be UTF-8. On the CSV import page is a button to export a blank CSV file in the correct format to get you started.
+
+It is critical that your database or spreadsheet application be able to export the CSV in the proper format for the process to work. In some cases, you may have to open your CSV file (as exported from your spreadsheet or database) in a text editing application for further modification to get everything working. This must be a plain-text editor, don't try this with a word processor!
+
+In particular, if your data has both double and single quotes (which are also apostrophes!) in it, it will be very difficult to import because one of the two will need to be used as the text delimiter. I suggest you convert quotes and apostrophes that are part of blocks of text into their HTML equivalents: &#39; for apostrophes and single quotes and &quot; for double quotes. This way, the text delimiter can do it's job without other characters interfering. You will probably have to use a text editing application to make these substitutions.
+
+The "Image Upload Location" setting in the plugin is important here because that is where the plugin will place the uploaded CSV. The default setting for this is 'wp-content/uploads/participants-database/' If the plugin does not find the directory specified in the "Image Upload Location" setting, it will attempt to create it. It should notify you if it fails, and you may have to create the directory manually (using an FTP client, for instance) to get the CSV import to work.
+
+**Plugin Support**
+
+I do monitor the WP forums and comments page on my own website for support requests. I very much appreciate bugs being brought to my attention, so please let me know if things are broken or not working as expected.
+
+I only ask that you read the documentation before posting with support requests because it will save us both valuable time. Many of the issues people have are due to imporoper setup or use of the plugin...this is partly due, I know, to shorcomings in the documentation. It is a complex plugin with lots of options, so it can be difficult to explain how it works in a way that everybody will understand.

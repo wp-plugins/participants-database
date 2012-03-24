@@ -4,6 +4,7 @@
  */
 // translations strings for buttons
 /* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
+global $PDb_i18n;
 $PDb_i18n = array(
   'update fields'   => __( 'Update Fields', Participants_Db::PLUGIN_NAME ),
   'update groups'   => __( 'Update Groups', Participants_Db::PLUGIN_NAME ),
@@ -52,6 +53,25 @@ if ( isset( $_POST['action'] ) ) {
 						
 					}
 					
+					if ( ! empty( $row['validation'] ) && ! in_array( $row['validation'], array( 'yes','no' ) ) ) {
+						
+						$row['validation'] = str_replace( '\\\\', '\\', $row['validation'] );
+						
+					}
+					
+					// modify the datatype if necessary
+					$sql = "SHOW FIELDS FROM ".Participants_Db::$participants_table." WHERE field = '".$row['name']."'";
+					$field_info = $wpdb->get_results( $sql );
+					$new_type = strtolower( Participants_Db::set_datatype( $row['form_element'] ) );
+					if ( $new_type != current($field_info)->Type ) {
+						
+						$sql = "ALTER TABLE ".Participants_Db::$participants_table." MODIFY COLUMN `".$row['name']."` ".$new_type;
+						
+						$result = $wpdb->get_results( $sql );
+						
+					}
+					
+					
 					// remove the fields we won't be updating
 					unset( $row['status'],$row['id'],$row['name'] );
 					$wpdb->update( Participants_Db::$fields_table, $row, array( 'id'=> $id ) );
@@ -93,7 +113,8 @@ if ( isset( $_POST['action'] ) ) {
 																		),
 														 $_POST
 														 );
-			Participants_Db::add_blank_field( $atts );
+			$result = Participants_Db::add_blank_field( $atts );
+			if ( false === $result ) $error_msgs[] = PDb_parse_db_error( $wpdb->last_error, $_POST['action'] );
 			break;
 
 		// add a new blank field
@@ -284,13 +305,16 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 					foreach( $attribute_columns[$group] as $attribute_column ) :
 					
 						if ( 'internal' == $group && in_array( $attribute_column, array( 'order' ) ) ) continue;
+						
+						// preserve backslashes in regex expressions
+						if ( $attribute_column == 'validation' ) $database_row[ $attribute_column ] = str_replace( '\\','&#92;',$database_row[ $attribute_column ] );
 	
 						$value = Participants_Db::prepare_value( $database_row[ $attribute_column ] );
 	
 						$element_atts = array_merge( Participants_Db::get_edit_field_type( $attribute_column ),
 																					array(
 																								'name'=>'row_'.$database_row[ 'id' ].'['.$attribute_column.']',
-																								'value'=> htmlspecialchars(stripslashes($value),ENT_QUOTES,"UTF-8",false),
+																								'value'=> PDb_prep_value( $value, (bool) ( $attribute_column == 'validation' ) ),
 																								) );
 					?>
 					<td class="<?php echo $attribute_column?>"><?php FormElement::print_element( $element_atts )  ?></td>
@@ -464,7 +488,7 @@ function PDb_header( $string ) {
 }
 function PDb_make_name( $string ) {
 
-	return strtolower(str_replace( array( ' ','-',"'",'"'),array('_','_','',''), stripslashes( $string ) ) );
+	return strtolower(str_replace( array( ' ','-',"'",'"','%','\\','#','$'),array('_','_','','','pct','','',''), stripslashes( $string ) ) );
 	
 }
 function PDb_trim_array( $array ) {
@@ -486,27 +510,51 @@ function PDb_prep_values_array( $array ) {
 
   foreach ( $array as $element ) {
 
-    $return[] = htmlentities( trim( stripslashes( $element ) ), ENT_QUOTES, "UTF-8", false  );
+    $return[] = PDb_prep_value( $element );
 
   }
 
   return $return;
   
 }
+function PDb_prep_value( $value, $slashes = false ) {
+
+	if ( $slashes ) return htmlentities( trim( $value ), ENT_QUOTES, "UTF-8", false  );
+		
+	else return htmlentities( trim( stripslashes( $value ) ), ENT_QUOTES, "UTF-8", false  );
+	
+}
+	
+	
 // this rather kludgy function will do for now
 function PDb_parse_db_error( $error, $context ) {
+
+  global $PDb_i18n;
 
 	// unless we find a custom message, use the class error message
 	$message = $error;
 
 	if ( false !== strpos( $error, 'Duplicate entry' ) ) {
 
+    $item = false;
+
 		switch ( $context ) {
 
 			case $PDb_i18n['add group']:
 
-				$message = __("The group was not added. Your new group must have a unique name.", Participants_Db::PLUGIN_NAME );
+        $item = 'group';
 				break;
+
+      case $PDb_i18n['add field']:
+
+        $item = 'field';
+        break;
+
+		}
+
+		if ( $item && false !== stripos( $message, 'duplicate'  ) ) {
+
+        $message = sprintf(__('The %1$s was not added. Your new %1$s must have a unique name.', Participants_Db::PLUGIN_NAME ), $item );
 
 		}
 

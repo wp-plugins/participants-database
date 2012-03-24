@@ -21,37 +21,51 @@ $errors = array();
 // if a file upload attempt been made, process it and display the status of the operation
 if( isset( $_POST['csv_file_upload'] ) ) :
 
-	$target_path = ABSPATH.Participants_Db::$plugin_options['image_upload_location'] . basename( $_FILES['uploadedfile']['name']);
+	$upload_location = Participants_Db::$plugin_options['image_upload_location'];
 
-	if( false !== move_uploaded_file( $_FILES['uploadedfile']['tmp_name'], $target_path ) ) {
+	// check for the target directory; attept to create if it doesn't exist
+	$target_directory_exists = is_dir( ABSPATH.$upload_location ) ? true : Participants_Db::_make_uploads_dir( $upload_location ) ;
+	
+	if ( false !== $target_directory_exists ) {
 
-		$errors[] = '<strong>'.sprintf( __('The file %s has been uploaded.', Participants_Db::PLUGIN_NAME ), $_FILES['uploadedfile']['name'] ).'</strong>';
-		
-		$insert_error = Participants_Db::insert_from_csv( $target_path );
+		$target_path = ABSPATH.$upload_location . basename( $_FILES['uploadedfile']['name']);
 
-		if ( is_numeric( $insert_error ) ) {
-
-			$errors[] = '<strong>'.$insert_error.' '._n('record imported','records imported', $insert_error, Participants_Db::PLUGIN_NAME ).'.</strong>';
-
-		} elseif( empty( $insert_error ) ) {
-
-			$errors[] = __('Zero records imported.', Participants_Db::PLUGIN_NAME );
-			$status = 'error';
-
-		} else { // parse error
-		
-			$errors[] = '<strong>'.__('Error occured while trying to add the data to the database', Participants_Db::PLUGIN_NAME ).':</strong>';
-			$errors[] = $insert_error;
-			$status = 'error';
-
+		if( false !== move_uploaded_file( $_FILES['uploadedfile']['tmp_name'], $target_path ) ) {
+	
+			$errors[] = '<strong>'.sprintf( __('The file %s has been uploaded.', Participants_Db::PLUGIN_NAME ), $_FILES['uploadedfile']['name'] ).'</strong>';
+			
+			$insert_error = Participants_Db::insert_from_csv( $target_path );
+	
+			if ( is_numeric( $insert_error ) ) {
+	
+				$errors[] = '<strong>'.$insert_error.' '._n('record imported','records imported', $insert_error, Participants_Db::PLUGIN_NAME ).'.</strong>';
+	
+			} elseif( empty( $insert_error ) ) {
+	
+				$errors[] = __('Zero records imported.', Participants_Db::PLUGIN_NAME );
+				$status = 'error';
+	
+			} else { // parse error
+			
+				$errors[] = '<strong>'.__('Error occured while trying to add the data to the database', Participants_Db::PLUGIN_NAME ).':</strong>';
+				$errors[] = $insert_error;
+				$status = 'error';
+	
+			}
+		} // file move successful
+		else { // file move failed
+	
+				$errors[] = '<strong>'.__('There was an error uploading the file.', Participants_Db::PLUGIN_NAME ).'</strong>';
+				$errors[] = __('Destination', Participants_Db::PLUGIN_NAME ).': '.$target_path;
+				$status = 'error';
+	
 		}
-	} // file move successful
-	else { // file move failed
-
-			$errors[] = '<strong>'.__('There was an error uploading the file.', Participants_Db::PLUGIN_NAME ).'</strong>';
-			$errors[] = __('Destination', Participants_Db::PLUGIN_NAME ).': '.$target_path;
-			$status = 'error';
-
+		
+	} else {
+		
+		$errors[] = '<strong>'.__('Target directory ('.$upload_location.') does not exist and could not be created. Try creating it manually.', Participants_Db::PLUGIN_NAME ).':</strong>';
+		$status = 'error';
+		
 	}
 
 endif; // isset( $_POST['file_upload'] 

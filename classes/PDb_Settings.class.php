@@ -116,11 +116,11 @@ class PDb_Settings extends Plugin_Settings {
 
     $this->plugin_settings[] = array(
         'name'       => 'image_upload_location',
-        'title'      => __('Image Upload Location', Participants_Db::PLUGIN_NAME ),
+        'title'      => __('File Upload Location', Participants_Db::PLUGIN_NAME ),
         'group'      => 'main',
         'options'    =>array(
           'type'        => 'text',
-          'help_text'   => __("this defines where the uploaded files will go, relative to the WordPress root.<br />Don't put it in the plugin folder, the images could get deleted when the plugin is updated.", Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __("this defines where the uploaded files will go, relative to the WordPress root.<br />Don't put it in the plugin folder, the images and files could get deleted when the plugin is updated.", Participants_Db::PLUGIN_NAME ),
           'value'       => Participants_Db::$uploads_path,
           )
         );
@@ -156,7 +156,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('if a field looks like a link (begins with "http") make it clickable', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('if a "text-line" field looks like a link (begins with "http") make it clickable', Participants_Db::PLUGIN_NAME ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
@@ -232,6 +232,19 @@ class PDb_Settings extends Plugin_Settings {
           'type'        => 'checkbox',
           'help_text'   => __('use rich text in plugin emails? If you turn this off, be sure to remove all HTML tags from the email body settings for the plugin.', Participants_Db::PLUGIN_NAME ),
           'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'strict_dates',
+        'title'      =>__('Strict Date Format', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. The date with your setting looks like this: "'.date(get_option('date_format')).'"', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
         );
@@ -499,7 +512,7 @@ class PDb_Settings extends Plugin_Settings {
 		
 		foreach( $pages as $page ) {
 			
-			$pagelist[ $page->post_name ] = $page->ID;
+			$pagelist[ $page->post_title ] = $page->ID;
 		
 		}
 		
