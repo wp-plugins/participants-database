@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.3.4
+Version: 1.3.5
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -236,13 +236,12 @@ class Participants_Db {
     // set the email content headers
     if ( ! isset( self::$plugin_options ) ) {
 
-      $options = get_option( self::$participants_db_options );
+      self::$plugin_options = get_option( self::$participants_db_options );
 
-    } else {
-
-      $options = self::$plugin_options;
-
-    }
+    } 
+		
+		$options = self::$plugin_options;
+		
     if ( 0 != $options['html_email'] ) {
       $type = 'text/html; charset="'.get_option('blog_charset').'"';
     } else {
@@ -628,11 +627,14 @@ class Participants_Db {
 	public function get_sortables() {
 		
 	 global $wpdb;
+	 
+	 if ( is_admin() ) $frontend_fields = '';
+	 else $frontend_fields = ' AND `display_column` > 0 ';
 
 		$sql = "
 			SELECT `name`,`title`
 			FROM ".self::$fields_table."
-			WHERE `sortable` > 0";
+			WHERE `sortable` > 0".$frontend_fields;
 
 		$result = $wpdb->get_results( $sql, ARRAY_N );
 
@@ -866,7 +868,7 @@ class Participants_Db {
               
 			case 'image-upload' :
 			
-				$return = '<img src="'.self::get_image_uri( $value ).'" />';
+				$return = empty( $value ) ? '' : '<img src="'.self::get_image_uri( $value ).'" />';
 				break;
 				
 			case 'date' :
@@ -1976,10 +1978,10 @@ class Participants_Db {
 	public function make_link( $link, $title = '', $template = false, $get = false ) {
 
     // URL's, emails and the like are case-insensitive
-    $link = strtolower( $link );
+    $lc_link = strtolower( $link );
     
     // if it's not really a link don't wrap it in anchor tag
-    if ( ( 0 !== stripos( $link, 'http' ) && false === $get ) && ! filter_var( $link, FILTER_VALIDATE_EMAIL ) ) return esc_html( $link );
+    if ( ( 0 !== stripos( $lc_link, 'http' ) && false === $get ) && ! filter_var( $lc_link, FILTER_VALIDATE_EMAIL ) ) return esc_html( $link );
 
     if ( false !== $get && is_array( $get ) ) {
 
@@ -1995,10 +1997,10 @@ class Participants_Db {
 
     }
 
-    if ( filter_var( $link, FILTER_VALIDATE_EMAIL ) && 0 !== strpos( $link, 'mailto:' ) ) {
+    if ( filter_var( $lc_link, FILTER_VALIDATE_EMAIL ) && 0 !== strpos( $lc_link, 'mailto:' ) ) {
     
       $title = $link;
-      $link = 'mailto:'.$link;
+      $link = 'mailto:'.$lc_link;
 
     }
 		

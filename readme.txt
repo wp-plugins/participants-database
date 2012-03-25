@@ -159,6 +159,14 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.3.5 =
+* fixed submit bug with webkit browsers
+* corrected de-capitalization of fields when auto-linking enabled
+* eliminated empty IMG tags for empty image fields
+* included "date_updated" and "date_recorded" fields in frontend list sorts
+* removed non-displayed fields from fronent list sorting dropdown
+* added "display_count" option to [pdb_list] display
+
 = 1.3.4 =
 * added sort and search field options to [pdb_list] shortcode
 * added new "hidden" field for adding extra data to signups
@@ -337,6 +345,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Upgrade Notice ==
 
+= 1.3.5 =
+Bug fix release: several bugs fixed, new record total disply option for the list display
+
 = 1.3.4 =
 Important upgrade including several bug fixes, two new features and improved error handling and documentation
 
@@ -431,7 +442,7 @@ Of course, records can be entered in the backend by a user with "edit posts" or 
 
 **Setting Up the Signup Form "Thank You" Page**
 
-To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the [pdb_signup_thanks] shotcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
+To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the [pdb_signup_thanks] shortcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
 
 It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.
 
@@ -449,6 +460,7 @@ Here is the full list of parameters you can use with the [pdb_list] shortcode:
 * filter - lets you determine which records are shown (see the usage notes for an explanation)
 * orderby - order the list by one of the columns
 * order - determines whether the list is ordered in ascending (asc) or descending (desc) order
+* display_count - if set to 'true' will display a total of all records
 
 You can set the number of records to show per page (yes, it's paginated!) with the 'list_limit' setting.
 
@@ -466,7 +478,7 @@ The operators can be '=', '!', '<', '>' and '~' only. '!' means "NOT", so if you
 
 You can use more than one filter by stringing them together like this: [pdb_list filter='last_name>c&last_name<h' ] (note ampersand between filter statements) This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
 
-To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date vaules should be a regular date string like this: [pdb_list filter='date>jan3,2012'] It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
+To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date values should be a regular date string like this: [pdb_list filter='date>jan3,2012'] It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
 
 **Approving Records for Public Display**
 
@@ -496,17 +508,23 @@ These fields will now be excluded from the display. The template offers many oth
 
 There is a new field type called "hidden" that can be used to add dynamic values to the signup form submissions. For instance, if you had the signup form in multiple locations on your blog, you could know which page the user was on when they signed up because the page name would be placed in a hidden field. 
 
-Here' is a quick tutorial to add a field that tracks the page the signup form is on:
-	1. Add a new field with a descriptive name, like "source page" 
-	2. Make that field a hidden type and for the default value, put "post->post_title" 
-	3. This will fill in the title of the page the signup form appears on. 
+Here is a quick tutorial to add a field that tracks the page the signup form is on:
+
+1. Add a new field with a descriptive name, like "source page" 
+
+2. Make that field a hidden type
+
+3. for the default value, put "post->post_title" 
+
+4. This will fill in the title of the page the signup form appears on. 
+
 When the form is submitted, the information in the hidden field will be included.
 
 At the moment, only two WordPress objects are available: $post and $current_user. You can look these up in the codex to see what properties you can access. The way this works is simple: just put the name of the property in the default value field for the hidden field. For instance "current_user->user_login" will put in the user login of a logged-in user. You don't need the dollar sign, it will ignore it if you do put it in.
 
 If you just want to put in a fixed value, the hidden field will include any string you put into the "default" for the field.
 
-For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden field is also present in the form presented by the [pdb_record] shortcode. It is visible and editable in the admin edit page.
+For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden fields are also present in the form presented by the [pdb_record] shortcode. It is visible and editable in the admin edit page.
 
 **Image Uploads**
 

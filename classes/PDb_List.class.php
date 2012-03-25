@@ -111,6 +111,7 @@ class PDb_List
 																			'orderby'			=> 'last_name',
 																			'order'       => 'asc',
 																			'fields'			=> '',
+																			'display_count' => 'false',
                                       );
 
     self::$shortcode_params = shortcode_atts( $shortcode_defaults, $atts );
@@ -390,7 +391,7 @@ class PDb_List
 		$orderby = Participants_Db::is_column( $orderby ) ? $orderby : current( self::$sortables );
 		self::$filter['sortBy'] = $orderby;
 			
-		$order = isset( $_POST['ascdesc'] ) ? strtoupper( $_POST['ascdesc'] ) : strtoupper( self::$shortcode_params['orderby'] );
+		$order = isset( $_POST['ascdesc'] ) ? strtoupper( $_POST['ascdesc'] ) : strtoupper( self::$shortcode_params['order'] );
 		$order = in_array( $order, array( 'ASC', 'DESC' ) ) ? $order : 'ASC';
 		self::$filter['ascdesc'] = strtolower($order);
 		
@@ -694,6 +695,9 @@ class PDb_List
   private function _main_table( $mode = '' ) { ?>
 
    <table class="wp-list-table widefat fixed pages pdb-list" cellspacing="0" >
+   	<?php if ( self::$shortcode_params['display_count'] == 'true' ) : ?>
+   	<caption><?php printf(__('Total Records Found',Participants_Db::PLUGIN_NAME ).': %s',self::$num_records )?></caption>
+    <?php endif ?>
       <?php
 		// template for printing the registration page link in the admin
 		$PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
@@ -750,7 +754,7 @@ class PDb_List
 
            case 'image-upload':
 
-              $display_value = self::$backend ? basename( $value[ $column ] ) : '<img class="PDb-list-image" src="'.Participants_Db::get_image_uri( $value[ $column ] ).'" />';
+              $display_value = self::$backend ? basename( $value[ $column ] ) : ( empty( $value[ $column ] ) ? '' : '<img class="PDb-list-image" src="'.Participants_Db::get_image_uri( $value[ $column ] ).'" />' );
 					 
 					 		if (
                     isset( self::$options['single_record_link_field'] )

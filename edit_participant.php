@@ -125,7 +125,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 				
 				case 'image-upload':
 				
-					$value = Participants_Db::get_image_uri( $value );
+					$value = empty( $value ) ? '' : Participants_Db::get_image_uri( $value );
 					
 					break;
 					

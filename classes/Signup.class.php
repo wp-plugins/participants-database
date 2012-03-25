@@ -178,7 +178,7 @@ class Signup {
 			// send the email receipt and notification
 			$this->_send_email();
 			
-			set_transient( 'signup-'.$submission_id, 'sent' );
+			set_transient( 'signup-'.$submission_id, 'sent', 30 );
 			
 		}
 		
