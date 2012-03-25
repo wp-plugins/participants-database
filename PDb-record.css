@@ -37,6 +37,10 @@
   margin-top:0;
   margin-bottom:0;
 }
+.edit-participant .form-table tr.hidden {
+	visibility:hidden;
+	position:absolute;
+}
 .edit-participant .uploaded-image {
   width:auto;
   height:85px;

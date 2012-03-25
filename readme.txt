@@ -161,6 +161,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 = 1.3.4 =
 * added sort and search field options to [pdb_list] shortcode
+* added new "hidden" field for adding extra data to signups
 * list shortcode filtering, sorting and display may now use internal fields
 * multi-select array fields may now be exported/imported
 * fixed bug in manage fields where backslashes were removed from regexes
@@ -487,6 +488,22 @@ In this template file is an array that can be used to prevent any fields from di
 $exclude = array('city','state','postcode');
 
 These fields will now be excluded from the display. The template offers many other opportunities to customize the output of the [pdb_single] shortcode to match your theme.
+
+**Hidden Signup Fields**
+
+There is a new field type called "hidden" that can be used to add dynamic values to the signup form submissions. For instance, if you had the signup form in multiple locations on your blog, you could know which page the user was on when they signed up because the page name would be placed in a hidden field. 
+
+Here' is a quick tutorial to add a field that tracks the page the signup form is on:
+	1. Add a new field with a descriptive name, like "source page" 
+	2. Make that field a hidden type and for the default value, put "post->post_title" 
+	3. This will fill in the title of the page the signup form appears on. 
+When the form is submitted, the information in the hidden field will be included.
+
+At the moment, only two WordPress objects are available: $post and $current_user. You can look these up in the codex to see what properties you can access. The way this works is simple: just put the name of the property in the default value field for the hidden field. For instance "current_user->user_login" will put in the user login of a logged-in user. You don't need the dollar sign, it will ignore it if you do put it in.
+
+If you just want to put in a fixed value, the hidden field will include any string you put into the "default" for the field.
+
+For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden field is also present in the form presented by the [pdb_record] shortcode. It is visible and editable in the admin edit page.
 
 **Image Uploads**
 

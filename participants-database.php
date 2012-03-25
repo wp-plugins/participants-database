@@ -146,7 +146,8 @@ class Participants_Db {
                                  'select-other',
                                  'multi-select-other',
 																 'link',
-																 'image-upload'
+																 'image-upload',
+																 'hidden',
                                  );
 		
 

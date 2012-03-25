@@ -84,14 +84,14 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
     echo $id_line;
 ?>
 
-	<tr class="<?php echo $column->form_element?>">
+	<tr class="<?php echo ( is_admin() && 'hidden' == $column->form_element ) ? 'text-line' : $column->form_element ?>">
     <?php
     $column_title = htmlspecialchars(stripslashes($column->title),ENT_QUOTES,"UTF-8",false);
     if ( $options['mark_required_fields'] && $column->validation != 'no' ) {
       $column_title = sprintf( $options['required_field_marker'], $column_title );
     }
     ?>
-		<th><?php echo $column_title ?></th>
+		<th><?php echo $column_title . ( ( Participants_Db::backend_user() && 'hidden' == $column->form_element ) ? ' (hidden)' : '' ) ?></th>
 		<td id="<?php echo Participants_Db::$css_prefix.$column->name?>" >
 		<?php
 		
@@ -111,20 +111,55 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 			
 		}
 		
-		// format the date if it's a date field
-		if ( 'date' == $column->form_element && ! empty( $value ) ) {
-		
-			$time = preg_match( '#^[0-9-]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
-		
-			$value = $time ? date( get_option( 'date_format' )/*.' '.get_option( 'time_format' )*/, $time ) : '';
+		if ( isset( $value ) ) {
 			
-		} elseif ( 'image-upload' == $column->form_element && ! empty( $value ) ) {
+			switch ( $column->form_element ) {
+			// format the date if it's a date field
+				case 'date':
 			
-			$value = Participants_Db::get_image_uri( $value );
+					$time = preg_match( '#^[0-9-]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
 			
-		} elseif ( in_array( $column->form_element, array( 'multi-select-other','multi-checkbox' ) ) && ! empty( $value ) ) {
-			
-			$value = is_array( $value ) ? $value : explode( ',', $value );
+					$value = $time ? date( get_option( 'date_format' )/*.' '.get_option( 'time_format' )*/, $time ) : '';
+					
+					break;
+				
+				case 'image-upload':
+				
+					$value = Participants_Db::get_image_uri( $value );
+					
+					break;
+					
+				case 'multi-select-other':
+				case 'multi-checkbox':
+				
+					$value = is_array( $value ) ? $value : explode( ',', $value );
+					
+					break;
+					
+				case 'hidden':
+				
+					if ( Participants_Db::backend_user() ) {
+						
+						// for backend user this field is exposed and editable
+						$column->form_element = 'text-line';
+						
+					} else {
+				
+						global $post, $current_user;
+				
+						if ( false !== strpos( html_entity_decode($value), '->' ) ) {
+							
+							list( $object, $property ) = explode( '->', html_entity_decode($value) );
+							
+							$object = ltrim( $object, '$' );
+							
+							$value = isset( $$object->$property )? $$object->$property : $value;
+							
+						}
+						
+					}
+					
+			}
 			
 		}
 

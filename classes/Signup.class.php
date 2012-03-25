@@ -121,12 +121,12 @@ class Signup {
     } else $this->groups = false;
 
 		$atts = shortcode_atts( array(
-																			'title'   => '',
-																			'captcha' => 'none',
-																			'class' => 'signup',
-																			'type' => 'signup',
-																			),
-														$params );
+																	'title'   => '',
+																	'captcha' => 'none',
+																	'class' => 'signup',
+																	'type' => 'signup',
+																	),
+												$params );
 														
 		$this->captcha_type = $atts['captcha'];
 		
@@ -233,6 +233,14 @@ class Signup {
 
 				// skip the ID column
 				if ( in_array( $column->name, array( 'id', 'private_id' ) ) ) continue;
+				
+				if ( in_array( $column->form_element, array( 'hidden' ) ) ) {
+					
+					$this->_print_hidden_field( $column, $participant_values );
+					
+					continue;
+					
+				}
 				
 				
 				// if we're showing groups, is the group of the next field a new one? If so, show it
@@ -455,6 +463,37 @@ class Signup {
 
 		}
 
+	}
+	
+	private function _print_hidden_field( $column, $participant_values ) {
+		
+		// unserialize it if the default is an array
+		$value = isset( $participant_values[ $column->name ] ) ? $participant_values[ $column->name ] : false  ;
+		
+		if ( $value ) {
+		
+			global $post, $current_user;
+			
+			if ( false !== strpos( html_entity_decode($value), '->' ) ) {
+				
+				list( $object, $property ) = explode( '->', html_entity_decode($value) );
+				
+				$object = ltrim( $object, '$' );
+				
+				$value = isset( $$object->$property )? $$object->$property : $value;
+				
+			}
+			
+			FormElement::print_element( array(
+																				'type'       => $column->form_element,
+																				'value'      => $value,
+																				'name'       => $column->name,
+																				)
+																 );
+
+			
+		}
+		
 	}
 
 }
