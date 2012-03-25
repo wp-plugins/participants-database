@@ -834,6 +834,7 @@ class Participants_Db {
                                             FROM '.self::$fields_table.' v
                                             WHERE v.group = "'.$group->name.'"
                                             '.$excludes.'
+																						AND v.form_element != "hidden"  
                                             ORDER BY v.order
                                             ', OBJECT_K );
 
