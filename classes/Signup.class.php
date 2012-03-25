@@ -205,7 +205,7 @@ class Signup {
 	private function _form( $atts ) {
 		ob_start();
 		?>
-		<div class="<?php echo $atts['class']?>" >
+		<div class="<?php echo $atts['class']?> pdb-signup" >
 		<?php
 		
 		$participant_values = Participants_Db::get_participant( Participants_Db::$id_base_number );

@@ -1,8 +1,9 @@
 // frontend scrips for PDB plugin
 jQuery(document).ready( function($) {
-				$('input.pdb-submit').click(function(e){
-																								 $(this).attr("disabled", true);
-																								 $(this).css("opacity",0.5);
-																								 });
-				
+				var pdbform = $('input.pdb-submit').parents("form");
+				pdbform.submit(function(e) {
+        			if ($(this).hasClass('pdb-disabled')) { e.preventDefault(); return false; }
+        				$(this).addClass('pdb-disabled');
+        			return true;
+        		});	
 			});
