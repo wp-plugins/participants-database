@@ -337,6 +337,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Upgrade Notice ==
 
+= 1.3.4 =
+Important upgrade including several bug fixes, two new features and improved error handling and documentation
+
 = 1.3.3 =
 Bug fix release affecting several minor problems: image path; email plugin conflicts; admin CSS; group name change issues
 
