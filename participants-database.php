@@ -1520,12 +1520,6 @@ class Participants_Db {
 															$options['email_signup_notify_addresses'], 
 															$options['record_update_email_subject'], 
 															self::proc_tags( $options['record_update_email_body'], $participant_id ), 
-															sprintf(
-																'From: %2$s <%1$s>%3$s',
-																$options['receipt_from_address'],
-																$options['receipt_from_name'],
-																"\r\n"
-															),
 															self::$email_headers
 														);
 						
