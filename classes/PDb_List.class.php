@@ -973,7 +973,7 @@ class PDb_List
 															);
 			
 			if ( 
-					( isset( $_POST['submit'] ) or isset( $_GET[ self::$list_page ] ) ) 
+				( ! isset( $_POST['submit'] ) or isset( $_GET[ self::$list_page ] ) ) 
 					or 
 					( isset( $_POST['submit'] ) && self::$i18n['clear'] != $_POST['submit'] )
 					) {	
@@ -983,11 +983,15 @@ class PDb_List
 				// if we got stored values, merge them with the defaults
 				if ( is_array( $stored_values ) ) $values = shortcode_atts( $default_values, $stored_values );
 			
+				if ( isset( $_POST['submit'] ) ) $_GET[ self::$list_page ] = 1;
+			
 			} else {
 			
 				$values = $default_values;
 				
 				delete_transient( self::$list_storage );
+				
+				foreach( array( 'where_clause','value','operator' ) as $key ) unset( $_POST[ $key ] );
 				
 			}
 			
