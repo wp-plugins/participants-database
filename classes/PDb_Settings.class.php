@@ -156,7 +156,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('if a "text-line" field looks like a link (begins with "http") make it clickable', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('if a "text-line" field looks like a link (begins with "http" or is an email address) make it clickable', Participants_Db::PLUGIN_NAME ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
@@ -243,7 +243,20 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. The date with your setting looks like this: "'.date(get_option('date_format')).'"', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your setting looks like this: "'.date(get_option('date_format')).'"', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'strict_search',
+        'title'      =>__('Strict User Searching', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('When checked, the frontend list search must match the whole field exactly. If unchecked, the search will match if the search term is found in part of the field. Searches are not case-sensitive either way.', Participants_Db::PLUGIN_NAME ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),

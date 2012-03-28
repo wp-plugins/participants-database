@@ -387,14 +387,14 @@ class PDb_List
     $skip_default = ' `id` != '.Participants_Db::$id_base_number;
 		
 		// get the previously submitted values
-		$filter_values = get_transient( self::$list_storage );	
+		$user_input = get_transient( self::$list_storage );
 		
 		// if we've got a valid orderby, use it. Check $_POST first, shortcode second
-		$orderby = isset( $filter_values['sortBy'] ) ? $filter_values['sortBy'] : self::$shortcode_params['orderby'];
+		$orderby = isset( $user_input['sortBy'] ) ? $user_input['sortBy'] : self::$shortcode_params['orderby'];
 		$orderby = Participants_Db::is_column( $orderby ) ? $orderby : current( self::$sortables );
 		self::$filter['sortBy'] = $orderby;
 			
-		$order = isset( $filter_values['ascdesc'] ) ? strtoupper( $filter_values['ascdesc'] ) : strtoupper( self::$shortcode_params['order'] );
+		$order = isset( $user_input['ascdesc'] ) ? strtoupper( $user_input['ascdesc'] ) : strtoupper( self::$shortcode_params['order'] );
 		$order = in_array( $order, array( 'ASC', 'DESC' ) ) ? $order : 'ASC';
 		self::$filter['ascdesc'] = strtolower($order);
 		
@@ -408,19 +408,19 @@ class PDb_List
 				// go back to the first page
 				$_GET[ self::$list_page ] = 1;
 				
-				return;
-				
 		}
 		
 		$where_clause = '';
 		
-		if( isset( $filter_values['value'] ) ) $post_filter = self::_make_filter_statement( $filter_values );
+    /*
+		if( isset( $user_input['value'] ) ) $post_filter = self::_make_filter_statement( $user_input );
 		
 		if ( ! empty( $post_filter ) ) {
 			
 			self::$shortcode_params['filter'] = ! empty( self::$shortcode_params['filter'] ) ? self::$shortcode_params['filter'].'&'.$post_filter : $post_filter;
 					
 				}
+    */
 				
 		if ( isset( self::$shortcode_params['filter'] ) ) {
 				
@@ -430,12 +430,18 @@ class PDb_List
 				
 				$operator = preg_match( '#(\S+)(\>|\<|=|!|~)(\S+)#', str_replace(' ','', $statement ), $matches );
 				
-				if ( $operator === 0 ) return;// no valid operator; just use the default query
+				if ( $operator === 0 ) continue;// no valid operator; skip to the next statement
 				
 				// get the parts
 				list( $string, $column, $op_char, $target ) = $matches;
 				
-				if ( ! Participants_Db::is_column( $column ) ) return;// not a valid column; just use the default query
+				if ( ! Participants_Db::is_column( $column ) or $column == $user_input['where_clause'] ) {
+
+          // not a valid column or was used in a user search query which overrides
+          // the shortcode; skip to the next one
+          continue;
+
+        }
 				
 				$field_atts = Participants_Db::get_field_atts( $column );
 				
@@ -445,7 +451,11 @@ class PDb_List
 				// get a correct comparison
 				if ( $field_atts->form_element == 'date' ) {
 				
-					$target = strtotime( $target );
+					$target = Participants_Db::parse_date( $target );
+					
+					// if we don't get a valid date, skip this statement
+					if ( false === $target ) continue;
+					
 					$delimiter = array( 'CAST(',' AS SIGNED)' );
 					
 				}
@@ -468,9 +478,19 @@ class PDb_List
 				}
 				
 				// build the where clause
-				$where_clause .= '`'.$column.'` '.$operator.' '.$delimiter[0].$target.$delimiter[1].' AND ';
+				//$where_clause .= '`'.$column.'` '.$operator.' '.$delimiter[0].$target.$delimiter[1].' AND ';
+				$where_clause .= sprintf( '`%s` %s %s%s%s AND ', $column, $operator, $delimiter[0], $target, $delimiter[1] );
 				
 			}// foreach $statements
+
+			// add the user search
+			if ( isset( $user_input['value'] ) && ! empty( $user_input['value'] ) && 'none' != $user_input['where_clause'] ) {
+
+        $pattern = self::$options['strict_search'] ? '`%s` = "%s" AND ' : '`%s` LIKE "%%%s%%" AND ';
+
+        $where_clause .= sprintf( $pattern, $user_input['where_clause'],$user_input['value'] );
+
+      }
 			
 			self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table.' WHERE '.$where_clause.$skip_default.' ORDER BY `'.$orderby.'` '.$order;
 			
@@ -573,7 +593,7 @@ class PDb_List
 	
 	?>
 	<div class="pdb-searchform">
-	<form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" action="<?php echo get_page_link( $post->ID ).'#'.self::$list_anchor ?>"  >
+	<form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" <?php if ( ! self::$backend ) printf( 'action="%s" ',get_page_link( $post->ID ).'#'.self::$list_anchor ) ?>  >
     <input type="hidden" name="action" value="sort">
     
   	<?php if ( in_array( $mode, array( 'filter','both' ) ) ) : ?>
@@ -972,10 +992,12 @@ class PDb_List
 															'ascdesc'      => 'asc'
 															);
 			
+			$values = $default_values;
+			
 			if ( 
 				( ! isset( $_POST['submit'] ) or isset( $_GET[ self::$list_page ] ) ) 
 					or 
-					( isset( $_POST['submit'] ) && self::$i18n['clear'] != $_POST['submit'] )
+				( isset( $_POST['submit'] ) && self::$i18n['clear'] != $_POST['submit'] )
 					) {	
 			
 				$stored_values = get_transient( self::$list_storage );
@@ -986,8 +1008,6 @@ class PDb_List
 				if ( isset( $_POST['submit'] ) ) $_GET[ self::$list_page ] = 1;
 			
 			} else {
-			
-				$values = $default_values;
 				
 				delete_transient( self::$list_storage );
 				

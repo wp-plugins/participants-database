@@ -1011,7 +1011,7 @@ class Participants_Db {
 
 		// check for an existing record with same email so we can at least avoid
 		// inserting a duplicate email address into the database
-		if ( $options['unique_email'] && isset( $post['email'] ) && self::email_exists( $post['email'] ) ) {
+		if ( $options['unique_email'] && isset( $post['email'] ) && ! empty( $post['email'] ) && self::email_exists( $post['email'] ) ) {
 
       // record with same email exists...get the id and update the existing record
       $participant_id = self::_get_participant_id_by_term( 'email', $post['email'] );
@@ -1089,43 +1089,7 @@ class Participants_Db {
 					
 				} elseif ( $column_atts->form_element == 'date' ) {
 					
-					// date values stored as unix timestamps
-					if ( self::$plugin_options['strict_dates'] ) {
-
-            $date = date_create_from_format( get_option( 'date_format' ), $post[ $column_atts->name ] );
-
-            if ( is_array( date_get_last_errors() ) && ! empty( $post[ $column_atts->name ] ) ) {
-
-              $errors = date_get_last_errors();
-
-              if ( $errors['warning_count'] > 0 || $errors['error_count'] > 0 ) {
-
-                $date = false;
-
-                if ( is_object( self::$validation_errors ) ) {
-
-                  self::$validation_errors->add_error( $column_atts->name, sprintf( __('The date for "%s" was invalid. Please input the date with the exact format shown' ), $column_atts->title ) );
-
-                }
-
-              }
-
-            }
-
-            // if we have a valid date, convert to timestamp
-            if ( $date ) $date = date_format( $date, 'U' );
-
-          } else {
-
-            $date = strtotime( $post[ $column_atts->name ] );
-
-          }
-					
-					/*
-					 * bugfix: if the site is using date formats with just numerals and separators (3/4/01) then strtotime can misinterpret dates and return false
-					 *
-					 * I want to set up a date format setting then interpret the date using the setting with the PHP function DateTime::createFromFormat
-					 */
+					$date = self::parse_date( $post[ $column_atts->name ], $column_atts );
 				
 					$new_value = $date ? $date : NULL ;
 					
@@ -2206,6 +2170,59 @@ class Participants_Db {
 		
 		return str_replace( ' ','', preg_replace( '#^[0-9]*#','',strtolower( $title ) ) );
 		
+	}
+	
+	/**
+	 * parses a date string into UNIX timestamp
+	 *
+	 * @param string $string      the string to parse
+	 * @param object $column_atts the column object; if not given, we buld a default object; 
+	 *                            if a string is given, we use it to identify the field for user feedback
+	 */
+	public function parse_date( $string, $column = false ) {
+		
+					if ( ! is_object( $column ) ) {
+						
+						$column_atts = new stdClass;
+						
+						$column_atts->name = false === $column ? '' : $column;
+						$column_atts->title = false === $column ? '' : ucwords( $column );
+						
+					} else $column_atts = $column;
+						
+		
+					if ( self::$plugin_options['strict_dates'] ) {
+
+            $date = date_create_from_format( get_option( 'date_format' ), $string );
+
+            if ( is_array( date_get_last_errors() ) && ! empty( $string ) ) {
+
+              $errors = date_get_last_errors();
+
+              if ( $errors['warning_count'] > 0 || $errors['error_count'] > 0 ) {
+
+                $date = false;
+
+                if ( is_object( self::$validation_errors ) ) {
+
+                  self::$validation_errors->add_error( $column_atts->name, sprintf( __('The date for "%s" was invalid. Please input the date with the exact format shown', self::PLUGIN_NAME ), $column_atts->title ) );
+
+                }
+
+              }
+
+            }
+
+            // if we have a valid date, convert to timestamp
+            if ( $date ) $date = date_format( $date, 'U' );
+
+          } else {
+
+            $date = strtotime( $string );
+
+          }
+					
+					return $date;
 	}
 	
 	/**

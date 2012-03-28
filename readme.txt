@@ -161,7 +161,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 = 1.3.6 =
 * better handling of search and sort functions, pagination in frontend record list
+* new "strict search" setting forces exact match in user (frontend) searches on [pdb_list]
 * fixed issue with select/other and multiselect/other fields not following user selects in some cases
+* fixed bug that duplicated records edited in the admin if unique emails checked, email not validated and blank
 
 = 1.3.5 =
 * fixed submit bug with webkit browsers
@@ -475,6 +477,12 @@ Which columns are shown by the shortcode is set up on the fields management page
 
 If you want to get tricky with the CSS, each header column has a class name that corresponds to the name of the field, you can use CSS to lay out the listing exactly as you want.
 
+** Searching and Sorting The List **
+
+You can activate list searching and/or sorting for your users to control how the list is displayed. Like this [pdb_list search="true"] or [pdb_list sort="true"] The use can select which field they want to search through a dropdown. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
+
+There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
+
 **Filtering which Records Get Shown with the List Shortcode**
 
 There are 3 parameters for the [pdb_list] shortcode that allow you to determine which records get shown. It's a little complicated, but here's how you do it.
@@ -486,6 +494,8 @@ The operators can be '=', '!', '<', '>' and '~' only. '!' means "NOT", so if you
 You can use more than one filter by stringing them together like this: [pdb_list filter='last_name>c&last_name<h' ] (note ampersand between filter statements) This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
 
 To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date values should be a regular date string like this: [pdb_list filter='date>jan3,2012'] It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
+
+The "Strict Date Format" setting affects how the shortcode filters are interpreted, so if this is checked, the date format in your filter argument must match the date format set in your WP General Settings.
 
 **Approving Records for Public Display**
 
