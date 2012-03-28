@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.3.5
+Version: 1.3.6
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -1519,13 +1519,7 @@ class Participants_Db {
 						$sent = wp_mail( 
 															$options['email_signup_notify_addresses'], 
 															$options['record_update_email_subject'], 
-															self::proc_tags( $options['record_update_email_body'], $participant_id ), 
-															sprintf(
-																'From: %2$s <%1$s>%3$s',
-																$options['receipt_from_address'],
-																$options['receipt_from_name'],
-																"\r\n"
-															),
+															self::proc_tags( $options['record_update_email_body'], $participant_id ),
 															self::$email_headers
 														);
 						

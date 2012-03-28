@@ -159,6 +159,10 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 == Changelog ==
 
+= 1.3.6 =
+* better handling of search and sort functions, pagination in frontend record list
+* fixed issue with select/other and multiselect/other fields not following user selects in some cases
+
 = 1.3.5 =
 * fixed submit bug with webkit browsers
 * corrected de-capitalization of fields when auto-linking enabled
@@ -344,6 +348,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.3.6 =
+Minor improvements to [pdb_list] shortcode search and sort, bug fixes for select/other form fields
 
 = 1.3.5 =
 Bug fix release: several bugs fixed, new record total disply option for the list display

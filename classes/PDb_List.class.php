@@ -386,12 +386,15 @@ class PDb_List
     // add this to the query to remove the default record
     $skip_default = ' `id` != '.Participants_Db::$id_base_number;
 		
+		// get the previously submitted values
+		$filter_values = get_transient( self::$list_storage );	
+		
 		// if we've got a valid orderby, use it. Check $_POST first, shortcode second
-		$orderby = isset( $_POST['sortBy'] ) ? $_POST['sortBy'] : self::$shortcode_params['orderby'];
+		$orderby = isset( $filter_values['sortBy'] ) ? $filter_values['sortBy'] : self::$shortcode_params['orderby'];
 		$orderby = Participants_Db::is_column( $orderby ) ? $orderby : current( self::$sortables );
 		self::$filter['sortBy'] = $orderby;
 			
-		$order = isset( $_POST['ascdesc'] ) ? strtoupper( $_POST['ascdesc'] ) : strtoupper( self::$shortcode_params['order'] );
+		$order = isset( $filter_values['ascdesc'] ) ? strtoupper( $filter_values['ascdesc'] ) : strtoupper( self::$shortcode_params['order'] );
 		$order = in_array( $order, array( 'ASC', 'DESC' ) ) ? $order : 'ASC';
 		self::$filter['ascdesc'] = strtolower($order);
 		
@@ -401,7 +404,7 @@ class PDb_List
 			
 				self::$filter['value'] = '';
 				self::$filter['where_clause'] = 'none';
-		
+				
 				// go back to the first page
 				$_GET[ self::$list_page ] = 1;
 				
@@ -411,16 +414,16 @@ class PDb_List
 		
 		$where_clause = '';
 		
-		if( isset( $_POST['value'] ) ) $post_filter = self::_make_filter_statement( $_POST );
+		if( isset( $filter_values['value'] ) ) $post_filter = self::_make_filter_statement( $filter_values );
 		
 		if ( ! empty( $post_filter ) ) {
 			
 			self::$shortcode_params['filter'] = ! empty( self::$shortcode_params['filter'] ) ? self::$shortcode_params['filter'].'&'.$post_filter : $post_filter;
-			
-		}
-		
+					
+				}
+				
 		if ( isset( self::$shortcode_params['filter'] ) ) {
-			
+				
 			$statements = explode( '&', html_entity_decode(self::$shortcode_params['filter']) );
 			
 			foreach ( $statements as $statement ) {
@@ -565,10 +568,12 @@ class PDb_List
 	private function _sort_filter_forms( $mode ) {
 	
 		if ( $mode == 'none' ) return;
+		
+		global $post;
 	
 	?>
 	<div class="pdb-searchform">
-	<form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" >
+	<form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" action="<?php echo get_page_link( $post->ID ).'#'.self::$list_anchor ?>"  >
     <input type="hidden" name="action" value="sort">
     
   	<?php if ( in_array( $mode, array( 'filter','both' ) ) ) : ?>
@@ -966,19 +971,31 @@ class PDb_List
 															'operator'     => 'LIKE',
 															'ascdesc'      => 'asc'
 															);
-															
 			
-			$stored_values = unserialize( get_transient( self::$list_storage ) );
+			if ( 
+					( isset( $_POST['submit'] ) or isset( $_GET[ self::$list_page ] ) ) 
+					or 
+					( isset( $_POST['submit'] ) && self::$i18n['clear'] != $_POST['submit'] )
+					) {	
 			
-			// if we got stored values, merge them with the defaults
-			if ( is_array( $stored_values ) ) $values = shortcode_atts( $default_values, $stored_values );
-			else $values = $default_values;
+				$stored_values = get_transient( self::$list_storage );
+			
+				// if we got stored values, merge them with the defaults
+				if ( is_array( $stored_values ) ) $values = shortcode_atts( $default_values, $stored_values );
+			
+			} else {
+			
+				$values = $default_values;
+				
+				delete_transient( self::$list_storage );
+				
+			}
 			
 			// now merge them with the $_POST array so if there are any new values coming in, they're included
 			$values = shortcode_atts( $values, $_POST );
 			
 			// store them
-			set_transient( self::$list_storage, serialize( $values ) );
+			set_transient( self::$list_storage, $values );
 			
 			return $values;
 			

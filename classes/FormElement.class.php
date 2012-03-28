@@ -32,7 +32,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, 2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.3
+ * @version    Release: 1.4
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -500,8 +500,10 @@ class FormElement {
    */
   private function _select_other( $type = 'radio' ) {
     
+    if ( $type != 'radio' ) {
 		$this->value = (array) $this->value;
 		if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
+	}
     
     // determine the label for the other field
     if ( isset( $this->attributes['other'] ) ) {
@@ -521,14 +523,18 @@ class FormElement {
     $type == 'checkbox' ? $this->_add_checkbox_series() : $this->_add_radio_series();
     
     // add the "other" option
+    $options = $this->options;
+    $options[] = '';
+		
+		error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
     $this->_addline( '<label for="'.$this->name.'">' );
-    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( $this->options, $this->value['other'], 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
+    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( $options, ( $type == 'checkbox' ? $this->value['other'] : $this->value ), 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
     $this->_addline( $otherlabel.':' );
     $this->_addline( '</label>', -1 );
     
     // build the text input element
 
-    $this->_addline( '<input type="text" id="' . $this->name . '_other" name="' . $this->name . ( $type == 'checkbox' ? '[other]' : '' ) . '" value="' . $this->value['other'] . '" onClick="' . $js_prefix . 'SetOther()" >' );
+    $this->_addline( '<input type="text" id="' . $this->name . '_other" name="' . $this->name . ( $type == 'checkbox' ? '[other]' : '' ) . '" value="' . ( $type == 'checkbox' ? $this->value['other'] : ( ! in_array( $this->value, $options ) ? $this->value : '' ) ) . '" onClick="' . $js_prefix . 'SetOther()" >' );
     
     
     // close the container
@@ -542,11 +548,11 @@ class FormElement {
     var otherselect=document.getElementById("'.$js_prefix.'_otherselect");
     if ( otherselect.checked ) {
       otherfield.name="'. $this->name . ( $type == 'checkbox' ? '[other]' : '' ) . '";
-      otherselect.name = "temp";
+      otherselect.name = "'. ( $type == 'checkbox' ? 'temp' : $this->name ) . '";
       otherfield.select();
     } else {
       otherfield.name="temp";
-      otherselect.name = "other";
+      otherselect.name = "'. ( $type == 'checkbox' ? 'other' : $this->name ) . '";
       otherfield.value=""; 
     }
   }

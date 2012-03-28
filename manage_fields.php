@@ -488,7 +488,7 @@ function PDb_header( $string ) {
 }
 function PDb_make_name( $string ) {
 
-	return strtolower(str_replace( array( ' ','-',"'",'"','%','\\','#','$'),array('_','_','','','pct','','',''), stripslashes( $string ) ) );
+	return strtolower(str_replace( array( ' ','-',"'",'"','%','\\','#','$','.'),array('_','_','','','pct','','','',''), stripslashes( $string ) ) );
 	
 }
 function PDb_trim_array( $array ) {

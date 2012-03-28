@@ -248,7 +248,7 @@ class PDb_Settings extends Plugin_Settings {
           'options'     => array( 1, 0 ),
           ),
         );
-		
+
 
     // signup form settings
 
