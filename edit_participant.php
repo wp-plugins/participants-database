@@ -116,10 +116,12 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 			switch ( $column->form_element ) {
 			// format the date if it's a date field
 				case 'date':
-			
-					$time = preg_match( '#^[0-9-]+$#', $value ) > 0 ? (int) $value : strtotime( $value );
-			
-					$value = $time ? date( get_option( 'date_format' )/*.' '.get_option( 'time_format' )*/, $time ) : '';
+				
+					if ( ! empty( $value ) ) {
+					
+						$value = date( get_option( 'date_format' ), Participants_Db::parse_date( $value ) );
+						
+					}
 					
 					break;
 				

@@ -117,6 +117,10 @@ No, these signups and records are separate from people who can register on your 
 
 The idea is to use the database as a roster of volunteers, supporters, etc. for the organization, not the website. If there is a popular call for it, I can try to make this plugin's signups also be site users, but I am not sure if it's possible.
 
+= People are signing up, but emails are not getting sent =
+
+The most common reason emails are not being sent is because the WP application cannot send email. If you are having this problem, I suggest you install an SMTP plugin (like WP-Mail-SMTP) and use that plugin to test your email sending. Sometimes it is necessary to set up and use SMTP (which is not the default on most systems) to successfully send email.
+
 = I don't see anything on the page where I put the [pdb_record] shortcode. What's up? =
 
 The form will only appear if someone uses a valid private link to access the page. All that's required for a private link is a valid "pid" value has to be included in the URI. (it looks like "pid=TH65J" in the link) This code can be seen in the record if you want to make your own links.
@@ -158,6 +162,12 @@ Even better than that, there is a new form field type called "link" that lets pe
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.3.7 =
+* fixed potential problem with timestamp fields having their datatype changed
+* dates and arrays are now made readable for inclusion in emails
+* improved security on list searches: prevent unwanted records from appearing
+* records added in the backend are now properly timestamped
 
 = 1.3.6 =
 * better handling of search and sort functions, pagination in frontend record list
@@ -350,6 +360,9 @@ Even better than that, there is a new form field type called "link" that lets pe
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.3.7 =
+Important bugfix and minor improvements
 
 = 1.3.6 =
 Minor improvements to [pdb_list] shortcode search and sort, bug fixes for select/other form fields

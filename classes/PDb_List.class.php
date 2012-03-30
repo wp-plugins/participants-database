@@ -17,7 +17,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.3.1
+ * @version    Release: 1.3.7
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
  
@@ -98,8 +98,6 @@ class PDb_List
     self::$display_columns = Participants_Db::get_list_display_columns( self::$backend ? 'admin_column' : 'display_column' );
 
     self::$sortables = Participants_Db::get_sortables();
-		
-		self::$filter = self::_filter_settings();
 
     // define the default settings for the shortcode
     $shortcode_defaults = array(
@@ -108,13 +106,15 @@ class PDb_List
                                       'list_limit'  => self::$page_list_limit,
                                       'class'       => 'participants-database',
 																			'filter'      => '',
-																			'orderby'			=> 'last_name',
-																			'order'       => 'asc',
+																			'orderby'			=> 'date_recorded',
+																			'order'       => 'desc',
 																			'fields'			=> '',
 																			'display_count' => 'false',
                                       );
 
     self::$shortcode_params = shortcode_atts( $shortcode_defaults, $atts );
+		
+		self::$filter = self::_filter_settings();
 		
 		// allow for an arbitrary fields definition list in the shortcode
 		if ( ! empty( self::$shortcode_params['fields'] ) ) {
@@ -435,7 +435,7 @@ class PDb_List
 				// get the parts
 				list( $string, $column, $op_char, $target ) = $matches;
 				
-				if ( ! Participants_Db::is_column( $column ) or $column == $user_input['where_clause'] ) {
+				if ( ! Participants_Db::is_column( $column ) or ( ! empty( $user_input['value'] ) && $column == $user_input['where_clause'] ) ) {
 
           // not a valid column or was used in a user search query which overrides
           // the shortcode; skip to the next one
@@ -976,7 +976,7 @@ class PDb_List
 		 * set sort/filter properties
 		 *
 		 * this gets progressive overrides for the values: first, from the defaults,
-		 * then from values stored in a transient, then from submitted vlues in the
+		 * then from values stored in a transient, then from submitted values in the
 		 * POST array
 		 *
 		 * we use WP's 'shortcode_atts' function because it is a convenient way to
@@ -984,18 +984,25 @@ class PDb_List
 		 */
 		private function _filter_settings() {
 			
-			$default_values = array(
+			// set up the basic values; sort values come from the shortcode
+			$values = array(
 															'where_clause' => 'none',
-															'sortBy'       => current( self::$sortables ),
+															'sortBy'       => self::$shortcode_params['orderby'],
 															'value'        => '',
 															'operator'     => 'LIKE',
-															'ascdesc'      => 'asc'
+															'ascdesc'      => self::$shortcode_params['order']
 															);
 			
-			$values = $default_values;
-			
+			/*
+			 * if we have no user search and we're getting a page, get the values from
+			 * the transient
+			 * if we do have a user search that's not a "clear" get the transient,
+			 * then merge in the user search and go back to page 1
+			 * otherwise, we delete the transient and clear our search elements out of
+			 * the $_POST array
+			 */
 			if ( 
-				( ! isset( $_POST['submit'] ) or isset( $_GET[ self::$list_page ] ) ) 
+				( ! isset( $_POST['submit'] ) and isset( $_GET[ self::$list_page ] ) ) 
 					or 
 				( isset( $_POST['submit'] ) && self::$i18n['clear'] != $_POST['submit'] )
 					) {	
@@ -1003,8 +1010,9 @@ class PDb_List
 				$stored_values = get_transient( self::$list_storage );
 			
 				// if we got stored values, merge them with the defaults
-				if ( is_array( $stored_values ) ) $values = shortcode_atts( $default_values, $stored_values );
+				if ( is_array( $stored_values ) ) $values = shortcode_atts( $values, $stored_values );
 			
+				// if we're processing a submit, take us back to page one
 				if ( isset( $_POST['submit'] ) ) $_GET[ self::$list_page ] = 1;
 			
 			} else {
@@ -1015,11 +1023,11 @@ class PDb_List
 				
 			}
 			
-			// now merge them with the $_POST array so if there are any new values coming in, they're included
+			// now merge them with the $_POST array (which might be empty) so if there are any new values coming in, they're included
 			$values = shortcode_atts( $values, $_POST );
 			
-			// store them
-			set_transient( self::$list_storage, $values );
+			// store them for one hour to support pagination
+			set_transient( self::$list_storage, $values, 3600 );
 			
 			return $values;
 			

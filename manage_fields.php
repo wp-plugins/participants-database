@@ -60,16 +60,18 @@ if ( isset( $_POST['action'] ) ) {
 					}
 					
 					// modify the datatype if necessary
-					$sql = "SHOW FIELDS FROM ".Participants_Db::$participants_table." WHERE field = '".$row['name']."'";
-					$field_info = $wpdb->get_results( $sql );
-					$new_type = strtolower( Participants_Db::set_datatype( $row['form_element'] ) );
-					if ( $new_type != current($field_info)->Type ) {
-						
-						$sql = "ALTER TABLE ".Participants_Db::$participants_table." MODIFY COLUMN `".$row['name']."` ".$new_type;
-						
-						$result = $wpdb->get_results( $sql );
-						
-					}
+					if ( isset( $row['group'] ) && $row['group'] != 'internal' ) {
+            $sql = "SHOW FIELDS FROM ".Participants_Db::$participants_table." WHERE field = '".$row['name']."'";
+            $field_info = $wpdb->get_results( $sql );
+            $new_type = strtolower( Participants_Db::set_datatype( $row['form_element'] ) );
+            if ( $new_type != current($field_info)->Type ) {
+
+              $sql = "ALTER TABLE ".Participants_Db::$participants_table." MODIFY COLUMN `".$row['name']."` ".$new_type;
+
+              $result = $wpdb->get_results( $sql );
+
+            }
+          }
 					
 					
 					// remove the fields we won't be updating

@@ -401,6 +401,51 @@ class PDb_Init
         $this->set_default_record();
 				
 			}
+
+      /*
+       * this is to fix a problem with the timestamp having it's datatype
+       * changed when the field attributes are edited
+       */
+			if ( '0.5' == get_option( Participants_Db::$db_version ) ) {
+
+        $sql = "SHOW FIELDS FROM ".Participants_Db::$participants_table." WHERE `field` IN ('date_recorded','date_updated')";
+        $field_info = $wpdb->get_results( $sql );
+
+        foreach ( $field_info as $field ) {
+
+          if ( $field->Type !== 'TIMESTAMP' ) {
+
+            switch ( $field->Field ) {
+
+              case 'date_recorded':
+
+                $column_definition = '`date_recorded` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP';
+                break;
+
+              case 'date_updated':
+
+                $column_definition = '`date_updated` TIMESTAMP NOT NULL DEFAULT 0';
+                break;
+
+              default:
+
+                $column_definition = false;
+
+            }
+
+            if ( false !== $column_definition ) {
+
+              $sql = "ALTER TABLE ".Participants_Db::$participants_table." MODIFY COLUMN ".$column_definition;
+
+              $result = $wpdb->get_results( $sql );
+
+            }
+
+          }
+
+        }
+
+			}
 				
       error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
       

@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.3.6
+Version: 1.3.7
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -873,13 +873,13 @@ class Participants_Db {
 				
 			case 'date' :
 			
-				$return = empty( $value ) ? '' : date( get_option( 'date_format' ), $value );
+				$return = empty( $value ) ? '' : date( get_option( 'date_format' ), self::parse_date( $value ) );
 				break;
 				
 			case 'multi-checkbox' :
 			case 'multi-select-other' :
 			
-				$return = implode( ', ', (array) Participants_Db::unserialize_array( $value ) );
+				$return = implode( ', ', (array) self::unserialize_array( $value ) );
 				break;
 				
 			case 'link' :
@@ -1330,6 +1330,8 @@ class Participants_Db {
 	 $participant_record['by'] = $current_user->display_name;
 	 $participant_record['when'] = date( get_option( 'date_format' ) );
 	 $participant_record['private_id'] = self::generate_pid();
+	 $participant_record['date_recorded'] = date( 'Y-m-d H:i:s' );
+	 $participant_record['date_updated'] = date( 'Y-m-d H:i:s' );
 	 
 	 // get the id of the last record stored
 	 $last_record = get_transient( self::$last_record );
@@ -2131,8 +2133,8 @@ class Participants_Db {
 		foreach( self::get_column_atts( $mode ) as $column ) {
 
 			$tags[] = '['.$column->name.']';
-
-			$values[] = $participant[$column->name];
+			
+			$values[] = self::prep_field_for_display( $participant[$column->name], $column->form_element );
 
 		}
 		
@@ -2144,7 +2146,7 @@ class Participants_Db {
 		
 		// add the date tag
 		$tags[] = '[date]';
-		$values[] = date( get_option( 'date_format ' ) );
+		$values[] = self::parse_date();
 				
 
 		$placeholders = array();
@@ -2175,21 +2177,18 @@ class Participants_Db {
 	/**
 	 * parses a date string into UNIX timestamp
 	 *
-	 * @param string $string      the string to parse
-	 * @param object $column_atts the column object; if not given, we buld a default object; 
-	 *                            if a string is given, we use it to identify the field for user feedback
+	 * @param string $string      the string to parse; if not given, defaults to now
+	 * @param object $column_atts the column object; used to identify the field for
+	 *                            user feedback
+	 * @return int  UNIX timestamp or false if parse fails
 	 */
-	public function parse_date( $string, $column = false ) {
-		
-					if ( ! is_object( $column ) ) {
-						
-						$column_atts = new stdClass;
-						
-						$column_atts->name = false === $column ? '' : $column;
-						$column_atts->title = false === $column ? '' : ucwords( $column );
-						
-					} else $column_atts = $column;
-						
+	public function parse_date( $string = false, $column = '' ) {
+
+          // return the now() timestamp
+          if ( false === $string ) return time();
+					
+					// it's already a timestamp; or something that looks like a timestamp but wouldn't parse anyway
+					if ( preg_match( '#^[0-9]+$#', $string ) > 0 ) return $string;
 		
 					if ( self::$plugin_options['strict_dates'] ) {
 
@@ -2203,9 +2202,9 @@ class Participants_Db {
 
                 $date = false;
 
-                if ( is_object( self::$validation_errors ) ) {
+                if ( is_object( self::$validation_errors ) and is_object( $column ) ) {
 
-                  self::$validation_errors->add_error( $column_atts->name, sprintf( __('The date for "%s" was invalid. Please input the date with the exact format shown', self::PLUGIN_NAME ), $column_atts->title ) );
+                  self::$validation_errors->add_error( $column->name, sprintf( __('The date for "%s" was invalid. Please input the date with the exact format shown', self::PLUGIN_NAME ), $column->title ) );
 
                 }
 

@@ -425,7 +425,7 @@ class Signup {
 
 				$tags[] = '['.$column->name.']';
 
-				$values[] = $this->participant[$column->name];
+				$values[] = Participants_Db::prep_field_for_display( $this->participant[$column->name], $column->form_element );
 
 			}
 
