@@ -63,9 +63,6 @@ class PDb_List
 	// holds the parameters for a shortcode-called display of the list
 	static $shortcode_params;
 	
-	// name of the list parameter transient storage
-	static $list_storage = 'PDb_list_filter';
-	
 	// holds the settings for the list filtering and sorting
 	static $filter;
 	
@@ -114,7 +111,17 @@ class PDb_List
 
     self::$shortcode_params = shortcode_atts( $shortcode_defaults, $atts );
 		
-		self::$filter = self::_filter_settings();
+		// set up the basic values; sort values come from the shortcode
+		$default_values = array(
+														'where_clause' => 'none',
+														'value'        => '',
+														'operator'     => 'LIKE',
+														'sortBy'       => self::$shortcode_params['orderby'],
+														'ascdesc'      => self::$shortcode_params['order']
+														);
+		
+		// merge the defaults with the $_REQUEST array so if there are any new values coming in, they're included
+		self::$filter = shortcode_atts( $default_values, $_REQUEST );
 		
 		// allow for an arbitrary fields definition list in the shortcode
 		if ( ! empty( self::$shortcode_params['fields'] ) ) {
@@ -225,20 +232,19 @@ class PDb_List
 	
 		$URI_parts = explode( '?', $uri );
 		
-		if ( empty( $URI_parts[1] ) ) return $URI_parts[0].'?'.self::$list_page.'=%s#'.self::$list_anchor;
+		if ( empty( $URI_parts[1] ) ) {
 		
-		parse_str( $URI_parts[1], $values );
+			$values = array();
 		
-		$get = '';
+		} else {
 		
-		foreach( $values as $key => $value ) {
+			parse_str( $URI_parts[1], $values );
 			
-			// strip out the page value
-			if ( $key != self::$list_page ) $get .= $key.'='.$value.'&';
+			unset( $values[ self::$list_page ] );
 			
 		}
 		
-		return $URI_parts[0].'?'.trim( $get, '&' ).'&'.self::$list_page.'=%s#'.self::$list_anchor;
+		return $URI_parts[0].'?'.http_build_query( array_merge( $values, self::$filter ) ).'&'.self::$list_page.'=%s#'.self::$list_anchor;
 	
 	}
 	
@@ -386,15 +392,12 @@ class PDb_List
     // add this to the query to remove the default record
     $skip_default = ' `id` != '.Participants_Db::$id_base_number;
 		
-		// get the previously submitted values
-		$user_input = get_transient( self::$list_storage );
-		
 		// if we've got a valid orderby, use it. Check $_POST first, shortcode second
-		$orderby = isset( $user_input['sortBy'] ) ? $user_input['sortBy'] : self::$shortcode_params['orderby'];
+		$orderby = isset( self::$filter['sortBy'] ) ? self::$filter['sortBy'] : self::$shortcode_params['orderby'];
 		$orderby = Participants_Db::is_column( $orderby ) ? $orderby : current( self::$sortables );
 		self::$filter['sortBy'] = $orderby;
 			
-		$order = isset( $user_input['ascdesc'] ) ? strtoupper( $user_input['ascdesc'] ) : strtoupper( self::$shortcode_params['order'] );
+		$order = isset( self::$filter['ascdesc'] ) ? strtoupper( self::$filter['ascdesc'] ) : strtoupper( self::$shortcode_params['order'] );
 		$order = in_array( $order, array( 'ASC', 'DESC' ) ) ? $order : 'ASC';
 		self::$filter['ascdesc'] = strtolower($order);
 		
@@ -411,16 +414,6 @@ class PDb_List
 		}
 		
 		$where_clause = '';
-		
-    /*
-		if( isset( $user_input['value'] ) ) $post_filter = self::_make_filter_statement( $user_input );
-		
-		if ( ! empty( $post_filter ) ) {
-			
-			self::$shortcode_params['filter'] = ! empty( self::$shortcode_params['filter'] ) ? self::$shortcode_params['filter'].'&'.$post_filter : $post_filter;
-					
-				}
-    */
 				
 		if ( isset( self::$shortcode_params['filter'] ) ) {
 				
@@ -435,7 +428,7 @@ class PDb_List
 				// get the parts
 				list( $string, $column, $op_char, $target ) = $matches;
 				
-				if ( ! Participants_Db::is_column( $column ) or ( ! empty( $user_input['value'] ) && $column == $user_input['where_clause'] ) ) {
+				if ( ! Participants_Db::is_column( $column ) or ( ! empty( self::$filter['value'] ) && $column == self::$filter['where_clause'] ) ) {
 
           // not a valid column or was used in a user search query which overrides
           // the shortcode; skip to the next one
@@ -484,11 +477,11 @@ class PDb_List
 			}// foreach $statements
 
 			// add the user search
-			if ( isset( $user_input['value'] ) && ! empty( $user_input['value'] ) && 'none' != $user_input['where_clause'] ) {
+			if ( isset( self::$filter['value'] ) && ! empty( self::$filter['value'] ) && 'none' != self::$filter['where_clause'] ) {
 
         $pattern = self::$options['strict_search'] ? '`%s` = "%s" AND ' : '`%s` LIKE "%%%s%%" AND ';
 
-        $where_clause .= sprintf( $pattern, $user_input['where_clause'],$user_input['value'] );
+        $where_clause .= sprintf( $pattern, self::$filter['where_clause'],self::$filter['value'] );
 
       }
 			
@@ -963,75 +956,11 @@ class PDb_List
 
       if ( self::$backend ) return 'both';
 
-      // until we get this working:
-      //else return 'none';
-
       $mode = self::$shortcode_params['sort'] == 'true' ? 'sort' : 'none';
 
       return self::$shortcode_params['search'] == 'true' ? ( $mode == 'sort' ? 'both' : 'filter' ) : $mode ;
 
-    }
-		
-		/**
-		 * set sort/filter properties
-		 *
-		 * this gets progressive overrides for the values: first, from the defaults,
-		 * then from values stored in a transient, then from submitted values in the
-		 * POST array
-		 *
-		 * we use WP's 'shortcode_atts' function because it is a convenient way to
-		 * merge and trim arrays
-		 */
-		private function _filter_settings() {
-			
-			// set up the basic values; sort values come from the shortcode
-			$values = array(
-															'where_clause' => 'none',
-															'sortBy'       => self::$shortcode_params['orderby'],
-															'value'        => '',
-															'operator'     => 'LIKE',
-															'ascdesc'      => self::$shortcode_params['order']
-															);
-			
-			/*
-			 * if we have no user search and we're getting a page, get the values from
-			 * the transient
-			 * if we do have a user search that's not a "clear" get the transient,
-			 * then merge in the user search and go back to page 1
-			 * otherwise, we delete the transient and clear our search elements out of
-			 * the $_POST array
-			 */
-			if ( 
-				( ! isset( $_POST['submit'] ) and isset( $_GET[ self::$list_page ] ) ) 
-					or 
-				( isset( $_POST['submit'] ) && self::$i18n['clear'] != $_POST['submit'] )
-					) {	
-			
-				$stored_values = get_transient( self::$list_storage );
-			
-				// if we got stored values, merge them with the defaults
-				if ( is_array( $stored_values ) ) $values = shortcode_atts( $values, $stored_values );
-			
-				// if we're processing a submit, take us back to page one
-				if ( isset( $_POST['submit'] ) ) $_GET[ self::$list_page ] = 1;
-			
-			} else {
-				
-				delete_transient( self::$list_storage );
-				
-				foreach( array( 'where_clause','value','operator' ) as $key ) unset( $_POST[ $key ] );
-				
-			}
-			
-			// now merge them with the $_POST array (which might be empty) so if there are any new values coming in, they're included
-			$values = shortcode_atts( $values, $_POST );
-			
-			// store them for one hour to support pagination
-			set_transient( self::$list_storage, $values, 3600 );
-			
-			return $values;
-			
-		}
+    }		
 		
 		/**
 		 * takes the $_POST array and constructs a filter statement to add to the list shortcode filter

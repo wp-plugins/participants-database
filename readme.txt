@@ -119,6 +119,8 @@ The idea is to use the database as a roster of volunteers, supporters, etc. for 
 
 = People are signing up, but emails are not getting sent =
 
+Of course make sure your settings are set to send emails.
+
 The most common reason emails are not being sent is because the WP application cannot send email. If you are having this problem, I suggest you install an SMTP plugin (like WP-Mail-SMTP) and use that plugin to test your email sending. Sometimes it is necessary to set up and use SMTP (which is not the default on most systems) to successfully send email.
 
 = I don't see anything on the page where I put the [pdb_record] shortcode. What's up? =
@@ -151,7 +153,7 @@ Therefore, this plugin is *absolutely not* for the storage of any kind of inform
 
 = Can I make links in records clickable? =
 
-Yes, there is a plugin setting called "Make Links Clickable" that scans the fields looking for something that starts with "http" it will then wrap that in a link tag so it will be clickable.
+Yes, there is a plugin setting called "Make Links Clickable" that scans the fields looking for something that starts with "http" it will then wrap that in a link tag so it will be clickable. It will also render email addresses clickable.
 
 Even better than that, there is a new form field type called "link" that lets people fill in a URL and also give it a text label such as "My Website" that will click to the URL.
 
