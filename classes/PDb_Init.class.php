@@ -453,7 +453,6 @@ class PDb_Init
 
     private function _deactivate()
     {
-        delete_transient( PDb_List::$list_storage );
 				
 				error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
     }
