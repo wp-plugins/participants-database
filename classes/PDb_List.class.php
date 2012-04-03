@@ -103,7 +103,7 @@ class PDb_List
                                       'list_limit'  => self::$page_list_limit,
                                       'class'       => 'participants-database',
 																			'filter'      => '',
-																			'orderby'			=> 'date_recorded',
+																			'orderby'			=> 'date_updated',
 																			'order'       => 'desc',
 																			'fields'			=> '',
 																			'display_count' => 'false',
