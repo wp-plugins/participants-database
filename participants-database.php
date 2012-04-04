@@ -2146,7 +2146,7 @@ class Participants_Db {
 		
 		// add the date tag
 		$tags[] = '[date]';
-		$values[] = date( get_option( 'date_format', self::parse_date() ) );
+		$values[] = date( get_option( 'date_format' ), self::parse_date() );
 				
 
 		$placeholders = array();
