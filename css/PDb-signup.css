@@ -1,0 +1,14 @@
+@charset "UTF-8";
+@import url("PDb-error.css");
+
+
+.pdb-signup label {
+  display:inline-block;
+  width:135px;
+  margin-right:10px;
+  text-align:right;
+}
+.pdb-signup .helptext {
+  display:block;
+  margin-left:150px;
+}

@@ -9,7 +9,7 @@
  * @author     Roland Barker <webdeign@xnau.com>
  * @copyright  2011 xnau webdesign
  * @license    GPL2
- * @version    0.1
+ * @version    0.2
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    FormElement class
  */
@@ -20,9 +20,6 @@ class Signup {
 
 	// groups titles and descriptions
 	private $groups;
-	
-	// the currently active group
-	private $current_group;
 	
 	// holds the target page for the submission
 	private $submission_page;
@@ -71,6 +68,12 @@ class Signup {
 	
 	// plugin options array
 	private $options;
+	
+	// holds an index to the current field
+	private $field_index;
+	
+	// holds the current shorcode attributes
+	private $shortcode_atts;
 
 	// methods
 	//
@@ -120,15 +123,16 @@ class Signup {
 
     } else $this->groups = false;
 
-		$atts = shortcode_atts( array(
+		$this->shortcode_atts = shortcode_atts( array(
 																	'title'   => '',
 																	'captcha' => 'none',
 																	'class' => 'signup',
 																	'type' => 'signup',
+																	'template' => 'default',
 																	),
 												$params );
 														
-		$this->captcha_type = $atts['captcha'];
+		$this->captcha_type = $this->shortcode_atts['captcha'];
 		
 		
 		// if we're coming back from a successful form submission, the id of the new record will be present
@@ -155,12 +159,12 @@ class Signup {
 						 ( isset( $_GET['pid'] ) && false === Participants_Db::get_participant_id( $_GET['pid'] ) ) 
 						)
 						&&
-						$atts['type'] != 'thanks'
+						$this->shortcode_atts['type'] != 'thanks'
 					 )
 				{
-	
 					// no submission; output the form
-					$this->_form( $atts );
+					$this->_print_from_template();
+					//$this->_form( $atts );
 			
 				}
 			
@@ -201,141 +205,189 @@ class Signup {
 		
 	}
 	
-	// prints a signup form
-	private function _form( $atts ) {
-		ob_start();
-		?>
-		<div class="<?php echo $atts['class']?> pdb-signup" >
-		<?php
+	private function _print_from_template() {
 		
-		$participant_values = Participants_Db::get_participant( Participants_Db::$id_base_number );
-		
-		$action = 'action="'.$this->submission_page.'"';
+		$template = get_stylesheet_directory().'/templates/pdb-signup-'.$this->shortcode_atts['template'].'.php';
+			
+    if ( ! file_exists( $template ) ) {
 
+      $template = Participants_Db::$plugin_path.'/templates/pdb-signup-'.$this->shortcode_atts['template'].'.php';
+
+    } elseif ( ! file_exists( $template ) ) {
+
+      error_log( __METHOD__.' template not found: pdb-signup-'.$template.'.php' );
+      return '<p>'._x('Missing Template', 'message to show if the plugin cannot find the template', Participants_Db::PLUGIN_NAME ).'</p>';
+
+    }
+
+    error_log( __METHOD__.' using template:'.$template );
+			
+    ob_start(); ?>
+    
+    <link media="all" type="text/css" href="<?php echo plugins_url( Participants_Db::PLUGIN_NAME.'/css/PDb-signup.css' ) ?>" rel="stylesheet">
+
+    <?php include $template;
+
+    $this->output = ob_get_clean();
+			
+	}
+		
+
+	public function get_signup_form_fields() {
+
+    global $wpdb;
+
+    if ( $this->options['signup_show_group_descriptions'] ) {
+
+      // get the groups object
+      $sql = '
+              SELECT g.title, g.name, g.description
+              FROM '.Participants_Db::$groups_table.' g
+              WHERE g.display = 1
+              AND g.name IN (
+                SELECT f.group
+                FROM '.Participants_Db::$fields_table.' f
+                WHERE f.signup = 1
+                )
+              ORDER BY `order` ASC
+              ';
+
+      $groups = $wpdb->get_results( $sql, OBJECT_K );
+
+    } else {
+
+      $groups = array();
+      $groups[] = new stdClass;
+
+    }
+
+    foreach( $groups as $group ) {
+
+      $where = isset( $group->name ) ? 'f.group = "'.$group->name.'"' : 'g.display = 1';
+
+      $sql = '
+              SELECT f.*, g.display, g.order
+              FROM '.Participants_Db::$fields_table.' f
+              JOIN '.Participants_Db::$groups_table.' g
+							ON f.group = g.name
+              WHERE '.$where.' 
+              AND f.signup = 1
+              ORDER BY g.order, f.order
+							';
+
+      $group->fields = $wpdb->get_results( $sql, OBJECT_K );
+
+    }
+		
+		$this->field_index = -1;
+
+    return $groups;
+
+  }
+
+  // prints a signup form top
+  public function form_top() {
+    ?>
+    <form method="post" enctype="multipart/form-data" >
+        <?php
+        FormElement::print_hidden_fields( array(
+                                                'action'=>'signup',
+                                                'source'=>Participants_Db::PLUGIN_NAME,
+                                                'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ),
+                                                'thanks_page' => $this->submission_page
+                                                ) );
+
+  }
+	
+	public function errors() {
+		
 		if ( is_object( Participants_Db::$validation_errors ) ) {
 			
-			echo Participants_Db::$validation_errors->get_error_html();
-			
-			$action = '';
+			return Participants_Db::$validation_errors->get_validation_errors();
 			
 		}
-
-			?>
-			<form method="post" enctype="multipart/form-data" >
-				<?php
-				FormElement::print_hidden_fields( array( 'action'=>'signup', 'source'=>Participants_Db::PLUGIN_NAME, 'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ), 'thanks_page' => $this->submission_page ) );
-				?>
-				<table class="form-table pdb-signup">
-			<?php
-
-			// get the columns and output form
-			foreach ( $this->signup_columns as $column ) :
-
-				// skip the ID column
-				if ( in_array( $column->name, array( 'id', 'private_id' ) ) ) continue;
-				
-				if ( in_array( $column->form_element, array( 'hidden' ) ) ) {
-					
-					$this->_print_hidden_field( $column, $participant_values );
-					
-					continue;
-					
-				}
-				
-				
-				// if we're showing groups, is the group of the next field a new one? If so, show it
-        if ( false !== $this->groups && true === ( $column->group != $this->current_group['name'] ) ) {
-					
-					$this->_print_group_row( $column->group );
-					
-					$this->current_group = $this->groups[ $column->group ];
-					
-				}
-				
-				?>
-					<tr id="<?php echo $column->name?>" class="<?php echo $column->form_element?>">
-						<?php
-            $column_title = $column->title;
-            if ( $this->options['mark_required_fields'] && $column->validation != 'no' ) {
-              $column_title = sprintf( $this->options['required_field_marker'], $column_title );
-            }
-            ?>
-						<th><?php echo $column_title?></th>
-						<td>
-						<?php
-
-						// unserialize it if the default is an array
-						$value = isset( $participant_values[ $column->name ] ) ? Participants_Db::unserialize_array( $participant_values[ $column->name ] ) : '';
-						
-						// now get the inputted value and scrub it if it's a string
-						if ( isset( $_POST[ $column->name ] ) ) {
-							
-							if ( is_array( $_POST[ $column->name ] ) ) $value = $_POST[ $column->name ];
-							
-							else $value = esc_html(stripslashes($_POST[ $column->name ]));
-							
-						}
-
-						FormElement::print_element( array(
-																							'type'       => $column->form_element,
-																							'value'      => $value,
-																							'name'       => $column->name,
-																							'options'    => $column->values,
-                                      				'class'      => ( $column->validation != 'no' ? "required-field" : '' ),
-																							) );
-						if ( ! empty( $column->help_text ) ) :
-							?>
-							<span class="helptext"><?php echo trim( $column->help_text )?></span>
-							<?php
-						endif;
-						?>
-						</td>
-					</tr>
-					<?php
-				endforeach;
-				if ( $captcha = $this->_add_captcha( $this->captcha_type ) ) :
-					?>
-					<tr>
-						<td colspan="2"><?php echo $captcha?></td>
-					</tr>
-				<?php endif ?>
-					<tr>
-						<td colspan="2" class="submit-buttons">
-            <?php 
-						FormElement::print_element( array(
-																							'type'       => 'submit',
-																							'value'      => $this->options['signup_button_text'],
-																							'name'       => 'submit',
-																							'class'      => 'button-primary pdb-submit',
-																							) );
-						?>
-						</td>
-					</tr>
-				</table>
-			</form>
-		</div>
-		<?php
-		$this->output .= ob_get_clean();
+		
+	}
+	
+	public function error_class() {
+		
+		if ( is_object( Participants_Db::$validation_errors ) ) {
+			
+			echo Participants_Db::$validation_errors->get_error_class();
+			
+		}
+		
+	}
+	
+	public function error_CSS() {
+		
+		if ( is_object( Participants_Db::$validation_errors ) ) {
+			
+			echo Participants_Db::$validation_errors->get_error_CSS();
+			
+		}
+		
 	}
 
-	/**
-	 * prints a group row
-	 *
-	 * we use the array index to keep track of which group is current
-	 */
-  private function _print_group_row( $group ) {
+	private function have_fields( $group ) {
 
-    // get the group's info
-    $new_group = $this->groups[ $group ];
+    $field = $this->field_index < 0 ? current( $group->fields ) : next( $group->fields );
+		
+		$this->field_index ++;
 
-    ?>
-    <tr class="signup-group">
-      <td colspan="2">
-      	<?php printf( ( empty( $new_group['description'] ) ? '<h3>%1$s</h3>' : '<h3>%1$s</h3><p>%2$s</p>' ),$new_group['title'], $new_group['description'] )?>
-      </td>
-    </tr>
-    <?php
+    if ( is_object( $field ) && $field->form_element == 'hidden' ) {
+
+      $this->_print_hidden_field( $field, $field->default );
+
+      $field = next( $group->fields );
+
+    }
+		
+		$have_fields = is_object( $field );
+		
+		if ( ! $have_fields ) $this->field_index = -1;
+
+    return $have_fields;
+
   }
+
+  private function current_field( $group ) {
+
+    return current( $group->fields );
+
+  }
+	
+	public function field_title( $field ) {
+		
+		if ( $this->options['mark_required_fields'] && $field->validation != 'no' ) {
+			
+			printf( $this->options['required_field_marker'], $field->title );
+      
+		} else echo $field->title;
+		
+	}
+	
+	public function print_field( $field ) {
+		
+		FormElement::print_element( array(
+                                        'type'       => $field->form_element,
+                                        'value'      => Participants_Db::prepare_field_value( $field->name, $field->default, $_POST ),
+                                        'name'       => $field->name,
+                                        'options'    => $field->values,
+                                        'class'      => ( $field->validation != 'no' ? "required-field" : '' ),
+                                        ) );
+		
+	}
+	
+	public function submit_button( $class = 'button-primary pdb-submit' ) {
+		
+		FormElement::print_element( array(
+                                      'type'       => 'submit',
+                                      'value'      => $this->options['signup_button_text'],
+                                      'name'       => 'submit',
+                                      'class'      => $class,
+                                      ) );
+	}
 	
 	/**
 	 * prints a thank you note
@@ -465,10 +517,7 @@ class Signup {
 
 	}
 	
-	private function _print_hidden_field( $column, $participant_values ) {
-		
-		// unserialize it if the default is an array
-		$value = isset( $participant_values[ $column->name ] ) ? $participant_values[ $column->name ] : false  ;
+	private function _print_hidden_field( $column, $value = false ) {
 		
 		if ( $value ) {
 		
@@ -480,12 +529,12 @@ class Signup {
 				
 				$object = ltrim( $object, '$' );
 				
-				$value = isset( $$object->$property )? $$object->$property : $value;
+				$value = isset( $$object->$property ) ? is_array( $$object->$property ) ? current( $$object->$property ) : $$object->$property : $value;
 				
 			}
 			
 			FormElement::print_element( array(
-																				'type'       => $column->form_element,
+																				'type'       => 'hidden',
 																				'value'      => $value,
 																				'name'       => $column->name,
 																				)

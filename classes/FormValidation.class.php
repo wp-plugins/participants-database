@@ -12,6 +12,7 @@ class FormValidation {
 	private $invalid_message;
 	private $empty_message;
 	private $error_style;
+	public	$error_CSS;
 	
 	// holds the class name we give the container: error or message
 	private $error_class;
@@ -34,6 +35,7 @@ class FormValidation {
 
 		// clear the array
 		$this->errors = array();
+		$this->error_CSS = array();
 
 		$this->invalid_message = $options['invalid_field_message'];
 		$this->empty_message = $options['empty_field_message'];
@@ -88,59 +90,18 @@ class FormValidation {
 	}
 
 	/**
-	 * prepares the error messages and CSS for a general form submission
+	 * prepares the error messages and CSS for a main database submission
 	 *
 	 * @return array indexed array of error messages
 	 */
 	public function get_validation_errors() {
 
 		// check for errors
-		if ( ! $this->errors_exist() ) return '';
+		if ( ! $this->errors_exist() ) return array();
 
 		$output = '';
-
-		$error_CSS = array();
 		$error_messages = array();
-
-		foreach ( $this->errors as $field => $error ) :
-
-			if ( ! empty( $field ) ) $error_CSS[] = '#'.Participants_Db::$css_prefix.$field.' input[type="text"], #'.Participants_Db::$css_prefix.$field.' textarea';
-
-			switch ( $error ) {
-
-				case 'empty':
-
-					$error_messages[] = sprintf( $this->empty_message, $this->_make_title( $field ) );
-					break;
-
-				case 'invalid':
-
-					$error_messages[] = sprintf( $this->invalid_message, $this->_make_title( $field ) );
-					break;
-
-				default:
-
-			}
-
-    endforeach;
-
-    return $error_messages;
-
-	}
-
-	/**
-	 * prepares the error messages and CSS for a main database submission
-	 *
-	 */
-	public function get_error_html() {
-
-		// check for errors
-		if ( ! $this->errors_exist() ) return '';
-
-		$output = '';
-
-		$error_CSS = array();
-		$error_messages = array();
+		$this->error_CSS = array();
 
 		foreach ( $this->errors as $field => $error ) :
 
@@ -167,7 +128,7 @@ class FormValidation {
 
 			}
 
-			if ( $element ) $error_CSS[] = '#'.Participants_Db::$css_prefix.$field.' '.$element;
+			if ( $element ) $this->error_CSS[] = '#'.Participants_Db::$css_prefix.$field.' '.$element;
 
 			switch ( $error ) {
 
@@ -190,11 +151,22 @@ class FormValidation {
 
 			}
 
-		endforeach;// $this->errors
+		endforeach;// $this->errors 
 		
+		// now clear the errors array
 		$this->errors = array();
+		
+		return $error_messages;
 
-		return $this->_error_html( $error_CSS, $error_messages );
+	}
+
+	/**
+	 * returns the error messages HTML
+	 *
+	 */
+	public function get_error_html( ) {
+
+		return $this->_error_html( $this->get_validation_errors() );
 
 	}
 	
@@ -212,17 +184,33 @@ class FormValidation {
 	 *
 	 *
 	 */
-	private function _error_html( $error_CSS, $error_messages ) {
-
-		if ( ! empty ( $error_CSS ) ) $output = '<style type="text/css">'.implode( ', ',$error_CSS ).'{ '.$this->error_style.' }</style>';
+	private function _error_html( $error_messages ) {
 		
-		else $output = '';
+		if ( empty ( $error_messages ) ) return '';
+		
+		$output = $this->get_error_CSS();
 
 		$output .= '<div class="'.$this->error_class.'"><p>'.implode( '</p><p>', $error_messages ).'</p></div>';
 
 		return $output;
 
 	}
+	
+	public function get_error_CSS() {
+
+		if ( ! empty( $this->error_CSS ) ) return '<style type="text/css">'.implode( ', ',$this->error_CSS ).'{ '.$this->error_style.' }</style>';
+		
+		else return '';
+		
+	}
+	
+	public function get_error_class() {
+		
+		return $this->error_class;
+		
+	}
+		
+		
 
 
 	/**

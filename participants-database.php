@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.3.7
+Version: 1.4
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -183,12 +183,17 @@ class Participants_Db {
 		add_action( 'init', array( __CLASS__, 'init') );
 		add_action( 'admin_menu', array( __CLASS__, 'plugin_menu') );
 		add_action( 'admin_init', array( __CLASS__, 'admin_init') );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__,'include_scripts') );
+		
+		// handles ajax request from list filter
+    add_action( 'wp_ajax_pdb_list_filter', array( __CLASS__, 'pdb_list_filter' ) );
+		add_action( 'wp_ajax_nopriv_pdb_list_filter', array( __CLASS__, 'pdb_list_filter' ) );
 
 		// define our shortcodes
 		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
 		add_shortcode( 'pdb_signup_thanks', array( __CLASS__, 'print_signup_thanks_form' ) );
-		add_shortcode( 'pdb_list', array( 'PDb_List','initialize' ) );
+		add_shortcode( 'pdb_list', array( 'PDb_Show_Records','initialize' ) );
 		add_shortcode( 'pdb_single', array( __CLASS__, 'show_record' ) );
 		
 	
@@ -251,7 +256,7 @@ class Participants_Db {
                           "From: ".$options['receipt_from_name']." <".$options['receipt_from_address'].">\n" .
                           "Content-Type: ".$type."\n";
 		
-		self::include_scripts();
+		//self::include_scripts();
 
 		// this processes form submits before any output so that redirects can be used
 		self::process_page_request();
@@ -350,11 +355,11 @@ class Participants_Db {
 	}
 	
 	public function admin_style() {
-		wp_enqueue_style( 'participants_db_admin_stylesheet', '/wp-content/plugins/'.self::PLUGIN_NAME.'/participants-db.css' );// plugins_url('participants-db.css', __FILE__)
+		wp_enqueue_style( 'participants_db_admin_stylesheet', '/wp-content/plugins/'.self::PLUGIN_NAME.'/css/participants-db.css' );// plugins_url('participants-db.css', __FILE__)
 	}
 
 	public function global_admin_style() {
-		wp_enqueue_style( 'participants_db_global_admin_stylesheet','/wp-content/plugins/'.self::PLUGIN_NAME.'/PDb-admin.css', false, false  );// plugins_url('PDb-admin.css', __FILE__)
+		wp_enqueue_style( 'participants_db_global_admin_stylesheet','/wp-content/plugins/'.self::PLUGIN_NAME.'/css/PDb-admin.css', false, false  );// plugins_url('PDb-admin.css', __FILE__)
 	}
 
 	public function manage_fields_scripts() {
@@ -404,6 +409,16 @@ class Participants_Db {
 		
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'frontend', plugins_url( 'js/shortcodes.js', __FILE__ ) );
+		wp_enqueue_script( 'list-filter', plugin_dir_url( __FILE__ ) . 'js/list-filter.js', array( 'jquery' ) );
+
+		global $wp_query;
+		
+		$ajax_params = array(
+                          'ajaxurl' => admin_url( 'admin-ajax.php' ),
+                          'filterNonce' => wp_create_nonce( 'pdb-list-filter-nonce' ),
+                          'postID' => $wp_query->post->ID,
+                          );
+		wp_localize_script( 'list-filter', 'PDb_ajax', $ajax_params );
 		
 	}
 		
@@ -452,7 +467,7 @@ class Participants_Db {
 				
 				ob_start();
         ?>
-        <style type="text/css"><?php include 'PDb-record.css' ?></style>
+        <style type="text/css"><?php include 'css/PDb-record.css' ?></style>
         <div class="<?php echo $vars['class']?>">
         <?php
 
@@ -509,7 +524,7 @@ class Participants_Db {
 
       ob_start();
 
-      ?><style type="text/css"><?php include 'PDb-record.css' ?></style><?php
+      ?><style type="text/css"><?php include 'css/PDb-record.css' ?></style><?php
 
       foreach( (array) $ids as $id ) :
 
@@ -917,6 +932,26 @@ class Participants_Db {
 		
 		
 	}
+
+	/**
+	 * prepares a field value for display after a form has been unsuccessfully submitted
+	 *
+	 * @param string $name    the name of the field
+	 * @param string $default the default value of the field
+	 * @param array  $post    the post array
+	 * @return string
+	 */
+  public function prepare_field_value( $name, $default, $post ) {
+
+    if ( isset( $post[$name] ) ) {
+
+      if ( is_array( $post[$name] ) ) return $post[$name];
+
+      else return esc_html( stripslashes( $post[$name] ) );
+
+    } else return $default;
+
+  }
 	
 	/**
 	 * returns a path to the defined image location
@@ -2146,7 +2181,7 @@ class Participants_Db {
 		
 		// add the date tag
 		$tags[] = '[date]';
-		$values[] = self::parse_date();
+		$values[] = date( get_option( 'date_format' ), self::parse_date() );
 				
 
 		$placeholders = array();
@@ -2172,6 +2207,24 @@ class Participants_Db {
 		
 		return str_replace( ' ','', preg_replace( '#^[0-9]*#','',strtolower( $title ) ) );
 		
+	}
+	
+	/**
+	 * called by the wp_ajax_nopriv_pdb_list_filter action
+	 *
+	 * this happens when a user submits a search or sort on a record list
+	 *
+	 */
+	public function pdb_list_filter() {
+
+    if ( ! wp_verify_nonce( $_POST['filterNonce'], 'pdb-list-filter-nonce' ) )
+        die ( 'nonce check failed');
+			
+		header( "Content-Type:	text/html" );
+		echo PDb_Show_Records::initialize( get_transient(  PDb_Show_Records::$shortcode_transient ) );
+		
+		exit;
+
 	}
 	
 	/**

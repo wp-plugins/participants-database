@@ -1,6 +1,6 @@
 @charset "UTF-8";
-@import url("pdb-list.css");
-@import url("pdb-record.css");
+@import url("PDb-list.css");
+@import url("PDb-record.css");
 
 /* Participants DB CSS */
 body[class*='participants-database'] .widefat td {

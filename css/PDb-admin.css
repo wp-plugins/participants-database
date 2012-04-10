@@ -1,9 +1,9 @@
 
 #toplevel_page_participants-database div.wp-menu-image {
-	background: url("../../../wp-admin/images/menu.png?ver=20100531") no-repeat scroll -300px -33px transparent;
+	background: url("../../../../wp-admin/images/menu.png?ver=20100531") no-repeat scroll -300px -33px transparent;
 }
 #toplevel_page_participants-database div:hover.wp-menu-image {
-	background: url("../../../wp-admin/images/menu.png?ver=20100531") no-repeat scroll -300px -1px transparent;
+	background: url("../../../../wp-admin/images/menu.png?ver=20100531") no-repeat scroll -300px -1px transparent;
 }
 #toplevel_page_participants-database img {
 	visibility:hidden;
