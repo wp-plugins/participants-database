@@ -2188,7 +2188,7 @@ class Participants_Db {
           if ( false === $string ) return time();
 					
 					// it's already a timestamp; or something that looks like a timestamp but wouldn't parse anyway
-					if ( preg_match( '#^[0-9]+$#', $string ) > 0 ) return $string;
+					if ( preg_match( '#^[0-9-]+$#', $string ) > 0 ) return $string;
 		
 					if ( self::$plugin_options['strict_dates'] ) {
 
