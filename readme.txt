@@ -161,7 +161,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 There will be in the future, but for now, I'm suggesting this:
 
-Create a text-line field with the question “what is the sum of 10 and 7?” then put in a regex to verify the answer: #^17$#
+Create a text-line field with the question "what is the sum of 10 and 7?" then put in a regex to verify the answer: #^17$#
 
 You can no doubt come up with many variations on this.
 
