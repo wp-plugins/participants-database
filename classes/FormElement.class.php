@@ -526,7 +526,7 @@ class FormElement {
     $options = $this->options;
     $options[] = '';
 		
-		error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
+		//error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
     $this->_addline( '<label for="'.$this->name.'">' );
     $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( $options, ( $type == 'checkbox' ? $this->value['other'] : $this->value ), 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
     $this->_addline( $otherlabel.':' );

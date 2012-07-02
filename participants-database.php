@@ -1071,7 +1071,7 @@ class Participants_Db {
 
 				default :
 				
-				if ( !isset( $post[ $column_atts->name ] ) && $action == 'update' ) {
+				if ( !isset( $post[ $column_atts->name ] ) && ! is_null( $post[ $column_atts->name ] ) && $action == 'update' ) {
 					
 					$new_value = false;
 					
