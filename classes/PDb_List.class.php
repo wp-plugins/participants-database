@@ -168,7 +168,8 @@ class PDb_List
 		global $wpdb;
 		
 		// get the number of records returned
-		self::$num_records = count( $wpdb->get_results( self::$list_query, ARRAY_A ) );
+		$count = $wpdb->get_results( str_replace( 'SELECT * FROM', 'SELECT COUNT(*) FROM', self::$list_query ), ARRAY_A );
+		self::$num_records = current( $count[0] );
 		
 		// set the pagination object
 		self::$pagination = new Pagination( array(

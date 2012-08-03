@@ -1081,7 +1081,7 @@ class Participants_Db {
 					
 				} elseif ( NULL === $post[ $column_atts->name ] ) {
 				
-					$new_value = NULL;
+					$new_value = false;
 					
 				} elseif ( is_array( $post[ $column_atts->name ] ) ) {
 				
