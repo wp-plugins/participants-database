@@ -253,7 +253,7 @@ class Signup {
 				}
 				
 				?>
-					<tr id="<?php echo $column->name?>" class="<?php echo $column->form_element?>">
+					<tr id="pdb_<?php echo $column->name?>" class="<?php echo $column->form_element?>">
 						<?php
             $column_title = $column->title;
             if ( $this->options['mark_required_fields'] && $column->validation != 'no' ) {
