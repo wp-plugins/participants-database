@@ -254,7 +254,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 				
 				if ( 'internal' == $group && in_array( $attribute_column, array( 'order' ) ) ) continue;
 				
-				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'admin_column', 'display_column', 'CSV', 'signup', 'display' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
+				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'admin_column', 'display_column', 'CSV', 'signup', 'display', 'readonly' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
 				
 				?>
 				<th scope="col" class="<?php echo $column_class?>"><span><?php echo PDb_header( $attribute_column ) ?></span></th>

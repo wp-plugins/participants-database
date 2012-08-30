@@ -16,7 +16,7 @@
 class PDb_Init
 {
     // this is the current db version
-    const VERSION = '0.5';
+    const VERSION = '0.55';
 
     // arrays for building default field set
     public static $internal_fields;
@@ -79,8 +79,6 @@ class PDb_Init
     {
 
       global $wpdb;
-			
-			
 
       // fresh install: install the tables if they don't exist
       if ( $wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') != Participants_Db::$participants_table ) :
@@ -106,6 +104,7 @@ class PDb_Init
           `CSV` BOOLEAN DEFAULT 0,
           `persistent` BOOLEAN DEFAULT 0,
           `signup` BOOLEAN DEFAULT 0,
+					`readonly` BOOLEAN DEFAULT 0,
           UNIQUE KEY  ( `name` ),
           INDEX  ( `order` ),
           INDEX  ( `group` ),
@@ -446,6 +445,29 @@ class PDb_Init
         }
 
 			}
+			
+			/*
+			 * this database version adds the "read-only" attribute to fields
+			 * 
+			 * produced for client David Michael and will be rolled into the trunk version 1.4
+			 */
+			if ( '0.5' == get_option( Participants_Db::$db_version ) ) { 
+			
+				/*
+				 * add the "read-only" column
+				 */
+				$sql = "ALTER TABLE ".Participants_Db::$fields_table." ADD COLUMN `readonly` BOOLEAN DEFAULT 0 AFTER `signup`";
+
+        if ( false !== $wpdb->query( $sql ) ) {
+
+          // update the stored DB version number
+          update_option( Participants_Db::$db_version, $this->VERSION );
+
+        }
+			
+			}
+			
+			
 				
       error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
       

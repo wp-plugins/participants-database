@@ -97,7 +97,7 @@ div.manage-fields-wrap {
 .id, .order, .persistent, .sortable, .admin_column, .display_column, .CSV {
 	text-align:center;
 }
-th.id, th.order, th.persistent, th.sortable, th.CSV, th.delete, th.signup {
+th.vertical-title  {
 	width:25px;
 }
 th.admin_column, th.display_column, th.display {
