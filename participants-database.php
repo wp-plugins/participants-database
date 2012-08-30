@@ -789,7 +789,7 @@ class Participants_Db {
 				
 			case 'readonly':
 			
-				$where = 'WHERE v.group = "internal" OR v.readonly = 1';
+				$where = is_admin() ? 'WHERE v.group = "internal"' : 'WHERE v.group = "internal" OR v.readonly = 1';
 				break;
 
 			case 'new':
