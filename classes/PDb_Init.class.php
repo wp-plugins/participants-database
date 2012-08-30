@@ -461,7 +461,7 @@ class PDb_Init
         if ( false !== $wpdb->query( $sql ) ) {
 
           // update the stored DB version number
-          update_option( Participants_Db::$db_version, $this->VERSION );
+          update_option( Participants_Db::$db_version, '0.55' );
 
         }
 			
