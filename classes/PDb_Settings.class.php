@@ -104,6 +104,17 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'       =>'nonmatching_field_message',
+        'title'      =>__('Non-Matching Field Error Message', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __("the message shown when a field's value does match the value of another field", Participants_Db::PLUGIN_NAME ),
+          'value'      => __('The %s field must match.', Participants_Db::PLUGIN_NAME ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
         'name'       =>'field_error_style',
         'title'      =>__('Field Error Style', Participants_Db::PLUGIN_NAME ),
         'group'      => 'main',

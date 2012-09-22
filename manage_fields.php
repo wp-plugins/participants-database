@@ -484,6 +484,8 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 <?php
 //
 function PDb_header( $string ) {
+	
+	$string = str_replace( array('readonly'), array('read only'), $string );
 
 	return ucwords( str_replace( array( '_' ), array( "<br />\r" ), $string ) );
 

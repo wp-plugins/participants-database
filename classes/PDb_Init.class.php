@@ -16,7 +16,7 @@
 class PDb_Init
 {
     // this is the current db version
-    const VERSION = '0.55';
+    const VERSION = '0.6';
 
     // arrays for building default field set
     public static $internal_fields;
@@ -154,6 +154,7 @@ class PDb_Init
 
         $sql .= '`date_recorded` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           `date_updated` TIMESTAMP NOT NULL,
+          `last_accessed` TIMESTAMP NOT NULL,
           PRIMARY KEY  (`id`)
           )
           DEFAULT CHARACTER SET utf8
@@ -467,7 +468,39 @@ class PDb_Init
 			
 			}
 			
+			/*
+			 * this database version adds the "last_accessed" column to the main database
+			 * 
+			 */
+			if ( '0.55' == get_option( Participants_Db::$db_version ) ) { 
 			
+				/*
+				 * add the "last_accessed" column
+				 */
+				$sql = "ALTER TABLE ".Participants_Db::$participants_table." ADD COLUMN `last_accessed` TIMESTAMP NOT NULL AFTER `date_updated`";
+        
+        $wpdb->query( $sql );
+        
+        /*
+         * add the new field to the fields table
+         */
+        $data = array(
+                      'order' => '20',
+                      'name' => 'last_accessed',
+                      'title' => 'Last Accessed',
+                      'group' => 'internal',
+                      'sortable' => '1',
+                      'form_element' => 'date',
+                      );
+
+        if ( false !== $wpdb->insert( Participants_Db::$fields_table, $data ) ) {
+
+          // update the stored DB version number
+          update_option( Participants_Db::$db_version, '0.6' );
+
+        }
+			
+			}
 				
       error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
       
@@ -536,6 +569,11 @@ class PDb_Init
                                                     ),
                             'date_updated'   => array(
                                                     'title' => 'Date Updated',
+                                                    'form_element'=>'date',
+																										'sortable'=>1,
+                                                    ),
+                            'last_accessed'   => array(
+                                                    'title' => 'Last Accessed',
                                                     'form_element'=>'date',
 																										'sortable'=>1,
                                                     ),

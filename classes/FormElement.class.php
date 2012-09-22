@@ -206,6 +206,10 @@ class FormElement {
       case 'text-line':
         $this->_text_line();
         break;
+      
+      case 'password':
+        $this->_password();
+        break;
         
       case 'select-other':
         $this->_select_other();
@@ -341,6 +345,15 @@ class FormElement {
     $value = ! empty( $this->value ) ? $this->value : '';
     
     $this->_addline( '<textarea name="' . $this->name . '" rows="' . $this->textarea_dims['rows'] . '" cols="' . $this->textarea_dims['cols'] . '" ' . $this->_attributes() . ' >'.$value.'</textarea>', empty( $this->value ) ? 0 : -1 );
+    
+  }
+  
+  /**
+   * builds a password text element
+   */
+  private function _password() {
+    
+    $this->_addline( $this->_input_tag('password') );
     
   }
   

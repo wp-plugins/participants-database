@@ -4,7 +4,7 @@ Plugin Name: Participants Database
 Plugin URI: http://xnau.com/wordpress-plugins/participants-database
 Description: Plugin for managing a database of participants, members or volunteers
 Author: Roland Barker
-Version: 1.3.7dm
+Version: 1.3.8
 Author URI: http://xnau.com 
 License: GPL2
 Text Domain: participants-database
@@ -148,6 +148,7 @@ class Participants_Db {
 																 'link',
 																 'image-upload',
 																 'hidden',
+                                 'password',
                                  );
 		
 
@@ -449,6 +450,8 @@ class Participants_Db {
       $participant_id = self::get_participant_id( $_GET['pid'] );
 
       if ( $participant_id ) {
+        
+        self::_record_access( $participant_id );
 				
 				ob_start();
         ?>
@@ -463,9 +466,23 @@ class Participants_Db {
 				return ob_get_clean();
 			
       } else return '<p>'.__('There is no record for this ID.', Participants_Db::PLUGIN_NAME ).'</p>';
+      
     }
 		
 	}
+  
+  /**
+   * updates the "last_accessed" field in the database
+   */
+  private function _record_access( $id ) {
+    
+    global $wpdb;
+    
+    $sql = 'UPDATE '.self::$participants_table.' SET `last_accessed` = NOW() WHERE `id` = '.$id;
+    
+    return $wpdb->query( $sql );
+    
+  }
 	
 	/**
 	 * displays a single record using a shortcode called with the record ID
@@ -1052,7 +1069,7 @@ class Participants_Db {
 			// by a form submission
 			if ( is_object( self::$validation_errors ) ) {
 
-				self::$validation_errors->validate( ( isset( $post[ $column_atts->name ] ) ? $post[ $column_atts->name ] : '' ), $column_atts );
+				self::$validation_errors->validate( ( isset( $post[ $column_atts->name ] ) ? $post[ $column_atts->name ] : '' ), $column_atts, $post );
 
 			}
 
@@ -1097,11 +1114,16 @@ class Participants_Db {
 
           $new_value = stripslashes($post[ $column_atts->name ]);
 
-				} elseif ( $column_atts->readonly != '0' ) {
+				} elseif ( ! self::backend_user() && $column_atts->readonly != '0' ) {
 					
 					$new_value = false;
 					
-				}else {
+				} elseif ( 'password' == $column_atts->form_element ) {
+          
+          if ( ! empty( $post[ $column_atts->name ] ) ) $new_value = wp_hash_password( $post[ $column_atts->name ] );
+          else $new_value = false;
+					
+				} else {
 					
 					$new_value = self::_prepare_string_mysql( $post[ $column_atts->name ] );
 					
@@ -1728,7 +1750,7 @@ class Participants_Db {
 				return array( 'type' => 'dropdown', 'options'=>self::$element_types );
 				
 			case 'validation':
-				return array( 'type' => 'dropdown-other', 'options'=>array('No'=>'no','Yes'=>'yes'), 'attributes'=> array( 'other'=>'regex' ) );
+				return array( 'type' => 'dropdown-other', 'options'=>array('No'=>'no','Yes'=>'yes'), 'attributes'=> array( 'other'=>'regex/match' ) );
 			
 			case 'group':
 				// these options are defined on the "settings" page

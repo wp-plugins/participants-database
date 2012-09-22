@@ -118,8 +118,10 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 				case 'date':
 				
 					if ( ! empty( $value ) ) {
+            
+            $date = Participants_Db::parse_date( $value );
 					
-						$value = date( get_option( 'date_format' ), Participants_Db::parse_date( $value ) );
+						$value = date( get_option( 'date_format' ), $date ). ' - ' .date( get_option( 'time_format' ), $date );
 						
 					}
 					
@@ -137,6 +139,11 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 					$value = is_array( $value ) ? $value : explode( ',', $value );
 					
 					break;
+        
+        case 'password':
+          
+          $value = '';
+          break;
 					
 				case 'hidden':
 				
@@ -164,6 +171,8 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 			}
 			
 		}
+    
+    $field_class = ( $column->validation != 'no' ? "required-field" : '' ) . ( in_array( $column->form_element, array( 'text-line','date' ) ) ? ' regular-text' : '' );
 
 		if ( Participants_Db::backend_user() && 'textarea' == $column->form_element && $options['rich_text_editor'] ) {
 
@@ -173,7 +182,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
                 array(
                       'media_buttons' => false,
                       'textarea_name' => $column->name,
-                      'editor_class'  => ( $column->validation != 'no' ? "required-field" : '' ),
+                      'editor_class'  => $field_class,
                       )
                 );
                 
@@ -184,7 +193,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 																			'value'      => $value,
 																			'name'       => $column->name,
 																			'options'    => $column->values,
-                                      'class'      => ( $column->validation != 'no' ? "required-field" : '' ),
+                                      'class'      => $field_class,
 																			'attributes' => $readonly,
 																			) );
 
