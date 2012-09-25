@@ -1482,8 +1482,8 @@ class Participants_Db {
 
     // error_log( __METHOD__.' post:'.print_r( $_POST, true ) );
 
-		// instantiate the validation object
-		self::$validation_errors = new FormValidation();
+		// instantiate the validation object if it hasn't been
+		if ( ! is_object( self::$validation_errors) ) self::$validation_errors = new FormValidation();
 
 		switch ( $_POST['action'] ) :
 
