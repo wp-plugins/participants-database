@@ -32,7 +32,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, 2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.4
+ * @version    Release: 1.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -207,6 +207,10 @@ class FormElement {
         $this->_text_line();
         break;
         
+      case 'password':
+        $this->_password();
+        break;
+        
       case 'select-other':
         $this->_select_other();
         break;
@@ -341,6 +345,15 @@ class FormElement {
     $value = ! empty( $this->value ) ? $this->value : '';
     
     $this->_addline( '<textarea name="' . $this->name . '" rows="' . $this->textarea_dims['rows'] . '" cols="' . $this->textarea_dims['cols'] . '" ' . $this->_attributes() . ' >'.$value.'</textarea>', empty( $this->value ) ? 0 : -1 );
+    
+  }
+  
+  /**
+   * builds a password text element
+   */
+  private function _password() {
+    
+    $this->_addline( $this->_input_tag('password') );
     
   }
   
@@ -526,7 +539,7 @@ class FormElement {
     $options = $this->options;
     $options[] = '';
 		
-		error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
+		//error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
     $this->_addline( '<label for="'.$this->name.'">' );
     $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( $options, ( $type == 'checkbox' ? $this->value['other'] : $this->value ), 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
     $this->_addline( $otherlabel.':' );
@@ -714,10 +727,16 @@ class FormElement {
     
     // checkboxes are grouped, radios are not
     $group = $type == 'checkbox' ? true : false;
+		
+		$class = '';
+		if ( ! empty( $this->classes ) ) {
+			$class = 'class="'.$this->classes.'"';
+			$this->classes = '';
+			}
     
     foreach ( $this->_make_assoc( $this->options ) as $key => $value ) {
        
-      $this->_addline( '<label for="'.$this->name.'">' );
+      $this->_addline( '<label '.$class.' for="'.$this->name.'">' );
       $this->_addline( $this->_input_tag( $type, $value, 'checked', $group ), 1 );
       $this->_addline( $key );
       $this->_addline( '</label>', -1 );
@@ -871,15 +890,11 @@ class FormElement {
   /**
    * prepares a string for a comparison
    *
-   * removes all non-A-Z characters to avoid problems with encoded characters
-	 *
-	 * not at all perfect, but we just need to accomplish a match, so it would 
-	 * only fail if the difference between two terms was only within the 
-	 * excluded characters. We're not actually changing any stored data here.
+   * converts HTML entities to UTF-8 characters
    */
   private function _prep_comp_string( $string ) {
 
-    return preg_replace( '/[^a-zA-Z0-9\p{L}&#;!=]/', '' , htmlspecialchars_decode( (string) $string, ENT_QUOTES ) );
+    return html_entity_decode( (string) $string, ENT_QUOTES, 'UTF-8');
 
   }
 

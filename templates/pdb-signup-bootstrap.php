@@ -1,9 +1,6 @@
 <?php
 /*
- * template for signup form
- *
- * this template demonstrates how to output a form using a very simple output 
- * with minimal HTML structure
+ * bootstrap template for signup form
  *
  * If the signup form setting "Show Field Groups" is selected, the form fields
  * will be grouped by groups with the "visible" attribute checked in the manage
@@ -43,79 +40,65 @@
  * around, but leave all the parts between the <> brackets as they are.
  *
  */
+ 
+ $feedback_class = '';
+ $errors = $this->errors();
 
  ?>
  
 <div class="<?php echo $this->shortcode_atts['class']?> pdb-signup" >
 
-<?php $errors = $this->errors();
-if ( ! empty( $errors ) ) : // if there are errors to show ?>
-
-  <?php $this->error_CSS(); // output the CSS styles to highlight the fields that need correcting ?>
-
-  <ul class="<?php $this->error_class() ?>" >
-
-    <?php foreach( $errors as $error ) : ?>
-
-    <li><?php echo $error ?></li>
-
-    <?php endforeach ?>
-		
-	</ul>
-
-<?php endif ?>
-
   <?php $this->form_top(); // this must be included before any fields are output ?>
 
-    <div class="pdb-signup">
+    <div class="form-horizontal pdb-signup">
 
       <?php foreach( $this->get_signup_form_fields() as $group ) : ?>
 
         <?php if ( ! empty( $group->name ) ) : // print the group title/description row if present ?>
+        </fieldset>
         <fieldset class="signup-group">
-
-            <legend><?php echo $group->title ?></legend>
+          <legend><?php echo $group->title?></legend>
 
             <?php if ( ! empty( $group->description ) ) : ?>
-            <p><?php echo $group->description ?></p>
+            <p><?php echo $group->description?></p>
             <?php endif ?>
-        <?php endif; // end group title/description row
+				
+				<?php endif; // end group title/description header ?>
 
-        while ( $this->have_fields( $group ) ) :  $field = $this->current_field( $group ) ?>
-
-          <p id="<?php echo Participants_Db::$css_prefix,$field->name?>"><label for="<?php echo $field->name?>" class="<?php echo $field->form_element?>">
-  
-            <?php $this->field_title( $field ); // this function adds the required marker ?>
-  
-          </label>
-  
-            <?php $this->print_field( $field ) ?>
-  
-            <?php if ( ! empty( $field->help_text ) ) : ?>
-  
-              <span class="helptext">
-                <?php echo trim( $field->help_text ) ?>
-              </span>
-  
-            <?php endif ?>
-            
-            </p>
-  
-          <?php endwhile; // fields ?>
+        <?php while ( $this->have_fields( $group ) ) :  $field = $this->current_field( $group ) ?>
         
-        </fieldset>
+       <?php if ( is_object( Participants_Db::$validation_errors ) && in_array( "#pdb_".$field->name." input", Participants_Db::$validation_errors->error_CSS ) ) $feedback_class = 'error';
+				 else $feedback_class = ''; ?>
 
-        <?php endforeach; // groups ?>
+        <div id="<?php echo Participants_Db::$css_prefix,$field->name?>" class="pdb-<?php echo $field->form_element?> control-group <?php echo $feedback_class ?>">
 
+          <label class="control-label" for="<?php echo $field->name?>"><?php $this->field_title( $field ); // this function adds the required marker ?></label>
+          <div class="controls"><?php $this->print_field( $field ) ?>
+
+						<?php if ( ! empty( $field->help_text ) ) : ?>
+  
+              <p class="help-block">
+                <?php echo trim( $field->help_text ) ?>
+              </p>
+  
+            <?php endif ?>
+
+          </div>
+          
+        </div>
+
+        <?php endwhile; // fields
+
+        endforeach; // groups ?>
         
         <?php if ( $captcha = $this->_add_captcha( $this->captcha_type ) ) : ?>
-        <div  class="pdb-captcha">
-					<?php echo $captcha?>
+        <div id="captcha" class="control-group">
+          <td colspan="2" class="pdb-captcha"><?php echo $captcha?></td>
         </div>
         <?php endif ?>
-        
-        <div class="submit-buttons">
-          <?php $this->submit_button('button-primary pdb-submit') ?>
+        <div id="submit-button" class="controls">
+          <?php $this->submit_button('btn btn-primary pdb-submit') ?>
         </div>
+    </div>
   </form>
 </div>

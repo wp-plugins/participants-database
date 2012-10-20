@@ -8,7 +8,11 @@
  * @author     Rolanbd Barker <webdesign@xnau.com>
  * @copyright  2011, xnau webdesign
  * @license    GPL2
- * @version    1.1
+ * @version    1.2
+ *
+ * 08-08-12 added support for bootstrap-style pagination HTML
+ *          with methoeds for setting the class of the current page indicator and an option
+ *          to wrap the current page indicator numeral with a dummy anchor tag
  */
 
 class Pagination 
@@ -56,6 +60,20 @@ class Pagination
 	public $wrap_tag_close;
 	
 	/**
+	 * class name for current page link
+	 *
+	 * @var string
+	 */
+	private $current_page_class;
+	
+	/**
+	 * flag to select wrapping dummy anchor tag around current page link
+	 *
+	 * @var bool
+	 */
+	private $anchor_wrap = false;
+	
+	/**
 	 * Class Constructor
 	 *
 	 * @param array $args
@@ -76,6 +94,7 @@ class Pagination
 																				'link'=>'',
 																				'wrap_tag'=>'<div class="pagination">',
 																				'wrap_tag_close'=>'</div>',
+																				'current_page_class' => 'currentpage',
 																				) ) );
 		$this->setPage( $page );
 		$this->setSize( $size );
@@ -84,6 +103,7 @@ class Pagination
 
 		$this->set_wrap_tag( $wrap_tag );
 		$this->set_wrap_tag_close( $wrap_tag_close );
+		$this->current_page_class = $current_page_class;
 	}
 	
 	/**
@@ -144,6 +164,28 @@ class Pagination
 	public function set_wrap_tag_close( $tag )
 	{
 		$this->wrap_tag_close = $tag;
+	}
+	
+	/**
+	 * sets the current page class
+	 *
+	 * @params string $class
+	 */
+	public function set_current_page_class( $class ) {
+		
+		$this->current_page_class = $class;
+		
+	}
+	
+	/**
+	 * sets the current page anchor wrap flag
+	 *
+	 * @param bool $flag
+	 */
+	public function set_anchor_wrap( $flag = false ) {
+		
+		$this->anchor_wrap = $flag;
+		
 	}
 	
 	
@@ -252,7 +294,7 @@ class Pagination
 		for ($i = $loopStart; $i <= $loopEnd; $i++)
 		{
 			if ($i == $currentPage){
-				$output .= '<li class="currentpage">' . $i . '</li> ';
+				$output .= sprintf( ( $this->anchor_wrap ? '<li class="%s"><a href="#">%s</a></li> ' : '<li class="%s">%s</li> ' ), $this->current_page_class, $i );
 			} else {
 				$output .= sprintf('<li><a href="' . $link . '">', $i) . $i . '</a></li> ';
 			}
@@ -275,6 +317,12 @@ class Pagination
 	 */
 	public function links() {
 		echo $this->create_links();
+	}
+  /* alias of above func that doesn't output if an AJAX filtering refresh is happening */
+  public function show() {
+    
+    if ( ! PDb_List::$shortcode_params['filtering'] ) echo $this->create_links();
+    
 	}
 }
 

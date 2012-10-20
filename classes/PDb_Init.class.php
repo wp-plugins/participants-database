@@ -16,7 +16,7 @@
 class PDb_Init
 {
     // this is the current db version
-    const VERSION = '0.5';
+    const VERSION = '0.6';
 
     // arrays for building default field set
     public static $internal_fields;
@@ -106,6 +106,7 @@ class PDb_Init
           `CSV` BOOLEAN DEFAULT 0,
           `persistent` BOOLEAN DEFAULT 0,
           `signup` BOOLEAN DEFAULT 0,
+					`readonly` BOOLEAN DEFAULT 0,
           UNIQUE KEY  ( `name` ),
           INDEX  ( `order` ),
           INDEX  ( `group` ),
@@ -155,6 +156,7 @@ class PDb_Init
 
         $sql .= '`date_recorded` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           `date_updated` TIMESTAMP NOT NULL,
+          `last_accessed` TIMESTAMP NOT NULL,
           PRIMARY KEY  (`id`)
           )
           DEFAULT CHARACTER SET utf8
@@ -445,6 +447,60 @@ class PDb_Init
 
         }
 
+			}
+			
+			/*
+			 * this database version adds the "read-only" attribute to fields
+			 * 
+			 */
+			if ( '0.5' == get_option( Participants_Db::$db_version ) ) { 
+			
+				/*
+				 * add the "read-only" column
+				 */
+				$sql = "ALTER TABLE ".Participants_Db::$fields_table." ADD COLUMN `readonly` BOOLEAN DEFAULT 0 AFTER `signup`";
+
+        if ( false !== $wpdb->query( $sql ) ) {
+
+          // update the stored DB version number
+          update_option( Participants_Db::$db_version, '0.55' );
+
+        }
+			
+			}
+			
+			/*
+			 * this database version adds the "last_accessed" column to the main database
+			 * 
+			 */
+			if ( '0.55' == get_option( Participants_Db::$db_version ) ) { 
+			
+				/*
+				 * add the "last_accessed" column
+				 */
+				$sql = "ALTER TABLE ".Participants_Db::$participants_table." ADD COLUMN `last_accessed` TIMESTAMP NOT NULL AFTER `date_updated`";
+        
+        $wpdb->query( $sql );
+        
+        /*
+         * add the new field to the fields table
+         */
+        $data = array(
+                      'order' => '20',
+                      'name' => 'last_accessed',
+                      'title' => 'Last Accessed',
+                      'group' => 'internal',
+                      'sortable' => '1',
+                      'form_element' => 'date',
+                      );
+
+        if ( false !== $wpdb->insert( Participants_Db::$fields_table, $data ) ) {
+
+          // update the stored DB version number
+          update_option( Participants_Db::$db_version, '0.6' );
+
+        }
+			
 			}
 				
       error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );

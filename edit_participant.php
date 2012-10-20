@@ -54,7 +54,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 																					'action' => $action, 
 																					'id' => ( isset( $participant_values[ 'id' ] ) ? $participant_values[ 'id' ] : $participant_id ),
 																					'private_id' => $participant_values[ 'private_id' ],
-																					'source' => Participants_Db::PLUGIN_NAME,
+																					'subsource' => Participants_Db::PLUGIN_NAME,
 																					) );
 																					
 	// get the columns and output form
@@ -137,6 +137,11 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 					$value = is_array( $value ) ? $value : explode( ',', $value );
 					
 					break;
+        
+        case 'password':
+          
+          $value = '';
+          break;
 					
 				case 'hidden':
 				
@@ -164,6 +169,9 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 			}
 			
 		}
+    
+    $field_class = ( $column->validation != 'no' ? "required-field" : '' ) . ( in_array( $column->form_element, array( 'text-line','date' ) ) ? ' regular-text' : '' );
+
 
 		if ( Participants_Db::backend_user() && 'textarea' == $column->form_element && $options['rich_text_editor'] ) {
 
@@ -173,7 +181,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
                 array(
                       'media_buttons' => false,
                       'textarea_name' => $column->name,
-                      'editor_class'  => ( $column->validation != 'no' ? "required-field" : '' ),
+                      'editor_class'  => $field_class,
                       )
                 );
                 
@@ -184,7 +192,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 																			'value'      => $value,
 																			'name'       => $column->name,
 																			'options'    => $column->values,
-                                      'class'      => ( $column->validation != 'no' ? "required-field" : '' ),
+                                      'class'      => $field_class,
 																			'attributes' => $readonly,
 																			) );
 
@@ -192,7 +200,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
     
 		if ( ! empty( $column->help_text ) ) :
 			?>
-			<span class="helptext"><?php echo trim( $column->help_text )?></span>
+			<span class="helptext"><?php echo stripslashes( trim( $column->help_text ) ) ?></span>
 			<?php endif; ?>
 		</td>
 	 </tr>

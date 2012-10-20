@@ -1,24 +1,24 @@
 jQuery(document).ready(function($){
 
   // flag the row as changed
-  $('table.manage-fields input, table.manage-fields textarea').bind('keyup',function(el) {
+  $('#fields-tabs table.manage-fields input, #fields-tabs table.manage-fields textarea').bind('keyup',function(el) {
     var matches = $(this).attr('name').match(/row_(\d+)\[/);
     $('#status_'+matches[1]).attr('value','changed');
   });
 	// flag the row as changed
-  $('table.manage-fields select, table.manage-fields input[type=checkbox]').change(function(el) {
+  $('#fields-tabs table.manage-fields select, #fields-tabs table.manage-fields input[type=checkbox]').change(function(el) {
     var matches = $(this).attr('name').match(/row_(\d+)\[/);
     $('#status_'+matches[1]).attr('value','changed');
   });
 
   // defeat return key submit behavior
-  $("form").bind("keypress", function(e) {
+  $("#fields-tabs form").bind("keypress", function(e) {
     if (e.keyCode == 13) return false;
   });
 
   // disable autocomplete
   if ($.browser.mozilla)
-    $("form").attr("autocomplete", "off");
+    $("#fields-tabs form").attr("autocomplete", "off");
 
   // set up the UI tabs
   $("#fields-tabs").tabs( {
@@ -29,7 +29,7 @@ jQuery(document).ready(function($){
   // set up the delete functionality
 
   // set up the click function
-  $('.manage-fields a.delete').click(function (e) { // if a user clicks on the "delete" image
+  $('#fields-tabs .manage-fields a.delete').click(function (e) { // if a user clicks on the "delete" image
 
     //prevent the default browser behavior when clicking
     e.preventDefault();

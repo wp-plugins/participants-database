@@ -44,17 +44,15 @@ $exclude = array();
   foreach ( Participants_Db::single_record_fields( $id, $exclude ) as $group ) :
   ?>
   
-  <div class="section" id="<?php echo $group->name ?>">
+  <section id="<?php echo $group->name ?>" style="overflow:auto">
   
     <h2><?php echo $group->title ?></h2>
     
     <?php if ( ! empty( $group->description ) ) : ?>
-    
     <h3><?php echo $group->description ?></h3>
-     
     <?php endif ?>
     
-    <dl>
+    <dl class="dl-horizontal">
     
       <?php // this prints out all the fields in the group
 			foreach( $group->fields as $field ) : 
@@ -73,7 +71,7 @@ $exclude = array();
     
     </dl>
     
-  </div>
+  </section>
   
   <?php endforeach; // end of the groups loop ?>
   

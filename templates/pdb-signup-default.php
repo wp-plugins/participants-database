@@ -74,10 +74,10 @@ if ( ! empty( $errors ) ) : // if there are errors to show ?>
         <tr class="signup-group">
           <td colspan="2">
 
-            <h3>$group->title</h3>
+            <h3><?php echo $group->title?></h3>
 
             <?php if ( ! empty( $group->description ) ) : ?>
-            <p>$group->description</p>
+            <p><?php echo $group->description?></p>
             <?php endif ?>
 
           </td>
@@ -86,7 +86,7 @@ if ( ! empty( $errors ) ) : // if there are errors to show ?>
 
         <?php while ( $this->have_fields( $group ) ) :  $field = $this->current_field( $group ) ?>
 
-        <tr id="<?php echo $field->name?>" class="<?php echo $field->form_element?>">
+        <tr id="<?php echo Participants_Db::$css_prefix,$field->name?>" class="<?php echo $field->form_element?>">
 
           <th><?php $this->field_title( $field ); // this function adds the required marker ?></th>
 

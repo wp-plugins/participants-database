@@ -1,24 +1,24 @@
 <?php
 /*
- * add / edit / delete fields and field groups and their attributes 
+ * add / edit / delete fields and field groups and their attributes
  */
 // translations strings for buttons
 /* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
 global $PDb_i18n;
 $PDb_i18n = array(
-  'update fields'   => __( 'Update Fields', Participants_Db::PLUGIN_NAME ),
-  'update groups'   => __( 'Update Groups', Participants_Db::PLUGIN_NAME ),
-  'add field'       => __( 'Add Field',     Participants_Db::PLUGIN_NAME ),
-  'add group'       => __( 'Add Group',     Participants_Db::PLUGIN_NAME ),
-	'new field title' => __( 'new field title',     Participants_Db::PLUGIN_NAME ),
-	'new group title' => __( 'new group title',     Participants_Db::PLUGIN_NAME ),
+	'update fields'   => __( 'Update Fields',   Participants_Db::PLUGIN_NAME ),
+	'update groups'   => __( 'Update Groups',   Participants_Db::PLUGIN_NAME ),
+	'add field'       => __( 'Add Field',       Participants_Db::PLUGIN_NAME ),
+	'add group'       => __( 'Add Group',       Participants_Db::PLUGIN_NAME ),
+	'new field title' => __( 'new field title', Participants_Db::PLUGIN_NAME ),
+	'new group title' => __( 'new group title', Participants_Db::PLUGIN_NAME ),
   );
 // process form submission
 $error_msgs = array();
 if ( isset( $_POST['action'] ) ) {
-	
+
 	switch ( $_POST['action'] ) {
-		
+
 		case 'reorder_fields':
 			unset( $_POST['action'], $_POST['submit'] );
 			foreach( $_POST as $key => $value ) {
@@ -32,33 +32,33 @@ if ( isset( $_POST['action'] ) ) {
         $wpdb->update( Participants_Db::$groups_table, array( 'order' => $value ), array( 'name' => str_replace( 'order_','',$key ) ) );
       }
       break;
-			
+
 		case $PDb_i18n['update fields']:
 
 			// dispose of these now unneeded fields
 			unset( $_POST['action'], $_POST['submit'] );
-			
+
 			foreach( $_POST as $name => $row ) {
-				
+
 				// skip all non-row elements
 				if ( false === strpos( $name, 'row_' ) ) continue;
 
 				if ( $row['status'] == 'changed' ) {
-					
+
 					$id = $row['id'];
-					
+
 					if ( ! empty( $row['values'] ) ) {
-						
+
 						$row['values'] = serialize( PDb_prep_values_array( explode( ',', $row['values'] ) ) );
-						
+
 					}
-					
+
 					if ( ! empty( $row['validation'] ) && ! in_array( $row['validation'], array( 'yes','no' ) ) ) {
-						
+
 						$row['validation'] = str_replace( '\\\\', '\\', $row['validation'] );
-						
+
 					}
-					
+
 					// modify the datatype if necessary
 					if ( isset( $row['group'] ) && $row['group'] != 'internal' ) {
             $sql = "SHOW FIELDS FROM ".Participants_Db::$participants_table." WHERE field = '".$row['name']."'";
@@ -72,19 +72,19 @@ if ( isset( $_POST['action'] ) ) {
 
             }
           }
-					
-					
+
+
 					// remove the fields we won't be updating
 					unset( $row['status'],$row['id'],$row['name'] );
 					$wpdb->update( Participants_Db::$fields_table, $row, array( 'id'=> $id ) );
-					
+
 				}
 
 			}
-		
+
 			// load the default record with the default values
 			Participants_Db::update_default_record();
-			
+
 			break;
 
     case $PDb_i18n['update groups']:
@@ -95,9 +95,9 @@ if ( isset( $_POST['action'] ) ) {
       foreach( $_POST as $name => $row ) {
 
 					// make sure name is legal
-					$row['name'] = PDb_make_name( $row['name'] );
+					//$row['name'] = PDb_make_name( $row['name'] );
 
-          $wpdb->update( Participants_Db::$groups_table, $row, array( 'name'=> $name ) );
+          $wpdb->update( Participants_Db::$groups_table, $row, array( 'name'=> stripslashes_deep( $name ) ) );
 
       }
       break;
@@ -106,15 +106,22 @@ if ( isset( $_POST['action'] ) ) {
 		case $PDb_i18n['add field']:
 
 			// use the wp function to clear out any irrelevant POST values
-			$atts = shortcode_atts( array( 
+			$atts = shortcode_atts( array(
 																		'name'  => PDb_make_name( stripslashes($_POST['title']) ),
-																		'title' => htmlspecialchars( stripslashes($_POST['title']),ENT_QUOTES, "UTF-8", false ),//PDb_prep_title($_POST['title']),  
+																		'title' => htmlspecialchars( stripslashes($_POST['title']),ENT_QUOTES, "UTF-8", false ),//PDb_prep_title($_POST['title']),
 																		'group' => $_POST['group'],
 																		'order' => $_POST['order'],
 																		'validation' => 'no',
 																		),
 														 $_POST
 														 );
+			// if they're trying to use a reserved name, stop them
+			if ( in_array( $atts['name'], Participants_Db::$reserved_names ) ) {
+
+				$error_msgs[] = __('New field not added: field name cannot be one of these reserved names', Participants_Db::PLUGIN_NAME ) . ': ' . implode(', ',Participants_Db::$reserved_names);
+				break;
+
+			}
 			$result = Participants_Db::add_blank_field( $atts );
 			if ( false === $result ) $error_msgs[] = PDb_parse_db_error( $wpdb->last_error, $_POST['action'] );
 			break;
@@ -124,28 +131,28 @@ if ( isset( $_POST['action'] ) ) {
 
 			global $wpdb;
 			$wpdb->hide_errors();
-			
+
 			$atts = array(
 										'name'  => PDb_make_name( $_POST['group_title'] ),
 										'title' => htmlspecialchars( stripslashes($_POST['group_title']),ENT_QUOTES, "UTF-8", false ),
 										'order' => $_POST['group_order'],
 			);
-														 
+
 			$wpdb->insert( Participants_Db::$groups_table, $atts );
 
 			if ( $wpdb->last_error ) $error_msgs[] = PDb_parse_db_error( $wpdb->last_error, $_POST['action'] );
 			break;
-			
+
 		case 'delete_field':
 
 			global $wpdb;
 			$wpdb->hide_errors();
-	
+
 			$result = $wpdb->query('
 				DELETE FROM '.Participants_Db::$fields_table.'
 				WHERE id = '.$wpdb->escape($_POST['delete'])
 			);
-			
+
 			break;
 
 		case 'delete_group':
@@ -161,11 +168,11 @@ if ( isset( $_POST['action'] ) ) {
 																											);
 
 			break;
-			
+
 		default:
-		
+
 	}
-	
+
 }
 
 // get the defined groups
@@ -176,21 +183,21 @@ $attribute_columns = array();
 
 // get an array with all the defined fields
 foreach( $groups as $group ) {
-	
+
 	// only display these columns for internal group
 	$select_columns = ( $group === 'internal' ? '`id`,`order`,`name`,`title`,`admin_column`,`sortable`,`CSV`' : '*' );
-	
+
 	$sql = "SELECT $select_columns FROM " . Participants_Db::$fields_table . ' WHERE `group` = "'.$group.'" ORDER BY `order` ';
 	$database_rows[$group] =  $wpdb->get_results( $sql, ARRAY_A );
-	
+
 	// get an array of the field attributes
 	$attribute_columns[$group] = $wpdb->get_col_info( 'name' );
-	
+
 	// remove read-only fields
 	foreach( array( 'id'/*,'name'*/ ) as $item ) {
 		unset( $attribute_columns[$group][ array_search( $item, $attribute_columns ) ] );
 	}
-	
+
 }
 // this script updates a hidden field when a row is edited so we don't have to update the whole database on submit
 // second bit disables the submit on return behavior
@@ -202,11 +209,10 @@ foreach( $groups as $group ) {
 if ( ! empty( $error_msgs ) ) :
 ?>
 <div class="error settings-error">
-<?php 
-error_log( __FILE__.' errors registered:'.print_r( $error_msgs,true ));
+<?php
 foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 </div>
-<?php endif?>
+<?php endif; ?>
 <h4><?php _e('Field Groups',Participants_Db::PLUGIN_NAME )?>:</h4>
 <div id="fields-tabs">
 	<ul>
@@ -230,16 +236,16 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		// "add field" functionality
 		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add field'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button', 'onclick'=>'return false;') ) );
 		FormElement::print_element( array( 'type'=>'text', 'name'=>'title','value'=>$PDb_i18n['new field title'].'&hellip;','attributes'=>array('onfocus'=>"this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",'class'=>'add_field') ) );
-		
+
 		endif; // skip internal groups
-		
+
 		// number of rows in the group
 		$num_group_rows = count( $database_rows[ $group ] );
-		
+
 		$last_order = $num_group_rows > 1 ? $database_rows[ $group ][ $num_group_rows -1 ]['order']+1 : 1;
-		
+
 		FormElement::print_hidden_fields( array( 'group'=>$group, 'order'=>$last_order ) );
-		
+
 		?>
 		</p>
 		<table class="wp-list-table widefat fixed manage-fields" cellspacing="0" >
@@ -249,13 +255,13 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 				<th scope="col" class="delete vertical-title"><span><?php echo PDb_header( 'delete' ) ?></span></th>
 			<?php
 			endif; // internal group test
-			
+
 			foreach( $attribute_columns[ $group ] as $attribute_column ) {
-				
+
 				if ( 'internal' == $group && in_array( $attribute_column, array( 'order' ) ) ) continue;
-				
-				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'admin_column', 'display_column', 'CSV', 'signup', 'display' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
-				
+
+				$column_class = in_array( $attribute_column, array( 'order', 'persistent', 'sortable', 'admin_column', 'display_column', 'CSV', 'signup', 'display', 'readonly' ) ) ? $attribute_column.' vertical-title' : $attribute_column;
+
 				?>
 				<th scope="col" class="<?php echo $column_class?>"><span><?php echo PDb_header( $attribute_column ) ?></span></th>
 				<?php
@@ -280,16 +286,16 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 					endif; // hidden field test
 					// add the hidden fields
 					foreach( array( 'id'/*,'name'*/ ) as $attribute_column ) {
-	
+
 						$value = Participants_Db::prepare_value( $database_row[ $attribute_column ] );
-	
+
 						$element_atts = array_merge( Participants_Db::get_edit_field_type( $attribute_column ),
 																					array(
 																								'name'=>'row_'.$database_row[ 'id' ].'['.$attribute_column.']',
 																								'value'=> $value,
 																								) );
 						FormElement::print_element( $element_atts );
-	
+
 					}
 					FormElement::print_element( array(
 																'type' => 'hidden',
@@ -302,17 +308,17 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 					</td>
 					<?php
 					endif;// internal group test
-	
+
 					// list the fields for editing
 					foreach( $attribute_columns[$group] as $attribute_column ) :
-					
+
 						if ( 'internal' == $group && in_array( $attribute_column, array( 'order' ) ) ) continue;
-						
+
 						// preserve backslashes in regex expressions
 						if ( $attribute_column == 'validation' ) $database_row[ $attribute_column ] = str_replace( '\\','&#92;',$database_row[ $attribute_column ] );
-	
+
 						$value = Participants_Db::prepare_value( $database_row[ $attribute_column ] );
-	
+
 						$element_atts = array_merge( Participants_Db::get_edit_field_type( $attribute_column ),
 																					array(
 																								'name'=>'row_'.$database_row[ 'id' ].'['.$attribute_column.']',
@@ -354,7 +360,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	</div><!-- tab content container -->
 	<?php
 	endforeach; // groups
-	
+
 	// build the groups edit panel
 	$groups = Participants_Db::get_groups( '`order`,`display`,`name`,`title`,`description`' );
 	?>
@@ -364,13 +370,13 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<h3><?php _e('Edit / Add / Remove Field Groups',Participants_Db::PLUGIN_NAME )?></h3>
 		<p>
 		<?php
-		
+
 		// "add group" functionality
 		FormElement::print_element( array( 'type'=>'submit','value'=>$PDb_i18n['add group'],'name'=>'action', 'attributes'=>array( 'class'=>'add_field_button', 'onclick'=>'return false;' ) ) );
 		FormElement::print_element( array( 'type'=>'text', 'name'=>'group_title','value'=>$PDb_i18n['new group title'].'&hellip;','attributes'=>array('onfocus'=>"this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",'class'=>'add_field') ) );
 		$next_order = count( $groups ) + 1;
 		FormElement::print_hidden_fields( array( 'group_order'=>$next_order ) );
-		
+
 		?>
 		</p>
 		<table class="wp-list-table widefat fixed manage-fields manage-field-groups" cellspacing="0" >
@@ -382,11 +388,11 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 			foreach ( current( $groups ) as $column => $value ) {
 
 				$column_class = in_array( $column, array( 'order', 'display' ) ) ? $column.' vertical-title' : $column;
-				
+
 				?>
 				<th scope="col" class="<?php echo $column_class?>"><span><?php echo PDb_header( $column ) ?></span></th>
 				<?php
-				
+
 			}
 			?>
 			</tr>
@@ -397,46 +403,46 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 			if ( $group == 'internal' ) continue;
 
 			$group_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM '.Participants_Db::$fields_table.' WHERE `group` = "' . $group.'"' ) );
-			
+
 			?>
 			<tr>
       <td id="field_count_<?php echo $group?>"><?php echo $group_count?></td>
 			<td><a href="<?php echo $group_count?>" name="delete_<?php echo $group?>" class="delete" ref="group"></a></td>
 			<?php
 			foreach( $group_values as $column => $value  ) {
-				
+
 				$attributes = array();
 				$options = array();
 				$name = '';
-				
+
 				switch ( $column ) {
-					
+
 					case 'display':
 						$type = 'checkbox';
 						$options = array( 1, 0 );
 						break;
-						
+
 					case 'description':
 						$type = 'text-field';
 						break;
-						
+
 					case 'order':
 						$attributes = array( 'style'=>'width:30px' );
 						$name = 'order_'.$group;
 						$type = 'drag-sort';
 						break;
-						
+
 					case 'name':
 						$type = 'text';
 						$attributes = array('readonly'=>'readonly');
-						
+
 					default:
 						$type = 'text';
-						
+
 				}
 				$element_atts = array(
 														'name'=> ( empty( $name ) ? $group.'['.$column.']' : $name ),
-														'value'=> $value,
+														'value'=> htmlspecialchars( stripslashes($value),ENT_QUOTES, "UTF-8", false ),
 														'type'=> $type,
 														);
 				if ( ! empty( $attributes ) ) $element_atts['attributes'] = $attributes;
@@ -485,14 +491,18 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 //
 function PDb_header( $string ) {
 
+	$string = str_replace( array('readonly'), array('read only'), $string );
+
 	return ucwords( str_replace( array( '_' ), array( "<br />\r" ), $string ) );
 
 }
+
 function PDb_make_name( $string ) {
 
 	return strtolower(str_replace( array( ' ','-',"'",'"','%','\\','#','$','.'),array('_','_','','','pct','','','',''), stripslashes( $string ) ) );
-	
+
 }
+
 function PDb_trim_array( $array ) {
 
 	$return = array();
@@ -517,17 +527,17 @@ function PDb_prep_values_array( $array ) {
   }
 
   return $return;
-  
+
 }
 function PDb_prep_value( $value, $slashes = false ) {
 
 	if ( $slashes ) return htmlentities( trim( $value ), ENT_QUOTES, "UTF-8", false  );
-		
+
 	else return htmlentities( trim( stripslashes( $value ) ), ENT_QUOTES, "UTF-8", false  );
-	
+
 }
-	
-	
+
+
 // this rather kludgy function will do for now
 function PDb_parse_db_error( $error, $context ) {
 
@@ -567,11 +577,11 @@ function PDb_parse_db_error( $error, $context ) {
 }
 
 function PDb_prep_title( $title ) {
-	
+
 	$needle = array( '"',"'",'\\' );
 	$replace = array( '&quot;','&#039;','');
-	
+
 	return str_replace( $needle, $replace, $title );
-	
+
 }
 ?>

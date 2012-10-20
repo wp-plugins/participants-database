@@ -14,9 +14,10 @@ class PDb_Settings extends Plugin_Settings {
     // define the settings sections
     // no need to worry about the namespace, it will be prefixed
     $this->sections = array(
-                            'main' => __('General Settings', Participants_Db::PLUGIN_NAME ),
+                            'main'   => __('General Settings', Participants_Db::PLUGIN_NAME ),
                             'signup' => __('Signup Form Settings', Participants_Db::PLUGIN_NAME ),
                             'record' => __('Record Form Settings', Participants_Db::PLUGIN_NAME ),
+                            'list'   => __('List Display Settings', Participants_Db::PLUGIN_NAME ),
                             );
 
 
@@ -40,79 +41,12 @@ class PDb_Settings extends Plugin_Settings {
    * @return null
    */
   private function _define_settings() {
-
-    // general settings
-
-    $this->plugin_settings[] = array(
-        'name'       =>'list_limit',
-        'title'      => __('Records per Page', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'main',
-        'options'    =>array(
-          'type'        =>'text',
-          'help_text'   => __('the number of records to show on each page', Participants_Db::PLUGIN_NAME ),
-          'attributes'  =>array( 'style'=>'width:40px' ),
-          'value'       =>10,
-          ),
-        );
-
-    $this->plugin_settings[] = array(
-        'name'       =>'unique_email',
-        'title'      => __('Don&#39;t Allow Duplicate Email Addresses', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'main',
-        'options'    => array
-          (
-          'type'        => 'checkbox',
-          'help_text'   => __('if someone registers with an email address that already exists, update the existing record, don&#39;t create a new one.', Participants_Db::PLUGIN_NAME ),
-          'value'       => 1,
-          'options'     => array( 1, 0 ),
-          ),
-        );
-
-    $this->plugin_settings[] = array(
-        'name'       =>'show_pid',
-        'title'      =>__('Show the Private ID in List', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'main',
-        'options'    => array
-          (
-          'type'        => 'checkbox',
-          'help_text'   => __('whether to show the private ID in the participant list in the admin', Participants_Db::PLUGIN_NAME ),
-          'value'       => 1,
-          'options'     => array( 1, 0 ),
-          ),
-        );
-
-    $this->plugin_settings[] = array(
-        'name'       =>'empty_field_message',
-        'title'      =>__('Missing Field Error Message', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'main',
-        'options'    =>array(
-          'type'       =>'text',
-          'help_text'  => __('the message shown when a field is required, but left empty (the %s is replaced by the name of the field)', Participants_Db::PLUGIN_NAME ),
-          'value'      => __('The %s field is required.', Participants_Db::PLUGIN_NAME ),
-          )
-        );
-
-    $this->plugin_settings[] = array(
-        'name'       =>'invalid_field_message',
-        'title'      =>__('Invalid Field Error Message', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'main',
-        'options'    =>array(
-          'type'       =>'text',
-          'help_text'  => __("the message shown when a field's value does not pass the validation test", Participants_Db::PLUGIN_NAME ),
-          'value'      => __('The %s field appears to be incorrect.', Participants_Db::PLUGIN_NAME ),
-          )
-        );
-
-    $this->plugin_settings[] = array(
-        'name'       =>'field_error_style',
-        'title'      =>__('Field Error Style', Participants_Db::PLUGIN_NAME ),
-        'group'      => 'main',
-        'options'    =>array(
-          'type'        =>'text',
-          'help_text'   => __('the CSS style applied to an input or text field that is missing or has not passed validation', Participants_Db::PLUGIN_NAME ),
-          'value'       => __('border: 1px solid red', Participants_Db::PLUGIN_NAME ),
-          )
-        );
+		
+	/******************************************************
+	 *
+	 *   general settings
+	 *
+	 ******************************************************/
 
     $this->plugin_settings[] = array(
         'name'       => 'image_upload_location',
@@ -138,15 +72,16 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
-        'name'       =>'record_edit_capability',
-        'title'      =>__('Record Edit Access Level', Participants_Db::PLUGIN_NAME ),
-        'group'      => 'main',
-        'options'    =>array(
-          'type'        =>'dropdown',
-          'help_text'   => __('sets the user access level for adding, editing and listing records. (fields management and plugin settings always require admin level access)', Participants_Db::PLUGIN_NAME ),
-          'value'       => 'edit_others_posts',
-					'options'     => array( 'Author'=>'edit_posts','Editor'=>'edit_others_posts','Admin'=>'manage_options' ),
-          )
+        'name'       =>'use_plugin_css',
+        'title'      =>__('Use the Plugin CSS', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('use the plugin\'s CSS to style the output of shortcodes', Participants_Db::PLUGIN_NAME ),
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
         );
 
     $this->plugin_settings[] = array(
@@ -161,28 +96,61 @@ class PDb_Settings extends Plugin_Settings {
           'options'     => array( 1, 0 ),
           ),
         );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'email_protect',
+        'title'      =>__('Protect Email Addresses', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('protect email addresses in text-line fields with Javascript', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          ),
+        );
 		
     $this->plugin_settings[] = array(
-        'name'       =>'single_record_page',
-        'title'      =>__('Single Record Page', Participants_Db::PLUGIN_NAME ),
+        'name'       =>'empty_field_message',
+        'title'      =>__('Missing Field Error Message', Participants_Db::PLUGIN_NAME ),
         'group'      =>'main',
-        'options'    =>array
-          (
-          'type'       =>'dropdown',
-          'help_text'  => __('this is the page where the [pdb_single] shortcode is located.', Participants_Db::PLUGIN_NAME ),
-          'options'    => $this->_get_pagelist(),
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __('the message shown when a field is required, but left empty (the %s is replaced by the name of the field)', Participants_Db::PLUGIN_NAME ),
+          'value'      => __('The %s field is required.', Participants_Db::PLUGIN_NAME ),
           )
         );
 
     $this->plugin_settings[] = array(
-        'name'       =>'single_record_link_field',
-        'title'      =>__('Single Record Link Field', Participants_Db::PLUGIN_NAME ),
+        'name'       =>'invalid_field_message',
+        'title'      =>__('Invalid Field Error Message', Participants_Db::PLUGIN_NAME ),
         'group'      =>'main',
-        'options'    =>array
-          (
-          'type'       =>'dropdown',
-          'help_text'  => __('select the field on which to put a link to the single record. Leave blank or set to "none" for no link.', Participants_Db::PLUGIN_NAME ),
-          'options'    => $this->_get_display_columns(),
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __("the message shown when a field's value does not pass the validation test", Participants_Db::PLUGIN_NAME ),
+          'value'      => __('The %s field appears to be incorrect.', Participants_Db::PLUGIN_NAME ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'nonmatching_field_message',
+        'title'      =>__('Non-Matching Field Error Message', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __("the message shown when a field's value does match the value of another field", Participants_Db::PLUGIN_NAME ),
+          'value'      => __('The %s field must match.', Participants_Db::PLUGIN_NAME ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'field_error_style',
+        'title'      =>__('Field Error Style', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'        =>'text',
+          'help_text'   => __('the CSS style applied to an input or text field that is missing or has not passed validation', Participants_Db::PLUGIN_NAME ),
+          'value'       => __('border: 1px solid red', Participants_Db::PLUGIN_NAME ),
           )
         );
 
@@ -217,7 +185,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('enable the rich text editor on textarea fields (works only for logged-in WP users)', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('enable the rich text editor on "Rich Text" fields (works only for logged-in WP users, and "Text Area" fields will remain plain text)', Participants_Db::PLUGIN_NAME ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
@@ -243,16 +211,111 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your setting looks like this: "'.date(get_option('date_format')).'"', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your setting looks like this: %s %s', Participants_Db::PLUGIN_NAME ), date(get_option('date_format')), ( Participants_Db::php_version() >= 5.3 ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
         );
 
     $this->plugin_settings[] = array(
+        'name'       =>'record_edit_capability',
+        'title'      =>__('Record Edit Access Level', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'        =>'dropdown',
+          'help_text'   => __('sets the user access level for adding, editing and listing records. (fields management and plugin settings always require admin level access)', Participants_Db::PLUGIN_NAME ),
+          'value'       => 'edit_others_posts',
+					'options'     => array( __('Author')=>'edit_posts',__('Editor')=>'edit_others_posts',__('Admin')=>'manage_options' ),
+          )
+        );
+		
+
+    $this->plugin_settings[] = array(
+        'name'       =>'admin_default_sort',
+        'title'      =>__('Admin List Default Sort', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    =>array
+          (
+          'type'       =>'dropdown',
+					'value'      => 'date_updated',
+          'help_text'  => __('The record list shown in the admin section will be sorted by this field by default. (Field must be checked "sortable.")', Participants_Db::PLUGIN_NAME ),
+          'options'    => $this->_get_sort_columns(),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'admin_default_sort_order',
+        'title'      =>__('Admin List Default Sort Order', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'        =>'dropdown',
+          'help_text'   => __('Sets the default order of the record list in the admin.', Participants_Db::PLUGIN_NAME ),
+          'value'       => 'desc',
+					'options'     => array( __('Ascending', Participants_Db::PLUGIN_NAME )=>'asc',__('Descending', Participants_Db::PLUGIN_NAME )=>'desc' ),
+          )
+        );
+
+
+		/******************************************************
+		 *
+		 *   list display settings
+		 *
+		 ******************************************************/
+		 
+    $this->plugin_settings[] = array(
+        'name'       =>'list_limit',
+        'title'      => __('Records per Page', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'list',
+        'options'    =>array(
+          'type'        =>'text',
+          'help_text'   => __('the number of records to show on each page', Participants_Db::PLUGIN_NAME ),
+          'attributes'  =>array( 'style'=>'width:40px' ),
+          'value'       =>10,
+          ),
+        );
+		
+    $this->plugin_settings[] = array(
+        'name'       =>'show_pid',
+        'title'      =>__('Show the Private ID in List', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'list',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('whether to show the private ID in the participant list in the admin', Participants_Db::PLUGIN_NAME ),
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'single_record_link_field',
+        'title'      =>__('Single Record Link Field', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'list',
+        'options'    =>array
+          (
+          'type'       =>'dropdown',
+          'help_text'  => __('select the field on which to put a link to the [pdb_single] shortcode. Leave blank or set to "none" for no link.', Participants_Db::PLUGIN_NAME ),
+          'options'    => $this->_get_display_columns(),
+          )
+        );
+		
+    $this->plugin_settings[] = array(
+        'name'       =>'single_record_page',
+        'title'      =>__('Single Record Page', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'list',
+        'options'    =>array
+          (
+				  'attributes' => array( 'other' => 'Post ID' ),
+          'type'       =>'dropdown-other',
+          'help_text'  => __('this is the page where the [pdb_single] shortcode is located. If you want to assign a post or custom post type, enter the post ID in the "other" box.', Participants_Db::PLUGIN_NAME ),
+          'options'    => $this->_get_pagelist(),
+          )
+        );
+		
+    $this->plugin_settings[] = array(
         'name'       =>'strict_search',
         'title'      =>__('Strict User Searching', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'main',
+        'group'      =>'list',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -261,10 +324,13 @@ class PDb_Settings extends Plugin_Settings {
           'options'     => array( 1, 0 ),
           ),
         );
-
-
-    // signup form settings
-
+		
+		/******************************************************
+		 *
+		 *   signup form settings
+		 *
+		 ******************************************************/
+		
     $this->plugin_settings[] = array(
         'name'       =>'signup_button_text',
         'title'      =>__('Signup Button Text', Participants_Db::PLUGIN_NAME ),
@@ -282,9 +348,10 @@ class PDb_Settings extends Plugin_Settings {
         'group'      =>'signup',
         'options'    =>array
 					(
-          'type'       =>'dropdown',
-          'help_text'  => __('after they singup, send them to this page for a thank you message. This page is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have to do that if you have them go back to the same page.', Participants_Db::PLUGIN_NAME ),
-					'options'    => $this->_get_pagelist(),
+          'type'       =>'dropdown-other',
+          'help_text'  => __('after they singup, send them to this page for a thank you message. This page is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have to do that if you have them go back to the same page. You can also use a Post ID for posts and custom post types.', Participants_Db::PLUGIN_NAME ),
+					'options'    => $this->_get_pagelist( true ),
+					'attributes' => array( 'other' => 'Post ID' ),
           )
         );
 
@@ -329,7 +396,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text',
-          'help_text'   => __('subject line for the signup response email', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('subject line for the signup response email; placeholder tags can be used (see below)', Participants_Db::PLUGIN_NAME ),
           'value'       => sprintf( __("You've just signed up on %s", Participants_Db::PLUGIN_NAME ), get_bloginfo('name') ),
           )
         );
@@ -340,7 +407,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text-field',
-          'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link].', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. You can only use placeholders for fields that are present in the signup form, including hidden fields.', Participants_Db::PLUGIN_NAME ),
 					/* translators: the %s will be the name of the website */
           'value'       =>sprintf( __('<p>Thank you, [first_name] for signing up with %s.</p><p>You may complete your registration with additional information or update your information by visiting this link at any time: <a href="[record_link]">[record_link]</a>.</p>', Participants_Db::PLUGIN_NAME ),get_bloginfo('name') ),
           )
@@ -352,7 +419,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text-field',
-          'help_text'   => __('Note to display on the web page after someone has submitted a signup form. Can include HTML, placeholders:[first_name],[last_name],[email], etc. They must be fields that are present in the signup form.', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('Note to display on the web page after someone has submitted a signup form. Can include HTML and placeholders (see above)', Participants_Db::PLUGIN_NAME ),
           'value'       =>__('<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting the link provided in the email.</p>', Participants_Db::PLUGIN_NAME ),
           )
         );
@@ -388,7 +455,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text',
-          'help_text'   => __('subject of the notification email', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('subject of the notification email; placeholder tags can be used (see above)', Participants_Db::PLUGIN_NAME ),
 					/* translators: the %s will be the name of the website */
           'value'       => sprintf( __('New signup on %s', Participants_Db::PLUGIN_NAME ), get_bloginfo('name') ),
           )
@@ -404,6 +471,46 @@ class PDb_Settings extends Plugin_Settings {
           'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>'),
           )
         );
+		
+    $this->plugin_settings[] = array(
+        'name'       =>'unique_field',
+        'title'      =>__('Duplicate Record Check Field', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'signup',
+        'options'    =>array
+          (
+          'type'       =>'dropdown',
+          'help_text'  => __('when a signup is submitted, this field is checked for a duplicate', Participants_Db::PLUGIN_NAME ),
+          'options'    => $this->_get_display_columns(),
+					'value'      => 'email',
+          )
+        );
+    $this->plugin_settings[] = array(
+        'name'       =>'unique_email',
+        'title'      => __('Duplicate Record Preference', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'signup',
+        'options'    => array
+          (
+          'type'        => 'dropdown',
+          'help_text'   => __('when the submission matches the Duplicate Record Check Field of an existing record.', Participants_Db::PLUGIN_NAME ),
+          'value'       => 1,
+          'options'     => array(
+																 'Create a new record with the submission' => 0,
+																 'Overwrite matching record with new one, preserving values' => 1,
+																 'Generate validation error with an error message' => 2,
+																 ),
+          ),
+        );
+		
+    $this->plugin_settings[] = array(
+        'name'       =>'duplicate_field_message',
+        'title'      =>__('Duplicate Record Error Message', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'signup',
+        'options'    => array(
+          'type'        =>'text-field',
+          'help_text'   => __('This message will be shown if a signup is made with a "check field" that matches an existing record.', Participants_Db::PLUGIN_NAME ),
+          'value'       =>__('A record with that %s already exists. Please choose another.', Participants_Db::PLUGIN_NAME ),
+          )
+        );
 
     $this->plugin_settings[] = array(
         'name'       => 'signup_show_group_descriptions',
@@ -417,8 +524,12 @@ class PDb_Settings extends Plugin_Settings {
           'options'     => array( 1, 0 ),
           )
         );
-		
-		// record form settings
+
+		/******************************************************
+		 *
+		 *   record form settings
+		 *
+		 ******************************************************/
 
     $this->plugin_settings[] = array(
         'name'       =>'registration_page',
@@ -426,9 +537,10 @@ class PDb_Settings extends Plugin_Settings {
         'group'      =>'record',
         'options'    =>array
 					(
-          'type'       =>'dropdown',
-          'help_text'  => __('the page where your participant record ([pdb_record] shortcode) is displayed', Participants_Db::PLUGIN_NAME ),
+          'type'       =>'dropdown-other',
+          'help_text'  => __('The page where your participant record ([pdb_record] shortcode) is displayed. You can use a Post ID for posts and custom post types.', Participants_Db::PLUGIN_NAME ),
 					'options'    => $this->_get_pagelist(),
+					'attributes' => array( 'other' => 'Post ID' ),
           )
         );
 
@@ -499,7 +611,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'record',
         'options'    => array(
           'type'        =>'text',
-          'help_text'   => __('subject line for the record update notification email', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('subject line for the record update notification email; placeholders can be used.', Participants_Db::PLUGIN_NAME ),
           'value'       => sprintf( __("A record has just been updated on %s", Participants_Db::PLUGIN_NAME ), get_bloginfo('name') ),
           )
         );
@@ -517,9 +629,11 @@ class PDb_Settings extends Plugin_Settings {
 
   }
 	
-	private function _get_pagelist() {
+	private function _get_pagelist( $with_none = false ) {
 		
 		$pagelist = array();
+		
+		if ( $with_none ) $pagelist[ __('Same Page', Participants_Db::PLUGIN_NAME ) ] = 'none' ;
 		
 		$pages = get_pages( array() );
 		
@@ -528,6 +642,20 @@ class PDb_Settings extends Plugin_Settings {
 			$pagelist[ $page->post_title ] = $page->ID;
 		
 		}
+		
+		/*
+		 * if you wish to include posts in the list of pages where the shortcode can be found, uncomment this block of code
+		 */
+		/*
+		
+		$posts = get_posts( array( 'numberposts' => -1 ) );
+		
+		foreach( $posts as $post ) {
+			
+			$pagelist[ $post->post_title ] = $post->ID;
+		
+		}
+		*/
 		
 		return $pagelist;
 		
@@ -542,6 +670,22 @@ class PDb_Settings extends Plugin_Settings {
     foreach( $columns as $column ) {
 
       if ( in_array( $column->form_element, array( 'text-line', 'image-upload' ) ) ) $columnlist[ $column->title ] = $column->name;
+
+    }
+
+    return $columnlist;
+
+  }
+
+	private function _get_sort_columns() {
+
+    $columnlist = array();
+
+    $columns = Participants_Db::get_column_atts( 'sortable' );
+
+    foreach( $columns as $column ) {
+
+      $columnlist[ $column->title ] = $column->name;
 
     }
 

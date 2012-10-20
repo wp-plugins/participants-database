@@ -1,0 +1,965 @@
+# Copyright (C) 2012 Participants Database
+# This file is distributed under the same license as the Participants Database package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Participants Database 1.3.4\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/participants-database\n"
+"POT-Creation-Date: 2012-03-24 22:15:44+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2012-04-04 14:47+0100\n"
+"Last-Translator: Piotr Kubala <pik256@gmail.com>\n"
+"Language-Team: PiK\n"
+"X-Poedit-Language: Polish\n"
+"X-Poedit-Country: POLAND\n"
+
+#: classes/FormElement.class.php:150
+msgctxt "indicates a write-in choice"
+msgid "other"
+msgstr "inny"
+
+#: classes/FormElement.class.php:151
+msgctxt "indicates the text to be clicked to go to another web page"
+msgid "Link Text"
+msgstr "Tekst odnośnika"
+
+#: classes/PDb_List.class.php:171
+msgctxt "noun; page number indicator"
+msgid "Page"
+msgstr "Strona"
+
+#: classes/PDb_List.class.php:483
+msgid "Do you really want to delete the selected record?"
+msgstr "Czy na pewno chcesz skasować wybrany wiersz?"
+
+#: classes/PDb_List.class.php:483
+msgid "Do you really want to delete the selected records?"
+msgstr "Czy na pewno chcesz skasować wybrane wiersze?"
+
+#: classes/PDb_List.class.php:538
+msgid "List Participants: %s record found, sorted by:"
+msgstr "Lista certyfikatów: %s wierszy, kolejność wg"
+
+#: classes/PDb_List.class.php:577
+msgid "Show only records with"
+msgstr "Pokaż tylko certyfikaty z"
+
+#: classes/PDb_List.class.php:579
+msgid "Search"
+msgstr "Szukaj"
+
+#: classes/PDb_List.class.php:583
+msgid "show all"
+msgstr "pokaż wszystkie"
+
+#: classes/PDb_List.class.php:608
+msgid "is"
+msgstr "jest"
+
+#: classes/PDb_List.class.php:609
+msgid "is not"
+msgstr "nie jest"
+
+#: classes/PDb_List.class.php:610
+msgid "contains"
+msgstr "zawiera"
+
+#: classes/PDb_List.class.php:611
+msgid "doesn&#39;t contain"
+msgstr "nie zawiera"
+
+#: classes/PDb_List.class.php:612
+msgid "is greater than"
+msgstr "jest większy niż"
+
+#: classes/PDb_List.class.php:613
+msgid "is less than"
+msgstr "jest mniejszy niż"
+
+#: classes/PDb_List.class.php:630
+msgid "Sort by"
+msgstr "Kolejność wg"
+
+#: classes/PDb_List.class.php:646
+msgid "Ascending"
+msgstr "Rosnąco"
+
+#: classes/PDb_List.class.php:647
+msgid "Descending"
+msgstr "Malejąco"
+
+#: classes/PDb_List.class.php:681
+msgid "Show %s items per page."
+msgstr "Pokaż %s wierszy na stronie"
+
+#: classes/PDb_List.class.php:738
+msgid "Edit"
+msgstr "Edycja"
+
+#: classes/PDb_List.class.php:863
+msgid "No records found"
+msgstr "Nie znaleziono żadnego certyfikatu"
+
+#: classes/PDb_List.class.php:881
+msgid "Export CSV"
+msgstr "Eksport pliku CSV"
+
+#: classes/PDb_List.class.php:893
+msgid "File Name"
+msgstr "Nazwa pliku"
+
+#: classes/PDb_List.class.php:895
+msgid "Download CSV for this list"
+msgstr "Ściągnij listę w formacie CSV"
+
+#: classes/PDb_List.class.php:898
+msgid "This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages. The fields included in the export are defined in the \"CSV\" column on the Manage Database Fields page."
+msgstr "Spowoduje to ściągnięcie pełnej listy certyfikatów, które spełniają twoje kryteria wyszukiwania, w ustalonej tutaj kolejności. Eksport będzie zawierał wpisy ze wszystkich stron. Pola zawarte w eksporcie definiuje się w kolumnie \"CSV\" w na stronie zarządzania polami bazy danych."
+
+#. translators: uses the check symbol in a phrase that means "check all"
+#: classes/PDb_List.class.php:914
+msgid "&#10004; all"
+msgstr "&#10004; wszystkie"
+
+#. translators: the following 5 strings are used in logic matching, please test
+#. after translating in case special characters cause problems
+#: classes/PDb_List.class.php:1040
+msgctxt "submit button label"
+msgid "Delete Checked"
+msgstr "Skasuj zaznaczone"
+
+#: classes/PDb_List.class.php:1041
+msgctxt "submit button label"
+msgid "Change"
+msgstr "Zmień"
+
+#: classes/PDb_List.class.php:1042
+msgctxt "submit button label"
+msgid "Sort"
+msgstr "Sortuj"
+
+#: classes/PDb_List.class.php:1043
+msgctxt "submit button label"
+msgid "Filter"
+msgstr "Filtr"
+
+#: classes/PDb_List.class.php:1044
+msgctxt "submit button label"
+msgid "Clear"
+msgstr "Wyczyść"
+
+#: classes/PDb_List.class.php:1045
+msgctxt "search button label"
+msgid "Search"
+msgstr "Szukaj"
+
+#: classes/PDb_Settings.class.php:17
+msgid "General Settings"
+msgstr "Ustawienia ogólne"
+
+#: classes/PDb_Settings.class.php:18
+msgid "Signup Form Settings"
+msgstr "Formatka rejestracji"
+
+#: classes/PDb_Settings.class.php:19
+msgid "Record Form Settings"
+msgstr "Formatka certyfikatu"
+
+#: classes/PDb_Settings.class.php:26
+#, fuzzy
+msgid "Save Plugin Settings"
+msgstr "Ustawienia zapisywania"
+
+#: classes/PDb_Settings.class.php:48
+msgid "Records per Page"
+msgstr "Wierszy na stronie"
+
+#: classes/PDb_Settings.class.php:52
+msgid "the number of records to show on each page"
+msgstr "liczba wierszy do pokazania na każdej stronie"
+
+#: classes/PDb_Settings.class.php:60
+msgid "Don&#39;t Allow Duplicate Email Addresses"
+msgstr "Unikatowe adresy email"
+
+#: classes/PDb_Settings.class.php:65
+msgid "if someone registers with an email address that already exists, update the existing record, don&#39;t create a new one."
+msgstr "jeśli ktoś rejestruje adres email, który już istnieje, wtedy zaktualizuj istniejący certyfikat zamiast dodawania nowego."
+
+#: classes/PDb_Settings.class.php:73
+msgid "Show the Private ID in List"
+msgstr "Pokazuj prywatny ID na liście"
+
+#: classes/PDb_Settings.class.php:78
+msgid "whether to show the private ID in the participant list in the admin"
+msgstr "czy pokazywać prywatny ID na liście administracyjnej"
+
+#: classes/PDb_Settings.class.php:86
+msgid "Missing Field Error Message"
+msgstr "Komunikat brakującego pola"
+
+#: classes/PDb_Settings.class.php:90
+msgid "the message shown when a field is required, but left empty (the %s is replaced by the name of the field)"
+msgstr "komunikat pojawia się kiedy pole obowiązkowe pozostawiono puste (%s jest zastępowane przez nazwę pola)"
+
+#: classes/PDb_Settings.class.php:91
+msgid "The %s field is required."
+msgstr "Pole %s jest obowiązkowe."
+
+#: classes/PDb_Settings.class.php:97
+msgid "Invalid Field Error Message"
+msgstr "Komunikat nieprawidłowego pola"
+
+#: classes/PDb_Settings.class.php:101
+msgid "the message shown when a field's value does not pass the validation test"
+msgstr "komunikat pojawia się kiedy zawartość nie jest zgodna z nałożonymi ograniczeniami"
+
+#: classes/PDb_Settings.class.php:102
+msgid "The %s field appears to be incorrect."
+msgstr "Pole %s jest nieprawidłowe."
+
+#: classes/PDb_Settings.class.php:108
+msgid "Field Error Style"
+msgstr "Styl błędnego pola"
+
+#: classes/PDb_Settings.class.php:112
+msgid "the CSS style applied to an input or text field that is missing or has not passed validation"
+msgstr "Styl CSS stosowany do brakujących i nieprawidłowych pól"
+
+#: classes/PDb_Settings.class.php:113
+msgid "border: 1px solid red"
+msgstr "border: 1px solid red"
+
+#: classes/PDb_Settings.class.php:119
+msgid "File Upload Location"
+msgstr "Lokalizacja ładowanych plików"
+
+#: classes/PDb_Settings.class.php:123
+msgid "this defines where the uploaded files will go, relative to the WordPress root.<br />Don't put it in the plugin folder, the images and files could get deleted when the plugin is updated."
+msgstr "określa ścieżkę zapisu ładowanych plików, relatywnie do kartoteki głównej WordPressa.<br>Nie ładuj plików do folderu wtyczki, ponieważ zostaną skasowane podczas aktualizacji wtyczki."
+
+#: classes/PDb_Settings.class.php:130
+msgid "Image Upload Limit"
+msgstr "Limit rozmiarów obrazków"
+
+#: classes/PDb_Settings.class.php:134
+msgid "the maximum allowed file size for an uploaded image"
+msgstr "maksymalny rozmiar pliku ładowanego obrazka"
+
+#: classes/PDb_Settings.class.php:142
+msgid "Record Edit Access Level"
+msgstr "Poziom dostępu do edycji certyfikatów"
+
+#: classes/PDb_Settings.class.php:146
+msgid "sets the user access level for adding, editing and listing records. (fields management and plugin settings always require admin level access)"
+msgstr "ustawia poziom dostępu wymaganego do dodawania, poprawiania i listowania zawartości bazy danych. (zarządzanie polami i ustawienia wtyczki zawsze wymagają praw administratora)"
+
+#: classes/PDb_Settings.class.php:154
+msgid "Make Links Clickable"
+msgstr "Twórz klikalne odnośniki"
+
+#: classes/PDb_Settings.class.php:159
+msgid "if a \"text-line\" field looks like a link (begins with \"http\") make it clickable"
+msgstr "jeśli pole typu \"text-line\" wygląda jak odnośnik (zaczyna się od \"http\") to uczyń je klikalnym odnośnikiem"
+
+#: classes/PDb_Settings.class.php:167
+msgid "Single Record Page"
+msgstr "Szczegółowa strona certyfikatu"
+
+#: classes/PDb_Settings.class.php:172
+msgid "this is the page where the [pdb_single] shortcode is located."
+msgstr "strona, na której znajduje się skrót [pdb_single]"
+
+#: classes/PDb_Settings.class.php:179
+msgid "Single Record Link Field"
+msgstr "Pole odnośnika "
+
+#: classes/PDb_Settings.class.php:184
+msgid "select the field on which to put a link to the single record. Leave blank or set to \"none\" for no link."
+msgstr "wybierz pole, które ma być odnośnikiem do strony certyfikatu. Pozostaw puste lub wpisz \"none\" jeśli nie chcesz odnośnika."
+
+#: classes/PDb_Settings.class.php:191
+msgid "Mark Required Fields"
+msgstr "Zaznacz pola obowiązkowe"
+
+#: classes/PDb_Settings.class.php:196
+msgid "mark the title of required fields?"
+msgstr "czy oznaczać nazwy pól obowiązkowych?"
+
+#: classes/PDb_Settings.class.php:204
+msgid "Required Field Marker"
+msgstr "Znacznik pola obowiązkowego"
+
+#: classes/PDb_Settings.class.php:208
+msgid "html added to field title for required fields if selected above (the %s is replaced by the name of the field)"
+msgstr "html dodany do nazwy pola obowiązkowego jeśli zaznaczono opcję powyżej (%s jest zastępowane przez nazwę pola)"
+
+#: classes/PDb_Settings.class.php:215
+msgid "Use Rich Text Editor"
+msgstr "Użyj edytora wizualnego"
+
+#: classes/PDb_Settings.class.php:220
+msgid "enable the rich text editor on textarea fields (works only for logged-in WP users)"
+msgstr "włącz edytor wizualny w polach typu obszar tekstowy (tylko dla zalogowanych użytkowników)"
+
+#: classes/PDb_Settings.class.php:228
+msgid "Send HTML Email"
+msgstr "Wyślij wiadomość HTML"
+
+#: classes/PDb_Settings.class.php:233
+msgid "use rich text in plugin emails? If you turn this off, be sure to remove all HTML tags from the email body settings for the plugin."
+msgstr "Czy używać tekstu formatowanego w emailach wtyczki? Jeśli to wyłączysz, upewnij się że usunąłeś wszystkie tagi HTML z ustawień treści emaili."
+
+#: classes/PDb_Settings.class.php:241
+msgid "Strict Date Format"
+msgstr "Dokładny format daty"
+
+#: classes/PDb_Settings.class.php:257
+msgid "Signup Button Text"
+msgstr "Tekst klawisza rejestracji"
+
+#: classes/PDb_Settings.class.php:261
+msgid "text shown on the button to sign up"
+msgstr "tekst pokazywany na przycisku rejestracji"
+
+#: classes/PDb_Settings.class.php:262
+msgctxt "the text on a button to submit a signup form"
+msgid "Sign Up"
+msgstr "Rejestruj"
+
+#: classes/PDb_Settings.class.php:268
+msgid "Signup Thanks Page"
+msgstr "Strona odpowiedzi na rejestrację"
+
+#: classes/PDb_Settings.class.php:273
+msgid "after they singup, send them to this page for a thank you message. This page is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have to do that if you have them go back to the same page."
+msgstr "po rejestracji skieruj osobę rejestrującą się na tę stronę w ramach potwierdzenia. Jest to ta strona, na której wstawiłeś skrót [pdb_signup_thanks]. Nie musisz tego robić jeśli wiesz, że osoby rejestrujące się same wrócą na tę stronę."
+
+#: classes/PDb_Settings.class.php:280
+msgid "Send Signup Response Email"
+msgstr "Wyślij email potwierdzający rejestrację"
+
+#: classes/PDb_Settings.class.php:285
+msgid "Send a receipt email to people who sign up"
+msgstr "Wyślij potwierdzenie do osób, które się zarejestrowały"
+
+#: classes/PDb_Settings.class.php:293
+msgid "Signup Email From Address"
+msgstr "Adres email nadawcy potwierdzenia rejestracji"
+
+#: classes/PDb_Settings.class.php:297
+msgid "the \"From\" address on signup receipt emails. If the recipient hits \"reply\", their reply will go to this address"
+msgstr "adres \"From\" w potwierdzeniach rejestracji. Jeśli odbiorca kliknie \"odpowiedz\", to odpowiedź zostanie wysłana na ten adres"
+
+#: classes/PDb_Settings.class.php:304
+msgid "Signup Email From Name"
+msgstr "Czytelna nazwa nadawcy potwierdzenia rejestracji"
+
+#: classes/PDb_Settings.class.php:308
+#, fuzzy
+msgid "the \"From\" name on signup receipt emails."
+msgstr "nazwa nadawcy potwierdzeń rejestracji."
+
+#: classes/PDb_Settings.class.php:315
+msgid "Signup Response Email Subject"
+msgstr "Temat odpowiedzi na rejestrację"
+
+#: classes/PDb_Settings.class.php:319
+msgid "subject line for the signup response email"
+msgstr "temat odpowiedzi na rejestrację"
+
+#: classes/PDb_Settings.class.php:320
+msgid "You've just signed up on %s"
+msgstr "Zarejestrowałeś się na %s"
+
+#: classes/PDb_Settings.class.php:326
+#, fuzzy
+msgid "Signup Response Email"
+msgstr "Adres email na odpowiedź potwierdzenia rejestracji"
+
+#: classes/PDb_Settings.class.php:330
+msgid "Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]."
+msgstr "Treść wiadomości, którą otrzyma osoba, która się zarejestrowała. Odpowiedź powinna zawierać odnośnik ([record_link]) do certyfikatu aby osoba rejestrująca mogła go uzupełnić. Może zawierać zawerać także HTML oraz pola: [imie],[nazwisko],[email],[record_link]. "
+
+#. translators: the %s will be the name of the website
+#: classes/PDb_Settings.class.php:332
+msgid "<p>Thank you, [first_name] for signing up with %s.</p><p>You may complete your registration with additional information or update your information by visiting this link at any time: <a href=\"[record_link]\">[record_link]</a>.</p>"
+msgstr "<p>Dziękujemy [first_name] za rejestrację w %s</p><p>Możesz uzupełnić lub poprawić swoje dane w dowolnym momencie na stronie <a href=\"[record_link]\">[record_link]</a>.</p>"
+
+#: classes/PDb_Settings.class.php:338
+msgid "Signup Thanks Message"
+msgstr "Treść podziękowania za rejestrację"
+
+#: classes/PDb_Settings.class.php:342
+msgid "Note to display on the web page after someone has submitted a signup form. Can include HTML, placeholders:[first_name],[last_name],[email], etc. They must be fields that are present in the signup form."
+msgstr "Informacje wyświetlane na stronie po dokonaniu rejestracji. Mogą zawierać HTML i pola: [imie],[nazwisko],[email], itp. Muszą to być pola, które wystąpiły w formularzu rejestracji."
+
+#: classes/PDb_Settings.class.php:343
+msgid "<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting the link provided in the email.</p>"
+msgstr "<p>Dziękujemy, [first_name] za rejestrację!</p><p>Wkrótce otrzymasz potwierdzenie emailem. Możesz wtedy uzupełnic swoje dane korzystając z odnośnika, który będzie zawarty w potwierdzeniu.</p>"
+
+#: classes/PDb_Settings.class.php:349
+msgid "Send Signup Notification Email"
+msgstr "Wyślij powiadomienie o nowej rejestracji"
+
+#: classes/PDb_Settings.class.php:354
+msgid "Send an email notification that a signup has occurred."
+msgstr "Wyślij powiadomienie o tym, że dokonano nowej rejestracji."
+
+#: classes/PDb_Settings.class.php:363
+msgid "Signup Notification Recipients"
+msgstr "Odbiorcy powiadomień o nowych rejestracjach"
+
+#: classes/PDb_Settings.class.php:367
+msgid "comma-separated list of email addresses to send signup notifications to"
+msgstr "oddzielona przecinkami lista adresów email, na które zostanie rozesłane powiadomienie"
+
+#: classes/PDb_Settings.class.php:374
+msgid "Signup Notification Email Subject"
+msgstr "Temat powiadomienia o rejestracji"
+
+#: classes/PDb_Settings.class.php:378
+msgid "subject of the notification email"
+msgstr "Temat powiadomienia o nowej rejestracji"
+
+#. translators: the %s will be the name of the website
+#: classes/PDb_Settings.class.php:380
+msgid "New signup on %s"
+msgstr "Nowa rejestracja na %s"
+
+#: classes/PDb_Settings.class.php:386
+#, fuzzy
+msgid "Signup Notification Email"
+msgstr "Adres email nadawcy powiadomienia o nowej rejestracji"
+
+#: classes/PDb_Settings.class.php:390
+msgid "notification email body"
+msgstr "treść powiadomienia o nowej rejestracji"
+
+#: classes/PDb_Settings.class.php:391
+msgid "<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>"
+msgstr "<p>Pojawiła się nowa rejestracja</p><ul><li>Nazwa: [first_name] [last_name]</li><li>Email: [email]</li></ul>"
+
+#: classes/PDb_Settings.class.php:397
+msgid "Show Field Groups"
+msgstr "Pokaż grupy pól"
+
+#: classes/PDb_Settings.class.php:402
+msgid "Show groups and group descriptions in the signup form."
+msgstr "Pokaż grupy i opisy grup w formularzu rejestracyjnym."
+
+#: classes/PDb_Settings.class.php:412
+msgid "Participant Record Page"
+msgstr "Szczegółowa strona certyfikatu"
+
+#: classes/PDb_Settings.class.php:417
+msgid "the page where your participant record ([pdb_record] shortcode) is displayed"
+msgstr "strona, na ktorej znajdują się szczegóły certyfikatu (skrót [pdb_record])"
+
+#: classes/PDb_Settings.class.php:424
+msgid "Save Changes Label"
+msgstr "Etykieta zapisu zmian"
+
+#: classes/PDb_Settings.class.php:429
+msgid "label for the save changes button on the record form"
+msgstr "etykieta przycisku zapisywania zmian na stronie certyfikatu"
+
+#: classes/PDb_Settings.class.php:430
+msgid "Save Your Changes"
+msgstr "Zapisz wszystkie zmiany"
+
+#: classes/PDb_Settings.class.php:436
+msgid "Save Button Text"
+msgstr "Tekst przycisku Zapisz"
+
+#: classes/PDb_Settings.class.php:441
+msgid "text on the \"save\" button"
+msgstr "treść wypisana na przycisku \"zapisz\""
+
+#: classes/PDb_Settings.class.php:442
+msgctxt "a label for a button to save a form"
+msgid "Save"
+msgstr "Zapisz"
+
+#: classes/PDb_Settings.class.php:448
+msgid "Show Group Descriptions"
+msgstr "Pokaż opisy grup"
+
+#: classes/PDb_Settings.class.php:453
+msgid "Show the group description under each group title in the record form."
+msgstr "Pokazuj opis grupy pod każdą nazwą grupy na formularzu certyfikatu. "
+
+#: classes/PDb_Settings.class.php:461
+msgid "Record Updated Message"
+msgstr "Komunikat o aktualizacji certyfikatu"
+
+#: classes/PDb_Settings.class.php:465
+msgid "the message shown when a record form has been successfully submitted"
+msgstr "komunikat ukazujący się po przyjęciu poprawnego formularza"
+
+#: classes/PDb_Settings.class.php:466
+msgid "Your information has been updated:"
+msgstr "Twoje dane zostały zaktualizowane"
+
+#: classes/PDb_Settings.class.php:472
+msgid "Send Record Form Update Notification Email"
+msgstr "Wyślij potwierdzenie aktualizacji certyfikatu emailem"
+
+#: classes/PDb_Settings.class.php:477
+msgid "Send an email notification that a record has been updated."
+msgstr "Wyślij informację o tym, że certyfikat został zaktualizowany"
+
+#: classes/PDb_Settings.class.php:485
+msgid "Record Update Email Subject"
+msgstr "Temat informacji o aktualizacji certyfikatu"
+
+#: classes/PDb_Settings.class.php:489
+msgid "subject line for the record update notification email"
+msgstr "temat informacji o aktualizacji certyfikatu"
+
+#: classes/PDb_Settings.class.php:490
+msgid "A record has just been updated on %s"
+msgstr "Zaktualizowano certyfikat na %s"
+
+#: classes/PDb_Settings.class.php:496
+#, fuzzy
+msgid "Record Update Notification Email"
+msgstr "Powiadomienie o aktualizacji certyfikatu"
+
+#: classes/PDb_Settings.class.php:500
+msgid "Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. (The field name is under the \"name\" column on the \"Manage Database Fields\" page.)  Also available is [date] which will show the date and time of the update"
+msgstr "Treść emaila z informacją o aktualizacji certyfikatu. Dowolne pola certyfikatu mogą znaleźć się treści poprzez użycie kodów [nazwa_pola], np.: [imie], [nazwisko], [email] itp. (nazwy pól znajdują się w kolumnie \"nazwa\" na stronie zarządzania polami bazy danych). Dodatkowo dostępny jest kod [date], który zawiera datę i czas aktualizacji certyfikatu."
+
+#: classes/PDb_Settings.class.php:501
+msgid "<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] [last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</li><li>Phone: [phone]</li><li>Email: [email]</li></ul>"
+msgstr "<p>Dnia [date] został zaktualizowany następujący certyfikat:</p><ul><li>Nazwa: [first_name] [last_name]</li><li>Adres: [address]</li><li>[city], [state], [country]</li><li>Tel: [phone]</li><li>Email: [email]</li></ul>"
+
+#: classes/PDb_Settings.class.php:525
+msgid "None"
+msgstr "Brak"
+
+#: classes/PDb_Settings.class.php:549
+#: participants-database.php:318
+#: participants-database.php:319
+msgid "Settings"
+msgstr "Ustawienia"
+
+#: classes/Pagination.class.php:245
+msgid "First"
+msgstr "Pierwszy"
+
+#: classes/Pagination.class.php:249
+msgid "Previous"
+msgstr "Poprzedni"
+
+#: classes/Pagination.class.php:262
+msgid "Next"
+msgstr "Następny"
+
+#: classes/Pagination.class.php:266
+msgid "Last"
+msgstr "Ostatni"
+
+#: edit_participant.php:15
+msgid "Add New Participant Record"
+msgstr "Dodaj nowy certyfikat"
+
+#: edit_participant.php:20
+msgid "Edit Existing Participant Record"
+msgstr "Edytuj istniejący certyfikat"
+
+#: edit_participant.php:74
+msgctxt "abbreviation for \"identification\""
+msgid "ID"
+msgstr "ID"
+
+#: edit_participant.php:74
+msgctxt "indicates a new record is being entered"
+msgid "(new record)"
+msgstr "(nowy certyfikat)"
+
+#: edit_participant.php:172
+msgid "Save the Record"
+msgstr "Zapisz certyfikat"
+
+#: edit_participant.php:179
+msgid "<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one"
+msgstr "<strong>Submit:</strong> zapisz i powróć do listy<br><strong>Apply:</strong> zapisz i kontynuuj pracę z tym samym certyfikatem<br><strong>Next:</strong> zapisz i przejdź do następnego certyfikatu"
+
+#. translators: these strings are used in logic matching, please test after
+#. translating in case special characters cause problems
+#: manage_fields.php:9
+msgid "Update Fields"
+msgstr "Aktualizuj pola"
+
+#: manage_fields.php:10
+msgid "Update Groups"
+msgstr "Aktualizuj grupy"
+
+#: manage_fields.php:11
+msgid "Add Field"
+msgstr "Dodaj pole"
+
+#: manage_fields.php:12
+msgid "Add Group"
+msgstr "Dodaj grupę"
+
+#: manage_fields.php:13
+msgid "new field title"
+msgstr "nazwa nowego pola"
+
+#: manage_fields.php:14
+msgid "new group title"
+msgstr "Nazwa nowej grupy"
+
+#: manage_fields.php:198
+#: participants-database.php:300
+#: participants-database.php:301
+msgid "Manage Database Fields"
+msgstr "Zarządzaj polami bazy danych"
+
+#: manage_fields.php:208
+#: manage_fields.php:215
+msgid "Field Groups"
+msgstr "Grupy pól"
+
+#: manage_fields.php:216
+msgid "Help"
+msgstr "Pomoc"
+
+#: manage_fields.php:224
+msgid "Fields"
+msgstr "Pola"
+
+#: manage_fields.php:268
+msgid "No fields in this group"
+msgstr "Brak pól w tej grupie"
+
+#: manage_fields.php:362
+msgid "Edit / Add / Remove Field Groups"
+msgstr "Edytuj / Dodaj / Usuń grupy pól"
+
+#: manage_fields.php:377
+msgid "fields"
+msgstr "pola"
+
+#: manage_fields.php:378
+msgid "delete"
+msgstr "usuń"
+
+#: manage_fields.php:557
+msgid "The %1$s was not added. Your new %1$s must have a unique name."
+msgstr "%1$s nie została dodana. Twója nowa %1$s musi mieć unikatową nazwę."
+
+#: manage_fields_help.php:4
+msgid "Manage Fields Help"
+msgstr "Pomoc do zarządzania polami"
+
+#: manage_fields_help.php:5
+msgid "Defining Database Fields"
+msgstr "Definiowanie pól"
+
+#: manage_fields_help.php:6
+msgid "The database stores information about people. On this page, you can determine what pieces of information are stored and how they are presented and interacted with. Take a look at the \"Add Participant\" page to see how the form is presented. You will be able to see your changes to how the fields are set up by checking this page."
+msgstr "Baza danych przechowuje informacje o certyfikatach. Na tej stronie możesz określić jakie informacje będą przechowywane i w jaki sposób będą one prezentowane. Spójrz na stronę \"Dodaj certyfikat\" aby zobaczyć jak wygląda formularz. Możesz sprawdzić na tej stronie skutki wprowadzanych przez siebie zmian w ustawieniach pól."
+
+#: manage_fields_help.php:7
+msgid "<strong>Important:</strong> Some of the changes you can make here will affect existing records in the database. It is best to set up your database before you begin adding records, but it is possible to add fields to the database at any time. Any records that were entered before the new field was added will have no value for the field. This can be filled in by then editing the record."
+msgstr "<strong>Ważne:</strong> Niektóre zmiany mogą wpłynąć na zawartość już przechowywanych certyfikatów. Najlepiej jest ustawić wszystko zanim rozpoczniesz wprowadzanie certyfikatów ale istnieje możliwość zmiany pól bazy danych w dowolnym momencie. Wszystkie certyfikaty wprowadzone przed zdefiniowaniem nowego pola będą miały to pole puste. Oczywiście możesz je uzupełnić edytując poszczególne certyfikaty."
+
+#: manage_fields_help.php:8
+msgid "Delete"
+msgstr "Usuń"
+
+#: manage_fields_help.php:9
+msgid "Click on the red \"X\" to delete a field. If there are existing records with this data field, that information will not be deleted from the database, but you will no longer be able to display or edit it."
+msgstr "Kliknij na czerwony \"X\" aby skasować pole. Jeśli w bazie danych są jakieś certyfikaty z danymi w tym polu, to te dane nie zostaną wykasowane z bazy danych ale nie będziesz miał już do nich dostępu."
+
+#: manage_fields_help.php:10
+msgid "Order"
+msgstr "Kolejność"
+
+#: manage_fields_help.php:11
+msgid "Click and drag to reorder the fields. You do not need to click on \"Update\" for the change to take effect."
+msgstr "Przeciągnij pola aby zmienić ich kolejność. Nie musisz klikać na przycisk \"Aktualizuj\" aby zmiana była skuteczna."
+
+#: manage_fields_help.php:12
+msgid "Title"
+msgstr "Tytuł"
+
+#: manage_fields_help.php:13
+msgid "This is the display title for your field. You can change it at any time, it won&#39;t affect the field in any way other than to change how it is labeled in forms.<p>"
+msgstr "To jest nazwa pola w takiej postaci, w jakiej jest wyświetlana ona w formularzach. Możesz ją dowolnie zmieniać, nie wpłynie to na zawartość bazy danych a jedynie na etykietę pola w formularzu.</p>"
+
+#: manage_fields_help.php:14
+msgid "Default"
+msgstr "Domyślny"
+
+#: manage_fields_help.php:15
+msgid "If you wish to pre-load a field with a value, you can put it here."
+msgstr "Jeśli chcesz mieć wstępnie zdefiniowaną zawartość pola wpisz ją tutaj."
+
+#: manage_fields_help.php:16
+msgid "Group"
+msgstr "Grupa"
+
+#: manage_fields_help.php:17
+msgid "The database fields are organized into groups, and you can select which group the database field belongs to here. You can edit the groups under the \"Field Groups\" tab."
+msgstr "Pola bazy danych łączone są w grupy, możesz wybierać do której z grup należy każde pole. Grupy edytujesz w zakładce \"Grupy pól\"."
+
+#: manage_fields_help.php:18
+msgid "Help Text"
+msgstr "Tekst pomocy"
+
+#: manage_fields_help.php:19
+msgid "When a form is displayed, sometimes it is a good idea to explain something about the information you want in a field. Any text you put in here will be displayed next to the field. HTML is allowed, but be careful with that, you can break things!"
+msgstr "Czasami dobrym pomysłem jest dokładniejsze wyjaśnienie jakich informacji oczekujesz w konkretnym polu formularza. Tekst jaki tu wpiszesz pojawi się obok pola. Możesz używać HTMLa ale bądź ostrożny, nie zepsuj całej strony."
+
+#: manage_fields_help.php:20
+msgid "Form Element"
+msgstr "Element formularza"
+
+#: manage_fields_help.php:21
+msgid "If your piece of information is a simple line of text (like a name), it should be presented in the form as a text field. If a longer piece of text is called for, a text-field would be a better choice, and so forth. This is where you can determine what kind of form element this particular piece of information will be preseted with."
+msgstr "Jeśli informacja w danycm polu to słowo lub proste wyrażenie, powinno się wybrać pole tekstowe. Jeśli to dłuższy tekst lepszym wyborem może być obszar tekstowy itd. W tym miejscu ustalasz, w jakiej formie będzie prezentowany konkretny fragment informacji."
+
+#: manage_fields_help.php:22
+msgid "Under the multiple-choice dropdown are the form elements you can choose from. It is really best to avoid changing this once you have begun adding records to the database using this field&hellip;unpredictable things can happen, and although you won&#39;t lose any data, it can make a mess! That said, it <em>is</em> possible to change between similar elements, like text/text-field or select/dropdown or select-other/dropdown-other. Be warned, it&#39;s safest to set this up before you start getting data for the field."
+msgstr "Lista wielokrotnego wyboru pozwala na wybieranie kilku spośród listy predefiniowanych wartości. Unikaj zmiany tego elementu kiedy już masz wprowadzone informacje do bazy, ponieważ mogą zdarzyć się nieprzewidywalne rzeczy. Stracisz dane lub wprowadzisz do nich bałagan. Powiedzmy, że możliwe są zmiany pomiedzy podobnymi elementami, jak pole tekstowe/obszar tekstu lub lista/selekcja. Ostrzegamy: najbezpieczniej jest zdefiniować takie rzeczy poprawnie jeszcze przed rozpoczęciem wprowadzania danych."
+
+#: manage_fields_help.php:23
+msgid "Values"
+msgstr "Wartości"
+
+#: manage_fields_help.php:24
+msgid "For form elements that have multiple choices, you need to define those choices here. Type in a comma-separated list of the options you want to present."
+msgstr "Dla elementów wielokrotnego wyboru musisz zdefiniować listę wartości, które można wybrać. Wprowadź listę wartości rozdzielonych przecinkami."
+
+#: manage_fields_help.php:25
+msgid "Don&#39;t try to have a comma in one of your options, though! It&#39;s posiible to break things by trying to include other (mostly non-text and punctuation) characters, so test things, and if you get erratic behavior in the form, you may have characters here that are messing things up. Most international language characters should be fine, just type them in. Don&#39;t try to use HTML entities or codes, it just won&#39;t work."
+msgstr "Nie próbuj wstawiać wartości, które same zawierają przecinki! Istnieje możliwość, że wartości zostaną rozdzielone wskutek wstawienia innych znaków niż przecinki, więc jeśli osiągnąłeś błędny wynik, to może on być spowodowany użyciem takiego znaku. Większość literowych znaków międzynarodowych powinna działać poprawnie, po prostu wpisz je i zobacz. Nie próbuj używac kodów HTML lub HTMLowych nazw symbolicznych, tutaj to nie zadziała."
+
+#: manage_fields_help.php:26
+msgid "Validation"
+msgstr "Weryfikacja"
+
+#: manage_fields_help.php:27
+msgid "If you wish to require certain fields, you can set that here. \"No\" means you don&#39;t care if the field is filled in or not. \"Yes\" simply means the field must have something in it. \"Regex\" is a way to look for a specific kind of content for the field, but it is for advanced users, so if you don&#39;t know what a regex is, get some help before trying to use this feature."
+msgstr "Jeśli chcesz aby pewne informacje były obligatoryjne możesz to tutaj ustawić. \"Nie\" oznacza, że nie ma znaczenia, czy pole zostało wypełnione, czy pozostawiono je puste. \"Tak\" oznacza, że coś w polu musi być. \"Regex\" jest metodą ograniczenia zawartości w taki sposób, aby spełniała określone kryteria. Wykorzystanie tego wymaga znajomości wyrażeń regularnych, więc jeśli nie wiesz co to jest, to nie używaj lub uzyskaj pomoc od kogoś, ktoś się na tym zna."
+
+#: manage_fields_help.php:28
+msgid "Admin Column"
+msgstr "Kolumna administratora"
+
+#: manage_fields_help.php:29
+msgid "This only affects the \"List Participants\" page of the plugin. On that page, the database records are listed. Since it would be impractical to include every field as a column in this list, you can select which fields are shown here. \"0\" means don&#39;t display it, a number sets the order in which the column will appear. You have to make sure the numbers make sense, if you have multiple items with the same number (other than 0), only the last one with the number will appear."
+msgstr "To zmienia jedynie stronę zawierającą listę certyfikatów. Ponieważ byłoby bardzo niepraktyczne wypisywać na takiej stronie wszystkie informacje na temat każdego certyfikatu, możesz określić które pola mają być na tej liście widoczne. \"0\" oznacza aby informacji nie wyświetlać, natomiast wyższy numer opisuje, w której kolumnie wypisać zawartość pola. Do ciebie należy zapewnienie, aby numery kolumn miały sens, jeśli wstawisz kilka pól do tej samej kolumny, to wyświetlone zostanie tylko ostatnie z nich."
+
+#: manage_fields_help.php:30
+msgid "Display Column"
+msgstr "Kolumna widoczna"
+
+#: manage_fields_help.php:31
+msgid "When using the [pdb_list] shortcode to display the list of records, this column determines whether the column will be shown and in what order."
+msgstr "To służy do określenia czy dana kolumna zostanie wyświetlona i w jakiej kolejności, gdy użyjesz skrótu [pdb_list] do wyświetlenia listy certyfikatów."
+
+#: manage_fields_help.php:32
+msgid "Switches"
+msgstr "Przełączniki"
+
+#: manage_fields_help.php:33
+msgid "<strong>Sortable</strong> means the list presented on the \"List Participants\" page can be sorted by this field. Of course, it must have a non-zero value in \"Column\" to be seen at all."
+msgstr "<strong>Sortowalne</strong> oznacza, że lista wyświetlona po wybraniu opcji \"Lista certyfikatów\" może być sortowana wg tego pola. Oczywiście numer kolumny musi być niezerowy, aby pole w ogóle było widoczne na liście."
+
+#: manage_fields_help.php:34
+msgid "<strong>CSV</strong> means the field is one that can be imported or exported with a CSV file. If you are using CSV files to bring in records, you should set these switches based on which fields you are planning to import. When exporting a CSV, this switch determines whether the field will be exported.<p>"
+msgstr "<strong>CSV</strong> oznacza, że pole będzie importowane bądź esportowane w plikach CSV. Jeśli używasz plików CSV do importowania certyfikatów, powinieneś ustawić te przełączniki na podstawie tego, które pola zamierzasz importować. Kiedy eksportujesz certyfikaty ten przełącznik określa,czy pole będzie eksportowane.<p>"
+
+#: manage_fields_help.php:35
+msgid "<strong>Persistent</strong> is a convenience feature helpful when you are manually entering a series of records in the admin. If set, it means the field will carry over to the next blank entry. For instance, if a group of records from the same city are being entered, set the \"city\" field to be persistent, then once a city value has been entered in the first record of the series, the next blank record will have this city pre-filled."
+msgstr "<strong>Trwałość</strong> to wygodna cecha przydatna wtedy gdy wprowadzasz certyfikaty w panelu administratora. Jeśli ją zaznaczysz spowoduje to, że wpisana wartość przeniesie się do nowego formularza. Np. jeśli cała grupa wprowadzanych certyfikatów dotyczy tego samego miasta ustaw pole \"miasto\" jako trwałe a nazwę miasta będziesz musiał wpisać tylko raz, kolejne formularze dla nowych certyfikatów będą miały już to pole wstępnie wypełnione."
+
+#: manage_fields_help.php:36
+msgid "<strong>Signup</strong> selects this field for use in the brief signup form that is presented with the [PDb_signup] shortcode."
+msgstr "<strong>Rejestracja</strong> powoduje, że pole to znajdzie się na skróconym formularzu rejestracyjnym wyświetlonym na stronie zawierającej skrót [Pdb_signup]."
+
+#. #-#-#-#-#  plugin.pot (Participants Database 1.3.4)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: participants-database.php:233
+msgid "Participants Database"
+msgstr "Baza certyfikatów"
+
+#: participants-database.php:281
+#: participants-database.php:282
+msgid "List Participants"
+msgstr "Lista certyfikatów"
+
+#: participants-database.php:291
+#: participants-database.php:292
+msgid "Add Participant"
+msgstr "Dodaj certyfikat"
+
+#: participants-database.php:309
+#: participants-database.php:310
+#: upload_csv.php:76
+msgid "Import CSV File"
+msgstr "Importuj plik CSV"
+
+#: participants-database.php:327
+#: participants-database.php:328
+msgid "Edit Record"
+msgstr "Edytuj certyfikat"
+
+#. translators: don't translate the words in brackets {}
+#: participants-database.php:465
+msgid "There is no record for this ID."
+msgstr "Nie ma certyfikatu z takim identyfikatorem."
+
+#: participants-database.php:506
+msgctxt "message to show if the plugin cannot find the template"
+msgid "Missing Template"
+msgstr "Brak szablonu."
+
+#: participants-database.php:524
+msgid "No record found for %s."
+msgstr "Nie znaleziono certyfikatu %s"
+
+#: participants-database.php:1103
+msgid "The date for \"%s\" was invalid. Please input the date with the exact format shown"
+msgstr "Data \"%s\" jest nieprawidłowa. Wprowadź datę dokładnie w prezentowanej formie"
+
+#. translators: the %s will be the name of the file
+#: participants-database.php:1868
+msgid "Input file does not exist or path is incorrect.<br />Attempted to load: %s"
+msgstr "Plik wejściowy nie istnieje lub podana ścieżka jest błędna. <br />Próbowano załadować: %s"
+
+#: participants-database.php:1912
+msgid "The number of items in line %s is incorrect.<br />There are %s and there should be %s."
+msgstr "Liczba elementów w linii %s jest nieprawidłowa.<br />Znaleziono %s elementów, a oczekiwano %s."
+
+#: participants-database.php:1920
+msgid "Number of values does not match number of columns"
+msgstr "Liczba wartości nie jest zgodna z ilością kolumn"
+
+#: participants-database.php:2033
+msgid "There is something wrong with the file you tried to upload. Try another."
+msgstr "Niestety jest jakaś nieprawidłowość w przysłanym pliku. Spróbuj przysłać inny."
+
+#: participants-database.php:2044
+msgid "You may only upload image files like JPEGs, GIFs or PNGs."
+msgstr "Możesz przysyłać jedynie pliki obrazków JPEG, GIF lub PNG."
+
+#: participants-database.php:2058
+msgid "The image you tried to upload is too large. The file must be smaller than %sK."
+msgstr "Obrazek, który przysłałeś jest za duży. Plik musi być mniejszy niż %sK."
+
+#: participants-database.php:2066
+msgid "The file could not be saved."
+msgstr "Nie udało się zapisać pliku."
+
+#: participants-database.php:2092
+msgid "The uploads directory (%s) could not be created."
+msgstr "Nie można utworzyć kartoteki na przysyłane pliki (%s)."
+
+#: participants-database.php:2261
+msgid "WordPress Plugin"
+msgstr "Wtyczka WordPressa"
+
+#: participants-database.php:2262
+msgid "Helping organizations manage their volunteers, members and participants."
+msgstr "Pomaga organizacjom zarządzać woluntariuszami, członkami, uczestnikami i certyfikatami."
+
+#: participants-database.php:2265
+msgid "Developed by"
+msgstr "napisana przez"
+
+#: participants-database.php:2266
+msgid "Suggestions or crticisms of this plugin? I&#39;d love to hear them: email "
+msgstr "Sugestie albo uwagi dotyczące wtyczki? Chętnie posłucham: email "
+
+#: participants-database.php:2269
+msgid "Please consider contributing to the continued support and development of this software by visiting %1$sthis plugin&#39;s page,%3$s giving the plugin a %2$srating%3$s or review, or dropping something in the %1$stip jar.%3$s Thanks!"
+msgstr "Proszę, rozważ dotację na wsparcie i rozwój tego oprogramowania poprzez odwiedzenie %1$sstrony tej wtyczki%3$s, podniesienie %2$spozycji w rankingu wtyczki%3$s, recenzję, albo pozostawienie czegoś w moim %1$stip jar.%3$s Dziękuję!"
+
+#: upload_csv.php:35
+msgid "The file %s has been uploaded."
+msgstr "Plik %s został wczytany."
+
+#: upload_csv.php:41
+msgid "record imported"
+msgstr "zaimportowanych certyfikatów."
+
+#: upload_csv.php:45
+msgid "Zero records imported."
+msgstr "Nie zaimportowano żadnych certyfikatów."
+
+#: upload_csv.php:50
+msgid "Error occured while trying to add the data to the database"
+msgstr "W trakcie wpisywania danych do bazy pojawił się błąd"
+
+#: upload_csv.php:58
+msgid "There was an error uploading the file."
+msgstr "W trakcie przesyłania pliku pojawił się błąd"
+
+#: upload_csv.php:59
+#, fuzzy
+msgid "Destination"
+msgstr "Przeznaczenie"
+
+#: upload_csv.php:96
+msgid "1. Prepare a spreadsheet file with the correct format:"
+msgstr "1. Przygotuj plik arkusza w poprawnym formacie:"
+
+#: upload_csv.php:98
+msgid "To properly import your membership data, the columns in your spreadsheet must match exactly the columns in the database. Currently, the CSV import columns are as follows:"
+msgstr "Aby poprawnie zaimportować certyfikaty, poszczególne kolumny w twoim arkuszu muszą dokładnie pasować do kolumn w bazie danych. Kolumny importowanego pliku CSV powinny być następujące:"
+
+#: upload_csv.php:113
+msgid "This means your spreadsheet needs to have %s columns, and the heading in each of those columns needs to match exactly the names above. If there is no data for a particular column, you can include it and leave it blank, or leave it out entirely. The order of the columns doesn&#39;t matter."
+msgstr "Oznacza to, że twój arkusz musi mieć %s kolumn, a nagłówek każdej kolumny musi dokładnie pasować do powyższych nazw. Jeśli nie ma żadnych danych dla którejś z kolumn, to możesz ją pozostawić pustą albo całkowicie pominąć. Kolejność kolumn nie ma znaczenia."
+
+#: upload_csv.php:114
+msgid "<strong>Note:</strong> Imported records are checked against existing records by email. (Only if \"Don&#39;t Allow Duplicate Email Addresses\" is checked in the settings) If a record with an email matching an existing record is imported, the existing record will be updated with the data from the imported record. Blank or missing fields in such an imported record will not overwrite existing data."
+msgstr "<strong>Uwaga:</strong> Importowane certyfikaty są sprawdzane z istniejącymi pod kątem unikatowości pola email (tylko wtedy, gdy zaznaczyłeś opcję \"blokuj duplikaty adresów email\" w ustawieniach bazy danych). Jeśli zostanie zaimportowany certyfikat z takim samym emailem, jak jeden z certyfikatow w bazie danych, to zostanie zaktualizowana zawartość istniejącego certyfikatu. Puste lub brakujące pola w importowanym pliku nie spowodują skasowania danych w odpowiadających im polach w bazie danych."
+
+#: upload_csv.php:115
+msgid "Get Blank CSV File"
+msgstr "Pobierz pusty plik CSV"
+
+#: upload_csv.php:115
+msgid "You can download this file, then open it in Open Office, Excel or Google Docs."
+msgstr "Możesz ściągnąć ten plik a potem otworzyć go korzystając z Open Office, Excella lub Google Docs."
+
+#: upload_csv.php:121
+msgid "2. Upload the .csv file"
+msgstr "2. Wyślij plik .csv"
+
+#: upload_csv.php:123
+msgid "When you have your spreadsheet properly set up and filled with data, export it as any of the following: \"comma-delimited csv\", \"tab-delimited csv\", or just \"csv\". Save it to your computer then upload it here."
+msgstr "Kiedy już masz poprawnie skonfigurowany arkusz z danymi, wyeksportuj go do jednego z następujących formatów:  \"comma-delimited csv\", \"tab-delimited csv\", albo \"csv\". Zapisz go na komputerze a następnie wyślij tutaj."
+
+#: upload_csv.php:126
+msgid "Choose .csv file to import:"
+msgstr "Wybierz plik .csv do importu:"
+
+#: upload_csv.php:127
+msgid "Upload File"
+msgstr "Wyślij plik"
+
+#. Plugin URI of the plugin/theme
+msgid "http://xnau.com/wordpress-plugins/participants-database"
+msgstr "http://xnau.com/wordpress-plugins/participants-database"
+
+#. Description of the plugin/theme
+msgid "Plugin for managing a database of participants, members or volunteers"
+msgstr "Wtyczka do zarządzania bazą uczestników, członków woluntariuszy lub certyfikatów"
+
+#. Author of the plugin/theme
+msgid "Roland Barker"
+msgstr "Roland Barker"
+
+#. Author URI of the plugin/theme
+msgid "http://xnau.com"
+msgstr "http://xnau.com"
+

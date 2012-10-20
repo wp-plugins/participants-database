@@ -1,6 +1,4 @@
 @charset "UTF-8";
-@import url("PDb-list.css");
-@import url("PDb-record.css");
 
 /* Participants DB CSS */
 body[class*='participants-database'] .widefat td {
@@ -43,7 +41,7 @@ body[class*='participants-database'] a.delete {
 	display:block;
 	width:12px;
 	height:26px;
-	background:url('ui/delete.png') no-repeat center center;
+	background:url('../ui/delete.png') no-repeat center center;
 }
 body[class*='participants-database'] .form-table {
 	margin-bottom:4em;
@@ -97,14 +95,14 @@ div.manage-fields-wrap {
 .id, .order, .persistent, .sortable, .admin_column, .display_column, .CSV {
 	text-align:center;
 }
-th.id, th.order, th.persistent, th.sortable, th.CSV, th.delete, th.signup {
+th.vertical-title  {
 	width:25px;
 }
 th.admin_column, th.display_column, th.display {
 	width:40px;
 }
 th.form_element {
-	width:130px;
+	width:150px;
 }
 th.validation, th.title, th.default, th.group, th.name {
 	width:8%;
@@ -276,10 +274,13 @@ a.dragger {
 	/* css3 drop shadow */
 	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 	/* css3 border radius */
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
-	background:#eee;
+	border-radius: 5px;
+	background:#FFFBCC;
+   border: 1px solid #E6DB55;
 	/* styling of the dialog box, i have a fixed dimension for this demo */
 	width:328px;
 	/* make sure it has the highest z-index */

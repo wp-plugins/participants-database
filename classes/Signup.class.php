@@ -168,7 +168,7 @@ class Signup {
 			
 				}
 			
-		} elseif ( $submission_id && false === get_transient( 'signup-'.$submission_id ) ) {
+		} elseif ( $submission_id && 'sent' != get_transient( 'signup-'.$submission_id ) ) {
 
 			// load the values from the newly-submitted record
 			$this->_load_participant( $submission_id );
@@ -182,7 +182,8 @@ class Signup {
 			// send the email receipt and notification
 			$this->_send_email();
 			
-			set_transient( 'signup-'.$submission_id, 'sent', 30 );
+			// mark the record as sent to prevent duplicate emails
+			set_transient( 'signup-'.$submission_id, 'sent', 86400 );
 			
 		}
 		
@@ -207,26 +208,20 @@ class Signup {
 	
 	private function _print_from_template() {
 		
-		$template = get_stylesheet_directory().'/templates/pdb-signup-'.$this->shortcode_atts['template'].'.php';
+		$template = Participants_Db::get_template( 'signup', $this->shortcode_atts['template'] );
 			
-    if ( ! file_exists( $template ) ) {
+    if ( false === $template ) {
+			
+			$this->output = '<p class="alert alert-error">'.sprintf(_x('%sThe template %s was not found.%s Please make sure the name is correct and the template file is in the correct location.', 'message to show if the plugin cannot find the template', Participants_Db::PLUGIN_NAME ), '<strong>', 'pdb-signup-'.$this->shortcode_atts['template'].'.php', '</strong>' ) .'</p>';
+      
+    	return false;
 
-      $template = Participants_Db::$plugin_path.'/templates/pdb-signup-'.$this->shortcode_atts['template'].'.php';
-
-    } elseif ( ! file_exists( $template ) ) {
-
-      error_log( __METHOD__.' template not found: pdb-signup-'.$template.'.php' );
-      return '<p>'._x('Missing Template', 'message to show if the plugin cannot find the template', Participants_Db::PLUGIN_NAME ).'</p>';
 
     }
-
-    error_log( __METHOD__.' using template:'.$template );
 			
-    ob_start(); ?>
+    ob_start();
     
-    <link media="all" type="text/css" href="<?php echo plugins_url( Participants_Db::PLUGIN_NAME.'/css/PDb-signup.css' ) ?>" rel="stylesheet">
-
-    <?php include $template;
+    include $template;
 
     $this->output = ob_get_clean();
 			
@@ -240,17 +235,17 @@ class Signup {
     if ( $this->options['signup_show_group_descriptions'] ) {
 
       // get the groups object
-      $sql = '
-              SELECT g.title, g.name, g.description
-              FROM '.Participants_Db::$groups_table.' g
+      $sql = "
+              SELECT REPLACE( g.title, '\\\', '' ) as title, g.name, REPLACE( g.description, '\\\', '' ) as description 
+              FROM ".Participants_Db::$groups_table." g
               WHERE g.display = 1
               AND g.name IN (
                 SELECT f.group
-                FROM '.Participants_Db::$fields_table.' f
+                FROM ".Participants_Db::$fields_table." f
                 WHERE f.signup = 1
                 )
               ORDER BY `order` ASC
-              ';
+              ";
 
       $groups = $wpdb->get_results( $sql, OBJECT_K );
 
@@ -261,12 +256,15 @@ class Signup {
 
     }
 
+    // define which field columns are needed, un-escaping the display fields
+    $field_select = "f.name, REPLACE(f.title,'\\\','') as title, REPLACE(f.help_text,'\\\','') as help_text, f.form_element, f.values, f.validation, f.default";
+
     foreach( $groups as $group ) {
 
       $where = isset( $group->name ) ? 'f.group = "'.$group->name.'"' : 'g.display = 1';
 
       $sql = '
-              SELECT f.*, g.display, g.order
+              SELECT '.$field_select.', g.display, g.order
               FROM '.Participants_Db::$fields_table.' f
               JOIN '.Participants_Db::$groups_table.' g
 							ON f.group = g.name
@@ -292,7 +290,7 @@ class Signup {
         <?php
         FormElement::print_hidden_fields( array(
                                                 'action'=>'signup',
-                                                'source'=>Participants_Db::PLUGIN_NAME,
+                                                'subsource'=>Participants_Db::PLUGIN_NAME,
                                                 'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ),
                                                 'thanks_page' => $this->submission_page
                                                 ) );
@@ -438,18 +436,22 @@ class Signup {
 		
 		if ( ! isset( $this->participant['email'] ) || empty( $this->participant['email'] ) ) return NULL;
 
-		$body = $this->_proc_tags( $this->receipt_body );
-
-		$this->_mail( $this->participant['email'], $this->receipt_subject, $body );
+		$this->_mail(
+								 $this->participant['email'],
+								 $this->_proc_tags( $this->receipt_subject ),
+								 $this->_proc_tags( $this->receipt_body )
+								 );
 		
 	}
 
 	// sends a notification email
 	private function _do_notify() {
-
-		$body = $this->_proc_tags( $this->notify_body );
 		
-		$this->_mail( $this->notify_recipients, $this->notify_subject, $body );
+		$this->_mail(
+								 $this->notify_recipients, 
+								 $this->_proc_tags( $this->notify_subject ), 
+								 $this->_proc_tags( $this->notify_body ) 
+								 );
 		
 		
 	}
@@ -509,12 +511,16 @@ class Signup {
 
 		$p = Participants_Db::get_participant( $id );
 
+		if ( false !== $p ) {
+
 		foreach( $this->signup_columns as $column ) {
 
 			$this->participant[ $column->name ] = $p[ $column->name ];
 
 		}
 
+	}
+	
 	}
 	
 	private function _print_hidden_field( $column, $value = false ) {

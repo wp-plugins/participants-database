@@ -9,23 +9,23 @@ class FormValidation {
 	// this array collects validation errors for each field
 	private $errors;
 
-	private $invalid_message;
-	private $empty_message;
+  // holds the error messages
+	private $error_messages;
+  
+  // holds the CSS for an error indication as defined in the options
 	private $error_style;
 	public	$error_CSS;
 	
 	// holds the class name we give the container: error or message
 	private $error_class;
 
-	/**
+  // holdes an array of all the submitted values
+  private $post_array;
+
+	/*
 	 * instantiates the form validation object
 	 * this is meant to be instantiated once per form submission
-	 * called with the plugin options array
 	 *
-	 * @param array $options
-	 *                empty_field_message
-	 *                invalid_field_message
-	 *                field_error_style
 	 */
 	public function __construct() {
 
@@ -35,10 +35,14 @@ class FormValidation {
 
 		// clear the array
 		$this->errors = array();
-		$this->error_CSS = array();
 
-		$this->invalid_message = $options['invalid_field_message'];
-		$this->empty_message = $options['empty_field_message'];
+    /*
+     * get our error messages from the plugin options
+     * 
+     */
+    foreach ( array( 'invalid','empty','nonmatching','duplicate' ) as $error_type ) {
+      $this->error_messages[$error_type] = $options[$error_type.'_field_message'];
+    }
 		$this->error_style = $options['field_error_style'];
 
 	}
@@ -55,14 +59,17 @@ class FormValidation {
 	 * @param string $value       the submitted value of the field
 	 * @param string $column_atts the column atributes object
 	 *                            validation key can be NULL, 'yes', 'email', regex
+	 * @param array  $post        the post array with all submitted values
 	 */
-	public function validate( $value, $column_atts ) {
+	public function validate( $value, $column_atts, $post = NULL ) {
 
-		if ( isset( $column_atts->validation ) ) :
+		if ( isset( $column_atts->validation ) ) {
 
-			$this->_validate_field( $value, $column_atts->name, $column_atts->validation );
+			$this->_validate_field( $value, $column_atts->name, $column_atts->validation, $column_atts->title );
 
-		endif;
+      if ( is_array( $post ) ) $this->post_array = $post;
+
+    }
 
 	}
 
@@ -130,25 +137,12 @@ class FormValidation {
 
 			if ( $element ) $this->error_CSS[] = '#'.Participants_Db::$css_prefix.$field.' '.$element;
 
-			switch ( $error ) {
-
-				case 'empty':
-
-					$error_messages[] = sprintf( $this->empty_message, $field_atts->title );
-					$this->error_class = 'pdb-error';
-					break;
-
-				case 'invalid':
-
-					$error_messages[] = sprintf( $this->invalid_message, $field_atts->title );
-					$this->error_class = 'pdb-error';
-					break;
-
-				default:
-				
-					$error_messages[] = $error;
-					$this->error_class = empty( $field ) ? 'pdb-message' :'pdb-error' ;
-
+			if ( isset( $this->error_messages[$error] ) ) {
+        $error_messages[] = sprintf( $this->error_messages[$error], $field_atts->title );
+				$this->error_class = 'pdb-error';
+      } else {
+      	$error_messages[] = $error;
+				$this->error_class = empty( $field ) ? 'pdb-message' :'pdb-error' ;
 			}
 
 		endforeach;// $this->errors 
@@ -227,32 +221,56 @@ class FormValidation {
 
 		// error_log( __METHOD__.' validating field '.$name.' of value '.$value.' with '.$validation );
 
+    $error_type = false;
+
+    /*
+     * set as empty any fields requiring validation
+     * second condition is to allow match validation fields to be empty; they'll be tested again
+     */
 		if ( empty( $validation ) || NULL === $validation || 'no' == strtolower( $validation ) ) return;
 
-		if ( 'yes' == strtolower( $validation ) || self::_is_regex( $validation ) ) {
+		elseif ( empty( $value )  && ! isset( $this->post_array[$validation] ) ) $error_type = 'empty';
+    
+    else {
 
-			if ( empty( $value ) ) $this->_add_error( $name, 'empty' );
-
-		}
-
-		if ( ! empty( $value ) ) {
-
-			$regex = false;
-
-			if ( 'email'== strtolower( $validation ) ) {
-
-				$regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
-
-			} elseif ( self::_is_regex( $validation ) ) {
-
-				$regex = $validation;
-
-			}
-
-			if ( false !== $regex && preg_match( $regex, $value ) == 0 )
-				$this->_add_error( $name, 'invalid' );
-
-		}
+      /*
+       * perform the specific type of validation with our field
+       */
+      $regex = false;
+      $test_value = false;
+      switch (true) {
+        
+        /*
+         * if it's not a regex, test to see if it's a valid field name for a match test
+         */
+        case ( isset( $this->post_array[$validation] ) ) :
+          
+          $test_value = $this->post_array[$validation];
+          break;
+  
+        case ( 'email'== strtolower( $validation ) ) :
+  
+          $regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
+          break;
+  
+        case ( self::_is_regex( $validation ) ) :
+  
+          $regex = $validation;
+          break;
+        
+        default:
+  
+      }
+  
+      if ( false !== $regex && preg_match( $regex, $value ) == 0 ) {
+        $error_type = 'invalid';
+      } elseif ( false !== $test_value && $value !== $test_value ) {
+        $error_type = 'nonmatching';
+      }
+      
+    }
+    
+    if ( $error_type ) $this->_add_error( $name, $error_type );
 
 	}
 
