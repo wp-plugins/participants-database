@@ -103,8 +103,8 @@ class Participants_Db {
 	// header to include with plugin emails
 	public static $email_headers;
 	
-	// list of reserved field name
-	public static $reserved_names = array( 'source','subsource','id','private_id','action','submit','name', 'day','month','year','hour','date','minute' );
+	// list of reserved field names
+	public static $reserved_names = array( 'source','subsource','id','private_id','record_link','action','submit','name','day','month','year','hour','date','minute' );
 	
 	public function initialize() {
 
@@ -198,11 +198,14 @@ class Participants_Db {
 		add_action( 'wp_ajax_nopriv_pdb_list_filter', array( __CLASS__, 'pdb_list_filter' ) );
 
 		// define our shortcodes
-		add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
+		//add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
+		add_shortcode( 'pdb_record', array( __CLASS__, 'record_edit') );
 		add_shortcode( 'pdb_signup', array( __CLASS__, 'print_signup_form' ) );
 		add_shortcode( 'pdb_signup_thanks', array( __CLASS__, 'print_signup_thanks_form' ) );
-		add_shortcode( 'pdb_list', array( 'PDb_List','initialize' ) );
-		add_shortcode( 'pdb_single', array( __CLASS__, 'show_record' ) );
+		//add_shortcode( 'pdb_list', array( 'PDb_List_Static','initialize' ) );
+		add_shortcode( 'pdb_list', array( __CLASS__, 'print_list' ) );
+		add_shortcode( 'pdb_single', array( __CLASS__, 'print_single_record' ) );
+		//add_shortcode( 'pdb_single', array( __CLASS__, 'show_record' ) );
 		
 	
 		if ($wpdb->get_var('SHOW TABLES LIKE "'.self::$participants_table.'"') == self::$participants_table) :
@@ -295,7 +298,7 @@ class Participants_Db {
 			__('List Participants', self::PLUGIN_NAME ), 
 			self::$plugin_options['record_edit_capability'],
 			self::$plugin_page.'-list_participants',
-			array( 'PDb_List_Records','initialize' )
+			array( 'PDb_List_Admin','initialize' )
 			/*array( __CLASS__, 'include_admin_file' )*/ 
 			);
 		
@@ -472,39 +475,16 @@ class Participants_Db {
 		
 	}
 	
-	// plays out a record edit screeen for a participant
-	// it requires the use of a link with an id number
-	// low security on entry becuase we don't require that they establish an
-	// account, but we do use an encrypted account number
-	public function frontend_edit( $atts ) {
+  /**
+   * shows the frontend edit screen called by the [pdb_record] shortcode
+   *
+   * requires the 'pid' value in the URI
+   */
+  function record_edit( $atts ) {
 
-		// at present, there are no attributes
-		$vars = shortcode_atts( array(
-                                  'class' => 'PDb-record'
-                                  ), $atts );
-		
-		if ( isset( $_GET['pid'] ) ) {
-
-      $participant_id = self::get_participant_id( $_GET['pid'] );
-
-      if ( $participant_id ) {
-        
-        // update the access timestamp
-        self::_record_access( $participant_id );
+		$atts['id'] = isset( $_GET['pid'] ) ? self::get_participant_id( $_GET['pid'] ) : false;
 				
-				ob_start();
-        ?>
-        <div class="<?php echo $vars['class']?>">
-        <?php
-
-        include 'edit_participant.php';
-
-        ?></div><?php
-				
-				return ob_get_clean();
-			
-      } else return '<p>'.__('There is no record for this ID.', self::PLUGIN_NAME ).'</p>';
-    }
+    return PDb_Record::print_form( $atts );
 		
 	}
   
@@ -518,6 +498,15 @@ class Participants_Db {
     $sql = 'UPDATE '.self::$participants_table.' SET `last_accessed` = NOW() WHERE `id` = '.$id;
     
     return $wpdb->query( $sql );
+    
+  }
+	
+	/**
+   * sets the last_accessed timestamp
+   */
+  public function set_record_access( $id ) {
+    
+    self::_record_access( $id );
     
   }
 	
@@ -575,11 +564,31 @@ class Participants_Db {
   }
 	
 	/**
+   * prints a single record called by [pdb_list] shortcode
+   */
+  public function print_list( $params ) {
+    
+    return PDb_List::print_record( $params );
+    
+  }
+  
+  /**
+   * prints a single record called by [pdb_single] shortcode
+   */
+  public function print_single_record( $params ) {
+    
+    return PDb_Single::print_record( $params );
+    
+  }
+	
+	/**
 	 * prints a signup form
 	 */
 	public function print_signup_form( $params ) {
 
-		return Signup::print_form( $params );
+    $params['post_id'] = get_the_ID();
+
+		return PDb_Signup::print_form( $params );
 		
 	}
 	
@@ -588,9 +597,11 @@ class Participants_Db {
 	 */
 	public function print_signup_thanks_form( $params ) {
 		
+    $params['post_id'] = get_the_ID();
+		
 		$params['type'] = 'thanks';
 
-		return Signup::print_form( $params );
+		return PDb_Signup::print_form( $params );
 		
 	}
 
@@ -600,8 +611,8 @@ class Participants_Db {
 	 * looks first in the theme directory for the template file; then in the
 	 * plugin's directory for the named template, then for the default template
 	 *
-	 * @param string $module the mopdule name of the shortcode calling the
-	 *                       template: single, list, signup
+	 * @param string $module        the module name of the shortcode calling the
+	 *                              template: single, list, signup
 	 * @param string $template_name the name of the template to use
 	 *
 	 * @return the URL of the template file or false if none found
@@ -669,14 +680,30 @@ class Participants_Db {
 	 * get an array of groups
 	 *
 	 * @param string $column comma-separated list of columns to get, defualts to all (*)
-	 * @param string $exclude comma-separated list of groups to exclude
+	 * @param mixed $exclude singe group to exclude or array of groups to exclude
 	 * @return indexed array
 	 */
-  public function get_groups( $column = '*', $exclude = '' ) {
+  public function get_groups( $column = '*', $exclude = false ) {
 
 		global $wpdb;
 		
-		$where = empty( $exclude ) ? '' : ' WHERE `name` != "'.$exclude.'" ';
+    $where = '';
+		
+    if ( $exclude ) {
+      
+      $where = ' WHERE `name` ';
+      
+      if ( is_array( $exclude ) ) {
+        
+        $where .= 'NOT IN ("'.implode('","',$exclude).'") ';
+        
+      } else {
+        
+        $where .= '!= "'.$exclude.'" ';
+        
+      }
+      
+    }
 
 		$sql = 'SELECT '.$column.' FROM '.self::$groups_table.$where.' ORDER BY `order`,`name` ASC';
 		
@@ -897,6 +924,10 @@ class Participants_Db {
 	
   /**
    * builds an object of all participant values structured by groups and columns
+   *
+   * this function is DEPRICATED in favor of using the Shortcode class to render
+   * shortcode output, but we have to leave it in here for the moment because
+   * there may be modified templates using this function still in use
    */
 	public function single_record_fields( $id, $exclude = '' ) {
 
@@ -949,15 +980,23 @@ class Participants_Db {
 	 *
 	 * @param string $value        the raw value of the field
 	 * @param string $form_element the form element type of the field
+	 * @param bool   $html         if true, format fields with html; false: plain text only
 	 * @return string
 	 */
-	public function prep_field_for_display( $value, $form_element ) {
+	public function prep_field_for_display( $value, $form_element, $html = true ) {
 		
 		switch ( $form_element ) :
               
 			case 'image-upload' :
 			
-				$return = empty( $value ) ? '' : '<img src="'.self::get_image_uri( $value ).'" />';
+        $image = new PDb_Image( array( 'filename'=>$value ) );
+        
+        if ( $html ) $return = $image->get_image_html();
+        
+        elseif ( $image->file_exists ) $return = $image->get_image_file();
+      
+        else $return = $value;
+        
 				break;
 				
 			case 'date' :
@@ -984,16 +1023,22 @@ class Participants_Db {
 				
 				if ( 2 > count( $linkdata ) ) $lindata[1] = $linkdata[0];
 			
-				$return = vsprintf( ( empty( $linkdata[0] ) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>' ), $linkdata );
+				if ( $html ) $return = vsprintf( ( empty( $linkdata[0] ) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>' ), $linkdata );
+        else $return = $linkdata[0];
 				break;
 				
       case 'text-line' :
 
-        if ( self::$plugin_options['make_links'] ) {
+        if ( self::$plugin_options['make_links'] and $html ) {
 
           $return = self::make_link( $value );
           break;
 
+        } else {
+          
+          $return = $value;
+          break;
+          
         }
 				
 			default :
@@ -1028,19 +1073,53 @@ class Participants_Db {
   }
 	
 	/**
+	 * checks for the existence of an image file
+	 *
+	 * checks both absolute path and path relative to image location setting
+	 *
+	 * DEPRICATED this is handled in the PDb_Image class
+	 *
+	 * @return bool true if file exists
+	 */
+	public function image_exists( $filename ) {
+    
+    
+		
+		if ( ! file_exists( $filename ) ) {
+			
+			$filename = get_bloginfo('wpurl').'/'.self::$plugin_options['image_upload_location'].basename( $filename );
+			
+		}
+    
+    
+    
+    error_log( __METHOD__.' '.$filename.' is file:'. (is_file( $filename ) ?'yes':'no').' file_exists:'.(file_exists( $filename ) ? 'yes' : 'no' ).' imagesize:'.(getimagesize( $filename )?'yes':'no') ) ;
+    
+    if ( file_exists( $filename ) ) return true;
+    
+    else return false;
+		
+	}
+	
+	/**
 	 * returns a path to the defined image location
 	 *
+	 * this func is superceded by the PDb_Image class methods
+	 *
 	 * can also deal with a path saved before 1.3.2 which included the whole path
+	 *
+	 * @return the file url if valid; if the file can't be found returns the
+	 *         supplied filename
 	 */
 	public function get_image_uri( $filename ) {
 		
 		if ( ! file_exists( $filename ) ) {
 			
-			$fileURI = get_bloginfo('wpurl').'/'.self::$plugin_options['image_upload_location'].basename( $filename );
+			$filename = get_bloginfo('wpurl').'/'.self::$plugin_options['image_upload_location'].basename( $filename );
 					
-			return $fileURI ;
+		}
 			
-		} else return $filename;
+    return $filename;
 		
 	}
 	
@@ -1323,6 +1402,12 @@ class Participants_Db {
 		
 		return self::_get_participant_id_by_term( 'private_id', $pid );
 
+  }
+	
+  public function get_record_id_by_term( $term, $id ) {
+    
+    return self::_get_participant_id_by_term( $term, $id );
+    
   }
 	
 	/**
@@ -1752,9 +1837,6 @@ class Participants_Db {
 			
 		 case 'signup' :
 		 
-			// instantiate the validation object if it doesn't exist
-			if ( ! is_object( self::$validation_errors ) ) self::$validation_errors = new FormValidation();
-	
 			/* if someone signs up with an email that already exists, we update that
 			 * record rather than let them create a new record. This gives us a method
 			 * for dealing with people who have lost their access link, they just sign
@@ -2011,7 +2093,7 @@ class Participants_Db {
 		// build the column names
 		if ( is_array( $CSV->titles ) ) {
 			
-			$column_names = $CSV->titles;
+			$column_names = explode( ',', $CSV->titles);
 			
 			// remove enclosure characters
 			array_walk( $column_names, array( __CLASS__, '_enclosure_trim' ), $CSV->enclosure );
@@ -2039,7 +2121,7 @@ class Participants_Db {
 				$values[] = $wpdb->escape( trim( $value, $CSV->enclosure ) );
 			}
 	
-			if ( count( $values ) != count( $column_names) ) {
+			if ( count( $values ) != count( $column_names ) ) {
 	
 				return sprintf( 
 											 __('The number of items in line %s is incorrect.<br />There are %s and there should be %s.', self::PLUGIN_NAME ),
@@ -2112,7 +2194,7 @@ class Participants_Db {
     if ( filter_var( $URI, FILTER_VALIDATE_URL ) ) {
 
       // convert the get array to a get string and add it to the URI
-    if ( false !== $get && is_array( $get ) ) {
+      if ( is_array( $get ) ) {
 
           $URI .= false !== strpos( $URI, '?' ) ? '&' : '?';
 
@@ -2121,6 +2203,9 @@ class Participants_Db {
         }
 
     } elseif ( filter_var( $URI, FILTER_VALIDATE_EMAIL ) ) {
+
+      // in admin, emails are plaintext
+      if ( is_admin() ) return esc_html( $link );
 
       if ( self::$plugin_options['email_protect'] ) {
 

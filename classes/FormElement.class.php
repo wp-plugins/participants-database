@@ -595,6 +595,9 @@ class FormElement {
 	 */
 	private function _link_field( $linktext = true ) {
 		
+    $link_placeholder = '(URL)';
+    $linktext_placeholder = $this->i18n['linktext'];
+		
 		if ( true === $linktext ) {
 			
 			$parts = is_serialized( $this->value ) ? unserialize( $this->value ) : (array) $this->value;
@@ -607,17 +610,22 @@ class FormElement {
 			
 		} else $url = $this->value;
 		
-		$url = empty( $url ) ? '(URL)' : $url; 
+		//$url = empty( $url ) ? $link_placeholder : $url;
+    $title = empty( $title ) ? $linktext_placeholder : $title;
+    
+    // previous onClick script: "this.value=this.value=='(URL)'?'':this.value"
 		
-		$this->attributes['onclick'] = "this.value=this.value=='(URL)'?'':this.value";
+		$this->attributes['placeholder'] = $link_placeholder;
 		
 		$this->_addline( $this->_input_tag( 'text', $url, false, $linktext ) );
 		
-		unset( $this->attributes['onclick'] );
+		$this->attributes['placeholder'] = $linktext_placeholder;
 		
 		if ( true === $linktext )  {
 		
-			$this->_addline( '<label for="'.$this->name.'">'.$this->i18n['linktext'].'</label>'.$this->_input_tag( 'text', $title, false, true ).'</div>' );
+      // previous label: '<label for="'.$this->name.'">'.$linktext_placeholder.'</label>'
+      
+			$this->_addline( $this->_input_tag( 'text', $title, false, true ).'</div>' );
 			
 		}
 		

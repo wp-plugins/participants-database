@@ -72,6 +72,17 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'       => 'default_image',
+        'title'      => __('Default Image', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'main',
+        'options'    =>array(
+          'type'        => 'text',
+          'help_text'   => __("Full path to an image file to show if no image has been defined for an image field. Leave blank for no default image.", Participants_Db::PLUGIN_NAME ),
+          'value'       => '',
+          )
+        );
+
+    $this->plugin_settings[] = array(
         'name'       =>'use_plugin_css',
         'title'      =>__('Use the Plugin CSS', Participants_Db::PLUGIN_NAME ),
         'group'      =>'main',
@@ -624,6 +635,17 @@ class PDb_Settings extends Plugin_Settings {
           'type'        =>'text-field',
           'help_text'   => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. (The field name is under the "name" column on the "Manage Database Fields" page.)  Also available is [date] which will show the date and time of the update', Participants_Db::PLUGIN_NAME ),
           'value'       =>__('<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] [last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</li><li>Phone: [phone]</li><li>Email: [email]</li></ul>', Participants_Db::PLUGIN_NAME ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'no_record_error_message',
+        'title'      =>__('Record Not Found Error Message', Participants_Db::PLUGIN_NAME ),
+        'group'      => 'record',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('message to show if the record page was accessed without a valid identifier. Leave this empty if you want nothing at all to show.', Participants_Db::PLUGIN_NAME ),
+          'value'       => sprintf( __("No record was found.", Participants_Db::PLUGIN_NAME ), get_bloginfo('name') ),
           )
         );
 

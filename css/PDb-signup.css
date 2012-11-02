@@ -12,3 +12,6 @@
 .pdb-signup td .helptext {
   margin-left:0px;
 }
+.pdb-signup .checkbox .helptext {
+   display: inline-block;
+}

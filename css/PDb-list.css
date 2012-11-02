@@ -34,3 +34,16 @@ div.pagination {
 	float: left;
 	margin: 8px 6px 0 0;
 }
+.image-field-wrap {
+   display: block;
+   height: 40px;
+   width: auto;
+   overflow: hidden;
+}
+.image-field-wrap.empty {
+   height: auto;
+}
+.image-field-wrap img {
+   height: 100%;
+   width: auto;
+}

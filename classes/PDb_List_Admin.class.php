@@ -19,7 +19,7 @@
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
  
-class PDb_List_Records
+class PDb_List_Admin
 {
 	
 	// holds the main query for building the list

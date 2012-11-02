@@ -48,16 +48,13 @@ class Pagination
 	/**
 	 * Wrapper for the pagination links
 	 *
-	 * @var string
+	 * @var array
+	 *        'open'        open html for the whole control
+	 *        'close'       close html for the whole control
+	 *        'all_buttons' tag to wrap the buttons (defaults to 'ul')
+	 *        'button'      tag to wrap each button (defaults to 'li')
 	 */
-	public $wrap_tag;
-
-	/**
-	 * Close wrapper for the pagination links
-	 *
-	 * @var string
-	 */
-	public $wrap_tag_close;
+	public $wrappers;
 	
 	/**
 	 * class name for current page link
@@ -88,12 +85,10 @@ class Pagination
 	function __construct( $args )
 	{
 		extract( wp_parse_args( $args, array(
-																				'page'=>1,
-																				'size'=>10,
-																				'total_records'=>false,
-																				'link'=>'',
-																				'wrap_tag'=>'<div class="pagination">',
-																				'wrap_tag_close'=>'</div>',
+																				'page'                => 1,
+																				'size'                => 10,
+																				'total_records'       => false,
+																				'link'                => '',
 																				'current_page_class' => 'currentpage',
 																				) ) );
 		$this->setPage( $page );
@@ -101,9 +96,10 @@ class Pagination
 		$this->setTotalRecords( $total_records );
 		$this->setLink( $link );
 
-		$this->set_wrap_tag( $wrap_tag );
-		$this->set_wrap_tag_close( $wrap_tag_close );
+		$this->set_all_wrappers();
+		
 		$this->current_page_class = $current_page_class;
+		
 	}
 	
 	/**
@@ -147,23 +143,19 @@ class Pagination
 	}
 
 	/**
-	 * sets the wrap tag
-	 *
-	 * @param string $tag
+	 * sets all the wrap HTML values
 	 */
-	public function set_wrap_tag( $tag )
-	{
-		$this->wrap_tag = $tag;
-	}
+	public function set_all_wrappers( $wrappers = array() ) {
+		
+		$defaults = array(
+			'wrap_tag'            => '<div class="pagination">',
+			'wrap_tag_close'      => '</div>',
+			'all_button_wrap_tag' => 'ul',
+			'button_wrap_tag'     => 'li',
+		);
+	 
+		$this->wrappers = shortcode_atts( $defaults, $wrappers );
 
-	/**
-	 * sets the wrap tag close
-	 *
-	 * @param string $tag
-	 */
-	public function set_wrap_tag_close( $tag )
-	{
-		$this->wrap_tag_close = $tag;
 	}
 	
 	/**
@@ -250,6 +242,7 @@ class Pagination
 		$perPage = $this->size;
 		$currentPage = $this->page;
 		$link = $this->link;
+		extract( $this->wrappers );
 		
 		$totalPages = floor($totalItems / $perPage);
 		$totalPages += ($totalItems % $perPage != 0) ? 1 : 0;
@@ -283,32 +276,38 @@ class Pagination
 			}
 		}
 
+		$button_pattern = '<'.$button_wrap_tag.' class="%1$s"><a href="%2$s">%3$s</a></'.$button_wrap_tag.'>';
+
 		if ($loopStart != 1){
-			$output .= sprintf('<li class="disabledpage"><a href="' . $link . '">'.__('First',Participants_Db::PLUGIN_NAME ).'</a></li>', '1');
+			$output .= sprintf( $button_pattern, 'disabledpage', sprintf($link, 1), __('First',Participants_Db::PLUGIN_NAME ) );
 		}
 		
 		if ($currentPage > 1){
-			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">'.__('Previous',Participants_Db::PLUGIN_NAME ).'</a></li>', $currentPage - 1);
+			$output .= sprintf($button_pattern, 'nextpage', sprintf($link, $currentPage - 1), __('Previous',Participants_Db::PLUGIN_NAME ));
 		}
 		
 		for ($i = $loopStart; $i <= $loopEnd; $i++)
 		{
 			if ($i == $currentPage){
-				$output .= sprintf( ( $this->anchor_wrap ? '<li class="%s"><a href="#">%s</a></li> ' : '<li class="%s">%s</li> ' ), $this->current_page_class, $i );
+				$output .= sprintf(
+														( $this->anchor_wrap ? '<'.$button_wrap_tag.' class="%s"><a href="#">%s</a></'.$button_wrap_tag.'> ' : '<'.$button_wrap_tag.' class="%s">%s</'.$button_wrap_tag.'> ' ),
+														$this->current_page_class,
+														$i
+													 );
 			} else {
-				$output .= sprintf('<li><a href="' . $link . '">', $i) . $i . '</a></li> ';
+				$output .= sprintf('<'.$button_wrap_tag.'><a href="' . $link . '">', $i) . $i . '</a></'.$button_wrap_tag.'> ';
 			}
 		}
 
 		if ($currentPage < $totalPages){
-			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">'.__('Next',Participants_Db::PLUGIN_NAME ).'</a></li>', $currentPage + 1);
+			$output .= sprintf($button_pattern,'nextpage', sprintf($link, $currentPage + 1), __('Next',Participants_Db::PLUGIN_NAME ) );
 		}
 		
 		if ($loopEnd != $totalPages){
-			$output .= sprintf('<li class="nextpage"><a href="' . $link . '">'.__('Last',Participants_Db::PLUGIN_NAME ).'</a></li>', $totalPages);
+			$output .= sprintf($button_pattern,'lastpage', sprintf($link, $totalPages), __('Last',Participants_Db::PLUGIN_NAME ) );
 		}
 
-		return $this->wrap_tag . '<ul>' . $output . '</ul>' . $this->wrap_tag_close;
+		return $wrap_tag . '<'.$all_button_wrap_tag.'>' . $output . '</'.$all_button_wrap_tag.'>' . $wrap_tag_close;
 	}
 
 	/**
@@ -318,6 +317,7 @@ class Pagination
 	public function links() {
 		echo $this->create_links();
 	}
+	
   /* alias of above func that doesn't output if an AJAX filtering refresh is happening */
   public function show() {
     

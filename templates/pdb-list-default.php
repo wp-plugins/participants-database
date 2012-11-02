@@ -31,13 +31,15 @@ self::add_stylesheet();
 
   /* LIST DISPLAY */
 ?>
+<a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
+<div class="wrap <?php echo $this->wrap_class ?>">
 
   <table class="wp-list-table widefat fixed pages pdb-list" cellspacing="0" >
   
     <?php // print the count if enabled in the shortcode
 		if ( $display_count ) : ?>
     <caption>
-      Total Records Found: <?php echo $record_count ?>
+      Total Records Found: <?php echo $record_count ?>, showing <?php echo $records_per_page ?> per page
     </caption>
     <?php endif ?>
 
@@ -57,17 +59,17 @@ self::add_stylesheet();
       </thead>
   
       <tbody>
-      <?php foreach ( $records as $record ) : // each record is one row ?>
+      <?php while ( $this->have_records() ) : $this->the_record(); // each record is one row ?>
         <tr>
-          <?php foreach ( $fields as $field ) : // each field is one cell ?>
+          <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
   
             <td>
-              <?php self::display_field( $record, $field ); ?>
+              <?php $this->field->print_value() ?>
             </td>
           
-        <?php endforeach; // each field ?>
+        <?php endwhile; // each field ?>
         </tr>
-      <?php endforeach; // each record ?>
+      <?php endwhile; // each record ?>
       </tbody>
     
     <?php else : // if there are no records ?>
@@ -87,5 +89,5 @@ self::add_stylesheet();
    * pagination controls are not shown when the list is updated by a filter operation
    *
    */
-  self::$pagination->show();
+  $this->show_pagination_control();
   ?>

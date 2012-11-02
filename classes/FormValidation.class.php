@@ -15,6 +15,7 @@ class FormValidation {
   // holds the CSS for an error indication as defined in the options
 	private $error_style;
 	public	$error_CSS;
+  private $error_html_wrap;
 	
 	// holds the class name we give the container: error or message
 	private $error_class;
@@ -28,7 +29,6 @@ class FormValidation {
 	 *
 	 */
 	public function __construct() {
-
 
 		// this needs to be changed to eliminate dependency
 		$options = get_option( Participants_Db::$participants_db_options );
@@ -45,6 +45,9 @@ class FormValidation {
     }
 		$this->error_style = $options['field_error_style'];
 
+    // set the defualt error wrap HTML for the validation error feedback display
+    $this->error_html_wrap = array( '<div class="%s">%s</div>','<p>%s</p>' );
+
 	}
 	
 	function __destruct() {
@@ -53,7 +56,7 @@ class FormValidation {
 	/**
 	 * validates a field submitted to the main database
 	 *
-	 * receives a validation pair and preocesses it, adding any error to the
+	 * receives a validation pair and processes it, adding any error to the
 	 * validation status array
 	 *
 	 * @param string $value       the submitted value of the field
@@ -135,7 +138,7 @@ class FormValidation {
 
 			}
 
-			if ( $element ) $this->error_CSS[] = '#'.Participants_Db::$css_prefix.$field.' '.$element;
+			if ( $element ) $this->error_CSS[] = $element.'[name="'.$field_atts->name.'"]';
 
 			if ( isset( $this->error_messages[$error] ) ) {
         $error_messages[] = sprintf( $this->error_messages[$error], $field_atts->title );
@@ -147,23 +150,10 @@ class FormValidation {
 
 		endforeach;// $this->errors 
 		
-		// now clear the errors array
-		$this->errors = array();
-		
 		return $error_messages;
 
 	}
 
-	/**
-	 * returns the error messages HTML
-	 *
-	 */
-	public function get_error_html( ) {
-
-		return $this->_error_html( $this->get_validation_errors() );
-
-	}
-	
 	/**
 	 * adds an arbitrary error to the object
 	 */
@@ -184,9 +174,27 @@ class FormValidation {
 		
 		$output = $this->get_error_CSS();
 
-		$output .= '<div class="'.$this->error_class.'"><p>'.implode( '</p><p>', $error_messages ).'</p></div>';
+    $messages = '';
+    
+    foreach( $error_messages as $message ) {
+      
+      $messages .= sprintf($this->error_html_wrap[1],$message );
+      
+    }
+
+		$output .= sprintf( $this->error_html_wrap[0], $this->error_class, $messages );
 
 		return $output;
+
+	}
+	
+	/**
+	 * returns the error messages HTML
+	 *
+	 */
+	public function get_error_html( ) {
+
+		return $this->_error_html( $this->get_validation_errors() );
 
 	}
 	
@@ -204,7 +212,19 @@ class FormValidation {
 		
 	}
 		
+  /**
+   * sets the html wrapper for the error message display
+   *
+   * @param string $container wraps the whole error message element, must include
+   *                          2 %s placeholders: first for a class name, then one for the content
+   * @param string $wrap      wraps each error message, must have %s placeholders for the content.
+   *
+   */
+	public function set_error_html( $container, $wrap ) {
+    
+    $this->error_html_wrap = array( $container, $wrap );
 		
+  }
 
 
 	/**
@@ -229,9 +249,15 @@ class FormValidation {
      */
 		if ( empty( $validation ) || NULL === $validation || 'no' == strtolower( $validation ) ) return;
 
-		elseif ( empty( $value )  && ! isset( $this->post_array[$validation] ) ) $error_type = 'empty';
+		elseif ( empty( $value )  && ! isset( $this->post_array[$validation] ) ) {
     
-    else {
+    //error_log( __METHOD__.' test empty' );
+    
+      $error_type = 'empty';
+    
+    } else {
+    
+    //error_log( __METHOD__.' not empty; other validation' );
 
       /*
        * perform the specific type of validation with our field
@@ -286,6 +312,18 @@ class FormValidation {
 
 	}
 		
+  /**
+   * get an array of field errors
+   *
+   * @return array fieldname=>error
+   *
+   */
+  public function get_error_fields() {
+    
+    return $this->errors;
+		
+  }
+  
 	/*************************
 	 * UTILITIES             *
 	 *************************/
