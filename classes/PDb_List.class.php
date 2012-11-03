@@ -612,7 +612,7 @@ class PDb_List extends PDb_Shortcode {
     $output = array();
 
     $output[] = '<input name="operator" type="hidden" class="search-item" value="LIKE" />';
-    $output[] = '<input id="participant_search_term" type="text" name="value" class="search-item" value="'. @this->filter['value'] .'">';
+    $output[] = '<input id="participant_search_term" type="text" name="value" class="search-item" value="'. $this->filter['value'] .'">';
     $output[] = '<input name="submit" type="submit" value="'.$this->i18n['search'].'">';
     $output[] = '<input name="submit" type="submit" value="'.$this->i18n['clear'].'">';
 

@@ -573,6 +573,11 @@ class PDb_Init
                                                     'form_element'=>'date',
 																										'sortable'=>1,
                                                     ),
+                            'last_accessed'   => array(
+                                                    'title' => 'Last Accessed',
+                                                    'form_element'=>'date',
+																										'sortable'=>1,
+                                                    ),
                             );
 
       // these are some fields just to get things started
@@ -692,7 +697,7 @@ class PDb_Init
                                   );
       self::$source_fields = array(
                                   'where'             => array(
-                                                              'title' => 'Location or Event of Signup',
+                                                              'title' => 'Signup Location',
                                                               'form_element' => 'text-line',
                                                               'persistent' => 1,
                                                             ),

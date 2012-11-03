@@ -20,6 +20,12 @@ class PDb_Settings extends Plugin_Settings {
                             'list'   => __('List Display Settings', Participants_Db::PLUGIN_NAME ),
                             );
 
+    self::$section_description = array(
+      'record' => __( 'Settings for the [pdb_record] shortcode, which is used to show a user-editable form on the website.', Participants_Db::PLUGIN_NAME ),
+      'list' => __( 'Settings for the [pdb_list] shortcode, which is used to show a list of records from the database.', Participants_Db::PLUGIN_NAME ),
+      'signup' => __( 'Settings for the [pdb_signup] shortcode, which is used to show a signup or registration form on the website.', Participants_Db::PLUGIN_NAME ),
+    );
+
 
     // run the parent class initialization to finish setting up the class 
     parent::__construct( __CLASS__, $this->WP_setting, $this->sections );
@@ -184,7 +190,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'main',
         'options'    =>array(
           'type'       => 'text-field',
-          'help_text'  => __('html added to field title for required fields if selected above (the %s is replaced by the name of the field)', Participants_Db::PLUGIN_NAME ),
+          'help_text'  => __('html added to field title for required fields if selected above (the %s is replaced by the title of the field)', Participants_Db::PLUGIN_NAME ),
           'value'      => '%s<span class="reqd">*</span>',
           )
         );
@@ -286,19 +292,6 @@ class PDb_Settings extends Plugin_Settings {
         );
 		
     $this->plugin_settings[] = array(
-        'name'       =>'show_pid',
-        'title'      =>__('Show the Private ID in List', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'list',
-        'options'    => array
-          (
-          'type'        => 'checkbox',
-          'help_text'   => __('whether to show the private ID in the participant list in the admin', Participants_Db::PLUGIN_NAME ),
-          'value'       => 1,
-          'options'     => array( 1, 0 ),
-          ),
-        );
-
-    $this->plugin_settings[] = array(
         'name'       =>'single_record_link_field',
         'title'      =>__('Single Record Link Field', Participants_Db::PLUGIN_NAME ),
         'group'      =>'list',
@@ -332,6 +325,19 @@ class PDb_Settings extends Plugin_Settings {
           'type'        => 'checkbox',
           'help_text'   => __('When checked, the frontend list search must match the whole field exactly. If unchecked, the search will match if the search term is found in part of the field. Searches are not case-sensitive either way.', Participants_Db::PLUGIN_NAME ),
           'value'       => 0,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+		
+    $this->plugin_settings[] = array(
+        'name'       =>'show_pid',
+        'title'      =>__('Show the Private ID in Admin List', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'list',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('whether to show the private ID in the participant list in the admin', Participants_Db::PLUGIN_NAME ),
+          'value'       => 1,
           'options'     => array( 1, 0 ),
           ),
         );
@@ -769,7 +775,11 @@ class PDb_Settings extends Plugin_Settings {
 		
 		$name = Participants_db::make_anchor( end( explode( '_',$section['id'] ) ) );
 		
-		return printf('<a id="%1$s" name="%1$s" class="%2$s" ></a>', $name, Participants_Db::$css_prefix.'anchor' );
+    printf('<a id="%1$s" name="%1$s" class="%2$s" ></a>', $name, Participants_Db::$css_prefix.'anchor' );
+    
+    if ( isset( self::$section_description[$name] ) ) printf( '<div class="section-description" ><h4>%s</h4></div>', self::$section_description[$name] );
+  
+ 
 	
 	}
 
