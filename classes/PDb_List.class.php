@@ -37,9 +37,6 @@ class PDb_List extends PDb_Shortcode {
 	// translations strings for buttons
 	var $i18n;
 	
-	// holds the pagination object
-	var $pagination;
-
 	// holds the number of list items to show per page
 	var $page_list_limit;
 	
@@ -389,23 +386,6 @@ class PDb_List extends PDb_Shortcode {
 
   /* TEMPLATE METHODS */
 
-  /**
-   * prints a stylesheet link
-   *
-   * @param string $sheet name of the stylesheet file; expected to be in the
-   *                      theme directory; defaults to the plugin's default
-   *                      stylesheet
-   */
-  public function add_stylesheet( $sheet = false ) {
-
-    if ( false === $sheet ) $ss_url = plugins_url( Participants_Db::PLUGIN_NAME.'/css/PDb-list.css' );
-
-    else $ss_url = get_stylesheet_directory_uri() . '/' . $sheet;
-
-    wp_enqueue_style( 'pdb_list', $ss_url );
-
-  }
-  
   /**
    * prints the whole search/sort form as a shortcut function
    *

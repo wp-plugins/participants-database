@@ -2,9 +2,9 @@
 /*
  * plugin initialization class
  *
- * version 1.1
+ * version 1.5
  *
- * The way db updates will work is we will first set the "fresh intall" db
+ * The way db updates will work is we will first set the "fresh install" db
  * initialization to the latest version's structure. Then, we add the "delta"
  * queries to the series of upgrade steps that follow. Whichever version the
  * plugin comes in with when activated, it will jump into the series at that
@@ -543,8 +543,8 @@ class PDb_Init
       // define the default field groups
       self::$field_groups = array(
                                   'main'      => 'Participant Info',
-                                  'admin'     => 'Administrative Info',
                                   'personal'  => 'Personal Info',
+                                  'admin'     => 'Administrative Info',
                                   'source'    => 'Source of the Record',
                                   'internal'  => 'Record Info',
                                   );
@@ -555,6 +555,7 @@ class PDb_Init
                                                     'title' => 'Record ID',
                                                     'signup' => 1,
                                                     'form_element'=>'text-line',
+                                                    'CSV' => 1,
                                                     ),
                             'private_id'     => array(
                                                     'title' => 'Private ID',
@@ -580,29 +581,32 @@ class PDb_Init
                                                     ),
                             );
 
-      // these are some fields just to get things started
-      // in the released plugin, these will be defined by the user
-      //
-      // the key is the id slug of the field
-      // the fields in the array are:
-      //  title - a display title
-      //  help_text - help text to appear on the form
-      //   default - a default value
-      //   sortable - a listing can be sorted by this value if set
-      //   column - column in the list view and order (missing or 0 for not used)
-      //   persistent - is the field persistent from one entry to the next (for
-      //                convenience while entering multiple records)
-      //   CSV - is the field one to be imported or exported
-      //   validation - if the field needs to be validated, use this regex or just
-      //               yes for a value that must be filled in
-      //   form_element - the element to use in the form--defaults to
-      //                 input, Could be text-line (input), text-field (textarea),
-      //                 radio, dropdown (option) or checkbox, also select-other
-      //                 multi-checkbox and asmselect.(http://www.ryancramer.com/journal/entries/select_multiple/)
-      //                 The mysql data type is determined by this.
-      //   values array title=>value pairs for checkboxes, radio buttons, dropdowns
-      //               for checkbox, first item is visible option, if value
-      //               matches 'default' value then it defaults checked
+      
+      /*
+       * these are some fields just to get things started
+       * in the released plugin, these will be defined by the user
+       *
+       * the key is the id slug of the field
+       * the fields in the array are:
+       *  title - a display title
+       *  help_text - help text to appear on the form
+       *   default - a default value
+       *   sortable - a listing can be sorted by this value if set
+       *   column - column in the list view and order (missing or 0 for not used)
+       *   persistent - is the field persistent from one entry to the next (for
+       *                convenience while entering multiple records)
+       *   CSV - is the field one to be imported or exported
+       *   validation - if the field needs to be validated, use this regex or just
+       *               yes for a value that must be filled in
+       *   form_element - the element to use in the form--defaults to
+       *                 input, Could be text-line (input), text-field (textarea),
+       *                 radio, dropdown (option) or checkbox, also select-other
+       *                 multi-checkbox and asmselect.(http: *www.ryancramer.com/journal/entries/select_multiple/)
+       *                 The mysql data type is determined by this.
+       *   values array title=>value pairs for checkboxes, radio buttons, dropdowns
+       *               for checkbox, first item is visible option, if value
+       *               matches 'default' value then it defaults checked
+       */
       self::$main_fields = array(
                                   'first_name'   => array(
                                                         'title' => 'First Name',
@@ -671,6 +675,22 @@ class PDb_Init
                                                                           ),
                                                         ),
                                   );
+      self::$personal_fields = array(
+                                  'photo'       => array(
+                                                        'title' => 'Photo',
+                                                        'help_text' => 'upload a photo of yourself',
+                                                        'form_element' => 'image-upload',
+                                                        ),
+                                  'website'     => array(
+                                                        'title' => 'Website, Blog or Social Media Link',
+                                                        'form_element' => 'link',
+                                                        'help_text' => 'Put the URL in the left box and the link text that will be shown on the right',
+                                                        ),
+                                  'interests'   => array(
+                                                        'title' => 'Interests or Hobbies',
+                                                        'form_element' => 'text-field',
+                                                        ),
+                                  );
       self::$admin_fields = array(
                                   'donations'   => array(
                                                         'title' => 'Donations Made',
@@ -682,18 +702,6 @@ class PDb_Init
                                                         'help_text' => 'how much time they have volunteered',
                                                       ),
 
-                                  );
-      self::$personal_fields = array(
-                                  'contact_permission' => array(
-                                                              'title' => 'Contact Permission',
-                                                              'help_text' => 'may we contact you? If so, what is the best way?',
-                                                              'form_element' => 'text-line',
-                                                              ),
-                                  'resources'         => array(
-                                                              'title' => 'Resources Offered',
-                                                              'form_element' => 'text-field',
-                                                              'help_text' => 'how are you willing to help?',
-                                                              ),
                                   );
       self::$source_fields = array(
                                   'where'             => array(

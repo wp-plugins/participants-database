@@ -89,7 +89,7 @@ endif; // isset( $_POST['file_upload']
 
 			<form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
 			<input type="hidden" name="filename" value="blank_record.csv" />
-			<input type="hidden" name="source" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
+			<input type="hidden" name="subsource" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
 			<input type="hidden" name="action" value="output CSV" />
 			<input type="hidden" name="CSV type" value="blank" />
 				<div class="postbox">
@@ -111,7 +111,7 @@ endif; // isset( $_POST['file_upload']
 							</tr>
 						</table>
 						<p><?php printf( __('This means your spreadsheet needs to have %s columns, and the heading in each of those columns needs to match exactly the names above. If there is no data for a particular column, you can include it and leave it blank, or leave it out entirely. The order of the columns doesn&#39;t matter.', Participants_Db::PLUGIN_NAME ),$column_count)?></p>
-						<p><?php _e( '<strong>Note:</strong> Imported records are checked against existing records by email. (Only if "Don&#39;t Allow Duplicate Email Addresses" is checked in the settings) If a record with an email matching an existing record is imported, the existing record will be updated with the data from the imported record. Blank or missing fields in such an imported record will not overwrite existing data.', Participants_Db::PLUGIN_NAME )?></p>
+						<p><?php _e( '<strong>Note:</strong>Depending on the "Duplicate Record Preference" setting, imported records are checked against existing records by the field set in the "Duplicate Record Check Field" setting. If a record with an email matching an existing record is imported, the existing record will be updated with the data from the imported record. Blank or missing fields in such an imported record will not overwrite existing data.', Participants_Db::PLUGIN_NAME )?></p>
 						<p><input type="submit" value="<?php _e('Get Blank CSV File', Participants_Db::PLUGIN_NAME )?>" style="float:left;margin:0 5px 5px 0" /><?php _e( 'You can download this file, then open it in Open Office, Excel or Google Docs.', Participants_Db::PLUGIN_NAME )?></p>
 					</div>
 				</div>
@@ -122,7 +122,10 @@ endif; // isset( $_POST['file_upload']
 				<div class="inside">
 						<p><?php _e( 'When you have your spreadsheet properly set up and filled with data, export it as any of the following: "comma-delimited csv", "tab-delimited csv", or just "csv". Save it to your computer then upload it here.', Participants_Db::PLUGIN_NAME )?></p>
 					<form enctype="multipart/form-data" action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="POST">
+            
 						<input type="hidden" name="csv_file_upload" id="file_upload" value="true" />
+            
+            <?php /* _e( 'Enclosure Character', Participants_Db::PLUGIN_NAME ) ?> (&#39; or &quot;) <input name="eclosure" value="'" type="text" /><br /><?php */ ?>
 						<?php _e('Choose .csv file to import:', Participants_Db::PLUGIN_NAME )?> <input name="uploadedfile" type="file" /><br />
 						<input type="submit" class="button-primary" value="<?php _e('Upload File', Participants_Db::PLUGIN_NAME )?>" />
 					</form>

@@ -602,7 +602,12 @@ class FormElement {
 			
 			$parts = is_serialized( $this->value ) ? unserialize( $this->value ) : (array) $this->value;
 			
-			if ( count( $parts ) < 2 ) $parts[1] = $parts[0];
+      // if the value contains only a URL, the linktext and URL are made the same
+      // if the value is not a URL, only the linked text is used
+			if ( count( $parts ) < 2 ) {
+        $parts[1] = $parts[0];
+        if ( ! filter_var( $parts[0], FILTER_VALIDATE_URL ) ) $parts[0] = '';
+      }
 		
 			list( $url, $title ) = $parts;
 			
@@ -611,7 +616,7 @@ class FormElement {
 		} else $url = $this->value;
 		
 		//$url = empty( $url ) ? $link_placeholder : $url;
-    $title = empty( $title ) ? $linktext_placeholder : $title;
+    $title = empty( $title ) ? '' : $title;
     
     // previous onClick script: "this.value=this.value=='(URL)'?'':this.value"
 		
@@ -684,7 +689,8 @@ class FormElement {
 		// if an image is already defined, show it
 		if ( ! empty( $this->value ) ) {
 			
-			$this->_addline( '<img class="uploaded-image" id="image_'.$this->name.'" src="'.$this->value.'" />' );
+			//$this->_addline( '<img class="uploaded-image" id="image_'.$this->name.'" src="'.$this->value.'" />' );
+			$this->_addline( Participants_Db::prep_field_for_display( $this->value, 'image-upload' ) );
 			
 		}
 		

@@ -10,13 +10,6 @@
  * (pdb-list-detailed.php) for an example of how this can be done
  *
 */
-/* 
- * this adds the default plugin stylesheet
- * you can specify your own here, just put in the filename of your 
- * stylesheet (located in your theme directory) as the argument
- */
-// include the plugin stylesheet
-self::add_stylesheet();
 ?>
 
 
@@ -27,10 +20,11 @@ self::add_stylesheet();
    * the search/sort form is only presented when enabled in the shortcode.
    * 
    */
-  self::show_search_sort_form()
+  $this->show_search_sort_form()
 
   /* LIST DISPLAY */
 ?>
+<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
 <div class="wrap <?php echo $this->wrap_class ?>">
 

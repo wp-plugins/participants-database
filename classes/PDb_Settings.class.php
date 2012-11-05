@@ -89,6 +89,19 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'       =>'image_link',
+        'title'      =>__('Link Image to Fullsize', Participants_Db::PLUGIN_NAME ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('place a link to the full-size image on images', Participants_Db::PLUGIN_NAME ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
         'name'       =>'use_plugin_css',
         'title'      =>__('Use the Plugin CSS', Participants_Db::PLUGIN_NAME ),
         'group'      =>'main',
@@ -616,7 +629,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('Send an email notification that a record has been updated.', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('Send an email notification that a record has been updated. These will be sent to the email addresses listed in the "Signup Notification Recipients" setting.', Participants_Db::PLUGIN_NAME ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           )

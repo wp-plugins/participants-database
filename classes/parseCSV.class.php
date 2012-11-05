@@ -125,8 +125,8 @@ class parseCSV {
 	
 	# character encoding options
 	var $convert_encoding = false;
-	var $input_encoding = 'ISO-8859-1';
-	var $output_encoding = 'ISO-8859-1';
+	var $input_encoding = 'UTF-8';
+	var $output_encoding = 'UTF-8';
 	
 	# used by unparse(), save(), and output() functions
 	var $linefeed = "\r\n";

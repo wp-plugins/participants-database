@@ -11,9 +11,6 @@ jQuery(document).ready( function($) {
     if ($(this).hasClass('pdb-disabled')) {
       e.preventDefault(); return false;
     }
-    $('input[placeholder], textarea[placeholder]').each( function() {
-      clear_placeholder($(this));
-    });
         				$(this).addClass('pdb-disabled');
         			return true;
         		});	
@@ -22,17 +19,4 @@ jQuery(document).ready( function($) {
           var link = ''.concat( address.name,'@',address.domain );
           $(this).attr('href', 'mailto:'+link ).html( link ).attr('class','obfuscated');
         });
-  $('input[placeholder], textarea[placeholder]').each( function() {
-    var el = $(this);
-    if (''==el.val()) el.val(el.attr('placeholder'));
-    el.focus(function(){
-      console.log('selected:'+$(this).context);
-      clear_placeholder($(this));
-    });
-  });
-  function clear_placeholder(el){
-    if (el.val()==el.attr('placeholder')) {
-      el.val('');
-    }
-  }
 			});

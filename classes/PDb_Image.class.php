@@ -39,6 +39,9 @@ class PDb_Image {
   private $open = '';
   private $close = '';
   
+  // holds the default wrap tags
+  private $default_wrap;
+  
   // holds the path to the default image
   private $default_image = false;
   
@@ -57,13 +60,12 @@ class PDb_Image {
    */
   function __construct( $config ) {
     
+    $this->_set_default_wrap();
+    
     $defaults = array(
                       'filename' => '',
                       'classname' => 'pdb-image image-field-wrap',
-                      'wrap_tags' => array(
-                        '<span class="%s">',
-                        '</span>'
-                        ),
+                      'wrap_tags' => $this->default_wrap,
                       );
     
     $this->setup = shortcode_atts( $defaults, $config );
@@ -93,7 +95,7 @@ class PDb_Image {
     
     $pattern = $this->file_exists ? '%s<img src="%s" />%s' : '%s%s%s';
     
-    return sprintf( $pattern, sprintf( $this->open, $this->classname ), $this->image_uri, $this->close );
+    return sprintf( $pattern, sprintf( $this->open, $this->classname, $this->image_uri, basename($this->image_uri) ), $this->image_uri, $this->close );
     
   }
   
@@ -237,6 +239,28 @@ class PDb_Image {
     
     $this->classname = $this->setup['classname'];
     $this->set_image_wrap( $this->setup['wrap_tags'][0], $this->setup['wrap_tags'][1] );
+    
+  }
+  
+  /**
+   * sets up the default wrap tags
+   */
+  private function _set_default_wrap() {
+    
+    if ( Participants_Db::$plugin_options['image_link'] == 1 ) {
+      
+      $this->default_wrap = array(
+                        '<span class="%s"><a href="%s" rel="lightbox" title="%s" >',
+                        '</a></span>'
+                        );
+
+    } else {
+      
+      $this->default_wrap = array(
+                        '<span class="%s">',
+                        '</span>'
+                        );
+    }
     
   }
   

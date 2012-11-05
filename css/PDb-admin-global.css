@@ -1,0 +1,25 @@
+/* Participants Database Global Admin Stylesheet */
+#toplevel_page_participants-database div.wp-menu-image {
+	background: url("../../../../wp-admin/images/menu.png?ver=20100531") no-repeat scroll -300px -33px transparent;
+}
+#toplevel_page_participants-database div:hover.wp-menu-image {
+	background: url("../../../../wp-admin/images/menu.png?ver=20100531") no-repeat scroll -300px -1px transparent;
+}
+#toplevel_page_participants-database img {
+	visibility:hidden;
+}
+.participants-database_page_participants-database-edit_participant .wp-editor-wrap {
+  width: 500px;
+}
+.participants_db.settings-class option[value='none'],
+.participants_db.settings-class option[value='other'] {
+	font-weight:bold;
+}
+.participants_db.settings-class input[id$='_other'] {
+	float:none;
+	width:50px;
+}
+
+.participants_db.settings-class input[name='temp'] {
+	display:none;
+}

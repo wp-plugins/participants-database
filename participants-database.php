@@ -92,16 +92,22 @@ class Participants_Db {
 	public static $validation_errors;
 	
 	// record ID numbers begin counting up from this number
-	public static $id_base_number = 1325;
+	public static $id_base_number = 0;
 	
 	// name of the transient record used to hold the last record
 	public static $last_record = 'pdb_last_record';
+	
+  // this gets set if a shortcode is called on a page
+  public static $shortcode_present;
 	
 	// these columns are not manually edited
 	public static $internal_columns;
 	
 	// header to include with plugin emails
 	public static $email_headers;
+	
+  // enclosure character to use
+  static $CSV_enclosure = '"';
 	
 	// list of reserved field names
 	public static $reserved_names = array( 'source','subsource','id','private_id','record_link','action','submit','name','day','month','year','hour','date','minute' );
@@ -192,6 +198,7 @@ class Participants_Db {
 		add_action( 'admin_init', array( __CLASS__, 'admin_init') );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__,'include_scripts') );
     add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_includes' ) );
+    add_action( 'wp_footer', array( __CLASS__, 'add_scripts' ) );
 		
 		// handles ajax request from list filter
     add_action( 'wp_ajax_pdb_list_filter', array( __CLASS__, 'pdb_list_filter' ) );
@@ -353,6 +360,10 @@ class Participants_Db {
 		wp_register_script( 'cookie', plugins_url( 'js/jquery_cookie.js', __FILE__ ) );
 		wp_register_script( 'manage_fields', plugins_url( 'js/manage_fields.js', __FILE__ ) );
 		wp_register_script( 'settings_script', plugins_url( 'js/settings.js', __FILE__ ) );
+    wp_register_script( 'jq-placeholder', plugins_url( 'js/jquery.placeholder.min.js', __FILE__ ), array( 'jquery' ) );
+    wp_register_script( 'admin', plugins_url( 'js/admin.js', __FILE__ ), array( 'jquery' ) );
+		//wp_register_script( 'datepicker', plugins_url( 'js/jquery.datepicker.js', __FILE__ ) );
+		//wp_register_script( 'edit_record', plugins_url( 'js/edit.js', __FILE__ ) );
 
     if ( false !== stripos( $hook, 'participants-database' ) ) {
 		wp_enqueue_script( 'jquery' );
@@ -361,6 +372,8 @@ class Participants_Db {
       wp_enqueue_script( 'jquery-ui-sortable' );
 		wp_enqueue_script( 'jquery-ui-dialog' );
 		wp_enqueue_script( 'cookie' );
+      wp_enqueue_script( 'jq-placeholder');
+      wp_enqueue_script( 'admin');
     }
     
     if ( false !== stripos( $hook, 'settings_page' ) ) {
@@ -377,66 +390,42 @@ class Participants_Db {
       wp_enqueue_script( 'manage_fields' );
     }
     
-		wp_register_style( 'pdb-global-admin',plugins_url( '/css/PDb-admin.css', __FILE__ ), false, false  );
-    wp_register_style( 'pdb-admin', plugins_url('/css/participants-db.css', __FILE__ ) );
-    wp_register_style( 'pdb-list', plugins_url('/css/PDb-list.css', __FILE__ ) );
-    wp_register_style( 'pdb-record', plugins_url('/css/PDb-record.css', __FILE__ ) );
-    wp_register_style( 'pdb-error', plugins_url( '/css/PDb-error.css', __FILE__ ) );
+		wp_register_style( 'pdb-global-admin',plugins_url( '/css/PDb-admin-global.css', __FILE__ ), false, false  );
+    wp_register_style( 'pdb-admin', plugins_url('/css/PDb-admin.css', __FILE__ ) );
+    wp_register_style( 'pdb-frontend', plugins_url('/css/participants-database.css', __FILE__ ) );
     
 		wp_enqueue_style( 'pdb-global-admin' );
     
     // only incude these stylesheets on the plugin admin pages
     if ( false !==stripos( $hook, 'participants-database' ) ) {
       wp_enqueue_style( 'pdb-admin' );
-      wp_enqueue_style( 'pdb-list' );
-      wp_enqueue_style( 'pdb-record' );
-      wp_enqueue_style( 'pdb-error' );
-    }
-    
+      wp_enqueue_style( 'pdb-frontend' );
 	}
 
-	public function settings_scripts() {
-		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery-ui-core' );
-		wp_enqueue_script( 'jquery-ui-tabs' );
-		wp_register_script( 'cookie', plugins_url( 'js/jquery_cookie.js', __FILE__ ) );
-		wp_enqueue_script( 'cookie' );
-		wp_enqueue_script( 'settings_script' );
-	}
-	
-	
-
-	public function edit_scripts() {
-		
-		wp_register_script( 'datepicker', plugins_url( 'js/jquery.datepicker.js', __FILE__ ) );
-		wp_register_script( 'edit_record', plugins_url( 'js/edit.js', __FILE__ ) );
-		
-		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery-ui-core' );
-		wp_enqueue_script( 'datepicker' );
-		//wp_enqueue_script( 'edit_record' );
-		
 	}
 	
 	// include any JS needed for the front-end
 	public function include_scripts() {
 		
-    wp_register_style( 'pdb-error', plugins_url( '/css/PDb-error.css', __FILE__ ) );
-    wp_register_style( 'pdb-signup', plugins_url( '/css/PDb-signup.css', __FILE__ ) );
-    wp_register_style( 'pdb-record', plugins_url( '/css/PDb-record.css', __FILE__ ) );
+    // set the global shortcode flag
+    self::$shortcode_present = false;
+		
+    wp_register_style( 'pdb-frontend', plugins_url('/css/participants-database.css', __FILE__ ) );
     
     if ( self::$plugin_options['use_plugin_css'] ) {
       
-      wp_enqueue_style( 'pdb-error' );
-      wp_enqueue_style( 'pdb-signup' );
-      wp_enqueue_style( 'pdb-record' );
+      wp_enqueue_style( 'pdb-frontend' );
       
     }
 
+		wp_register_script( 'pdb-shortcode', plugins_url( 'js/shortcodes.js', __FILE__ ), array( 'jquery' ) );
 		wp_register_script( 'list-filter', plugin_dir_url( __FILE__ ) . 'js/list-filter.js', array( 'jquery' ) );
+    wp_register_script( 'jq-placeholder', plugins_url( 'js/jquery.placeholder.min.js', __FILE__ ), array( 'jquery' ) );
 
-		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'frontend', plugins_url( 'js/shortcodes.js', __FILE__ ) );
+    // this is now handled conditionally in the wp_footer action
+		//wp_enqueue_script( 'jquery' );
+		//wp_enqueue_script( 'pdb-shortcode' );
+    //wp_enqueue_script( 'jq-placeholder');
 
 		global $wp_query;
 		
@@ -449,6 +438,19 @@ class Participants_Db {
 		
 	}
 		
+  /**
+   * conditionally adds JS to pages that have one of our shortcodes
+   */
+  public function add_scripts() {
+    
+    if ( false !== self::$shortcode_present ) {
+      
+      wp_enqueue_script( 'pdb-shortcode' );
+      wp_enqueue_script( 'jq-placeholder');
+      
+    }
+		
+  }
 
 	// callback for plugin admin subpages
 	// grabs the name from the request and includes the file to display the page
@@ -1021,7 +1023,7 @@ class Participants_Db {
 					
 				}
 				
-				if ( 2 > count( $linkdata ) ) $lindata[1] = $linkdata[0];
+				if ( empty( $linkdata[1] ) ) $linkdata[1] = str_replace( 'http://', '', $linkdata[0] );
 			
 				if ( $html ) $return = vsprintf( ( empty( $linkdata[0] ) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>' ), $linkdata );
         else $return = $linkdata[0];
@@ -1289,6 +1291,26 @@ class Participants_Db {
 					
 					$new_value = empty( $column_atts->default ) ? false : $column_atts->default;
 					
+				} elseif ( 'link' == $column_atts->form_element ) {
+          
+          /* translate the link markdown used in CSV files to the array format used in the database
+           */
+          
+          if ( ! is_array( $post[ $column_atts->name ] ) and preg_match( '#^<([^>]+)>$#', trim( $post[ $column_atts->name ] ), $matches ) ) {
+            
+            $new_value = self::_prepare_array_mysql( array( '', $matches[1] ) );
+            
+          } elseif ( ! is_array( $post[ $column_atts->name ] ) and preg_match( '#^\[([^\]]+)\]\(([^\)]*)\)$#', trim( $post[ $column_atts->name ] ), $matches ) ) {
+            
+            $new_value = self::_prepare_array_mysql( array( $matches[1], $matches[2] ) );
+            
+          } else {
+					
+					$new_value = self::_prepare_array_mysql( $post[ $column_atts->name ] );
+          
+          }
+          break;
+          
 				} elseif ( is_array( $post[ $column_atts->name ] ) ) {
 				
 					$new_value = self::_prepare_array_mysql( $post[ $column_atts->name ] );
@@ -1818,12 +1840,14 @@ class Participants_Db {
 			 // create a file pointer connected to the output stream
 				$output = fopen('php://output', 'w');
 				
-				header('Content-type: application/csv'); // Content-Type: text/csv; charset=utf-8
-				header('Content-Disposition: attachment; filename="'.$filename.'"');
+				//header('Content-type: application/csv'); // some sources say it should be this
+        header( 'Content-Type: text/csv; charset=utf-8' );
+        header("Cache-Control: no-store, no-cache");
+				header( 'Content-Disposition: attachment; filename="'.$filename.'"' );
 				
 				// output the data lines
 				foreach( $data as $line ) {
-					fputcsv( $output, $line, ',', '"' );
+					fputcsv( $output, $line, ',', self::$CSV_enclosure );
 				}
 				
 				fclose( $output );
@@ -2039,9 +2063,21 @@ class Participants_Db {
 					if ( ! empty( $value ) && is_numeric( $value ) ) {
 				
 							$value = date( get_option( 'date_format' ), $value );
-							break;
 						
 					}
+							break;
+						
+        case 'link':
+				
+					// flatten the array
+					if ( is_serialized( $value ) ) {
+            
+            $link = unserialize( $value );
+            $pattern = empty( $link[1] ) ? '<%1$s>' : '[%2$s](%1$s)';
+            $value = vsprintf( $pattern, $link );
+            
+					}
+          break;
 					
 				default:
 				
@@ -2093,7 +2129,7 @@ class Participants_Db {
 		// build the column names
 		if ( is_array( $CSV->titles ) ) {
 			
-			$column_names = explode( ',', $CSV->titles);
+			$column_names = $CSV->titles;
 			
 			// remove enclosure characters
 			array_walk( $column_names, array( __CLASS__, '_enclosure_trim' ), $CSV->enclosure );

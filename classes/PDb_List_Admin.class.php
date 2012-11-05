@@ -687,7 +687,7 @@ class PDb_List_Admin
       <fieldset class="widefat">
       	<h3><?php _e('Export CSV', Participants_Db::PLUGIN_NAME )?></h3>
         <form method="post">
-          <input type="hidden" name="source" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
+          <input type="hidden" name="subsource" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
           <input type="hidden" name="action" value="output CSV" />
           <input type="hidden" name="CSV type" value="participant list" />
           <input type="hidden" name="query" value="<?php echo rawurlencode( self::$list_query )?>" />

@@ -47,6 +47,7 @@
 
  ?>
  
+<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <div class="wrap <?php echo $this->wrap_class ?>" >
 
   <?php // output any validation errors

@@ -1,0 +1,172 @@
+/* stylesheet for participants-database plugin */
+
+/* SIGNUP FORM */
+
+.pdb-signup label {
+  display:inline-block;
+  width:135px;
+  margin-right:10px;
+  text-align:right;
+}
+.pdb-signup .helptext {
+  display:block;
+  margin-left:150px;
+}
+.pdb-signup td .helptext {
+  margin-left:0px;
+}
+.pdb-signup .checkbox .helptext {
+   display: inline-block;
+}
+
+/* RECORD FORM */
+
+.edit-participant  input[type='checkbox'] {
+  position:relative;
+  top:4px;
+}
+.edit-participant textarea,
+.participants_db textarea,
+.participants_db input[type='text'],
+.edit-participant  input[type='text'],
+.edit-participant  input[type='checkbox'],
+.multicheckbox label,
+.link-element label {
+  float:left;
+  margin-right:10px;
+}
+.edit-participant h3 {
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+.edit-participant .helptext, .participants_db .helptext {
+  text-align:left;
+  vertical-align:top;
+}
+.edit-participant .helptext {
+  display:block;
+  width:100%;
+}
+.edit-participant .submit-buttons {
+  border:none;
+}
+.edit-participant .form-table th {
+  width:195px;
+  vertical-align:top;
+  padding-top: 1ex;
+}
+.edit-participant .form-table h3 {
+  margin-top:0;
+  margin-bottom:0;
+}
+.edit-participant .form-table tr.hidden {
+	visibility:hidden;
+	position:absolute;
+}
+.edit-participant .uploaded-image {
+  width:auto;
+  height:85px;
+  float:left;
+  margin-right:10px;
+}
+.selectother label {
+  float: left;
+  margin: 0 6px 0 3px;
+  width: auto;
+}
+.selectother {
+  border: 1px solid #DDDDDD;
+  overflow: auto;
+  padding: 2px 5px;
+}
+.edit-participant dt {
+   clear: both;
+   float: left;
+   font-weight: bold;
+   margin: 0 10px 1.625em 0;
+   width: 140px;
+   line-height: 1;
+}
+.edit-participant dt.blank-field {
+   width: 100%;
+}
+.edit-participant .image-field-wrap {
+   float: right;
+}
+.PDb-single .image-field-wrap {
+   float: none;
+}
+
+/* LIST SHORTCODE */
+
+/* pagination */
+.pdb_list .pagination {
+	overflow:auto;
+}
+.pdb_list .pagination ul {
+	margin:0;
+	list-style:none;
+}
+.pdb_list .pagination li.currentpage,
+.pdb_list .pagination a {
+	float:left;
+	margin: 0 3px;
+	padding: 1px 5px;
+	border: 1px solid #aaa;
+	border-radius: 2px;
+}
+.pdb_list .pagination li.currentpage:first-child,
+.pdb_list .pagination li:first-child a {
+	margin-left:0;
+}
+.pdb_list .pagination a {
+	text-decoration:none;
+}
+.pdb_list .pagination a:hover,
+.pdb_list .pagination li.currentpage {
+	background-color: #cccccc;
+}
+.pdb_list .pagination label {    
+	float: left;
+	margin: 8px 6px 0 0;
+}
+
+/* images */
+.PDb-list-image {
+	width:auto;
+	height:2em;
+}
+.image-field-wrap {
+   display: block;
+   height: 40px;
+   width: auto;
+   overflow: hidden;
+}
+.image-field-wrap.empty {
+   height: auto;
+}
+.image-field-wrap img {
+   height: 100%;
+   width: auto;
+}
+
+/* ERRORS / MESSAGES */
+
+.pdb-error {
+	display:inline-block;
+	padding:4px 7px;
+	background-color: #FFEBE8;
+	box-shadow:0 0 6px #CC0000 inset;
+	margin:0.5em 0;
+}
+.pdb-error li {
+	margin:0.5em 20px;
+}
+.pdb-message {
+	padding:4px 7px;
+	background-color: #C4F092;
+	box-shadow:0 0 6px #2DAA00 inset;
+}
+.pdb-error p, .pdb-message p {
+  margin:0;
+}

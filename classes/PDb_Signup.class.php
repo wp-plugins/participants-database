@@ -100,6 +100,8 @@ class PDb_Signup extends PDb_Shortcode {
     
     $this->participant_values = Participants_Db::get_participant( $this->participant_id );
     
+    $this->registration_page = Participants_Db::get_record_link( $this->participant_values['private_id'] );
+    
     // set up the signup form email preferences
     $this->_set_email_prefs();
 		
@@ -139,8 +141,6 @@ class PDb_Signup extends PDb_Shortcode {
 				}
 			
 		} elseif ( $this->submitted ) {
-			
-			$this->registration_page = Participants_Db::get_record_link( $this->participant_values['private_id'] );
 			
 			// print the thank you note
 			$this->_thanks();
