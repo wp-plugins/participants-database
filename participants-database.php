@@ -100,6 +100,9 @@ class Participants_Db {
   // this gets set if a shortcode is called on a page
   public static $shortcode_present;
 	
+  // status code for the last record processed
+  public static $insert_status;
+	
 	// these columns are not manually edited
 	public static $internal_columns;
 	
@@ -186,6 +189,9 @@ class Participants_Db {
 			
     }
 		
+    // set the initial ID to the ID of the default record
+    self::$id_base_number = self::initial_ID();
+		
 		// set the last record value to the initial id
 		// this is used to keep persistent fields as an aid to data entry
 		set_transient( self::$last_record, self::$id_base_number, (1*60*60*24) );
@@ -214,7 +220,10 @@ class Participants_Db {
 		add_shortcode( 'pdb_single', array( __CLASS__, 'print_single_record' ) );
 		//add_shortcode( 'pdb_single', array( __CLASS__, 'show_record' ) );
 		
-	
+    /*
+     * this checks to make sure the columns in the main database match the fields
+     * defined in the fields database
+     */
 		if ($wpdb->get_var('SHOW TABLES LIKE "'.self::$participants_table.'"') == self::$participants_table) :
 		// db integrity check and fix
 		$query = 'SELECT * FROM '.self::$fields_table;
@@ -1095,7 +1104,7 @@ class Participants_Db {
     
     
     
-    error_log( __METHOD__.' '.$filename.' is file:'. (is_file( $filename ) ?'yes':'no').' file_exists:'.(file_exists( $filename ) ? 'yes' : 'no' ).' imagesize:'.(getimagesize( $filename )?'yes':'no') ) ;
+    //error_log( __METHOD__.' '.$filename.' is file:'. (is_file( $filename ) ?'yes':'no').' file_exists:'.(file_exists( $filename ) ? 'yes' : 'no' ).' imagesize:'.(getimagesize( $filename )?'yes':'no') ) ;
     
     if ( file_exists( $filename ) ) return true;
     
@@ -1217,7 +1226,8 @@ class Participants_Db {
           case 1:
             
             // record with same field value exists...get the id and update the existing record
-            $participant_id = self::_get_participant_id_by_term( $field, $post[$field] );
+            if ( 'id' == strtolower( $field ) ) $participant_id = $post[$field];
+            else $participant_id = self::_get_participant_id_by_term( $field, $post[$field] );
             // get the first one
             if ( is_array( $participant_id ) ) $participant_id = current( $participant_id );
             // set the update mode
@@ -1229,6 +1239,7 @@ class Participants_Db {
             
             // set the error message
             if ( is_object( self::$validation_errors ) ) self::$validation_errors->add_error( $field, 'duplicate' );
+            $action = 'skip';
             // go on validating the rest of the form
             break;
             
@@ -1237,6 +1248,9 @@ class Participants_Db {
       }
 
     }
+
+    // set the insert status value
+    self::$insert_status = $action;
 
     switch ($action) {
 
@@ -1248,6 +1262,10 @@ class Participants_Db {
       case 'insert':
         $sql = 'INSERT INTO ';
         $where = '';
+        break;
+      
+      case 'skip':
+        return false;
 
     }
 
@@ -1298,11 +1316,11 @@ class Participants_Db {
           
           if ( ! is_array( $post[ $column_atts->name ] ) and preg_match( '#^<([^>]+)>$#', trim( $post[ $column_atts->name ] ), $matches ) ) {
             
-            $new_value = self::_prepare_array_mysql( array( '', $matches[1] ) );
+            $new_value = self::_prepare_array_mysql( array( $matches[1], '' ) );
             
-          } elseif ( ! is_array( $post[ $column_atts->name ] ) and preg_match( '#^\[([^\]]+)\]\(([^\)]*)\)$#', trim( $post[ $column_atts->name ] ), $matches ) ) {
+          } elseif ( ! is_array( $post[ $column_atts->name ] ) and preg_match( '#^\[([^\]]+)\]\(([^\)]+)\)$#', trim( $post[ $column_atts->name ] ), $matches ) ) {
             
-            $new_value = self::_prepare_array_mysql( array( $matches[1], $matches[2] ) );
+            $new_value = self::_prepare_array_mysql( array( $matches[2], $matches[1] ) );
             
           } else {
 					
@@ -1502,7 +1520,7 @@ class Participants_Db {
 
     global $wpdb;
 
-    $id_exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM ".self::$participants_table." WHERE $field = %s", $id ) );
+    $id_exists = $wpdb->get_var( "SELECT COUNT(*) FROM ".self::$participants_table." WHERE `".$field."` = '".$id."'" );
     
     if ( NULL !== $id_exists ) return $id_exists < 1 ? false : true;
     else {
@@ -1544,6 +1562,8 @@ class Participants_Db {
    * @return string prepped array in serialized form
    */
   private function _prepare_array_mysql( $array ) {
+
+    if ( ! is_array( $array ) ) return self::_prepare_string_mysql( $array );
 
     $prepped_array = array();
 
@@ -2073,8 +2093,11 @@ class Participants_Db {
 					if ( is_serialized( $value ) ) {
             
             $link = unserialize( $value );
-            $pattern = empty( $link[1] ) ? '<%1$s>' : '[%2$s](%1$s)';
-            $value = vsprintf( $pattern, $link );
+            if ( empty( $link[0] ) ) $value = '';
+            else {
+             $pattern = empty( $link[1] ) ? '<%1$s>' : '[%2$s](%1$s)';
+             $value = vsprintf( $pattern, $link );
+            }
             
 					}
           break;
@@ -2096,119 +2119,6 @@ class Participants_Db {
 		}
 		
 		return $output;
-		
-	}
-	
-	/**
-	 * inserts a series of records from a csv file
-	 *
-	 * @param string $src_file the file to parse
-	 *
-	 * @return mixed returns integer for number of records successfully added, or string error encountered
-	 */
-	public function insert_from_csv( $src_file ) {
-	
-		global $wpdb;
-		$wpdb->hide_errors();
-		
-		$errorMsg = '';
-	
-		if( empty( $src_file ) || ! is_file( $src_file ) ) {
-
-      /* translators: the %s will be the name of the file */
-			return sprintf( __('Input file does not exist or path is incorrect.<br />Attempted to load: %s', self::PLUGIN_NAME), basename($src_file) );
-	
-		}
-		
-		$CSV = new parseCSV();
-		
-		$CSV->enclosure = self::_detect_enclosure( $src_file );
-	
-		$CSV->auto( $src_file );
-	
-		// build the column names
-		if ( is_array( $CSV->titles ) ) {
-			
-			$column_names = $CSV->titles;
-			
-			// remove enclosure characters
-			array_walk( $column_names, array( __CLASS__, '_enclosure_trim' ), $CSV->enclosure );
-			
-		} else { 
-
-			foreach ( self::get_column_atts() as $column ) {
-			
-				if ( $column->CSV ) $column_names[] = $column->name;
-			
-			}
-			
-		}
-	
-	
-		$line_num = 1;
-		
-		foreach ( $CSV->data as $csv_line ) {
-	
-			// error_log( __METHOD__.' csv line= '.print_r( $csv_line, true ) );
-			
-			$values = array();
-			
-			foreach( $csv_line as $value ) {
-				$values[] = $wpdb->escape( trim( $value, $CSV->enclosure ) );
-			}
-	
-			if ( count( $values ) != count( $column_names ) ) {
-	
-				return sprintf( 
-											 __('The number of items in line %s is incorrect.<br />There are %s and there should be %s.', self::PLUGIN_NAME ),
-											 $line_num, 
-											 count( $values ), 
-											 count( $column_names ) 
-											 );
-	
-			}
-			
-			if ( ! $post = array_combine( $column_names, $values ) ) return __('Number of values does not match number of columns', self::PLUGIN_NAME) ;// suspenders and a belt here
-			
-			// error_log( __METHOD__.' post array='.print_r( $post, true));
-			
-			// we've got our record data, now add it to the database
-			self::process_form( $post, 'insert' );
-			
-			$line_num++;
-			
-		}
-		return $line_num - 1;
-	}
-	
-	/**
-	 * trims enclosure characters from the csv field
-	 * @access public because PHP callback uses it
-	 */
-	public function _enclosure_trim( &$value, $key, $enclosure = "'" ) {
-
-    $value = trim( $value, $enclosure );
-
-	}
-	
-	/**
-	 * detect an enclosure character
-	 *
-	 * there's no way to do this 100%, so we will look and fall back to a
-	 * reasonable assumption if we don't see a clear choice: simply whichever
-	 * of the two most common enclosure characters is more numerous is returned
-	 *
-	 * @param string $csv_file path to a csv file to read and analyze
-	 * return string the best guess enclosure character
-	 */
-	private function _detect_enclosure( $csv_file ) {
-		
-		$csv_text = file_get_contents( $csv_file );
-		
-		$single_quotes = substr_count( $csv_text, "'" );
-		$double_quotes = substr_count( $csv_text, '"' );
-		
-		return $single_quotes >= $double_quotes ? "'" : '"';
 		
 	}
 	
@@ -2403,6 +2313,24 @@ class Participants_Db {
     return is_object( $page ) ? $page->ID : false;
 		
 	}
+	
+	/**
+   * finds the initial ID of the current database
+   *
+   * makes use of the default record PID
+   *
+   */
+  function initial_ID() {
+    
+    $sql = 'SELECT `id`
+            FROM '.self::$participants_table.'
+            WHERE `private_id` = "RPNE2"';
+    
+    global $wpdb;
+    
+    return $wpdb->get_var( $sql );
+  
+  }
 	
 	/**
 	* replace the tags in text messages

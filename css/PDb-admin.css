@@ -180,6 +180,10 @@ a.dragger {
 	margin-top : 2px;
 }
 
+#message {
+   font-size: 16px;
+}
+
 /* SETTINGS PAGE */
 .settings-class textarea {
 	float:left;
@@ -321,7 +325,6 @@ cursor:pointer;
 .ui-dialog a.button:hover{
 background-color:#c33100;
 }
-/*extrastyling*/
 #confirmation-dialog p{
 }
 .ui-button {

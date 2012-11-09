@@ -364,7 +364,7 @@ class PDb_List_Admin
 		}
     
   </script>
-  <div class="wrap">
+  <div class="wrap pdb_list">
     <h2><?php echo Participants_Db::$plugin_title?></h2>
     <h3><?php printf( _n( 'List Participants: %s record found, sorted by:', 'List Participants: %s records found, sorted by:', self::$num_records ), self::$num_records )?> 
 		<?php echo Participants_Db::column_title( self::$filter['sortBy'] ) ?>.</h3>
@@ -593,7 +593,9 @@ class PDb_List_Admin
 
                 $params = unserialize( $value[ $column ] );
 								
-								if ( count( $params ) < 2 ) $params[1] = $params[0];
+                if ( empty( $params ) ) $page_link = array( '', '' );
+								
+								if ( count( $params ) == 1 ) $params[1] = $params[0];
 
               } else {
 

@@ -387,8 +387,6 @@ abstract class PDb_Shortcode {
     
     $this->record = new Record( $the_record, key( $this->records ) );
     
-    //error_log( __METHOD__.' '.print_r( $this->record,1 ) );
-    
     $this->reset_field_counter();
     
     $this->current_record_pointer++;

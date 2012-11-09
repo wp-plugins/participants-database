@@ -1,74 +1,7 @@
 <?php
-// prepare a display string of the main columns
-$column_names = array();
 
-// hold the status of UI messages
-$status = 'updated';
+$CSV_import = new PDb_CSV_Import( 'csv_file_upload' );
 
-foreach ( Participants_Db::get_column_atts() as $column ) {
-
-	if ( $column->CSV ) $column_names[] = $column->name;
-
-}
-
-$column_count = count( $column_names );
-
-$blank_record = array_fill_keys( $column_names, '' );
-
-
-$errors = array();
-			
-// if a file upload attempt been made, process it and display the status of the operation
-if( isset( $_POST['csv_file_upload'] ) ) :
-
-	$upload_location = Participants_Db::$plugin_options['image_upload_location'];
-
-	// check for the target directory; attept to create if it doesn't exist
-	$target_directory_exists = is_dir( ABSPATH.$upload_location ) ? true : Participants_Db::_make_uploads_dir( $upload_location ) ;
-	
-	if ( false !== $target_directory_exists ) {
-
-		$target_path = ABSPATH.$upload_location . basename( $_FILES['uploadedfile']['name']);
-
-		if( false !== move_uploaded_file( $_FILES['uploadedfile']['tmp_name'], $target_path ) ) {
-	
-			$errors[] = '<strong>'.sprintf( __('The file %s has been uploaded.', Participants_Db::PLUGIN_NAME ), $_FILES['uploadedfile']['name'] ).'</strong>';
-			
-			$insert_error = Participants_Db::insert_from_csv( $target_path );
-	
-			if ( is_numeric( $insert_error ) ) {
-	
-				$errors[] = '<strong>'.$insert_error.' '._n('record imported','records imported', $insert_error, Participants_Db::PLUGIN_NAME ).'.</strong>';
-	
-			} elseif( empty( $insert_error ) ) {
-	
-				$errors[] = __('Zero records imported.', Participants_Db::PLUGIN_NAME );
-				$status = 'error';
-	
-			} else { // parse error
-			
-				$errors[] = '<strong>'.__('Error occured while trying to add the data to the database', Participants_Db::PLUGIN_NAME ).':</strong>';
-				$errors[] = $insert_error;
-				$status = 'error';
-	
-			}
-		} // file move successful
-		else { // file move failed
-	
-				$errors[] = '<strong>'.__('There was an error uploading the file.', Participants_Db::PLUGIN_NAME ).'</strong>';
-				$errors[] = __('Destination', Participants_Db::PLUGIN_NAME ).': '.$target_path;
-				$status = 'error';
-	
-		}
-		
-	} else {
-		
-		$errors[] = '<strong>'.__('Target directory ('.$upload_location.') does not exist and could not be created. Try creating it manually.', Participants_Db::PLUGIN_NAME ).':</strong>';
-		$status = 'error';
-		
-	}
-
-endif; // isset( $_POST['file_upload'] 
 ?>
 <div class="wrap">
 	<div id="poststuff">
@@ -76,11 +9,11 @@ endif; // isset( $_POST['file_upload']
 			<h2><?php echo Participants_Db::$plugin_title.' '.__('Import CSV File', Participants_Db::PLUGIN_NAME )?></h2>
 			
 			<?php
-			if ( ! empty( $errors ) ): 
+			if ( ! empty( $CSV_import->errors ) ): 
 			?>
 			
-			<div class="<?php echo $status?> fade below-h2" id="message">
-				<p><?php echo implode( '</p><p>', $errors )?></p>
+			<div class="<?php echo $CSV_import->error_status ?> fade below-h2" id="message">
+				<p><?php echo implode( '</p><p>', $CSV_import->errors )?></p>
 			</div>
 			
 			<?php
@@ -99,19 +32,19 @@ endif; // isset( $_POST['file_upload']
 						<table class="spreadsheet">
 							<tr>
 							<?php
-							foreach ( $column_names as $name ) {
+							foreach ( $CSV_import->column_names as $name ) {
 								echo '<th>'.$name.'</th>';
 							}
 							?>
 							</tr>
 							<tr>
 								<?php
-								echo str_repeat( '<td>&nbsp;</td>', $column_count );
+								echo str_repeat( '<td>&nbsp;</td>', $CSV_import->column_count );
 								?>
 							</tr>
 						</table>
-						<p><?php printf( __('This means your spreadsheet needs to have %s columns, and the heading in each of those columns needs to match exactly the names above. If there is no data for a particular column, you can include it and leave it blank, or leave it out entirely. The order of the columns doesn&#39;t matter.', Participants_Db::PLUGIN_NAME ),$column_count)?></p>
-						<p><?php _e( '<strong>Note:</strong>Depending on the "Duplicate Record Preference" setting, imported records are checked against existing records by the field set in the "Duplicate Record Check Field" setting. If a record with an email matching an existing record is imported, the existing record will be updated with the data from the imported record. Blank or missing fields in such an imported record will not overwrite existing data.', Participants_Db::PLUGIN_NAME )?></p>
+						<p><?php printf( __('This means your spreadsheet needs to have %s columns, and the heading in each of those columns needs to match exactly the names above. If there is no data for a particular column, you can include it and leave it blank, or leave it out entirely. The order of the columns doesn&#39;t matter.', Participants_Db::PLUGIN_NAME ),$CSV_import->column_count)?></p>
+						<p><?php _e( 'If the imported CSV file has a different column set, that column set will be imported and used. If a column name does not match a defined column in the database, the data from that column will be discarded', Participants_Db::PLUGIN_NAME )?></p>
 						<p><input type="submit" value="<?php _e('Get Blank CSV File', Participants_Db::PLUGIN_NAME )?>" style="float:left;margin:0 5px 5px 0" /><?php _e( 'You can download this file, then open it in Open Office, Excel or Google Docs.', Participants_Db::PLUGIN_NAME )?></p>
 					</div>
 				</div>
@@ -120,7 +53,22 @@ endif; // isset( $_POST['file_upload']
 			<div class="postbox">
 				<h3><?php _e( '2. Upload the .csv file', Participants_Db::PLUGIN_NAME )?></h3>
 				<div class="inside">
-						<p><?php _e( 'When you have your spreadsheet properly set up and filled with data, export it as any of the following: "comma-delimited csv", "tab-delimited csv", or just "csv". Save it to your computer then upload it here.', Participants_Db::PLUGIN_NAME )?></p>
+						<p><?php _e( 'When you have your spreadsheet properly set up and filled with data, export it as any of the following: "comma-delimited csv", or just "csv". Save it to your computer then upload it here.', Participants_Db::PLUGIN_NAME )?></p>
+            <p><?php _e( 'Exported CSV files should be comma-delimited and enclosed with double-quotes ("). Encoding should be "UTF-8."', Participants_Db::PLUGIN_NAME )?></p>
+            <p><?php _e( '<strong>Note:</strong> Depending on the "Duplicate Record Preference" setting, imported records are checked against existing records by the field set in the "Duplicate Record Check Field" setting. If a record matching an existing record is imported, one of three things can happen, based on the "Duplicate Record Preference" setting:', Participants_Db::PLUGIN_NAME )?></p>
+            <h4><?php _e('Current Setting', Participants_Db::PLUGIN_NAME )?>: 
+               <?php switch ( Participants_Db::$plugin_options['unique_email'] ) :
+                    case 1:
+                      printf( __( '"Overwrite" an existing record with a matching %s will be updated with the data from the imported record. Blank or missing fields will not overwrite existing data.', Participants_Db::PLUGIN_NAME ), '<em>'.Participants_Db::$plugin_options['unique_field'].'</em>' );
+                      break;
+                    case 0 :
+                      _e( '"Create New" adds all imported records as new records without checking for a match.', Participants_Db::PLUGIN_NAME );
+                      break;
+                    case 2 :
+                      printf( __( '"Don&#39;t Import" does not import the new record if it matches the %s of an existing one.', Participants_Db::PLUGIN_NAME ), '<em>'.Participants_Db::$plugin_options['unique_field'].'</em>' );
+                      break;
+                    endswitch ?></h4>
+            
 					<form enctype="multipart/form-data" action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="POST">
             
 						<input type="hidden" name="csv_file_upload" id="file_upload" value="true" />

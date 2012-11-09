@@ -510,7 +510,7 @@ class PDb_Settings extends Plugin_Settings {
           (
           'type'       =>'dropdown',
           'help_text'  => __('when a signup is submitted, this field is checked for a duplicate', Participants_Db::PLUGIN_NAME ),
-          'options'    => $this->_get_display_columns(),
+          'options'    => array_merge( $this->_get_display_columns(), array( 'Record ID' => 'id' ) ),
 					'value'      => 'email',
           )
         );
