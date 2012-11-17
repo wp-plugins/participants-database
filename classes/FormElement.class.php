@@ -157,7 +157,7 @@ class FormElement {
     // it's possible for class names to be in either/both places, this collects them onto one place
     if ( isset( $this->attributes['class'] ) ) {
       
-      $this->classes .= $this->attributes['class'];
+      $this->classes .= ' '.$this->attributes['class'];
       unset( $this->attributes['class'] );
       
     }
@@ -166,9 +166,6 @@ class FormElement {
 
     // clear the output array
     $this->output = array();
-
-    // set the proper type for the value property
-    //$this->_condition_value_property();
 
     // build the element by calling the type's method
     switch ( $this->type ) :

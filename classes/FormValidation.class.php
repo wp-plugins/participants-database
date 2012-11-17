@@ -66,13 +66,9 @@ class FormValidation {
 	 */
 	public function validate( $value, $column_atts, $post = NULL ) {
 
-		if ( isset( $column_atts->validation ) ) {
+		$this->_validate_field( $value, $column_atts->name, $column_atts->validation, $column_atts->title );
 
-			$this->_validate_field( $value, $column_atts->name, $column_atts->validation, $column_atts->title );
-
-      if ( is_array( $post ) ) $this->post_array = $post;
-
-    }
+    if ( is_array( $post ) ) $this->post_array = $post;
 
 	}
 
@@ -257,7 +253,7 @@ class FormValidation {
     
     } else {
     
-    //error_log( __METHOD__.' not empty; other validation' );
+    //error_log( __METHOD__.' '.$name.' not empty; other validation:'.$validation.' '.print_r( $this->post_array,1 ) );
 
       /*
        * perform the specific type of validation with our field

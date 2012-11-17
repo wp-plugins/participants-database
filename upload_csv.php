@@ -56,16 +56,16 @@ $CSV_import = new PDb_CSV_Import( 'csv_file_upload' );
 						<p><?php _e( 'When you have your spreadsheet properly set up and filled with data, export it as any of the following: "comma-delimited csv", or just "csv". Save it to your computer then upload it here.', Participants_Db::PLUGIN_NAME )?></p>
             <p><?php _e( 'Exported CSV files should be comma-delimited and enclosed with double-quotes ("). Encoding should be "UTF-8."', Participants_Db::PLUGIN_NAME )?></p>
             <p><?php _e( '<strong>Note:</strong> Depending on the "Duplicate Record Preference" setting, imported records are checked against existing records by the field set in the "Duplicate Record Check Field" setting. If a record matching an existing record is imported, one of three things can happen, based on the "Duplicate Record Preference" setting:', Participants_Db::PLUGIN_NAME )?></p>
-            <h4><?php _e('Current Setting', Participants_Db::PLUGIN_NAME )?>: 
+            <h4 class="inset"><?php _e('Current Setting', Participants_Db::PLUGIN_NAME )?>: 
                <?php switch ( Participants_Db::$plugin_options['unique_email'] ) :
                     case 1:
-                      printf( __( '"Overwrite" an existing record with a matching %s will be updated with the data from the imported record. Blank or missing fields will not overwrite existing data.', Participants_Db::PLUGIN_NAME ), '<em>'.Participants_Db::$plugin_options['unique_field'].'</em>' );
+                      printf( __( '%sOverwrite%s an existing record with a matching %s will be updated with the data from the imported record. Blank or missing fields will not overwrite existing data.', Participants_Db::PLUGIN_NAME ), '<span class="emphasized">', '</span>', '<em>'.Participants_Db::$plugin_options['unique_field'].'</em>' );
                       break;
                     case 0 :
-                      _e( '"Create New" adds all imported records as new records without checking for a match.', Participants_Db::PLUGIN_NAME );
+                      printf( __( '%sCreate New%s adds all imported records as new records without checking for a match.', Participants_Db::PLUGIN_NAME ), '<span class="emphasized">', '</span>', '</span>' );
                       break;
                     case 2 :
-                      printf( __( '"Don&#39;t Import" does not import the new record if it matches the %s of an existing one.', Participants_Db::PLUGIN_NAME ), '<em>'.Participants_Db::$plugin_options['unique_field'].'</em>' );
+                      printf( __( '%sDon&#39;t Import%s does not import the new record if it matches the %s of an existing one.', Participants_Db::PLUGIN_NAME ), '<span class="emphasized">', '</span>', '<em>'.Participants_Db::$plugin_options['unique_field'].'</em>' );
                       break;
                     endswitch ?></h4>
             

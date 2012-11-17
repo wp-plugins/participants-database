@@ -2,336 +2,367 @@
 
 /* Participants DB Admin CSS */
 body[class*='participants-database'] .widefat td {
-  vertical-align:middle;
+    vertical-align:middle;
 }
 body[class*='participants-database']  .widefat tr:nth-child(even) {
-	background-color:#EDEDED;
+    background-color:#EDEDED;
 }
 .participants_db input[type='text'] {
-	width: 300px;
+    width: 300px;
 }
-body[class*='participants-database'] input[type=checkbox] {
-	position:relative;
-	top:-1px;
+.participants_db input[type=checkbox] {
+    margin-top: 4px;
+}
+.participants_db .wp-editor-wrap {
+    width: 500px;
+}
+.participants_db option[value='none'],
+.participants_db option[value='other'] {
+    font-weight:bold;
+}
+.participants_db input[id$='_other'] {
+    width:50px;
+}
+.participants_db input[name='temp'] {
+    display:none;
 }
 #PDb_footer {
-	box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
-	border-color: rgba(197, 99, 59, 0.5);
+    box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
+    border-color: rgba(197, 99, 59, 0.5);
 }
 .pdb-signup th {
-	width:200px;
+    width:200px;
 }
 fieldset.widefat,
 #PDb_footer {
-  padding:7px;
-  width:auto;
-  margin-top: 1.4em;
-  overflow:auto;
+    padding:7px;
+    width:auto;
+    margin-top: 1.4em;
+    overflow:auto;
 }
 #PDb_footer .section {
-  width:280px;
-  float:left;
-  margin:0 18px;
+    width:280px;
+    float:left;
+    margin:0 18px;
 }
 input[readonly] {
-	border:none;
-	background:none transparent;
+    border:none;
+    background:none transparent;
 }
 body[class*='participants-database'] a.delete {
-	display:block;
-	width:12px;
-	height:26px;
-	background:url('../ui/delete.png') no-repeat center center;
+    display:block;
+    width:12px;
+    height:26px;
+    background:url('../ui/delete.png') no-repeat center center;
 }
 body[class*='participants-database'] .form-table {
 	margin-bottom:4em;
 }
-
 .wp-admin .edit-participant .helptext {
-	display:inline;
+    display:inline;
+}
+.participants_db input[type='text']+.helptext,
+.participants_db input[type='checkbox']+.helptext,
+.participants_db select+.helptext {
+    float:left;
+    width:390px;
+}
+textarea,
+select,
+input[type="text"],
+input[type="checkbox"],
+.multicheckbox label,
+.link-element label {
+    float: left;
+    margin-right: 10px;
+}
+.emphasized {
+  color: #7C0000;
+  font-weight: normal;
+  text-transform: uppercase;
 }
 
 body[class*='participants-database'] .selectother input[type=text] {
-	width:50px;
+	width:auto;
 }
 table.spreadsheet {
-	width:90%;
-	border-collapse:collapse;
+    width:90%;
+    border-collapse:collapse;
 }
 .spreadsheet td, .spreadsheet th {
-	border:1px dashed #AAAAAA;
-	padding:3px;
+    border:1px dashed #AAAAAA;
+    padding:3px;
 }
 body[class*='participants-database'] .text-block {
-  max-width: 35em;
+    max-width: 35em;
 }
 #delete_button.unarmed {
-	opacity:0.5;
+    opacity:0.5;
 }
 #delete_button.armed {
-	border: 1px solid rgba(204, 0, 0, 0.5);
-  box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
+    border: 1px solid rgba(204, 0, 0, 0.5);
+    box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
 }
 .participants_db.settings-class .pdb_anchor {
-	position:relative;
-	top:-5em;
+    position:relative;
+    top:-5em;
 }
 
 /* manage fields */
 div.manage-fields-wrap {
-	min-width:1100px;
+    min-width:1100px;
 }
 .manage-fields thead > tr {
-	height:6em;
+    height:6em;
 }
 .manage-fields.widefat th {
-  padding:5px 0;
-  vertical-align:middle;
-  text-align:center;
+    padding:5px 0;
+    vertical-align:middle;
+    text-align:center;
 }
 .manage-fields th.sortable {
-	/*padding:7px 7px 8px;*/
+    /*padding:7px 7px 8px;*/
 }
 .id, .order, .persistent, .sortable, .admin_column, .display_column, .CSV {
-	text-align:center;
+    text-align:center;
 }
 th.vertical-title  {
-	width:25px;
+    width:25px;
 }
 th.admin_column, th.display_column, th.display {
-	width:40px;
+    width:40px;
 }
 th.form_element {
-	width:150px;
+    width:150px;
 }
 th.validation, th.title, th.default, th.group, th.name {
-	width:8%;
+    width:8%;
 }
 #internal th.name, #internal th.title {
-	width:100%;
+    width:100%;
 }
 #internal table.manage-fields {
-	width: 360px;
+    width: 360px;
 }
 #field_groups th.title {
-	width:auto;
+    width:auto;
 }
 .manage-fields th.vertical-title {
-	vertical-align:text-top;
+    vertical-align:text-top;
 }
 .manage-fields th.vertical-title span {
-  writing-mode:tb-rl;
-	-moz-transform: rotate(90deg);
-	-webkit-transform: rotate(90deg);
-  -o-transform: rotate(90deg);
-  white-space:nowrap;
-	word-wrap: normal;
-	display:block;
-	width:20px;
-	height:20px;
-	line-height: 1;
-	position:relative;
-	top:0;
-	left:0;
+    writing-mode:tb-rl;
+    -moz-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    white-space:nowrap;
+    word-wrap: normal;
+    display:block;
+    width:20px;
+    height:20px;
+    line-height: 1;
+    position:relative;
+    top:0;
+    left:0;
 }
 .manage-fields th.admin_column span, .manage-fields th.display_column span {
-	left:18px;
+    left:18px;
 }
 .manage-fields input, 
 .manage-fields textarea {
-	width:100%;
+    width:100%;
 }
 .manage-fields input[type="checkbox"], 
 .manage-fields input[type="radio"] {
-	width:auto;
-	position:relative;
-	top:-1px;
+    width:auto;
+    position:relative;
+    top:-1px;
 }
 .manage-fields textarea {
-	height:3.5em;
+    height:3.5em;
 }
 .manage-field-groups th.name {
-	width:160px;
+    width:160px;
 }
 
 .manage-field-groups th.fields {
-	width:30px;
+    width:30px;
 }
 .manage-field-groups td[id^='field_count'] {
-	text-align:center;
+    text-align:center;
 }
 .manage-field-groups th.column span {
-	position:relative;
-	left:5px;
+    position:relative;
+    left:5px;
 }
 td.order {
-	padding:3px 0;
-	text-align: center;
+    padding:3px 0;
+    text-align: center;
 }
 a.dragger {
-	background-color: #EEEEEE;
-	border: 1px solid #DDDDDD;
-	border-radius: 2px 2px 2px 2px;
-	cursor: move;
-	display: block;
-	letter-spacing: 0;
-	line-height: 15px;
-	padding: 3px 0;
-	margin-top : 2px;
+    background-color: #EEEEEE;
+    border: 1px solid #DDDDDD;
+    border-radius: 2px 2px 2px 2px;
+    cursor: move;
+    display: block;
+    letter-spacing: 0;
+    line-height: 15px;
+    padding: 3px 0;
+    margin-top : 2px;
 }
 
 #message {
-   font-size: 16px;
+    font-size: 16px;
 }
 
 /* SETTINGS PAGE */
 .settings-class textarea {
-	float:left;
-	margin-right:10px;
-	height:140px;
-	width:300px;
+    float:left;
+    margin-right:10px;
+    height:140px;
+    width:300px;
 }
 
 /*   UI TABS   */
 
 /* hide before tabs kicks in */
 #fields-tabs.ui-tabs {
-  visibility:visible;
+    visibility:visible;
 }
 #fields-tabs {
-  visibility:hidden;
+    visibility:hidden;
 }
 
 .ui-tabs-nav {
-	border-bottom: 1px solid #ccc;
-	height: 28px;
-	margin: 20px 0;
-	padding: 0;
+    border-bottom: 1px solid #ccc;
+    height: 28px;
+    margin: 20px 0;
+    padding: 0;
 }
 .ui-tabs-nav li {
-	display: block;
-	float: left;
-	margin: 0;
+    display: block;
+    float: left;
+    margin: 0;
 }
 .ui-tabs-nav li a {
-	padding: 4px 20px 6px;
-	font-weight: bold;
+    padding: 4px 20px 6px;
+    font-weight: bold;
 }
 .ui-tabs-nav li a {
-	border-style: solid;
-	border-color: #CCC #CCC #F9F9F9;
-	border-width: 1px 1px 0;
-	color: #777777;
-	text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
-	display: inline-block;
-	padding: 4px 14px 7px;
-	text-decoration: none;
-	margin: 0 6px -1px 0;
-	-moz-border-radius: 5px 5px 0 0;
-	-webkit-border-top-left-radius: 5px;
-	-webkit-border-top-right-radius: 5px;
-	-khtml-border-top-left-radius: 5px;
-	-khtml-border-top-right-radius: 5px;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
+    border-style: solid;
+    border-color: #CCC #CCC #F9F9F9;
+    border-width: 1px 1px 0;
+    color: #777777;
+    text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
+    display: inline-block;
+    padding: 4px 14px 7px;
+    text-decoration: none;
+    margin: 0 6px -1px 0;
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -khtml-border-top-left-radius: 5px;
+    -khtml-border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs-nav li.ui-state-focus a {
-	border-width: 1px;
-	color: #333333;
-	background-color:#ffffff;
+    border-width: 1px;
+    color: #333333;
+    background-color:#ffffff;
 }
 .ui-tabs-panel {
-	clear: both;
+    clear: both;
 }
 .ui-tabs-panel h3 {
-	font: italic normal normal 24px/29px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
-	margin: 0;
-	padding: 0 0 5px;
-	line-height: 35px;
-	text-shadow: 0 1px 0 #fff;
+    font: italic normal normal 24px/29px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+    margin: 0;
+    padding: 0 0 5px;
+    line-height: 35px;
+    text-shadow: 0 1px 0 #fff;
 }
 .ui-tabs-panel h4 {
-	font-size: 15px;
-	font-weight: bold;
-	margin: 1em 0;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 1em 0;
 }
 /* DIALOG BOXES */
 #dialog-overlay {
-	/* set it to fill the whil screen */
-	width:100%;
-	height:100%;
-	/* transparency for different browsers */
-	filter:alpha(opacity=50);
-	-moz-opacity:0.5;
-	-khtml-opacity: 0.5;
-	opacity: 0.5;
-	background:#000;
-	/* make sure it appear behind the dialog box but above everything else */
-	position:absolute;
-	top:0;
-	left:0;
-	z-index:3000;
-	/* hide it by default */
-	display:none;
+    /* set it to fill the whil screen */
+    width:100%;
+    height:100%;
+    /* transparency for different browsers */
+    filter:alpha(opacity=50);
+    -moz-opacity:0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    background:#000;
+    /* make sure it appear behind the dialog box but above everything else */
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:3000;
+    /* hide it by default */
+    display:none;
 }
 .ui-dialog {
-	/* css3 drop shadow */
-	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-	/* css3 border radius */
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	background:#FFFBCC;
-   border: 1px solid #E6DB55;
-	/* styling of the dialog box, i have a fixed dimension for this demo */
-	width:328px;
-	/* make sure it has the highest z-index */
-	position:absolute;
-	z-index:5000;
-	/* hide it by default */
-	display:none;
+    /* css3 drop shadow */
+    -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    /* css3 border radius */
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background:#FFFBCC;
+    border: 1px solid #E6DB55;
+    /* styling of the dialog box, i have a fixed dimension for this demo */
+    width:328px;
+    /* make sure it has the highest z-index */
+    position:absolute;
+    z-index:5000;
+    /* hide it by default */
+    display:none;
 }
 .ui-dialog {
-padding:20px 40px;
+    padding:20px 40px;
 }
 .ui-dialog a.button{
-/*stylesforbutton*/
-margin:10px auto 0 auto;
-text-align:center;
-display:block;
-width:50px;
-padding:5px 10px 6px;
-color:#fff;
-text-decoration:none;
-font-weight:bold;
-line-height:1;
-/*buttoncolor*/
-background-color:#e33100;
-/*css3implementation:)*/
-/*roundedcorner*/
--moz-border-radius:5px;
--webkit-border-radius:5px;
-/*dropshadow*/
--moz-box-shadow:0 1px 3px rgba(0,0,0,0.5);
--webkit-box-shadow:0 1px 3px rgba(0,0,0,0.5);
-/*textshadow*/
-text-shadow:0 -1px 1px rgba(0,0,0,0.25);
-border-bottom:1px solid rgba(0,0,0,0.25);
-position:relative;
-cursor:pointer;
+    /*stylesforbutton*/
+    margin:10px auto 0 auto;
+    text-align:center;
+    display:block;
+    width:50px;
+    padding:5px 10px 6px;
+    color:#fff;
+    text-decoration:none;
+    font-weight:bold;
+    line-height:1;
+    /*buttoncolor*/
+    background-color:#e33100;
+    /*css3implementation:)*/
+    /*roundedcorner*/
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    /*dropshadow*/
+    -moz-box-shadow:0 1px 3px rgba(0,0,0,0.5);
+    -webkit-box-shadow:0 1px 3px rgba(0,0,0,0.5);
+    /*textshadow*/
+    text-shadow:0 -1px 1px rgba(0,0,0,0.25);
+    border-bottom:1px solid rgba(0,0,0,0.25);
+    position:relative;
+    cursor:pointer;
 }
 .ui-dialog a.button:hover{
-background-color:#c33100;
+    background-color:#c33100;
 }
 #confirmation-dialog p{
 }
 .ui-button {
-	margin:0.6em 2em 0.6em 0;
+    margin:0.6em 2em 0.6em 0;
 }
 .ui-dialog-titlebar {
-	position:absolute;
-	top:1.6em;
-	right:1.6em;
+    position:absolute;
+    top:1.6em;
+    right:1.6em;
 }

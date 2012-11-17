@@ -40,8 +40,9 @@ jQuery(document).ready(function($){
     var thing = $(this).attr('ref');
     // set the group ID and get the field count for the group
     var group = parent.children('td.group').children('select').val();
-    if ( typeof group != "undefined" ) var group_id = group;
-    else var group_id = row_id;
+    var group_id;
+    if ( typeof group != "undefined" ) group_id = group;
+    else group_id = row_id;
     var countDisplay = $('#field_count_'+group_id);
     var count = countDisplay.html();
     // test to see if the group we're deleting has fields in it
@@ -83,7 +84,7 @@ jQuery(document).ready(function($){
                 beforeSend: function () {
                   parent.animate({
                     'backgroundColor': 'yellow'
-                  }, 600);
+                  }, 200);
                 },
                 success: function (response) {
                   parent.slideUp(600, function () { //remove the Table row .

@@ -79,6 +79,10 @@
   overflow: auto;
   padding: 2px 5px;
 }
+.dropdown-other select {
+    float: left;
+    margin-right: 10px;
+}
 .edit-participant dt {
    clear: both;
    float: left;
@@ -92,6 +96,9 @@
 }
 .edit-participant .image-field-wrap {
    float: right;
+}
+.participants-database .image-field-wrap img {
+  height: 3em;
 }
 .PDb-single .image-field-wrap {
    float: none;

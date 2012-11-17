@@ -82,9 +82,6 @@ if ( isset( $_POST['action'] ) ) {
 
 			}
 
-			// load the default record with the default values
-			Participants_Db::update_default_record();
-
 			break;
 
     case $PDb_i18n['update groups']:
@@ -118,7 +115,12 @@ if ( isset( $_POST['action'] ) ) {
 			// if they're trying to use a reserved name, stop them
 			if ( in_array( $atts['name'], Participants_Db::$reserved_names ) ) {
 
-				$error_msgs[] = __('New field not added: field name cannot be one of these reserved names', Participants_Db::PLUGIN_NAME ) . ': ' . implode(', ',Participants_Db::$reserved_names);
+				$error_msgs[] = sprintf(
+																'<h3>%s</h3> %s:<br />%s',
+																__('Cannot add a field with that name', Participants_Db::PLUGIN_NAME ),
+																__('This name is reserved; please choose another. Reserved names are', Participants_Db::PLUGIN_NAME ),
+																implode(', ',Participants_Db::$reserved_names)
+															 );
 				break;
 
 			}
@@ -228,7 +230,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	foreach ( $groups as $group ) :
 	?>
 	<div id="<?php echo $group?>" class="manage-fields-wrap" >
-		<form id="manage_<?php echo $group?>_fields" method="post">
+		<form id="manage_<?php echo $group?>_fields" method="post" autocomplete="off">
 		<h3><?php echo ucwords( str_replace( '_',' ',$group ) ),' ', __('Fields',Participants_Db::PLUGIN_NAME )?></h3>
 		<p>
 		<?php

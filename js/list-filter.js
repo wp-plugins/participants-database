@@ -1,9 +1,9 @@
 jQuery(document).ready(function ($) {
   "use strict";
   var isError,
-      errormsg = $('.pdb-searchform .pdb-error'),
-      filterform = $('#sort_filter_form'),
-      submission = {};
+  errormsg = $('.pdb-searchform .pdb-error'),
+  filterform = $('#sort_filter_form'),
+  submission = {};
   
   clear_error_messages();
   
@@ -47,14 +47,14 @@ jQuery(document).ready(function ($) {
       });
       $.ajax({
         type: "POST",
-             url: PDb_ajax.ajaxurl,
-             data: submission,
-             success: function(html,status) {
-                $('#pdb-show-records .pdb-list').html(html);
-             },
-             error:function(jqXHR,status,errorThrown){
-           console.log('Participants Database JS error status:'+status+' error:'+errorThrown);
-             }
+        url: PDb_ajax.ajaxurl,
+        data: submission,
+        success: function(html,status) {
+          $('.pdb_list').replaceWith(html);
+        },
+        error:function(jqXHR,status,errorThrown){
+          console.log('Participants Database JS error status:'+status+' error:'+errorThrown);
+        }
       });
     }
   });

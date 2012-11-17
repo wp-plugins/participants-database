@@ -79,8 +79,6 @@ class PDb_Init
     {
 
       global $wpdb;
-			
-			
 
       // fresh install: install the tables if they don't exist
       if ( $wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') != Participants_Db::$participants_table ) :
@@ -112,7 +110,8 @@ class PDb_Init
           INDEX  ( `group` ),
           PRIMARY KEY  ( `id` )
           )
-          DEFAULT CHARACTER SET utf8
+          DEFAULT CHARACTER SET utf8,
+          AUTO_INCREMENT = 0
           ';
         $wpdb->query($sql);
 
@@ -160,7 +159,6 @@ class PDb_Init
           PRIMARY KEY  (`id`)
           )
           DEFAULT CHARACTER SET utf8
-          AUTO_INCREMENT = '.Participants_Db::$id_base_number.'
           ;';
 
         $wpdb->query($sql);
@@ -210,9 +208,6 @@ class PDb_Init
           $i++;
 
         }
-
-        // create the default record
-        $this->set_default_record();
 
       endif;// end of the fresh install
 
@@ -399,9 +394,6 @@ class PDb_Init
 
         }
 				
-				// create the default record
-        $this->set_default_record();
-				
 			}
 
       /*
@@ -447,13 +439,19 @@ class PDb_Init
 
         }
 
-			}
-			
-			/*
-			 * this database version adds the "read-only" attribute to fields
-			 * 
-			 */
-			if ( '0.5' == get_option( Participants_Db::$db_version ) ) { 
+        // delete the default record
+        $wpdb->query( 
+          $wpdb->prepare( 
+            "DELETE FROM ".Participants_Db::$participants_table."
+             WHERE private_id = 'RPNE2'"
+          )
+        );
+				
+				// add the new private ID admin column setting because we eliminated the redundant special setting
+				$options = get_option( self::$participants_db_options );
+				if ( $options['show_pid'] ) {
+						$wpdb->update( Participants_Db::$fields_table, array( 'admin_column' => 90 ), array( 'name' => 'private_id') );
+				}
 			
 				/*
 				 * add the "read-only" column
@@ -561,12 +559,13 @@ class PDb_Init
                                                     'title' => 'Private ID',
                                                     'signup' => 1,
                                                     'form_element' => 'text',
+																										'admin_column' => 90,
                                                     'default' => 'RPNE2',
                                                     ),
                             'date_recorded'  => array(
                                                     'title' => 'Date Recorded',
                                                     'form_element'=>'date',
-																										'admin_column'=>'100',
+																										'admin_column'=>100,
 																										'sortable'=>1,
                                                     ),
                             'date_updated'   => array(
@@ -613,7 +612,7 @@ class PDb_Init
                                                         'form_element' => 'text-line',
                                                         'validation' => 'yes',
                                                         'sortable' => 1,
-                                                        'admin_column' => 1,
+                                                        'admin_column' => 2,
                                                         'display_column' => 1,
                                                         'signup' => 1
                                                         ),
@@ -622,7 +621,7 @@ class PDb_Init
                                                         'form_element' => 'text-line',
                                                         'validation' => 'yes',
                                                         'sortable' => 1,
-                                                        'admin_column' => 2,
+                                                        'admin_column' => 3,
                                                         'display_column' => 2,
                                                         'signup' => 1
                                                         ),
@@ -635,30 +634,37 @@ class PDb_Init
                                                         'sortable' => 1,
                                                         'persistent' => 1,
                                                         'form_element' => 'text-line',
-                                                        'admin_column' => 3,
+                                                        'admin_column' => 0,
                                                         'display_column' => 3,
                                                       ),
                                   'state'        => array(
                                                         'title' => 'State',
+                                                        'sortable' => 1,
+                                                        'persistent' => 1,
                                                         'form_element' => 'text-line',
                                                         'display_column' => 4,
                                                       ),
                                   'country'      => array(
                                                         'title' => 'Country',
+                                                        'sortable' => 1,
+                                                        'persistent' => 1,
                                                         'form_element' => 'text-line',
                                                       ),
                                   'zip'          => array(
                                                         'title' => 'Zip Code',
+                                                        'sortable' => 1,
+                                                        'persistent' => 1,
                                                         'form_element' => 'text-line',
                                                       ),
                                   'phone'        => array(
                                                         'title' => 'Phone',
-                                                        'help_text' => 'primary contact number',
+                                                        'help_text' => 'Your primary contact number',
                                                         'form_element' => 'text-line',
                                                       ),
                                   'email'        => array(
                                                         'title' => 'Email',
                                                         'form_element' => 'text-line',
+																												'admin_column' => 4,
                                                         'validation' => '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i',
                                                         'signup' => 1,
                                                       ),
@@ -678,7 +684,7 @@ class PDb_Init
       self::$personal_fields = array(
                                   'photo'       => array(
                                                         'title' => 'Photo',
-                                                        'help_text' => 'upload a photo of yourself',
+                                                        'help_text' => 'Upload a photo of yourself. 300 pixels maximum width or height.',
                                                         'form_element' => 'image-upload',
                                                         ),
                                   'website'     => array(
@@ -688,10 +694,27 @@ class PDb_Init
                                                         ),
                                   'interests'   => array(
                                                         'title' => 'Interests or Hobbies',
-                                                        'form_element' => 'text-field',
+                                                        'form_element' => 'multi-select-other',
+                                                        'values' => array(
+                                                                          'sports',
+                                                                          'photography',
+                                                                          'crafts',
+                                                                          'outdoors',
+                                                                          'yoga'
+                                                                          ),
                                                         ),
                                   );
       self::$admin_fields = array(
+                                  'approved' => array(
+                                                        'title' => 'Approved',
+                                                        'sortable' => 1,
+                                                        'form_element' => 'checkbox',
+                                                        'default' => 'no',
+                                                        'values'  => array(
+                                                                          'yes',
+                                                                          'no',
+                                                                          ),
+                                                        ),
                                   'donations'   => array(
                                                         'title' => 'Donations Made',
                                                         'form_element' => 'text-field',
@@ -722,33 +745,6 @@ class PDb_Init
                                   );
 
 
-
-    }
-
-    // create the default record
-    public function set_default_record() {
-			
-			if ( ! is_array( self::$field_groups ) ) self::_define_init_arrays();
-
-      $default_values = array();
-      $fields = array();
-
-      // append all the field groups into one array ($fields) for the insert
-      foreach( array_keys( self::$field_groups ) as $group ) {
-
-        $fields = array_merge( $fields, self::${$group.'_fields'} );
-
-      }
-
-      // now build an array of default values to put into the default record
-      foreach ( $fields as $name => $field ) {
-
-        $default_values[ $name ] = isset( $field['default'] ) ? $field['default'] : '';
-
-      }
-
-      // insert the record; no id value for the record id forces it to use the default record id
-      return Participants_Db::process_form( $default_values, 'insert', true );
 
     }
 

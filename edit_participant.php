@@ -1,32 +1,39 @@
 <?php 
-// submission processing happens in Participants_Db::process_page_request on the admin_init action
-//
-// this file is called by the admin, also by the sortcode [edit_record]
-//
+/*
+ * this file is called by the admin menu item, also a link in the admin record list
+ * 
+ * submission processing happens in Participants_Db::process_page_request on the
+ * admin_init action
+ *
+ */
 
 if ( ! isset( $participant_id ) ) {
+	
   // if there is no id in the request, use the default record
-  $participant_id = isset( $_REQUEST['id'] ) ? $_REQUEST['id'] : Participants_Db::$id_base_number;
+  $participant_id = isset( $_REQUEST['id'] ) ? $_REQUEST['id'] : false;
+	
 }
 
-if ( $participant_id == Participants_Db::$id_base_number ) {
+if ( false === $participant_id ) {
 	
   $action = 'insert';
   $page_title = __('Add New Participant Record', Participants_Db::PLUGIN_NAME );
+	$participant_values = Participants_Db::get_default_record();
 	
 } else {
 	
   $action = 'update';
   $page_title = __('Edit Existing Participant Record', Participants_Db::PLUGIN_NAME );
+	$participant_values = Participants_Db::get_participant( $participant_id );
 	
 }
 
-// get the participant information
-// and run the rest of the script if the id is valid
-// if this returns false, we have an invlaid ID; do nothing
-if ( $participant_values = Participants_Db::get_participant( $participant_id ) ) :
+/*
+ * if we have a valid ID or are creating a new record, show the form
+ */
+if ( $participant_values ) :
 
-if ( $participant_id == Participants_Db::$id_base_number ) $participant_values = Participants_Db::set_initial_record($participant_values);
+//error_log( basename( __FILE__).' default record:'.print_r( $participant_values,1));
 
 //get the groups info
 $groups = Participants_Db::get_groups();
@@ -36,10 +43,19 @@ get_currentuserinfo();
 
 $options = get_option( self::$participants_db_options );
 
+// set up the hidden fields
+$hidden = array(
+	'action' => $action,
+	'subsource' => Participants_Db::PLUGIN_NAME,
+);
+foreach ( array( 'id', 'private_id' ) as $i ) {
+	if ( isset( $participant_values[ $i ] ) ) $hidden[ $i ] = $participant_values[ $i ];
+}
+
 $section = '';
 ?>
 <div class="wrap edit-participant">
-<?php if ( is_admin() ) : ?><h2><?php echo $page_title?></h2><?php endif ?>
+	<h2><?php echo $page_title?></h2>
 <?php
 if ( is_object( Participants_Db::$validation_errors ) ) {
 	
@@ -48,19 +64,13 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 }
 
 ?>
-<form method="post" action="<?php echo $_SERVER['REQUEST_URI']?>" enctype="multipart/form-data" >
+	<form method="post" action="<?php echo $_SERVER['REQUEST_URI']?>" enctype="multipart/form-data" autocomplete="off" >
 	<?php 
-	FormElement::print_hidden_fields( array(
-																					'action' => $action, 
-																					'id' => ( isset( $participant_values[ 'id' ] ) ? $participant_values[ 'id' ] : $participant_id ),
-																					'private_id' => $participant_values[ 'private_id' ],
-																					'subsource' => Participants_Db::PLUGIN_NAME,
-																					) );
+		FormElement::print_hidden_fields( $hidden );
 																					
 	// get the columns and output form
-	$type = is_admin() ? 'backend' : 'frontend';
 	$readonly_columns = Participants_Db::get_readonly();
-	foreach ( Participants_db::get_column_atts( $type ) as $column ) :
+		foreach ( Participants_db::get_column_atts( 'backend' ) as $column ) :
 
     $id_line = '';
 		
@@ -70,8 +80,8 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 ?>
 </table>
 <?php
-		  } elseif ( Participants_Db::backend_user() ) {
-        $id_line = '<tr><th>'._x('ID','abbreviation for "identification"',Participants_Db::PLUGIN_NAME).'</th><td>'.($participant_id == Participants_Db::$id_base_number ? _x('(new record)','indicates a new record is being entered',Participants_Db::PLUGIN_NAME) : $participant_id ).'</td></tr>';
+				} else {
+					$id_line = '<tr><th>'._x('ID','abbreviation for "identification"',Participants_Db::PLUGIN_NAME).'</th><td>'.( false === $participant_id ? _x('(new record)','indicates a new record is being entered',Participants_Db::PLUGIN_NAME) : $participant_id ).'</td></tr>';
 		  }
 		  $section = $column->group
 ?>
@@ -84,14 +94,14 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
     echo $id_line;
 ?>
 
-	<tr class="<?php echo ( is_admin() && 'hidden' == $column->form_element ) ? 'text-line' : $column->form_element ?>">
+		<tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) ?>">
     <?php
     $column_title = htmlspecialchars(stripslashes($column->title),ENT_QUOTES,"UTF-8",false);
     if ( $options['mark_required_fields'] && $column->validation != 'no' ) {
       $column_title = sprintf( $options['required_field_marker'], $column_title );
     }
     ?>
-		<th><?php echo $column_title . ( ( Participants_Db::backend_user() && 'hidden' == $column->form_element ) ? ' (hidden)' : '' ) ?></th>
+			<th><?php echo $column_title . ( ( 'hidden' == $column->form_element ) ? ' (hidden)' : '' ) ?></th>
 		<td id="<?php echo Participants_Db::$css_prefix.$column->name?>" >
 		<?php
 		
@@ -105,7 +115,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 			
 			if ( is_array( $_POST[ $column->name ] ) ) $value = $_POST[ $column->name ];
 			
-			elseif  ( Participants_Db::backend_user() && 'textarea' == $column->form_element && $options['rich_text_editor'] ) $value = $_POST[ $column->name ];
+				elseif  ( 'textarea' == $column->form_element && $options['rich_text_editor'] ) $value = $_POST[ $column->name ];
 
 			else $value = esc_html( stripslashes( $_POST[ $column->name ] ) );
 			
@@ -125,6 +135,11 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 					
 					break;
 				
+					//case 'link':
+					//	
+					//	$value = Participants_Db::get_link_array( $value );
+					//	break;
+					
 				case 'image-upload':
 				
 					$value = empty( $value ) ? '' : Participants_Db::get_image_uri( $value );
@@ -145,27 +160,8 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 					
 				case 'hidden':
 				
-					if ( Participants_Db::backend_user() ) {
-						
-						// for backend user this field is exposed and editable
 						$column->form_element = 'text-line';
 						
-					} else {
-				
-						global $post, $current_user;
-				
-						if ( false !== strpos( html_entity_decode($value), '->' ) ) {
-							
-							list( $object, $property ) = explode( '->', html_entity_decode($value) );
-							
-							$object = ltrim( $object, '$' );
-							
-							$value = isset( $$object->$property )? $$object->$property : $value;
-							
-						}
-						
-					}
-					
 			}
 			
 		}
@@ -235,7 +231,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
   </table>
 </form>
 </div>
-<?php endif?>
+<?php endif;// ID is valid ?>
 <?php /* ?>
 <script type="text/javascript">
 jQuery(document).ready( function($) {

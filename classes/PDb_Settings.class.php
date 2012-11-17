@@ -83,8 +83,8 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'main',
         'options'    =>array(
           'type'        => 'text',
-          'help_text'   => __("Full path to an image file to show if no image has been defined for an image field. Leave blank for no default image.", Participants_Db::PLUGIN_NAME ),
-          'value'       => '',
+          'help_text'   => __("Path (relative to WP root) of an image file to show if no image has been defined for an image field. Leave blank for no default image.", Participants_Db::PLUGIN_NAME ),
+          'value'       => 'wp-content/plugins/'.Participants_Db::PLUGIN_NAME.'/ui/no-image.png',
           )
         );
 
@@ -95,7 +95,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('place a link to the full-size image on images', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('place a link to the full-size image on images. This link will work with most "lightbox" plugins.', Participants_Db::PLUGIN_NAME ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
@@ -341,7 +341,7 @@ class PDb_Settings extends Plugin_Settings {
           'options'     => array( 1, 0 ),
           ),
         );
-		
+		/*
     $this->plugin_settings[] = array(
         'name'       =>'show_pid',
         'title'      =>__('Show the Private ID in Admin List', Participants_Db::PLUGIN_NAME ),
@@ -353,7 +353,7 @@ class PDb_Settings extends Plugin_Settings {
           'value'       => 1,
           'options'     => array( 1, 0 ),
           ),
-        );
+        );*/
 		
 		/******************************************************
 		 *
@@ -439,7 +439,7 @@ class PDb_Settings extends Plugin_Settings {
           'type'        =>'text-field',
           'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. You can only use placeholders for fields that are present in the signup form, including hidden fields.', Participants_Db::PLUGIN_NAME ),
 					/* translators: the %s will be the name of the website */
-          'value'       =>sprintf( __('<p>Thank you, [first_name] for signing up with %s.</p><p>You may complete your registration with additional information or update your information by visiting this link at any time: <a href="[record_link]">[record_link]</a>.</p>', Participants_Db::PLUGIN_NAME ),get_bloginfo('name') ),
+          'value'       =>sprintf( __('<p>Thank you, [first_name], for signing up with %s.</p><p>You may complete your registration with additional information or update your information by visiting this private link at any time: <a href="[record_link]">[record_link]</a>.</p>', Participants_Db::PLUGIN_NAME ),get_bloginfo('name') ),
           )
         );
 
@@ -509,7 +509,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    =>array
           (
           'type'       =>'dropdown',
-          'help_text'  => __('when a signup is submitted, this field is checked for a duplicate', Participants_Db::PLUGIN_NAME ),
+          'help_text'  => __('when a signup is submitted or CSV record is imported, this field is checked for a duplicate', Participants_Db::PLUGIN_NAME ),
           'options'    => array_merge( $this->_get_display_columns(), array( 'Record ID' => 'id' ) ),
 					'value'      => 'email',
           )
@@ -521,12 +521,12 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'dropdown',
-          'help_text'   => __('when the submission matches the Duplicate Record Check Field of an existing record.', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('when the submission matches the Duplicate Record Check Field of an existing record. This also applies to importing records from a CSV file.', Participants_Db::PLUGIN_NAME ),
           'value'       => 1,
           'options'     => array(
 																 'Create a new record with the submission' => 0,
-																 'Overwrite matching record with new one, preserving values' => 1,
-																 'Generate validation error with an error message' => 2,
+																 'Overwrite matching record with new data' => 1,
+																 'Show a validation error message' => 2,
 																 ),
           ),
         );
@@ -537,7 +537,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text-field',
-          'help_text'   => __('This message will be shown if a signup is made with a "check field" that matches an existing record.', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('This validation error message will be shown if a signup is made with a "check field" that matches an existing record.', Participants_Db::PLUGIN_NAME ),
           'value'       =>__('A record with that %s already exists. Please choose another.', Participants_Db::PLUGIN_NAME ),
           )
         );
@@ -745,7 +745,7 @@ class PDb_Settings extends Plugin_Settings {
     ?>
     <div class="wrap participants_db settings-class">
       <h2><?php echo Participants_Db::$plugin_title?> <?php _e('Settings', Participants_Db::PLUGIN_NAME )?></h2>
-      <form action="options.php" method="post">
+      <form action="options.php" method="post" >
         <div class="ui-tabs">
           <ul class="ui-tabs-nav">
           <?php foreach ( $this->sections as $id => $title ) printf('<li><a href="#%s">%s</a></li>',Participants_Db::make_anchor( $id ), $title ); ?>

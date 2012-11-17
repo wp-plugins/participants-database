@@ -8,18 +8,3 @@
 #toplevel_page_participants-database img {
 	visibility:hidden;
 }
-.participants-database_page_participants-database-edit_participant .wp-editor-wrap {
-  width: 500px;
-}
-.participants_db.settings-class option[value='none'],
-.participants_db.settings-class option[value='other'] {
-	font-weight:bold;
-}
-.participants_db.settings-class input[id$='_other'] {
-	float:none;
-	width:50px;
-}
-
-.participants_db.settings-class input[name='temp'] {
-	display:none;
-}

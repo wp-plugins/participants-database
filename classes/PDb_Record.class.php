@@ -87,7 +87,7 @@
    */
   private function print_form_head() {
     
-    echo '<form method="post" action="'.$_SERVER['REQUEST_URI'].'" enctype="multipart/form-data" >';
+    echo '<form method="post" action="'.$_SERVER['REQUEST_URI'].'" enctype="multipart/form-data"  autocomplete="off" >';
     FormElement::print_hidden_fields( array(
                                             'action' => 'update', 
                                             'id' => $this->participant_id,

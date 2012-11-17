@@ -41,7 +41,7 @@ $exclude = array();
           if ( in_array( $this->field->name, $exclude ) ) continue;
 					
           // CSS class for empty fields
-					$empty_class = empty( $this->field->value ) ? 'blank-field' : '';
+					$empty_class = $this->get_empty_class( $this->field );
       
       ?>
       

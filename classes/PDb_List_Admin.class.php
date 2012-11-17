@@ -206,13 +206,12 @@ class PDb_List_Admin
 	}
 	
 	/**
-	 * precesses searches and sorts to build the listing query
+	 * processes searches and sorts to build the listing query
+	 *
+	 * @param string $submit the value of the submit field
 	 */
 	private function _process_search( $submit ) {
 
-    // add this to the query to remove the default record
-    $skip_default = ' `id` != '.Participants_Db::$id_base_number;
-		
 		switch ( $submit ) {
 		
 			case self::$i18n['sort']:
@@ -270,16 +269,9 @@ class PDb_List_Admin
 						
 					}
 					
-						self::$list_query .= ' WHERE `'.mysql_real_escape_string(self::$filter['where_clause']).'` '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
+					self::$list_query .= ' WHERE `'.mysql_real_escape_string(self::$filter['where_clause']).'` '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
 						
-						self::$list_query .= ' AND '.$skip_default;
-					
-				} else {
-					
-					self::$list_query .= ' WHERE '.$skip_default;
-					
 				}
-				
 				
 				// add the sorting
 				self::$list_query .= ' ORDER BY `'.mysql_real_escape_string(self::$filter['sortBy']).'` '.mysql_real_escape_string(self::$filter['ascdesc']);
@@ -299,7 +291,7 @@ class PDb_List_Admin
 				
 			default:
 			
-				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table.' WHERE '.$skip_default.' ORDER BY `'.mysql_real_escape_string(self::$filter['sortBy']).'` '.mysql_real_escape_string(self::$filter['ascdesc']);
+				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table.' ORDER BY `'.mysql_real_escape_string(self::$filter['sortBy']).'` '.mysql_real_escape_string(self::$filter['ascdesc']);
 				
 		}
 		

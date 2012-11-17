@@ -12,7 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Template_Item class
  */
-class Record extends Template_Item {
+class Record_Item extends Template_Item {
   
   // properties
   

@@ -77,6 +77,9 @@ class PDb_Signup extends PDb_Shortcode {
 	 */
 	public function __construct( $params ) {
     
+		// define shortcode-specific attributes to use
+		$add_atts = array( 'type' => 'signup' );
+    
 		/*
      * if we're coming back from a successful form submission, the id of the new
      * record will be present, otherwise, the id is set to the default record
@@ -85,20 +88,17 @@ class PDb_Signup extends PDb_Shortcode {
       
       $this->participant_id = $_GET['id'];
       $this->submitted = true;
+      $this->participant_values = Participants_Db::get_participant( $this->participant_id );
+      $add_atts['id'] = $this->participant_id;
       
     } else {
       
-      $this->participant_id = Participants_Db::$id_base_number;
+      $this->participant_values = Participants_Db::get_default_record();
       
     }
 		
-		// define shortcode-specific attributes to use
-		$add_atts = array( 'type' => 'signup', 'id' => $this->participant_id );
-    
     // run the parent class initialization to set up the parent methods 
     parent::__construct( $this, $params, $add_atts );
-    
-    $this->participant_values = Participants_Db::get_participant( $this->participant_id );
     
     $this->registration_page = Participants_Db::get_record_link( $this->participant_values['private_id'] );
     

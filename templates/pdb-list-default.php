@@ -24,9 +24,9 @@
 
   /* LIST DISPLAY */
 ?>
+<div class="wrap <?php echo $this->wrap_class ?>">
 <!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
-<div class="wrap <?php echo $this->wrap_class ?>">
 
   <table class="wp-list-table widefat fixed pages pdb-list" cellspacing="0" >
   
@@ -78,10 +78,8 @@
     
 	</table>
   <?php
-  /* PAGINATION
-   *
-   * pagination controls are not shown when the list is updated by a filter operation
-   *
+  /* 
+   * PAGINATION
    */
   $this->show_pagination_control();
   ?>
