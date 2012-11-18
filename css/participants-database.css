@@ -95,7 +95,8 @@
    width: 100%;
 }
 .edit-participant .image-field-wrap {
-   float: right;
+   float: left;
+   margin-right:10px;
 }
 .participants-database .image-field-wrap img {
   height: 3em;
@@ -145,9 +146,7 @@
 }
 .image-field-wrap {
    display: block;
-   height: 40px;
-   width: auto;
-   overflow: hidden;
+   height: 50px;
 }
 .image-field-wrap.empty {
    height: auto;

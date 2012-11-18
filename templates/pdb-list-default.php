@@ -57,7 +57,7 @@
         <tr>
           <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
   
-            <td>
+            <td class="<?php echo $this->field->name ?>-field">
               <?php $this->field->print_value() ?>
             </td>
           

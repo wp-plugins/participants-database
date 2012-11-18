@@ -272,23 +272,24 @@ class PDb_List extends PDb_Shortcode {
 
       $statements = explode('&', html_entity_decode($this->shortcode_atts['filter']));
 
-      foreach ($statements as $statement) {
+      $clauses = array();
 
-        $clauses = array();
+      foreach ($statements as $statement) {
 
         $operator = preg_match('#^([^\2]+)(\>|\<|=|!|~)(.*)$#', $statement, $matches);
 
         if ($operator === 0)
           continue; // no valid operator; skip to the next statement
-
-          
-// get the parts
+      
+        // get the parts
         list( $string, $column, $op_char, $target ) = $matches;
 
         if (!Participants_Db::is_column($column) or (!empty($this->filter['value']) && $column == $this->filter['where_clause'] )) {
-
-          // not a valid column or was used in a user search query which overrides
-          // the shortcode; skip to the next one
+          
+          /* 
+           * the column specified was not valid or was used in a user search 
+           * query which overrides the shortcode; skip to the next one
+           */
           continue;
         }
 
@@ -296,8 +297,10 @@ class PDb_List extends PDb_Shortcode {
 
         $delimiter = array('"', '"');
 
-        // if we're dealing with a date element, the target value needs to be conditioned to
-        // get a correct comparison
+        /* 
+         * if we're dealing with a date element, the target value needs to be 
+         * conditioned to get a correct comparison
+         */
         if ($field_atts->form_element == 'date') {
 
           $target = Participants_Db::parse_date($target);
@@ -323,8 +326,14 @@ class PDb_List extends PDb_Shortcode {
             break;
 
           case '!':
-            $operator = 'NOT LIKE';
-            $delimiter = array('"%', '%"');
+            
+            if (empty($target)) {
+              $operator = '<>';
+              $delimiter = array( "'","'");
+            } else {
+              $operator = 'NOT LIKE';
+              $delimiter = array('"%', '%"');
+            }
             break;
 
           default:

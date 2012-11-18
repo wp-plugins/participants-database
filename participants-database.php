@@ -654,10 +654,7 @@ class Participants_Db {
 
     global $wpdb;
 
-    if (is_admin())
-      $frontend_fields = '';
-    else
-      $frontend_fields = ' AND `display_column` > 0 ';
+    $frontend_fields =  is_admin() ? '' : ' AND `display_column` > 0 ';
 
     $sql = "
 			SELECT `name`, REPLACE(`title`,'\\\','') as title
@@ -1206,13 +1203,6 @@ class Participants_Db {
               $value_array['other'] = implode(',', $value_array['other']);
             }
 
-
-            //foreach( implode( ',', $post[ $column_atts->name ] ) as $v ) {
-            //  
-            //  if ( in_array( $v, $field_values ) ) $values[] = $v;
-            //  else 
-            //}
-
             $new_value = self::_prepare_array_mysql($value_array);
           } elseif ('link' == $column_atts->form_element) {
 
@@ -1223,7 +1213,7 @@ class Participants_Db {
 
               $new_value = self::_prepare_array_mysql(self::get_link_array($post[$column_atts->name]));
             } else {
-
+              
               $new_value = self::_prepare_array_mysql($post[$column_atts->name]);
             }
           } elseif ('date' == $column_atts->form_element) {
@@ -1531,13 +1521,20 @@ class Participants_Db {
    *
    * gets the string ready by getting rid of slashes and converting quotes and
    * other undesirables to HTML entities
+   * 
+   * @param string $string the string to prepare
    */
   private function _prepare_string_mysql($string) {
 
     return htmlspecialchars(stripslashes($string), ENT_QUOTES, 'utf-8');
   }
 
-  // unserialize if necessary
+  /**
+   * unserialize if necessary
+   * 
+   * @param string $string the string to unserialize; does nothing if it is not 
+   *                       a serialization
+   */
   public function unserialize_array($string) {
 
     // is_serialized is a WordPress utility function
@@ -1643,9 +1640,9 @@ class Participants_Db {
       case 'update':
       case 'insert':
 
-        $participant_id = isset($_POST['id']) ? $_POST['id'] : ( isset($_GET['id']) ? $_GET['id'] : false );
+        $id = isset($_POST['id']) ? $_POST['id'] : ( isset($_GET['id']) ? $_GET['id'] : false );
 
-        $participant_id = self::process_form($_POST, $_POST['action'], $participant_id);
+        $participant_id = self::process_form($_POST, $_POST['action'], $id);
 
         if (false === $participant_id) {
 
@@ -1661,7 +1658,10 @@ class Participants_Db {
           if ($options['send_record_update_notify_email']) {
 
             $sent = wp_mail(
-                    $options['email_signup_notify_addresses'], self::proc_tags($options['record_update_email_subject'], $participant_id), self::proc_tags($options['record_update_email_body'], $participant_id), self::$email_headers
+                    $options['email_signup_notify_addresses'],
+                    self::proc_tags($options['record_update_email_subject'], $participant_id),
+                    self::proc_tags($options['record_update_email_body'], $participant_id),
+                    self::$email_headers
             );
           }
 
@@ -2115,7 +2115,7 @@ class Participants_Db {
     if (false === mkdir(ABSPATH . $dir, 0755, true)) {
 
       if (is_object(self::$validation_errors))
-        self::$validation_errors->add_error($name, sprintf(__('The uploads directory (%s) could not be created.', self::PLUGIN_NAME), $dir));
+        self::$validation_errors->add_error('', sprintf(__('The uploads directory (%s) could not be created.', self::PLUGIN_NAME), $dir));
 
       umask($savedmask);
 
@@ -2154,6 +2154,22 @@ class Participants_Db {
     $delimiter = false !== strpos($page_link, '?') ? '&' : '?';
 
     return $page_link . $delimiter . 'pid=' . $PID;
+  }
+  
+  /**
+   * builds an admin record edit link
+   * 
+   * this is meant to be included in the admin notification for a new signup, 
+   * giving them the ability to click the link and edit the new record
+   * 
+   * @param int $id the id of the new record
+   * @return string the HREF for the record edit link
+   */
+  public function get_admin_record_link($id) {
+    
+    $path = 'admin.php?page=participants-database-edit_participant&action=edit&id='.$id;
+    
+    return get_admin_url( NULL, $path );
   }
 
   /**

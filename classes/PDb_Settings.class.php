@@ -341,19 +341,6 @@ class PDb_Settings extends Plugin_Settings {
           'options'     => array( 1, 0 ),
           ),
         );
-		/*
-    $this->plugin_settings[] = array(
-        'name'       =>'show_pid',
-        'title'      =>__('Show the Private ID in Admin List', Participants_Db::PLUGIN_NAME ),
-        'group'      =>'list',
-        'options'    => array
-          (
-          'type'        => 'checkbox',
-          'help_text'   => __('whether to show the private ID in the participant list in the admin', Participants_Db::PLUGIN_NAME ),
-          'value'       => 1,
-          'options'     => array( 1, 0 ),
-          ),
-        );*/
 		
 		/******************************************************
 		 *
@@ -497,8 +484,8 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text-field',
-          'help_text'   => __('notification email body'),
-          'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>'),
+          'help_text'   => __('notification email body. The [admin_record_link] tag will supply the URL for editing the record in the admin.'),
+          'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul><p>Edit this new record <a href="[admin_record_link]">here.</a></p>'),
           )
         );
 		
@@ -652,8 +639,8 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'record',
         'options'    => array(
           'type'        =>'text-field',
-          'help_text'   => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. (The field name is under the "name" column on the "Manage Database Fields" page.)  Also available is [date] which will show the date and time of the update', Participants_Db::PLUGIN_NAME ),
-          'value'       =>__('<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] [last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</li><li>Phone: [phone]</li><li>Email: [email]</li></ul>', Participants_Db::PLUGIN_NAME ),
+          'help_text'   => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. (The field name is under the "name" column on the "Manage Database Fields" page.)  Also available is [date] which will show the date and time of the update and [admin_record_link] tag for a link to edit the record in the admin.', Participants_Db::PLUGIN_NAME ),
+          'value'       =>__('<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] [last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</li><li>Phone: [phone]</li><li>Email: [email]</li></ul><p>Edit this record <a href="[admin_record_link]">here.</a></p>', Participants_Db::PLUGIN_NAME ),
           )
         );
 

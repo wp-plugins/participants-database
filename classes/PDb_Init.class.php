@@ -176,7 +176,6 @@ class PDb_Init
 
             $defaults['name'] = $name;
             $defaults['group'] = $group;
-            $defaults['CSV'] = 'main' == $group ? 1 : 0;
             $defaults['order'] = $i;
             $defaults['validation'] = isset( $defaults['validation'] ) ? $defaults['validation'] : 'no';
 
@@ -614,7 +613,8 @@ class PDb_Init
                                                         'sortable' => 1,
                                                         'admin_column' => 2,
                                                         'display_column' => 1,
-                                                        'signup' => 1
+                                                        'signup' => 1,
+                                                        'CSV' => 1,
                                                         ),
                                   'last_name'    => array(
                                                         'title' => 'Last Name',
@@ -623,11 +623,13 @@ class PDb_Init
                                                         'sortable' => 1,
                                                         'admin_column' => 3,
                                                         'display_column' => 2,
-                                                        'signup' => 1
+                                                        'signup' => 1,
+                                                        'CSV' => 1,
                                                         ),
                                   'address'      => array(
                                                         'title' => 'Address',
                                                         'form_element' => 'text-line',
+                                                        'CSV' => 1,
                                                         ),
                                   'city'         => array(
                                                         'title' => 'City',
@@ -636,6 +638,7 @@ class PDb_Init
                                                         'form_element' => 'text-line',
                                                         'admin_column' => 0,
                                                         'display_column' => 3,
+                                                        'CSV' => 1,
                                                       ),
                                   'state'        => array(
                                                         'title' => 'State',
@@ -643,23 +646,27 @@ class PDb_Init
                                                         'persistent' => 1,
                                                         'form_element' => 'text-line',
                                                         'display_column' => 4,
+                                                        'CSV' => 1,
                                                       ),
                                   'country'      => array(
                                                         'title' => 'Country',
                                                         'sortable' => 1,
                                                         'persistent' => 1,
                                                         'form_element' => 'text-line',
+                                                        'CSV' => 1,
                                                       ),
                                   'zip'          => array(
                                                         'title' => 'Zip Code',
                                                         'sortable' => 1,
                                                         'persistent' => 1,
                                                         'form_element' => 'text-line',
+                                                        'CSV' => 1,
                                                       ),
                                   'phone'        => array(
                                                         'title' => 'Phone',
                                                         'help_text' => 'Your primary contact number',
                                                         'form_element' => 'text-line',
+                                                        'CSV' => 1,
                                                       ),
                                   'email'        => array(
                                                         'title' => 'Email',
@@ -667,6 +674,7 @@ class PDb_Init
 																												'admin_column' => 4,
                                                         'validation' => '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i',
                                                         'signup' => 1,
+                                                        'CSV' => 1,
                                                       ),
                                   'mailing_list' => array(
                                                         'title' => 'Mailing List',
@@ -674,6 +682,7 @@ class PDb_Init
                                                         'sortable' => 1,
                                                         'signup' => 1,
                                                         'form_element' => 'checkbox',
+                                                        'CSV' => 1,
                                                         'default' => 'Yes',
                                                         'values'  => array(
                                                                           'Yes',

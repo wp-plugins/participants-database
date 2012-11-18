@@ -73,6 +73,16 @@ class Field_Group_Item extends Template_Item {
   }
   
   /**
+   * indicates whether group titles or descriptions shold be shown
+   * 
+   * @return bool 
+   */
+  public function printing_title() {
+    
+    return (bool) $this->options['signup_show_group_descriptions'] and ! empty( $this->title );
+  }
+  
+  /**
    * prints the title of the group
    *
    * @param string $start_tag the opening tag for the title wrapper

@@ -61,12 +61,12 @@
 
       <?php while ( $this->have_groups() ) : $this->the_group(); ?>
 
-        <?php if ( $this->options['signup_show_group_descriptions'] and ! empty( $this->group->title ) ) : // print the group title/description row if present ?>
+        <?php if ( $this->group->printing_title() ) : // are we printing group titles and descriptions? ?>
         <tr class="signup-group">
           <td colspan="2">
         
             <?php $this->group->print_title() ?>
-            <?php $this->group->print_group_description() ?>
+            <?php $this->group->print_description() ?>
 
           </td>
         </tr>

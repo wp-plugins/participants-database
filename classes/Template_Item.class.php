@@ -36,7 +36,7 @@ class Template_Item {
   /**
    * constructs a Template Item object
    *
-   * @param object an object with the item's properties
+   * @param object $properties an object with the item's properties
    */
   public function __construct( $properties ) {
 		
@@ -47,6 +47,7 @@ class Template_Item {
   /**
    * displays an object value with deslashing and entity encoding
    *
+   * @param string $string the value to be printed
    */
   protected function print_value( $string ) {
     
@@ -58,6 +59,8 @@ class Template_Item {
    * prepare a field for display
    *
    * primarily to deal with encoded characters, quotes and slashes
+   * 
+   * @param string $string the value to be prepared
    */
   protected function prepare_display_value( $string ) {
     
@@ -107,6 +110,12 @@ class Template_Item {
     
   }
   
+  /**
+   * assigns the object properties that match properties in the slupplied object
+   * 
+   * @param object $item the supplied object
+   * @param string $class the classname of the instantiating class
+   */
   protected function assign_props( $item, $class = __CLASS__ ) {
     
     // grab and assign the class properties from the provided object
