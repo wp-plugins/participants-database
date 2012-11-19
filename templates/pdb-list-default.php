@@ -70,7 +70,7 @@
 
       <tbody>
         <tr>
-          <td><?php _e('No records found', Participants_Db::PLUGIN_NAME )?></td>
+          <td><?php _e('No records found', 'participants-database' )?></td>
         </tr>
       </tbody>
 

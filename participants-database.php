@@ -35,8 +35,8 @@
 Participants_Db::initialize();
 
 class Participants_Db {
+  
   // this is same as the plugin directory name
-
   const PLUGIN_NAME = 'participants-database';
 
   // display title
@@ -225,9 +225,9 @@ class Participants_Db {
 
   public function init() {
 
-    load_plugin_textdomain(self::PLUGIN_NAME, false, dirname(plugin_basename(__FILE__)) . '/languages/');
+    load_plugin_textdomain('participants-database', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
-    self::$plugin_title = __('Participants Database', self::PLUGIN_NAME);
+    self::$plugin_title = __('Participants Database', 'participants-database');
 
     // set the email content headers
     if (!isset(self::$plugin_options)) {
@@ -266,28 +266,28 @@ class Participants_Db {
     );
 
     $listpage = add_submenu_page(
-            self::PLUGIN_NAME, __('List Participants', self::PLUGIN_NAME), __('List Participants', self::PLUGIN_NAME), self::$plugin_options['record_edit_capability'], self::$plugin_page . '-list_participants', array('PDb_List_Admin', 'initialize')
+            self::PLUGIN_NAME, __('List Participants', 'participants-database'), __('List Participants', 'participants-database'), self::$plugin_options['record_edit_capability'], self::$plugin_page . '-list_participants', array('PDb_List_Admin', 'initialize')
             /* array( __CLASS__, 'include_admin_file' ) */
     );
 
     $addpage = add_submenu_page(
-            self::PLUGIN_NAME, __('Add Participant', self::PLUGIN_NAME), __('Add Participant', self::PLUGIN_NAME), self::$plugin_options['record_edit_capability'], self::$plugin_page . '-edit_participant', array(__CLASS__, 'include_admin_file')
+            self::PLUGIN_NAME, __('Add Participant', 'participants-database'), __('Add Participant', 'participants-database'), self::$plugin_options['record_edit_capability'], self::$plugin_page . '-edit_participant', array(__CLASS__, 'include_admin_file')
     );
 
     $managepage = add_submenu_page(
-            self::PLUGIN_NAME, __('Manage Database Fields', self::PLUGIN_NAME), __('Manage Database Fields', self::PLUGIN_NAME), 'manage_options', self::$plugin_page . '-manage_fields', array(__CLASS__, 'include_admin_file')
+            self::PLUGIN_NAME, __('Manage Database Fields', 'participants-database'), __('Manage Database Fields', 'participants-database'), 'manage_options', self::$plugin_page . '-manage_fields', array(__CLASS__, 'include_admin_file')
     );
 
     $uploadpage = add_submenu_page(
-            self::PLUGIN_NAME, __('Import CSV File', self::PLUGIN_NAME), __('Import CSV File', self::PLUGIN_NAME), 'manage_options', self::$plugin_page . '-upload_csv', array(__CLASS__, 'include_admin_file')
+            'participants-database', __('Import CSV File', 'participants-database'), __('Import CSV File', 'participants-database'), 'manage_options', self::$plugin_page . '-upload_csv', array(__CLASS__, 'include_admin_file')
     );
 
     $settingspage = add_submenu_page(
-            self::PLUGIN_NAME, __('Settings', self::PLUGIN_NAME), __('Settings', self::PLUGIN_NAME), 'manage_options', self::$plugin_page . '_settings_page', array(self::$plugin_settings, 'show_settings_form')
+            self::PLUGIN_NAME, __('Settings', 'participants-database'), __('Settings', 'participants-database'), 'manage_options', self::$plugin_page . '_settings_page', array(self::$plugin_settings, 'show_settings_form')
     );
 
     $editpage = add_submenu_page(
-            '', __('Edit Record', self::PLUGIN_NAME), __('Edit Record', self::PLUGIN_NAME), self::$plugin_options['record_edit_capability'], self::$plugin_page . '_edit_participant'
+            '', __('Edit Record', 'participants-database'), __('Edit Record', 'participants-database'), self::$plugin_options['record_edit_capability'], self::$plugin_page . '_edit_participant'
     );
   }
 
@@ -467,7 +467,7 @@ class Participants_Db {
       $template = self::get_template('single', $vars['template']);
 
       if (false === $template)
-        return '<p>' . _x('Missing Template', 'message to show if the plugin cannot find the template', self::PLUGIN_NAME) . '</p>';
+        return '<p>' . _x('Missing Template', 'message to show if the plugin cannot find the template', 'participants-database') . '</p>';
 
       ob_start();
 
@@ -481,7 +481,7 @@ class Participants_Db {
 
           </div><?php
         } else
-          echo '<p>' . sprintf(__('No record found for %s.', self::PLUGIN_NAME), $id) . '</p>';
+          echo '<p>' . sprintf(__('No record found for %s.', 'participants-database'), $id) . '</p>';
 
       endforeach; // cycle through ids
 
@@ -1889,8 +1889,8 @@ class Participants_Db {
         return array(
             'type' => 'dropdown-other',
             'options' => array(
-                __('Not Required', Participants_Db::PLUGIN_NAME) => 'no',
-                __('Required', Participants_Db::PLUGIN_NAME) => 'yes',
+                __('Not Required', 'participants-database') => 'no',
+                __('Required', 'participants-database') => 'yes',
             ),
             'attributes' => array('other' => 'regex/match'),
         );
@@ -2061,7 +2061,7 @@ class Participants_Db {
 
     if (!is_uploaded_file($file['tmp_name'])) {
 
-      self::$validation_errors->add_error($name, __('There is something wrong with the file you tried to upload. Try another.', self::PLUGIN_NAME));
+      self::$validation_errors->add_error($name, __('There is something wrong with the file you tried to upload. Try another.', 'participants-database'));
 
       return false;
     }
@@ -2071,7 +2071,7 @@ class Participants_Db {
     // check the type of file to make sure it is an image file
     if (!in_array($fileinfo[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WBMP))) {
 
-      self::$validation_errors->add_error($name, __('You may only upload image files like JPEGs, GIFs or PNGs.', self::PLUGIN_NAME));
+      self::$validation_errors->add_error($name, __('You may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'));
 
       return false;
     }
@@ -2082,14 +2082,14 @@ class Participants_Db {
 
     if ($file['size'] > $options['image_upload_limit'] * 1024) {
 
-      self::$validation_errors->add_error($name, sprintf(__('The image you tried to upload is too large. The file must be smaller than %sK.', self::PLUGIN_NAME), $options['image_upload_limit']));
+      self::$validation_errors->add_error($name, sprintf(__('The image you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), $options['image_upload_limit']));
 
       return false;
     }
 
     if (false === move_uploaded_file($file['tmp_name'], ABSPATH . $options['image_upload_location'] . $new_filename)) {
 
-      self::$validation_errors->add_error($name, __('The file could not be saved.', self::PLUGIN_NAME));
+      self::$validation_errors->add_error($name, __('The file could not be saved.', 'participants-database'));
 
       return false;
     }
@@ -2115,7 +2115,7 @@ class Participants_Db {
     if (false === mkdir(ABSPATH . $dir, 0755, true)) {
 
       if (is_object(self::$validation_errors))
-        self::$validation_errors->add_error('', sprintf(__('The uploads directory (%s) could not be created.', self::PLUGIN_NAME), $dir));
+        self::$validation_errors->add_error('', sprintf(__('The uploads directory (%s) could not be created.', 'participants-database'), $dir));
 
       umask($savedmask);
 
@@ -2304,7 +2304,7 @@ class Participants_Db {
 
           if (is_object(self::$validation_errors) and is_object($column)) {
 
-            self::$validation_errors->add_error($column->name, sprintf(__('The date for "%s" was invalid. Please input the date with the exact format shown', self::PLUGIN_NAME), $column->title));
+            self::$validation_errors->add_error($column->name, sprintf(__('The date for "%s" was invalid. Please input the date with the exact format shown', 'participants-database'), $column->title));
           }
         }
       }
@@ -2374,15 +2374,15 @@ class Participants_Db {
     ?>
     <div id="PDb_footer" class="widefat">
       <div class="section">
-        <h4><?php echo self::$plugin_title, ' ', self::$plugin_version ?><br /><?php _e('WordPress Plugin', self::PLUGIN_NAME) ?></h4>
-        <p><em><?php _e('Helping organizations manage their volunteers, members and participants.', self::PLUGIN_NAME) ?></em></p>
+        <h4><?php echo self::$plugin_title, ' ', self::$plugin_version ?><br /><?php _e('WordPress Plugin', 'participants-database') ?></h4>
+        <p><em><?php _e('Helping organizations manage their volunteers, members and participants.', 'participants-database') ?></em></p>
       </div>
       <div class="section">
-        <h4><a href="http://xnau.com"><img src="<?php bloginfo('wpurl') ?>/wp-content/plugins/<?php echo self::PLUGIN_NAME ?>/ui/xnau-square-60.png" style="float:left;width:50px;height:auto;margin-right:10px" /></a><?php _e('Developed by', self::PLUGIN_NAME) ?><br /><a href="http://xnau.com">xn&lowast;au webdesign</a></h4>
-        <p><?php _e('Suggestions or crticisms of this plugin? I&#39;d love to hear them: email ', self::PLUGIN_NAME) ?><a href="mailto:support@xnau.com">support@xnau.com.</a>
+        <h4><a href="http://xnau.com"><img src="<?php bloginfo('wpurl') ?>/wp-content/plugins/<?php echo self::PLUGIN_NAME ?>/ui/xnau-square-60.png" style="float:left;width:50px;height:auto;margin-right:10px" /></a><?php _e('Developed by', 'participants-database') ?><br /><a href="http://xnau.com">xn&lowast;au webdesign</a></h4>
+        <p><?php _e('Suggestions or crticisms of this plugin? I&#39;d love to hear them: email ', 'participants-database') ?><a href="mailto:support@xnau.com">support@xnau.com.</a>
       </div>
       <div class="section">
-        <p><?php printf(__('Please consider contributing to the continued support and development of this software by visiting %1$sthis plugin&#39;s page,%3$s giving the plugin a %2$srating%3$s or review, or dropping something in the %1$stip jar.%3$s Thanks!', self::PLUGIN_NAME), '<a href="http://xnau.com/wordpress-plugins/participants-database">', '<a href="http://wordpress.org/extend/plugins/participants-database/">', '</a>') ?></p>
+        <p><?php printf(__('Please consider contributing to the continued support and development of this software by visiting %1$sthis plugin&#39;s page,%3$s giving the plugin a %2$srating%3$s or review, or dropping something in the %1$stip jar.%3$s Thanks!', 'participants-database'), '<a href="http://xnau.com/wordpress-plugins/participants-database">', '<a href="http://wordpress.org/extend/plugins/participants-database/">', '</a>') ?></p>
       </div>
     </div>
     <?php

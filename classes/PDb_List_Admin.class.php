@@ -111,7 +111,7 @@ class PDb_List_Admin
 																	'page'          => isset( $_GET[ self::$list_page ] ) ? $_GET[ self::$list_page ] : '1',
 																	'size'          => self::$page_list_limit,
 																	'total_records' => self::$num_records,
-																	'wrap_tag'      => '<div class="pagination"><label>'._x('Page', 'noun; page number indicator', Participants_Db::PLUGIN_NAME ).':</label> ',
+																	'wrap_tag'      => '<div class="pagination"><label>'._x('Page', 'noun; page number indicator', 'participants-database' ).':</label> ',
 																	'wrap_tag_close'=> '</div>',
 																	));
 		
@@ -303,7 +303,7 @@ class PDb_List_Admin
 	private function _admin_top() {
 	?>
 	<script type="text/javascript" language="javascript">
-    var L10n = {"record":"<?php _e("Do you really want to delete the selected record?", Participants_Db::PLUGIN_NAME )?>","records":"<?php _e("Do you really want to delete the selected records?", Participants_Db::PLUGIN_NAME )?>"};
+    var L10n = {"record":"<?php _e("Do you really want to delete the selected record?", 'participants-database' )?>","records":"<?php _e("Do you really want to delete the selected records?", 'participants-database' )?>"};
   
     function delete_confirm() {
 			var plural = ( document.getElementById('select_count').value > 1 ) ? true : false;
@@ -379,10 +379,10 @@ class PDb_List_Admin
     <input type="hidden" name="action" value="sort">
     
     <fieldset class="widefat">
-    <legend><?php _e('Show only records with', Participants_Db::PLUGIN_NAME )?>:</legend>
+    <legend><?php _e('Show only records with', 'participants-database' )?>:</legend>
     <?php
 			//build the list of columns available for filtering
-			$filter_columns = array( '('.__('show all', Participants_Db::PLUGIN_NAME ).')' => 'none' );
+			$filter_columns = array( '('.__('show all', 'participants-database' ).')' => 'none' );
 			foreach ( Participants_db::get_column_atts( 'backend' ) as $column ) {
 				
 				if ( in_array( $column->name, array( 'id','private_id' ) ) ) continue;
@@ -406,12 +406,12 @@ class PDb_List_Admin
                         'name'     => 'operator',
                         'value'    => self::$filter['operator'],
                         'options'  => array(
-                                          __('is', Participants_Db::PLUGIN_NAME )         => '=',
-                                          __('is not', Participants_Db::PLUGIN_NAME )     => '!=',
-                                          __('contains', Participants_Db::PLUGIN_NAME )   => 'LIKE',
-                                          __('doesn&#39;t contain', Participants_Db::PLUGIN_NAME )  => 'NOT LIKE',
-                                          __('is greater than', Participants_Db::PLUGIN_NAME )  => 'gt',
-                                          __('is less than', Participants_Db::PLUGIN_NAME )  => 'lt',
+                                          __('is', 'participants-database' )         => '=',
+                                          __('is not', 'participants-database' )     => '!=',
+                                          __('contains', 'participants-database' )   => 'LIKE',
+                                          __('doesn&#39;t contain', 'participants-database' )  => 'NOT LIKE',
+                                          __('is greater than', 'participants-database' )  => 'gt',
+                                          __('is less than', 'participants-database' )  => 'lt',
                                           ),
                         );
       FormElement::print_element( $element );
@@ -422,7 +422,7 @@ class PDb_List_Admin
     </fieldset>
     
     <fieldset class="widefat">
-    <legend><?php _e('Sort by', Participants_Db::PLUGIN_NAME )?>:</legend>
+    <legend><?php _e('Sort by', 'participants-database' )?>:</legend>
     	<?php
 		
 			$element = array(
@@ -438,8 +438,8 @@ class PDb_List_Admin
 											 'name'		=> 'ascdesc',
 											 'value'	=>	self::$filter['ascdesc'],
 											 'options'	=> array(
-											                    __('Ascending', Participants_Db::PLUGIN_NAME )  => 'asc',
-											                    __('Descending', Participants_Db::PLUGIN_NAME ) => 'desc'
+											                    __('Ascending', 'participants-database' )  => 'asc',
+											                    __('Descending', 'participants-database' ) => 'desc'
 											                    ),
 											 );
       FormElement::print_element( $element );
@@ -472,7 +472,7 @@ class PDb_List_Admin
 																																								) 
 																														) 
 																										 )?>
-        <span style="padding-left:20px"><?php printf( __( 'Show %s items per page.', Participants_Db::PLUGIN_NAME ),$list_limit )?>
+        <span style="padding-left:20px"><?php printf( __( 'Show %s items per page.', 'participants-database' ),$list_limit )?>
         <?php FormElement::print_element( array( 'type'=>'submit', 'name'=>'submit','value'=>self::$i18n['change']) )?>
         </span>
       </div>
@@ -528,7 +528,7 @@ class PDb_List_Admin
       <tr>
         <?php // print delete check ?>
         <td>
-          <a href="admin.php?page=<?php echo Participants_Db::PLUGIN_NAME ?>-edit_participant&action=edit&id=<?php echo $value['id']?>"><?php _e( 'Edit', Participants_Db::PLUGIN_NAME )?></a> |
+          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id']?>"><?php _e( 'Edit', 'participants-database' )?></a> |
           <input type="checkbox" name="pid[]" value="<?php echo $value['id']?>" onClick="addSelects( this.checked )">
         </td>
         <?php
@@ -661,7 +661,7 @@ class PDb_List_Admin
     	?>
       <tbody>
       <tr>
-        <td><?php _e('No records found', Participants_Db::PLUGIN_NAME )?></td>
+        <td><?php _e('No records found', 'participants-database' )?></td>
       </tr>
       </tbody>
       <?php
@@ -679,7 +679,7 @@ class PDb_List_Admin
 		private function _print_export_form() { ?>
     
       <fieldset class="widefat">
-      	<h3><?php _e('Export CSV', Participants_Db::PLUGIN_NAME )?></h3>
+      	<h3><?php _e('Export CSV', 'participants-database' )?></h3>
         <form method="post">
           <input type="hidden" name="subsource" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
           <input type="hidden" name="action" value="output CSV" />
@@ -691,12 +691,12 @@ class PDb_List_Admin
           $namelength = round( strlen( $suggested_filename ) * 0.9 ) ;
           ?>
           <p>
-					  <?php _e( 'File Name', Participants_Db::PLUGIN_NAME  )?>:
+					  <?php _e( 'File Name', 'participants-database'  )?>:
             <input type="text" name="filename" value="<?php echo $suggested_filename?>" size="<?php echo $namelength ?>" />
-            <input type="submit" name="submit" value="<?php _e( 'Download CSV for this list', Participants_Db::PLUGIN_NAME  )?>" />
+            <input type="submit" name="submit" value="<?php _e( 'Download CSV for this list', 'participants-database'  )?>" />
           </p>
           <p>
-						<?php _e( 'This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages. The fields included in the export are defined in the "CSV" column on the Manage Database Fields page.', Participants_Db::PLUGIN_NAME  )?>
+						<?php _e( 'This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages. The fields included in the export are defined in the "CSV" column on the Manage Database Fields page.', 'participants-database'  )?>
           </p>
         </form>
       </fieldset>
@@ -711,7 +711,7 @@ class PDb_List_Admin
 
       // print the "select all" header ?>
       <th scope="col" style="width:6em">
-        <?php /* translators: uses the check symbol in a phrase that means "check all" */ _e( '&#10004; all', Participants_Db::PLUGIN_NAME )?>
+        <?php /* translators: uses the check symbol in a phrase that means "check all" */ _e( '&#10004; all', 'participants-database' )?>
         <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" style="top: 2px; margin-left: 4px;">
       </th>
       <?php
@@ -734,12 +734,12 @@ class PDb_List_Admin
 		
 			/* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
 			self::$i18n = array(
-				'delete_checked' => _x( 'Delete Checked', 'submit button label', Participants_Db::PLUGIN_NAME ),
-				'change' => _x( 'Change', 'submit button label', Participants_Db::PLUGIN_NAME ),
-				'sort' => _x( 'Sort', 'submit button label', Participants_Db::PLUGIN_NAME ),
-				'filter' => _x( 'Filter', 'submit button label', Participants_Db::PLUGIN_NAME ),
-				'clear' => _x( 'Clear', 'submit button label', Participants_Db::PLUGIN_NAME ),
-        'search' => _x( 'Search', 'search button label', Participants_Db::PLUGIN_NAME ),
+				'delete_checked' => _x( 'Delete Checked', 'submit button label', 'participants-database' ),
+				'change' => _x( 'Change', 'submit button label', 'participants-database' ),
+				'sort' => _x( 'Sort', 'submit button label', 'participants-database' ),
+				'filter' => _x( 'Filter', 'submit button label', 'participants-database' ),
+				'clear' => _x( 'Clear', 'submit button label', 'participants-database' ),
+        'search' => _x( 'Search', 'search button label', 'participants-database' ),
 			);
 		
 		}

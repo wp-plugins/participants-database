@@ -279,11 +279,11 @@ class Pagination
 		$button_pattern = '<'.$button_wrap_tag.' class="%1$s"><a href="%2$s">%3$s</a></'.$button_wrap_tag.'>';
 
 		if ($loopStart != 1){
-			$output .= sprintf( $button_pattern, 'disabledpage', sprintf($link, 1), __('First',Participants_Db::PLUGIN_NAME ) );
+			$output .= sprintf( $button_pattern, 'disabledpage', sprintf($link, 1), __('First','participants-database' ) );
 		}
 		
 		if ($currentPage > 1){
-			$output .= sprintf($button_pattern, 'nextpage', sprintf($link, $currentPage - 1), __('Previous',Participants_Db::PLUGIN_NAME ));
+			$output .= sprintf($button_pattern, 'nextpage', sprintf($link, $currentPage - 1), __('Previous','participants-database' ));
 		}
 		
 		for ($i = $loopStart; $i <= $loopEnd; $i++)
@@ -300,11 +300,11 @@ class Pagination
 		}
 
 		if ($currentPage < $totalPages){
-			$output .= sprintf($button_pattern,'nextpage', sprintf($link, $currentPage + 1), __('Next',Participants_Db::PLUGIN_NAME ) );
+			$output .= sprintf($button_pattern,'nextpage', sprintf($link, $currentPage + 1), __('Next','participants-database' ) );
 		}
 		
 		if ($loopEnd != $totalPages){
-			$output .= sprintf($button_pattern,'lastpage', sprintf($link, $totalPages), __('Last',Participants_Db::PLUGIN_NAME ) );
+			$output .= sprintf($button_pattern,'lastpage', sprintf($link, $totalPages), __('Last','participants-database' ) );
 		}
 
 		return $wrap_tag . '<'.$all_button_wrap_tag.'>' . $output . '</'.$all_button_wrap_tag.'>' . $wrap_tag_close;

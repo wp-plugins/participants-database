@@ -447,7 +447,7 @@ class PDb_Init
         );
 				
 				// add the new private ID admin column setting because we eliminated the redundant special setting
-				$options = get_option( self::$participants_db_options );
+				$options = get_option( Participants_Db::$participants_db_options );
 				if ( $options['show_pid'] ) {
 						$wpdb->update( Participants_Db::$fields_table, array( 'admin_column' => 90 ), array( 'name' => 'private_id') );
 				}

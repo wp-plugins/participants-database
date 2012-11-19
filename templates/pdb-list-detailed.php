@@ -25,8 +25,8 @@ this is a more detailed template showing how the parts of the display can be cus
   <div class="pdb-searchform">
   
     <div class="pdb-error pdb-search-error" style="display:none">
-      <p id="where_clause_error"><?php _e( 'Please select a column to search in.', Participants_Db::PLUGIN_NAME )?></p>
-      <p id="value_error"><?php _e( 'Please type in something to search for.', Participants_Db::PLUGIN_NAME )?></p>
+      <p id="where_clause_error"><?php _e( 'Please select a column to search in.', 'participants-database' )?></p>
+      <p id="value_error"><?php _e( 'Please type in something to search for.', 'participants-database' )?></p>
     </div>
 
     <?php self::search_sort_form_top(); ?>
@@ -34,7 +34,7 @@ this is a more detailed template showing how the parts of the display can be cus
     <?php if ( $filter_mode == 'filter' || $filter_mode == 'both' ) : ?>
 
     <fieldset class="widefat">
-      <legend><?php _e('Search', Participants_Db::PLUGIN_NAME )?>:</legend>
+      <legend><?php _e('Search', 'participants-database' )?>:</legend>
 
       <?php
         // you can replace "false" with your own text for the "all columns" value
@@ -48,7 +48,7 @@ this is a more detailed template showing how the parts of the display can be cus
     <?php if ( $filter_mode == 'sort' || $filter_mode == 'both' ) : ?>
     
     <fieldset class="widefat">
-      <legend><?php _e('Sort by', Participants_Db::PLUGIN_NAME )?>:</legend>
+      <legend><?php _e('Sort by', 'participants-database' )?>:</legend>
 
       <?php self::sort_form() ?>
 
@@ -210,7 +210,7 @@ this is a more detailed template showing how the parts of the display can be cus
 
     <tbody>
       <tr>
-        <td><?php _e('No records found', Participants_Db::PLUGIN_NAME )?></td>
+        <td><?php _e('No records found', 'participants-database' )?></td>
       </tr>
     </tbody>
 

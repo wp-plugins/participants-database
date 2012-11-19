@@ -118,7 +118,7 @@ abstract class PDb_Shortcode {
 
     if (false === $this->template) {
 
-      $this->output = '<p class="alert alert-error">' . sprintf(_x('<%1$s>The template %2$s was not found.</%1$s> Please make sure the name is correct and the template file is in the correct location.', 'message to show if the plugin cannot find the template', Participants_Db::PLUGIN_NAME), 'strong', $this->template) . '</p>';
+      $this->output = '<p class="alert alert-error">' . sprintf(_x('<%1$s>The template %2$s was not found.</%1$s> Please make sure the name is correct and the template file is in the correct location.', 'message to show if the plugin cannot find the template', 'participants-database'), 'strong', $this->template) . '</p>';
 
       return false;
     }

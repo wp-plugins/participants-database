@@ -6,12 +6,12 @@
 /* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
 global $PDb_i18n;
 $PDb_i18n = array(
-	'update fields'   => __( 'Update Fields',   Participants_Db::PLUGIN_NAME ),
-	'update groups'   => __( 'Update Groups',   Participants_Db::PLUGIN_NAME ),
-	'add field'       => __( 'Add Field',       Participants_Db::PLUGIN_NAME ),
-	'add group'       => __( 'Add Group',       Participants_Db::PLUGIN_NAME ),
-	'new field title' => __( 'new field title', Participants_Db::PLUGIN_NAME ),
-	'new group title' => __( 'new group title', Participants_Db::PLUGIN_NAME ),
+	'update fields'   => __( 'Update Fields',   'participants-database' ),
+	'update groups'   => __( 'Update Groups',   'participants-database' ),
+	'add field'       => __( 'Add Field',       'participants-database' ),
+	'add group'       => __( 'Add Group',       'participants-database' ),
+	'new field title' => __( 'new field title', 'participants-database' ),
+	'new group title' => __( 'new group title', 'participants-database' ),
   );
 // process form submission
 $error_msgs = array();
@@ -117,8 +117,8 @@ if ( isset( $_POST['action'] ) ) {
 
 				$error_msgs[] = sprintf(
 																'<h3>%s</h3> %s:<br />%s',
-																__('Cannot add a field with that name', Participants_Db::PLUGIN_NAME ),
-																__('This name is reserved; please choose another. Reserved names are', Participants_Db::PLUGIN_NAME ),
+																__('Cannot add a field with that name', 'participants-database' ),
+																__('This name is reserved; please choose another. Reserved names are', 'participants-database' ),
 																implode(', ',Participants_Db::$reserved_names)
 															 );
 				break;
@@ -206,7 +206,7 @@ foreach( $groups as $group ) {
 ?>
 <div class="wrap">
 <h2><?php echo Participants_Db::$plugin_title?></h2>
-<h3><?php _e('Manage Database Fields',Participants_Db::PLUGIN_NAME )?></h3>
+<h3><?php _e('Manage Database Fields','participants-database' )?></h3>
 <?php
 if ( ! empty( $error_msgs ) ) :
 ?>
@@ -215,15 +215,15 @@ if ( ! empty( $error_msgs ) ) :
 foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 </div>
 <?php endif; ?>
-<h4><?php _e('Field Groups',Participants_Db::PLUGIN_NAME )?>:</h4>
+<h4><?php _e('Field Groups','participants-database' )?>:</h4>
 <div id="fields-tabs">
 	<ul>
 		<?php
 		foreach ( $groups as $group ) {
 			echo '<li><a href="#'.$group.'" id="tab_'.$group.'">'.ucwords( str_replace( '_',' ',$group ) ).'</a></li>';
 		}
-		echo '<li><a href="#field_groups">'.__('Field Groups',Participants_Db::PLUGIN_NAME ).'</a></li>';
-    echo '<li><a href="#help">'.__('Help',Participants_Db::PLUGIN_NAME ).'</a></li>';
+		echo '<li><a href="#field_groups">'.__('Field Groups','participants-database' ).'</a></li>';
+    echo '<li><a href="#help">'.__('Help','participants-database' ).'</a></li>';
 		?>
 	</ul>
 	<?php
@@ -231,7 +231,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	?>
 	<div id="<?php echo $group?>" class="manage-fields-wrap" >
 		<form id="manage_<?php echo $group?>_fields" method="post" autocomplete="off">
-		<h3><?php echo ucwords( str_replace( '_',' ',$group ) ),' ', __('Fields',Participants_Db::PLUGIN_NAME )?></h3>
+		<h3><?php echo ucwords( str_replace( '_',' ',$group ) ),' ', __('Fields','participants-database' )?></h3>
 		<p>
 		<?php
 		if ( 'internal' !== $group ) :
@@ -275,7 +275,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 			<?php
 			if ( $num_group_rows < 1 ) { // there are no rows in this group to show
 			?>
-			<tr><td colspan="<?php echo count( $attribute_columns[ $group ] ) + 1 ?>"><?php _e('No fields in this group',Participants_Db::PLUGIN_NAME )?></td></tr>
+			<tr><td colspan="<?php echo count( $attribute_columns[ $group ] ) + 1 ?>"><?php _e('No fields in this group','participants-database' )?></td></tr>
 			<?php
 			} else {
 				// add the rows of the group
@@ -369,7 +369,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 	<div id="field_groups" class="manage-fields-wrap">
 		<form id="manage_field_groups" method="post">
 		<input type="hidden" name="action" value="<?php echo $PDb_i18n['update groups']?>" />
-		<h3><?php _e('Edit / Add / Remove Field Groups',Participants_Db::PLUGIN_NAME )?></h3>
+		<h3><?php _e('Edit / Add / Remove Field Groups','participants-database' )?></h3>
 		<p>
 		<?php
 
@@ -384,8 +384,8 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		<table class="wp-list-table widefat fixed manage-fields manage-field-groups" cellspacing="0" >
 		<thead>
 			<tr>
-				<th scope="col" class="fields vertical-title"><span><?php echo PDb_header( __('fields',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
-        <th scope="col" class="delete vertical-title"><span><?php echo PDb_header( __('delete',Participants_Db::PLUGIN_NAME ) ) ?></span></th>
+				<th scope="col" class="fields vertical-title"><span><?php echo PDb_header( __('fields','participants-database' ) ) ?></span></th>
+        <th scope="col" class="delete vertical-title"><span><?php echo PDb_header( __('delete','participants-database' ) ) ?></span></th>
 			<?php
 			foreach ( current( $groups ) as $column => $value ) {
 
@@ -568,7 +568,7 @@ function PDb_parse_db_error( $error, $context ) {
 
 		if ( $item && false !== stripos( $message, 'duplicate'  ) ) {
 
-        $message = sprintf(__('The %1$s was not added. Your new %1$s must have a unique name.', Participants_Db::PLUGIN_NAME ), $item );
+        $message = sprintf(__('The %1$s was not added. Your new %1$s must have a unique name.', 'participants-database' ), $item );
 
 		}
 

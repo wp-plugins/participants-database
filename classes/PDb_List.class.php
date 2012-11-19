@@ -380,8 +380,8 @@ class PDb_List extends PDb_Shortcode {
 
       $output[] = '<div class="pdb-searchform">';
       $output[] = '<div class="pdb-error pdb-search-error" style="display:none">';
-      $output[] = sprintf('<p id="where_clause_error">%s</p>', __('Please select a column to search in.', Participants_Db::PLUGIN_NAME));
-      $output[] = sprintf('<p id="value_error">%s</p>', __('Please type in something to search for.', Participants_Db::PLUGIN_NAME));
+      $output[] = sprintf('<p id="where_clause_error">%s</p>', __('Please select a column to search in.', 'participants-database'));
+      $output[] = sprintf('<p id="value_error">%s</p>', __('Please type in something to search for.', 'participants-database'));
       $output[] = '</div>';
       $output[] = $this->search_sort_form_top(false, false, false);
 
@@ -389,7 +389,7 @@ class PDb_List extends PDb_Shortcode {
 
         $output[] = '<fieldset class="widefat">';
 
-        $output[] = sprintf('<legend>%s:</legend>', __('Search', Participants_Db::PLUGIN_NAME));
+        $output[] = sprintf('<legend>%s:</legend>', __('Search', 'participants-database'));
 
         $output[] = $this->column_selector(false, false);
         $output[] = $this->search_form(false);
@@ -401,7 +401,7 @@ class PDb_List extends PDb_Shortcode {
 
         $output[] = '<fieldset class="widefat">';
 
-        $output[] = sprintf('<legend>%s:</legend>', __('Sort by', Participants_Db::PLUGIN_NAME));
+        $output[] = sprintf('<legend>%s:</legend>', __('Sort by', 'participants-database'));
 
         $output[] = $this->sort_form(false);
 
@@ -440,7 +440,7 @@ class PDb_List extends PDb_Shortcode {
   //build the list of columns available for filtering
   public function column_selector($all = false, $print = true) {
 
-    $all_string = false === $all ? '(' . __('show all', Participants_Db::PLUGIN_NAME) . ')' : $all;
+    $all_string = false === $all ? '(' . __('show all', 'participants-database') . ')' : $all;
 
     $filter_columns = array($all_string => 'none');
 
@@ -497,8 +497,8 @@ class PDb_List extends PDb_Shortcode {
         'value' => $this->filter['ascdesc'],
         'class' => 'checkbox inline search-item',
         'options' => array(
-            __('Ascending', Participants_Db::PLUGIN_NAME) => 'asc',
-            __('Descending', Participants_Db::PLUGIN_NAME) => 'desc'
+            __('Ascending', 'participants-database') => 'asc',
+            __('Descending', 'participants-database') => 'desc'
         ),
     );
     $output[] = FormElement::get_element($element);
@@ -788,12 +788,12 @@ class PDb_List extends PDb_Shortcode {
 
     /* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
     $this->i18n = array(
-        'delete_checked' => _x('Delete Checked', 'submit button label', Participants_Db::PLUGIN_NAME),
-        'change' => _x('Change', 'submit button label', Participants_Db::PLUGIN_NAME),
-        'sort' => _x('Sort', 'submit button label', Participants_Db::PLUGIN_NAME),
-        'filter' => _x('Filter', 'submit button label', Participants_Db::PLUGIN_NAME),
-        'clear' => _x('Clear', 'submit button label', Participants_Db::PLUGIN_NAME),
-        'search' => _x('Search', 'search button label', Participants_Db::PLUGIN_NAME),
+        'delete_checked' => _x('Delete Checked', 'submit button label', 'participants-database'),
+        'change' => _x('Change', 'submit button label', 'participants-database'),
+        'sort' => _x('Sort', 'submit button label', 'participants-database'),
+        'filter' => _x('Filter', 'submit button label', 'participants-database'),
+        'clear' => _x('Clear', 'submit button label', 'participants-database'),
+        'search' => _x('Search', 'search button label', 'participants-database'),
     );
   }
 
