@@ -25,7 +25,7 @@ class PDb_List extends PDb_Shortcode {
   // a string identifier for the class
   var $module = 'list';
   // class for the wrapper
-  var $wrap_class = 'pdb_list';
+  var $wrap_class = 'pdb-list';
   // holds the current instance of the class
   static $instance;
   // holds the main query for building the list
@@ -99,7 +99,7 @@ class PDb_List extends PDb_Shortcode {
     $this->_setup_i18n();
 
     // enqueue the filter/sort AJAX script
-    if ($this->_sort_filter_mode() !== 'none')
+    if ($this->_sort_filter_mode() !== 'none' and $this->options['ajax_search'] == 1)
       wp_enqueue_script('list-filter');
 
     // set up the iteration data
@@ -136,7 +136,7 @@ class PDb_List extends PDb_Shortcode {
     $record_count = $this->num_records;
     $records = $this->records;
     $fields = $this->display_columns;
-    $single_record_link = get_page_link($this->options['single_record_page']);
+    $single_record_link = isset($this->options['single_record_page']) ? get_page_link($this->options['single_record_page']) : '';
     $records_per_page = $this->shortcode_atts['list_limit'];
     $filtering = $this->shortcode_atts['filtering'];
 
@@ -234,7 +234,7 @@ class PDb_List extends PDb_Shortcode {
 
     // set up the basic values; sort values come from the shortcode
     $default_values = array(
-        'where_clause' => 'none',
+        'search_field' => 'none',
         'value' => '',
         'operator' => 'LIKE',
         'sortBy' => $this->shortcode_atts['orderby'],
@@ -253,16 +253,14 @@ class PDb_List extends PDb_Shortcode {
     $order = in_array($order, array('ASC', 'DESC')) ? $order : 'ASC';
     $this->filter['ascdesc'] = strtolower($order);
 
-    if ($orderby == 'random') {
-      $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . ' ORDER BY RAND()';
-    } else {
-      $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . ' ORDER BY `' . $orderby . '` ' . $order;
-    }
+    $order_clause = $orderby == 'random' ? ' ORDER BY RAND()' : ' ORDER BY `' . $orderby . '` ' . $order;
+
+    $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $order_clause;
 
     if (isset($_POST['submit']) && $_POST['submit'] == $this->i18n['clear']) {
 
       $this->filter['value'] = '';
-      $this->filter['where_clause'] = 'none';
+      $this->filter['search_field'] = 'none';
 
       // go back to the first page
       $_GET[$this->list_page] = 1;
@@ -280,13 +278,14 @@ class PDb_List extends PDb_Shortcode {
 
         if ($operator === 0)
           continue; // no valid operator; skip to the next statement
-      
-        // get the parts
+
+          
+// get the parts
         list( $string, $column, $op_char, $target ) = $matches;
 
-        if (!Participants_Db::is_column($column) or (!empty($this->filter['value']) && $column == $this->filter['where_clause'] )) {
-          
-          /* 
+        if (!Participants_Db::is_column($column) or (!empty($this->filter['value']) && $column == $this->filter['search_field'] )) {
+
+          /*
            * the column specified was not valid or was used in a user search 
            * query which overrides the shortcode; skip to the next one
            */
@@ -297,7 +296,7 @@ class PDb_List extends PDb_Shortcode {
 
         $delimiter = array('"', '"');
 
-        /* 
+        /*
          * if we're dealing with a date element, the target value needs to be 
          * conditioned to get a correct comparison
          */
@@ -326,10 +325,10 @@ class PDb_List extends PDb_Shortcode {
             break;
 
           case '!':
-            
+
             if (empty($target)) {
               $operator = '<>';
-              $delimiter = array( "'","'");
+              $delimiter = array("'", "'");
             } else {
               $operator = 'NOT LIKE';
               $delimiter = array('"%', '%"');
@@ -340,16 +339,23 @@ class PDb_List extends PDb_Shortcode {
             $operator = $op_char;
         }
 
+        /*
+         * don't add an 'id = 0' clause if there is a user search. This gives us a 
+         * way to create a "search results only" list if the shortcode contains 
+         * a filter for 'id=0'
+         */
+        if (isset($this->filter['value']) and !empty($this->filter['value']) and $column == 'id' and $target == '0')
+          break;
+
         // add the clause
         $clauses[] = sprintf('`%s` %s %s%s%s', $column, $operator, $delimiter[0], $target, $delimiter[1]);
       }// foreach $statements
-
       // add the user search
-      if (isset($this->filter['value']) && !empty($this->filter['value']) && 'none' != $this->filter['where_clause']) {
+      if (isset($this->filter['value']) && !empty($this->filter['value']) && 'none' != $this->filter['search_field']) {
 
         $pattern = $this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"';
 
-        $clauses[] = sprintf($pattern, $this->filter['where_clause'], $this->filter['value']);
+        $clauses[] = sprintf($pattern, $this->filter['search_field'], $this->filter['value']);
       }
 
       // assemble there WHERE clause
@@ -380,7 +386,7 @@ class PDb_List extends PDb_Shortcode {
 
       $output[] = '<div class="pdb-searchform">';
       $output[] = '<div class="pdb-error pdb-search-error" style="display:none">';
-      $output[] = sprintf('<p id="where_clause_error">%s</p>', __('Please select a column to search in.', 'participants-database'));
+      $output[] = sprintf('<p id="search_field_error">%s</p>', __('Please select a column to search in.', 'participants-database'));
       $output[] = sprintf('<p id="value_error">%s</p>', __('Please type in something to search for.', 'participants-database'));
       $output[] = '</div>';
       $output[] = $this->search_sort_form_top(false, false, false);
@@ -417,18 +423,20 @@ class PDb_List extends PDb_Shortcode {
   /**
    * prints the top of the search/sort form
    *
-   * @param bool $target determines whether the form submits to the top of the
-   *                     form or to the top of the page.
+   * @param string $target set the action attribute of the search form to another 
+   *                       page, giving the ability to have the search on a 
+   *                       different page than the list, defaults to the same page
    */
-  public function search_sort_form_top($target = true, $class = false, $print = true) {
+  public function search_sort_form_top($target = false, $class = false, $print = true) {
 
     global $post;
 
     $output = array();
 
-    $anchor = $target ? '#' . $this->list_anchor : '';
+    $action = $target ? $target : get_page_link($post->ID) . '#' . $this->list_anchor;
+    $ref = $target ? 'remote' : 'update';
     $class_att = $class ? 'class="' . $class . '"' : '';
-    $output[] = '<form method="post" id="sort_filter_form" action="' . get_page_link($post->ID) . $anchor . '"' . $class_att . ' >';
+    $output[] = '<form method="post" id="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
     $output[] = '<input type="hidden" name="action" value="pdb_list_filter">';
 
     if ($print)
@@ -443,19 +451,16 @@ class PDb_List extends PDb_Shortcode {
     $all_string = false === $all ? '(' . __('show all', 'participants-database') . ')' : $all;
 
     $filter_columns = array($all_string => 'none');
-
-    foreach (Participants_db::get_column_atts('frontend_list') as $column) {
-
-      if (in_array($column->name, array('id', 'private_id')))
-        continue;
-
-      $filter_columns[stripslashes($column->title)] = $column->name;
+    
+    foreach($this->display_columns as $column ) {
+      
+      $filter_columns[Participants_Db::column_title($column)] = $column;
     }
 
     $element = array(
         'type' => 'dropdown',
-        'name' => 'where_clause',
-        'value' => $this->filter['where_clause'],
+        'name' => 'search_field',
+        'value' => $this->filter['search_field'],
         'class' => 'search-item',
         'options' => $filter_columns,
     );
@@ -616,8 +621,6 @@ class PDb_List extends PDb_Shortcode {
    */
   public function show_date($value, $format = false, $print = true) {
 
-    error_log(__METHOD__ . ' DEPRICATED func got called');
-
     $time = preg_match('#^[0-9-]+$#', $value) > 0 ? (int) $value : strtotime($value);
 
     $dateformat = $format ? $format : get_option('date_format', 'r');
@@ -630,9 +633,7 @@ class PDb_List extends PDb_Shortcode {
 
   public function show_array($value, $glue = ', ', $print = true) {
 
-    error_log(__METHOD__ . ' DEPRICATED func got called');
-
-    $output = is_serialized($value[$column]) ? implode($glue, unserialize($value)) : $value;
+    $output = implode($glue, Participants_Db::unserialize_array($value));
 
     if ($print)
       echo $output;
@@ -645,8 +646,6 @@ class PDb_List extends PDb_Shortcode {
   }
 
   public function show_link($value, $template = false, $print = false) {
-
-    error_log(__METHOD__ . ' DEPRICATED func got called');
 
     if (is_serialized($value)) {
 
@@ -725,7 +724,7 @@ class PDb_List extends PDb_Shortcode {
    */
   private function _filter_query($values) {
 
-    if (!empty($values) and $values['where_clause'] != 'none') {
+    if (!empty($values) and $values['search_field'] != 'none') {
 
       return http_build_query(array_merge($values, $this->filter)) . '&';
     } else
@@ -737,10 +736,10 @@ class PDb_List extends PDb_Shortcode {
    */
   private function _make_filter_statement($post) {
 
-    if (!Participants_Db::is_column($post['where_clause']))
+    if (!Participants_Db::is_column($post['search_field']))
       return '';
 
-    $this->filter['where_clause'] = $post['where_clause'];
+    $this->filter['search_field'] = $post['search_field'];
 
 
     switch ($post['operator']) {
@@ -778,7 +777,7 @@ class PDb_List extends PDb_Shortcode {
 
     $this->filter['value'] = $post['value'];
 
-    return $this->filter['where_clause'] . $this->filter['operator'] . $this->filter['value'];
+    return $this->filter['search_field'] . $this->filter['operator'] . $this->filter['value'];
   }
 
   /**

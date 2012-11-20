@@ -102,6 +102,9 @@
    */
   protected function _include_template() {
     
+    // set some template variables
+    $id = $this->participant_id;
+    
     include $this->template;
 		
   }

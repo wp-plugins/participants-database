@@ -11,25 +11,26 @@
  *
 */
 ?>
-
-
+<div class="wrap <?php echo $this->wrap_class ?>">
+<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
+<a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
 <?php
   /*
    * SEARCH/SORT FORM
    *
    * the search/sort form is only presented when enabled in the shortcode.
-   * 
+   *
    */
   $this->show_search_sort_form()
 
   /* LIST DISPLAY */
 ?>
-<div class="wrap <?php echo $this->wrap_class ?>">
-<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
-<a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
+  <?php /*
+   * IMPORTANT: the list container must have an id="pdb-list" in order for the
+	 * AJAX-enabled search to work.
+   */ ?>
+  <table class="wp-list-table widefat fixed pages" id="pdb-list" cellspacing="0" >
 
-  <table class="wp-list-table widefat fixed pages pdb-list" cellspacing="0" >
-  
     <?php // print the count if enabled in the shortcode
 		if ( $display_count ) : ?>
     <caption>
@@ -51,21 +52,21 @@
           ?>
         </tr>
       </thead>
-  
+
       <tbody>
       <?php while ( $this->have_records() ) : $this->the_record(); // each record is one row ?>
         <tr>
           <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
-  
+
             <td class="<?php echo $this->field->name ?>-field">
               <?php $this->field->print_value() ?>
             </td>
-          
+
         <?php endwhile; // each field ?>
         </tr>
       <?php endwhile; // each record ?>
       </tbody>
-    
+
     <?php else : // if there are no records ?>
 
       <tbody>
@@ -75,11 +76,12 @@
       </tbody>
 
     <?php endif; // $record_count > 0 ?>
-    
+
 	</table>
   <?php
-  /* 
+  /*
    * PAGINATION
    */
   $this->show_pagination_control();
   ?>
+</div>

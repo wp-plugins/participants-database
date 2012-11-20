@@ -81,7 +81,7 @@ class PDb_List_Admin
 		
 		// set up the basic values
 		$default_values = array(
-														'where_clause' => 'none',
+														'search_field' => 'none',
 														'value'        => '',
 														'operator'     => 'LIKE',
 														'sortBy'       => self::$options['admin_default_sort'],
@@ -246,10 +246,10 @@ class PDb_List_Admin
 						
 				}
 				
-				if ( self::$filter['where_clause'] != 'none' ) {
+				if ( self::$filter['search_field'] != 'none' ) {
 				
 					// if the field searched is a "date" field, convert the search string to a date
-					$field_atts = Participants_Db::get_field_atts( self::$filter['where_clause'] );
+					$field_atts = Participants_Db::get_field_atts( self::$filter['search_field'] );
 					
 					$value = self::$filter['value']; 
 					
@@ -263,13 +263,13 @@ class PDb_List_Admin
 						
 					}
 					
-					if ( in_array( self::$filter['where_clause'], array( 'date_recorded','date_updated' ) ) ) {
+					if ( in_array( self::$filter['search_field'], array( 'date_recorded','date_updated' ) ) ) {
 					
 						$delimiter = array( 'FROM_UNIXTIME(',')' );
 						
 					}
 					
-					self::$list_query .= ' WHERE `'.mysql_real_escape_string(self::$filter['where_clause']).'` '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
+					self::$list_query .= ' WHERE `'.mysql_real_escape_string(self::$filter['search_field']).'` '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
 						
 				}
 				
@@ -284,7 +284,7 @@ class PDb_List_Admin
 			case self::$i18n['clear'] :
 			
 				self::$filter['value'] = '';
-				self::$filter['where_clause'] = 'none';
+				self::$filter['search_field'] = 'none';
 		
 				// go back to the first page
 				$_GET[ self::$list_page ] = 1;
@@ -393,8 +393,8 @@ class PDb_List_Admin
 			
 			$element = array(
 											 'type'		=> 'dropdown',
-											 'name'		=> 'where_clause',
-											 'value'	=>	self::$filter['where_clause'],
+											 'name'		=> 'search_field',
+											 'value'	=>	self::$filter['search_field'],
 											 'options'	=> $filter_columns,
 											 );
       FormElement::print_element( $element );

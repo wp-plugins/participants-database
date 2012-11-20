@@ -6,13 +6,11 @@ template for participants list shortcode output
 this is a more detailed template showing how the parts of the display can be customized
 
 */
-
-  /* 
-   * this adds the default plugin stylesheet
-   * you can specify your own here, just put in the filename of your 
-   * stylesheet (located in your theme directory) as the argument
-   */
-  self::add_stylesheet();
+?>
+<div class="wrap <?php echo $this->wrap_class ?>">
+<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
+<a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
+<?php
 
   /*
    * SEARCH/SORT FORM
@@ -25,11 +23,11 @@ this is a more detailed template showing how the parts of the display can be cus
   <div class="pdb-searchform">
   
     <div class="pdb-error pdb-search-error" style="display:none">
-      <p id="where_clause_error"><?php _e( 'Please select a column to search in.', 'participants-database' )?></p>
+      <p id="search_field_error"><?php _e( 'Please select a column to search in.', 'participants-database' )?></p>
       <p id="value_error"><?php _e( 'Please type in something to search for.', 'participants-database' )?></p>
     </div>
 
-    <?php self::search_sort_form_top(); ?>
+    <?php $this->search_sort_form_top(); ?>
 
     <?php if ( $filter_mode == 'filter' || $filter_mode == 'both' ) : ?>
 
@@ -38,10 +36,10 @@ this is a more detailed template showing how the parts of the display can be cus
 
       <?php
         // you can replace "false" with your own text for the "all columns" value
-        self::column_selector( false );
+        $this->column_selector( false );
       ?>
 
-      <?php self::search_form() ?>
+      <?php $this->search_form() ?>
       
     </fieldset>
     <?php endif ?>
@@ -50,7 +48,7 @@ this is a more detailed template showing how the parts of the display can be cus
     <fieldset class="widefat">
       <legend><?php _e('Sort by', 'participants-database' )?>:</legend>
 
-      <?php self::sort_form() ?>
+      <?php $this->sort_form() ?>
 
     </fieldset>
     <?php endif ?>
@@ -64,7 +62,7 @@ this is a more detailed template showing how the parts of the display can be cus
   /* LIST DISPLAY */
 ?>
 
-  <table class="wp-list-table widefat fixed pages pdb-list" cellspacing="0" >
+  <table class="wp-list-table widefat fixed pages" id="pdb-list" cellspacing="0" >
   
     <?php // print the count if enabled in the shortcode
 		if ( $display_count ) : ?>
@@ -83,7 +81,7 @@ this is a more detailed template showing how the parts of the display can be cus
          * %2$s is the form element type identifier
          * %1$s is the title of the field
          */
-        self::_print_header_row( '<th class="%2$s" scope="col">%1$s</th>' );
+        $this->_print_header_row( '<th class="%2$s" scope="col">%1$s</th>' );
         ?>
       </tr>
     </thead>
@@ -91,27 +89,27 @@ this is a more detailed template showing how the parts of the display can be cus
       if ( $records_per_page > 20 ) : ?>
     <tfoot>
       <tr>
-        <?php self::_print_header_row( '<th class="%2$s" scope="col">%1$s</th>' ) ?>
+        <?php $this->_print_header_row( '<th class="%2$s" scope="col">%1$s</th>' ) ?>
       </tr>
     </tfoot>
     <?php endif ?>
 
     <tbody>
-    <?php foreach ( $records as $record ) : ?>
+    <?php while ( $this->have_records() ) : $this->the_record(); // each record is one row ?>
       <tr>
-        <?php foreach ( $fields as $field ) : ?>
+        <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
 
-          <?php $value = $record[$field];
+          <?php $value = $this->field->value;
           if ( ! empty( $value ) ) : ?>
           <td>
           	<?php 
 						// wrap the item in a link if it's enabled for this field
-						if ( self::is_single_record_link( $field ) ) {
+						if ( $this->field->is_single_record_link() ) {
               echo Participants_Db::make_link(
                 $single_record_link,             // URL of the single record page
                 $value,                          // field value
                 '<a href="%1$s" title="%2$s" >', // template for building the link
-                array( 'pdb'=>$record['id'] )    // record ID to get the record
+                array( 'pdb'=>$this->field->record_id )    // record ID to get the record
               );
             } ?>
 
@@ -119,7 +117,7 @@ this is a more detailed template showing how the parts of the display can be cus
             * here is where we determine how each field value is presented,
             * depending on what kind of field it is
             */
-            switch ( self::get_field_type( $field ) ) :
+            switch ( $this->field->form_element ) :
 
 							case 'image-upload': ?>
 
@@ -134,7 +132,7 @@ this is a more detailed template showing how the parts of the display can be cus
 								 * argument in this function; otherwise, it will default to 
 								 * the site setting
 								 */
-								self::show_date( $value, false );
+								$this->show_date( $value, false );
 								
 								break;
 								
@@ -145,7 +143,7 @@ this is a more detailed template showing how the parts of the display can be cus
 							 * this function shows the values as a comma separated list
 							 * you can customize the glue that joins the array elements
 							 */
-							self::show_array( $value, $glue = ', ' );
+							$this->show_array( $value, $glue = ', ' );
 							
 							break;
 							
@@ -157,7 +155,7 @@ this is a more detailed template showing how the parts of the display can be cus
 							 * %1$s is the URL
 							 * %2$s is the linked text
 							 */
-							self::show_link( $value, $template = '<a href="%1$s" >%2$s</a>' );
+							$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>' );
 							
 							break;
 							
@@ -180,7 +178,7 @@ this is a more detailed template showing how the parts of the display can be cus
 							/*
 							 * if the make links setting is enabled, try to make a link out of the field
 							 */
-							if ( self::$options['make_links'] && ! self::is_single_record_link( $field ) ) {
+							if ( $this->options['make_links'] && ! $this->is_single_record_link() ) {
 								
 								echo Participants_Db::make_link( $value );
 								
@@ -192,7 +190,7 @@ this is a more detailed template showing how the parts of the display can be cus
 
             endswitch; // switch by field type ?>
             <?php // close the anchor tag if it's a link 
-						if ( self::is_single_record_link( $field ) ) : ?>
+						if ( $this->field->is_single_record_link() ) : ?>
             	</a>
             <?php endif ?>
             </td>
@@ -201,9 +199,9 @@ this is a more detailed template showing how the parts of the display can be cus
         <td></td>
         <?php endif ?>
         
-			<?php endforeach; // each field ?>
+			<?php endwhile; // fields ?>
       </tr>
-    <?php endforeach; // each record ?>
+    <?php endwhile; // records ?>
     </tbody>
     
     <?php else : // if there are no records ?>
@@ -221,8 +219,8 @@ this is a more detailed template showing how the parts of the display can be cus
   /* END LIST */
   
   /* PAGINATION
-   *
-   * pagination controls are not shown when the list is updated by a filter operation
-   *
+   * 
+   * this is how you add the pagination controls
    */
-  self::$pagination->show(); ?>
+  $this->show_pagination_control(); ?>
+</div>

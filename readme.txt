@@ -130,6 +130,8 @@ Of course make sure your settings are set to send emails.
 
 The most common reason emails are not being sent is because the WP application cannot send email. If you are having this problem, I suggest you install an SMTP plugin (like WP-Mail-SMTP) and use that plugin to test your email sending. Sometimes it is necessary to set up and use SMTP (which is not the default on most systems) to successfully send email.
 
+Another common source of email trouble is other plugins that send email. It is not uncommon for such plugins to "hijack" the WP mail function and this can break it for other plugins. Try turning off other plugins that send email to see who the troublemaker is.
+
 = I don't see anything on the page where I put the `[pdb_record]` shortcode. What's up? =
 
 The form will only appear if someone uses a valid private link to access the page. All that's required for a private link is a valid "pid" value has to be included in the URI. (it looks like "pid=TH65J" in the link) This code can be seen in the record if you want to make your own links.
@@ -168,7 +170,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 There will be in the future, but for now, I'm suggesting this:
 
-Create a text-line field with the question “what is the sum of 10 and 7?” then put in a regex to verify the answer: #^17$#
+Create a text-line field with the question "what is the sum of 10 and 7?" then put in a regex to verify the answer: #^17$#
 
 You can no doubt come up with many variations on this.
 
@@ -189,6 +191,8 @@ You can no doubt come up with many variations on this.
 * moved all CSS files to CSS directory
 * placeholder tags may now be used in email subject lines
 * new form element: "Rich Text" so now you can have a form element either be a plain textarea or a rich text editor (for logged-in users only for now)
+* added 'search results only' functionality for list shortcode
+* list searches are now optionally performed ansynchronously with no-script fallback
 
 = 1.3.7 =
 * fixed potential problem with timestamp fields having their datatype changed
@@ -525,9 +529,11 @@ If you want to get tricky with the CSS, each header column has a class name that
 
 **Searching and Sorting The List**
 
-You can activate list searching and/or sorting for your users to control how the list is displayed. Like this `[pdb_list search="true"]` or `[pdb_list sort="true"]` The use can select which field they want to search through a dropdown. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
+You can activate list searching and/or sorting for your users to control how the list is displayed. Like this `[pdb_list search="true"]` or `[pdb_list sort="true"]` The user can select which field they want to search through a dropdown. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
 
 There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
+
+It's also possible to perform a "search" on the list with parameters in the URL. This would be handy if you wanted to create a link to the list that would only show certain results. For instance, if you wanted to make a link to the list that showed only results from the city of Phoenix you would add these variables to the URL: `?search_field=city&value=phoenix` Add that to the end of a link to the page where the `[pdb_list]` shortcode is, and it will only show records with a city value of 'phoenix.' This also means you can create your own search functionality, the primary limitation being you can only do this for one field at a time.
 
 = Filtering which Records Get Shown with the List Shortcode =
 
@@ -542,6 +548,12 @@ You can use more than one filter by stringing them together like this: `[pdb_lis
 To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date values should be a regular date string like this: `[pdb_list filter='date>jan3,2012']` It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
 
 The "Strict Date Format" setting affects how the shortcode filters are interpreted, so if this is checked, the date format in your filter argument must match the date format set in your WP General Settings.
+
+= Only Showing List Items When a User Searches =
+
+You can set up the list so no listings will show until a user makes a search. Just add a filter for id=0, like this: `[pdb_list filter="id=0"]` since there is no record with that ID, nothing will show. The user search will override that and show the result of their search, but this is a special case.
+
+Normally, a user search can only override the fields they search on. For instance, if you set your list to show only listings from a certain city, and a user searches for a name, the search results will find the name they searched for and also continue to be filtered by the city. If they search by city, their search will override the city filter in the shortcode.
 
 = Approving Records for Public Display =
 

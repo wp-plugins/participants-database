@@ -147,8 +147,8 @@ class FormElement {
     }
     
     $this->i18n = array(
-    					'other' => _x('other', 'indicates a write-in choice', Participants_Db::PLUGIN_NAME ),
-							'linktext' => _x( 'Link Text','indicates the text to be clicked to go to another web page', Participants_Db::PLUGIN_NAME )
+    					'other' => _x('other', 'indicates a write-in choice', 'participants-database' ),
+							'linktext' => _x( 'Link Text','indicates the text to be clicked to go to another web page', 'participants-database' )
     					);
     
     $this->attributes = $params['attributes'];

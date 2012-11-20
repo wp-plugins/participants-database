@@ -341,6 +341,18 @@ class PDb_Settings extends Plugin_Settings {
           'options'     => array( 1, 0 ),
           ),
         );
+    $this->plugin_settings[] = array(
+        'name'       =>'ajax_search',
+        'title'      =>__('Enable AJAX Search Functionality', 'participants-database' ),
+        'group'      =>'list',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __("This enables list search results that are updated without reloading the page. It requires Javascript, but search will still work if Javascript is disabled in the user's browser.", 'participants-database' ),
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
 		
 		/******************************************************
 		 *

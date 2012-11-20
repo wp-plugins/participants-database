@@ -28,8 +28,8 @@ self::$pagination->set_wrap_tag_close( '</div>' );
   <div class="pdb-searchform">
   
     <div class="alert alert-block" style="display:none">
-    	<a class="close" data-dismiss="alert" href="#">×</a>
-      <p id="where_clause_error"><?php _e( 'Please select a column to search in.', Participants_Db::PLUGIN_NAME )?></p>
+    	<a class="close" data-dismiss="alert" href="#">X</a>
+      <p id="search_field_error"><?php _e( 'Please select a column to search in.', Participants_Db::PLUGIN_NAME )?></p>
       <p id="value_error"><?php _e( 'Please type in something to search for.', Participants_Db::PLUGIN_NAME )?></p>
     </div>
 

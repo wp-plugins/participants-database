@@ -27,6 +27,8 @@ class Field_Item extends Template_Item {
   
   // the field's form element
   var $form_element;
+  // the field's id
+  var $record_id;
   
   // the field's defualt value
   var $default;
@@ -85,6 +87,13 @@ class Field_Item extends Template_Item {
     
     echo $output;
     
+  }
+  
+  /**
+   * provides public access to the single record link test func
+   */
+  public function is_single_record_link() {
+    return $this->_is_single_record_link();
   }
 	
 	/**

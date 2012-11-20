@@ -17,13 +17,13 @@ if ( ! isset( $participant_id ) ) {
 if ( false === $participant_id ) {
 	
   $action = 'insert';
-  $page_title = __('Add New Participant Record', Participants_Db::PLUGIN_NAME );
+  $page_title = __('Add New Participant Record', 'participants-database' );
 	$participant_values = Participants_Db::get_default_record();
 	
 } else {
 	
   $action = 'update';
-  $page_title = __('Edit Existing Participant Record', Participants_Db::PLUGIN_NAME );
+  $page_title = __('Edit Existing Participant Record', 'participants-database' );
 	$participant_values = Participants_Db::get_participant( $participant_id );
 	
 }
@@ -81,7 +81,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 </table>
 <?php
 				} else {
-					$id_line = '<tr><th>'._x('ID','abbreviation for "identification"',Participants_Db::PLUGIN_NAME).'</th><td>'.( false === $participant_id ? _x('(new record)','indicates a new record is being entered',Participants_Db::PLUGIN_NAME) : $participant_id ).'</td></tr>';
+					$id_line = '<tr><th>'._x('ID','abbreviation for "identification"','participants-database').'</th><td>'.( false === $participant_id ? _x('(new record)','indicates a new record is being entered','participants-database') : $participant_id ).'</td></tr>';
 		  }
 		  $section = $column->group
 ?>
@@ -210,14 +210,14 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
   <table class="form-table">
     <?php if ( is_admin() ) : ?>
     <tr>
-      <th><h3><?php _e('Save the Record', Participants_Db::PLUGIN_NAME )?></h3></th>
+      <th><h3><?php _e('Save the Record', 'participants-database' )?></h3></th>
       <td class="submit-buttons"><input class="button-primary" type="submit" value="Submit" name="submit">
         <input class="button-primary" type="submit" value="Apply" name="submit">
         <input class="button-primary" type="submit" value="Next" name="submit">
       </td>
     </tr>
     <tr>
-      <td colspan="2"><?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', Participants_Db::PLUGIN_NAME )?> </td>
+      <td colspan="2"><?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', 'participants-database' )?> </td>
     </tr>
     <?php else : ?>
     <tr>
