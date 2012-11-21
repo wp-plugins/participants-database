@@ -64,7 +64,7 @@ Display the list on your website with the `[pdb_list]` shortcode. You can determ
 
 = Record Display =
 
-Each individual record can be displayed usinf a shortcode and accessed by the ID if the record. A template file formats the output of the shortcode. A plugin setting determines how a link to the individual record may be placed on the list of records.
+Each individual record can be displayed using a shortcode and accessed by the ID if the record. A template file formats the output of the shortcode. A plugin setting determines how a link to the individual record may be placed on the list of records.
 
 = Import/Export Records =
 
@@ -98,7 +98,7 @@ Put the `[pdb_signup]` shortcode where you want your signup form to go.
 
 A shortcode is a WordPress feature that lets you insert plugin content into your posts and pages. It is just a special bit of text that is replaced with the plugin content when the page or post is viewed. Just put this: `[pdb_signup]` into your page, and when you view the page, the signup form will be displayed.
 
-= What happens then? =
+= What happens when someone signs up? =
 
 Their record is added to the database with the information provided in the signup form. Also, two emails will be sent (if you want) one to the admin to notify them of the signup, and also to the user to tell them they've signed up and also give them a private link to their record edit page so they can update or add to their record.
 
@@ -188,11 +188,11 @@ You can no doubt come up with many variations on this.
 * added random sort for list output
 * added "match other field" validation option for field double-checks
 * added default sort order for the admin list
-* moved all CSS files to CSS directory
 * placeholder tags may now be used in email subject lines
 * new form element: "Rich Text" so now you can have a form element either be a plain textarea or a rich text editor (for logged-in users only for now)
 * added 'search results only' functionality for list shortcode
-* list searches are now optionally performed ansynchronously with no-script fallback
+* list searches now update the list without reloading the page (using AJAX)
+* you can define a "default image" to show when no image has been uploaded into a record
 
 = 1.3.7 =
 * fixed potential problem with timestamp fields having their datatype changed

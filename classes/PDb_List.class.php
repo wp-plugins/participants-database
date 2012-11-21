@@ -350,29 +350,33 @@ class PDb_List extends PDb_Shortcode {
         // add the clause
         $clauses[] = sprintf('`%s` %s %s%s%s', $column, $operator, $delimiter[0], $target, $delimiter[1]);
       }// foreach $statements
-      // add the user search
-      if (isset($this->filter['value']) && !empty($this->filter['value']) && 'none' != $this->filter['search_field']) {
+      
+      /*
+       * add the user search. These must be made secure as it is direct input from the browser 
+       */
+      if (
+              isset($this->filter['value']) && 
+              !empty($this->filter['value']) && 
+              'none' != $this->filter['search_field'] && 
+              in_array($this->filter['search_field'],$this->display_columns)
+              ) {
 
-        $pattern = $this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"';
-
-        $clauses[] = sprintf($pattern, $this->filter['search_field'], $this->filter['value']);
+        $clauses[] = sprintf(
+                ($this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"'), 
+                $this->display_columns[array_search($this->filter['search_field'], $this->display_columns)], 
+                mysql_real_escape_string($this->filter['value'])
+                );
       }
 
       // assemble there WHERE clause
       $where_clause = empty($clauses) ? '' : ' WHERE ' . implode(' AND ', $clauses);
 
-      if ($orderby == 'random') {
-        $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $where_clause . ' ORDER BY RAND()';
-      } else {
-        $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $where_clause . ' ORDER BY `' . $orderby . '` ' . $order;
-      }
+      $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $where_clause . $order_clause;
     }
 
     if (WP_DEBUG)
       error_log(__METHOD__ . ' list query= ' . $this->list_query);
   }
-
-  /* TEMPLATE METHODS */
 
   /**
    * prints the whole search/sort form as a shortcut function
