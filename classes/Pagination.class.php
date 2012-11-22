@@ -69,6 +69,13 @@ class Pagination
 	 * @var bool
 	 */
 	private $anchor_wrap = false;
+  
+  /**
+   * was the object instantiates by a filtering operation?
+   * 
+   * @var bool
+   */
+  private $filtering;
 	
 	/**
 	 * Class Constructor
@@ -95,8 +102,8 @@ class Pagination
 		$this->setSize( $size );
 		$this->setTotalRecords( $total_records );
 		$this->setLink( $link );
-
-		$this->set_all_wrappers();
+    $this->filtering = $filtering;
+		$this->set_wrappers();
 		
 		$this->current_page_class = $current_page_class;
 		
@@ -145,7 +152,7 @@ class Pagination
 	/**
 	 * sets all the wrap HTML values
 	 */
-	public function set_all_wrappers( $wrappers = array() ) {
+	public function set_wrappers( $wrappers = array() ) {
 		
 		$defaults = array(
 			'wrap_tag'            => '<div class="pagination">',
@@ -321,7 +328,7 @@ class Pagination
   /* alias of above func that doesn't output if an AJAX filtering refresh is happening */
   public function show() {
     
-    if ( ! PDb_List::$shortcode_params['filtering'] ) echo $this->create_links();
+    if ( ! $this->filtering ) echo $this->create_links();
     
 	}
 }

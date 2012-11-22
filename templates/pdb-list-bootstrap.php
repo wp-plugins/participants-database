@@ -11,16 +11,18 @@ this is the default template which formats the list of records as a table
  * you can specify your own here, just put in the filename of your 
  * stylesheet (located in your theme directory) as the argument
  */
-//self::add_stylesheet();
+//$this->add_stylesheet();
 
 // set up the bootstrap-style pagination block
 // sets the indicator class for the pagination display
-self::$pagination->set_current_page_class( 'active' );
+$this->pagination->set_current_page_class( 'active' );
 // wrap the current page indicator with a dummy anchor
-self::$pagination->set_anchor_wrap( true );
+$this->pagination->set_anchor_wrap( true );
 // set the wrap class and element
-self::$pagination->set_wrap_tag( '<div class="pagination">' );
-self::$pagination->set_wrap_tag_close( '</div>' );
+$this->pagination->set_wrappers( array(
+    'wrap_tag'=>'<div class="pagination">',
+    'wrap_tag_close' => '</div>'
+    ));
 ?>
 
 <?php /* SEARCH/SORT FORM */ ?>
@@ -33,7 +35,7 @@ self::$pagination->set_wrap_tag_close( '</div>' );
       <p id="value_error"><?php _e( 'Please type in something to search for.', Participants_Db::PLUGIN_NAME )?></p>
     </div>
 
-    <?php self::search_sort_form_top( true, 'form-horizontal' ); ?>
+    <?php $this->search_sort_form_top( true, 'form-horizontal' ); ?>
 
     <?php if ( $filter_mode == 'filter' || $filter_mode == 'both' ) : ?>
 
@@ -45,10 +47,10 @@ self::$pagination->set_wrap_tag_close( '</div>' );
         
 				<?php
           // you can replace "false" with your own text for the "all columns" value
-          self::column_selector( false );
+          $this->column_selector( false );
         ?>
 			
-      		<?php self::search_form() ?>
+      		<?php $this->search_form() ?>
         </div>
         
       </div>
@@ -60,7 +62,7 @@ self::$pagination->set_wrap_tag_close( '</div>' );
       	<label class="control-label"><?php _e('Sort by', Participants_Db::PLUGIN_NAME )?>:</label>
       	<div class="controls">
 
-      		<?php self::sort_form() ?>
+      		<?php $this->sort_form() ?>
           
         </div>
       </div>
@@ -88,7 +90,7 @@ self::$pagination->set_wrap_tag_close( '</div>' );
          * %2$s is the form element type identifier
          * %1$s is the title of the field
          */
-        self::_print_header_row( '<th class="%2$s" >%1$s</th>' );
+        $this->print_header_row( '<th class="%2$s" >%1$s</th>' );
         ?>
       </tr>
     </thead>
@@ -96,27 +98,27 @@ self::$pagination->set_wrap_tag_close( '</div>' );
       if ( $records_per_page > 30 ) : ?>
     <tfoot>
       <tr>
-        <?php self::_print_header_row( '<th class="%2$s">%1$s</th>' ) ?>
+        <?php $this->print_header_row( '<th class="%2$s">%1$s</th>' ) ?>
       </tr>
     </tfoot>
     <?php endif ?>
 
     <tbody>
-    <?php foreach ( $records as $record ) : ?>
+    <?php while ( $this->have_records() ) : $this->the_record(); // each record is one row ?>
       <tr>
-        <?php foreach ( $fields as $field ) : ?>
+        <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
 
-          <?php $value = $record[$field];
-          if ( ! empty( $value ) ) : ?>
+          <?php $value = $this->field->value;
+          if ( ! $this->field->is_empty( $value ) ) : ?>
           <td>
           	<?php 
 						// wrap the item in a link if it's enabled for this field
-						if ( self::is_single_record_link( $field ) ) {
+						if ( $this->field->is_single_record_link() ) {
               echo Participants_Db::make_link(
                 $single_record_link,             // URL of the single record page
                 $value,                          // field value
                 '<a href="%1$s" title="%2$s" >', // template for building the link
-                array( 'pdb'=>$record['id'] )    // record ID to get the record
+                array( 'pdb' => $this->field->record_id )    // record ID to get the record
               );
             } ?>
 
@@ -124,13 +126,13 @@ self::$pagination->set_wrap_tag_close( '</div>' );
             * here is where we determine how each field value is presented,
             * depending on what kind of field it is
             */
-            switch ( self::get_field_type( $field ) ) :
+            switch ( $this->field->form_element ) :
 
-							case 'image-upload': ?>
+							case 'image-upload':
 
-                <a href="<?php echo Participants_Db::get_image_uri( $value )?>"><img class="PDb-list-image" src="<?php echo Participants_Db::get_image_uri( $value )?>" /></a>
-             
-                <?php break;
+                $image = new PDb_Image(array('filename' => $value));
+                $image->print_image();
+                break;
 								
 							case 'date':
 							
@@ -139,7 +141,7 @@ self::$pagination->set_wrap_tag_close( '</div>' );
 								 * argument in this function; otherwise, it will default to 
 								 * the site setting
 								 */
-								self::show_date( $value, false );
+								$this->show_date( $value, false );
 								
 								break;
 								
@@ -150,7 +152,7 @@ self::$pagination->set_wrap_tag_close( '</div>' );
 							 * this function shows the values as a comma separated list
 							 * you can customize the glue that joins the array elements
 							 */
-							self::show_array( $value, $glue = ', ' );
+							$this->show_array( $value, $glue = ', ' );
 							
 							break;
 							
@@ -162,7 +164,7 @@ self::$pagination->set_wrap_tag_close( '</div>' );
 							 * %1$s is the URL
 							 * %2$s is the linked text
 							 */
-							self::show_link( $value, $template = '<a href="%1$s" >%2$s</a>' );
+							$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
 							
 							break;
 							
@@ -185,9 +187,9 @@ self::$pagination->set_wrap_tag_close( '</div>' );
 							/*
 							 * if the make links setting is enabled, try to make a link out of the field
 							 */
-							if ( self::$options['make_links'] && ! self::is_single_record_link( $field ) ) {
+							if ( $this->options['make_links'] && ! $this->field->is_single_record_link() ) {
 								
-								echo Participants_Db::make_link( $value );
+								$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
 								
 							} else {
 								
@@ -195,10 +197,11 @@ self::$pagination->set_wrap_tag_close( '</div>' );
 								
 							}
 
-            endswitch; // switch by field type ?>
+            endswitch; // switch by field type 
+            ?>
             </td>
             <?php // close the anchor tag if it's a link 
-						if ( self::is_single_record_link( $field ) ) : ?>
+						if ( $this->field->is_single_record_link() ) : ?>
             	</a>
             <?php endif ?>
             
@@ -206,19 +209,19 @@ self::$pagination->set_wrap_tag_close( '</div>' );
         <td></td>
         <?php endif ?>
         
-			<?php endforeach; // each field ?>
+			<?php endwhile; // each field ?>
       </tr>
-    <?php endforeach; // each record ?>
+    <?php endwhile; // each record ?>
     </tbody>
     
     <?php else : // if there are no records ?>
 
     <tbody>
       <tr>
-        <td><?php _e('No records found', Participants_Db::PLUGIN_NAME )?></td>
+        <td>No Records Found</td>
       </tr>
     </tbody>
 
     <?php endif; // $record_count > 0 ?>
 	</table>
-  <?php self::$pagination->show(); ?>
+  <?php $this->pagination->show(); ?>

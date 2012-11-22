@@ -43,6 +43,19 @@ class Template_Item {
 		$this->options = Participants_Db::$plugin_options;
     
   }
+  
+  /**
+   * tests a value for emptiness, includinf arrays with empty elements
+   * 
+   * @param mixed $value the value to test
+   * @return bool
+   */
+  public function is_empty($value) {
+    
+    if (is_array($value)) $value = implode('', $value);
+    
+    return empty($value);
+  }
 
   /**
    * displays an object value with deslashing and entity encoding

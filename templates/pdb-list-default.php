@@ -12,7 +12,6 @@
 */
 ?>
 <div class="wrap <?php echo $this->wrap_class ?>">
-<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
 <?php
   /*
@@ -48,7 +47,7 @@
            * %2$s is the form element type identifier
            * %1$s is the title of the field
            */
-          self::_print_header_row( '<th class="%2$s" scope="col">%1$s</th>' );
+          $this->print_header_row( '<th class="%2$s" scope="col">%1$s</th>' );
           ?>
         </tr>
       </thead>
@@ -71,7 +70,7 @@
 
       <tbody>
         <tr>
-          <td><?php _e('No records found', 'participants-database' )?></td>
+          <td>No Records Found</td>
         </tr>
       </tbody>
 

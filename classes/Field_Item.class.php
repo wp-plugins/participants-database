@@ -68,7 +68,7 @@ class Field_Item extends Template_Item {
    */
   public function print_value() {
     
-    if ( $this->_is_single_record_link() ) {
+    if ( $this->is_single_record_link() ) {
       
       $template = '<a class="single-record-link" href="%1$s" title="%2$s" >%2$s</a>';
       

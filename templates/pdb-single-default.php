@@ -1,10 +1,11 @@
 <?php
 /*
  * default template for displaying a single record
+ * 
+ * this is the new "WordPress style" template
  *
  * each group with the "visible" attribute checked will display its fields in the order set 
  * in the manage database fields page.
- *
  *
  * if there are specific fields you wish to exclude from display, you can include the "name" value of 
  * the field in the $exclude array like this: $exclude = array( 'city','state','country' ); or whatever 

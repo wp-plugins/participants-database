@@ -81,15 +81,15 @@ this is a more detailed template showing how the parts of the display can be cus
          * %2$s is the form element type identifier
          * %1$s is the title of the field
          */
-        $this->_print_header_row( '<th class="%2$s" scope="col">%1$s</th>' );
+        $this->print_header_row( '<th class="%2$s" scope="col">%1$s</th>' );
         ?>
       </tr>
     </thead>
     <?php // print the table footer row if there is a long list
-      if ( $records_per_page > 20 ) : ?>
+      if ( $records_per_page > 30 ) : ?>
     <tfoot>
       <tr>
-        <?php $this->_print_header_row( '<th class="%2$s" scope="col">%1$s</th>' ) ?>
+        <?php $this->print_header_row( '<th class="%2$s" scope="col">%1$s</th>' ) ?>
       </tr>
     </tfoot>
     <?php endif ?>
@@ -100,7 +100,7 @@ this is a more detailed template showing how the parts of the display can be cus
         <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
 
           <?php $value = $this->field->value;
-          if ( ! empty( $value ) ) : ?>
+          if ( ! $this->field->is_empty( $value ) ) : ?>
           <td>
           	<?php 
 						// wrap the item in a link if it's enabled for this field
@@ -119,11 +119,11 @@ this is a more detailed template showing how the parts of the display can be cus
             */
             switch ( $this->field->form_element ) :
 
-							case 'image-upload': ?>
-
-                <img class="PDb-list-image" src="<?php echo Participants_Db::get_image_uri( $value )?>" />
-             
-                <?php break;
+							case 'image-upload': 
+                
+                $image = new PDb_Image(array('filename' => $value));
+                $image->print_image();
+                break;
 								
 							case 'date':
 							
@@ -155,7 +155,7 @@ this is a more detailed template showing how the parts of the display can be cus
 							 * %1$s is the URL
 							 * %2$s is the linked text
 							 */
-							$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>' );
+							$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
 							
 							break;
 							
@@ -178,9 +178,9 @@ this is a more detailed template showing how the parts of the display can be cus
 							/*
 							 * if the make links setting is enabled, try to make a link out of the field
 							 */
-							if ( $this->options['make_links'] && ! $this->is_single_record_link() ) {
+							if ( $this->options['make_links'] && ! $this->field->is_single_record_link() ) {
 								
-								echo Participants_Db::make_link( $value );
+								$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
 								
 							} else {
 								

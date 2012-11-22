@@ -9,32 +9,6 @@
  * If the "Show Field Groups" setting is not checked, the fields will be shown
  * in the same order, but without the group titles.
  *
- * each group has three values you can use:
- *    $this->group->name         a unique string suitable for classnames and such
- *    $this->group->title        the group title to be displayed
- *    $this->group->description  contains any extra text you want to add to each group
- *
- * each field has these values:
- *    $this->field->name         like $this->group->name it's good for precise control
- *                               over your display using CSS selectors
- *    $this->field->title        the display title for the field, usually used as the label
- *    $this->field->form_element tells you what kind of data the field contains so you
- *                               can display it accordingly.
- *    $this->field->default      is the default value (if any) of the field, usually you don't
- *                               have to do anything with this, it will be used to pre-load the
- *                               field
- *
- * there are several print methods for outputting elements of the form. You don't 
- * have to use them, but if you don't, you will have to make sure the form is valid and still 
- * works properly.
- * 
- *    $this->field->print_field_label();   prints the title of the field and adds the required 
- *                                         marker if you have it set up
- *    $this->field->print_field_element(); prints the actual form field and any other elements 
- *                                         that go with it
- *    $this->print_submit_button();        prints a submit button with the class supplied
- *    $this->print_errors()                prints any validation errors
- *
  * this template is a simple demonstration of what is possible it is set up to
  * output the form exactly as it was output before we brought in templates so the
  * upgrade will not affect existing installations

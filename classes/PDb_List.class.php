@@ -166,6 +166,7 @@ class PDb_List extends PDb_Shortcode {
         'page' => isset($_GET[$this->list_page]) ? $_GET[$this->list_page] : '1',
         'size' => $this->shortcode_atts['list_limit'],
         'total_records' => $this->num_records,
+        'filtering' => $this->shortcode_atts['filtering'],
     );
 
     // instantiate the pagination object
@@ -532,7 +533,7 @@ class PDb_List extends PDb_Shortcode {
     if (!$this->shortcode_atts['filtering']) {
 
       // set the wrapper HTML parameters
-      $this->pagination->set_all_wrappers($this->pagination_wrap);
+      $this->pagination->set_wrappers($this->pagination_wrap);
 
       // print the control
       echo $this->pagination->create_links();
@@ -590,11 +591,8 @@ class PDb_List extends PDb_Shortcode {
   /**
    * get the column form element type
    *
-   * DEPRICATED
    */
   public function get_field_type($column) {
-
-    error_log(__METHOD__ . ' DEPRICATED func got called');
 
     $column_atts = Participants_Db::get_field_atts($column, '`form_element`,`default`');
 
@@ -606,8 +604,6 @@ class PDb_List extends PDb_Shortcode {
    * returns boolean
    */
   public function is_single_record_link($column) {
-
-    error_log(__METHOD__ . ' DEPRICATED func got called');
 
     return (
             isset($this->options['single_record_link_field'])
@@ -657,6 +653,9 @@ class PDb_List extends PDb_Shortcode {
 
       if (count($params) < 2)
         $params[1] = $params[0];
+    } elseif ( is_array($value)) {
+      
+      list($params[0],$params[1]) = $value;
     } else {
 
       // in case we got old unserialized data in there
@@ -676,7 +675,7 @@ class PDb_List extends PDb_Shortcode {
   /**
    * prints a table header row
    */
-  private function _print_header_row($head_pattern) {
+  public function print_header_row($head_pattern) {
 
     // print the top header row
     foreach ($this->display_columns as $column) {
