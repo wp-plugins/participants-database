@@ -174,9 +174,12 @@ class FormElement {
         $this->_date_field();
         break;
 
-      case 'text-field':
-      case 'textarea':
+      case 'text-area':
         $this->_text_field();
+        break;
+      
+      case 'rich-text':
+        $this->_rich_text_field();
         break;
 
       case 'checkbox':
@@ -342,6 +345,24 @@ class FormElement {
     $value = ! empty( $this->value ) ? $this->value : '';
     
     $this->_addline( '<textarea name="' . $this->name . '" rows="' . $this->textarea_dims['rows'] . '" cols="' . $this->textarea_dims['cols'] . '" ' . $this->_attributes() . ' >'.$value.'</textarea>', empty( $this->value ) ? 0 : -1 );
+    
+  }
+  
+  /**
+   * builds a rich-text editor (textarea) element
+   */
+  private function _rich_text_field() {
+    
+    $value = ! empty( $this->value ) ? $this->value : '';
+    
+    wp_editor(
+            htmlspecialchars_decode($value),
+            preg_replace( '#[0-9_-]#', '', Participants_Db::$css_prefix.$this->name ),
+            array(
+                'media_buttons' => false,
+                'textarea_name' => $this->name,
+                )
+            );
     
   }
   

@@ -189,7 +189,7 @@ You can no doubt come up with many variations on this.
 * added "match other field" validation option for field double-checks
 * added default sort order for the admin list
 * placeholder tags may now be used in email subject lines
-* new form element: "Rich Text" so now you can have a form element either be a plain textarea or a rich text editor (for logged-in users only for now)
+* new form element: "Rich Text" so now you can have a form element either be a plain textarea or a rich text editor
 * added 'search results only' functionality for list shortcode
 * list searches now update the list without reloading the page (using AJAX)
 * you can define a "default image" to show when no image has been uploaded into a record

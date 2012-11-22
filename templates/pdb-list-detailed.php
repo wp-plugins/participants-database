@@ -159,7 +159,7 @@ this is a more detailed template showing how the parts of the display can be cus
 							
 							break;
 							
-						case 'textarea':
+						case 'rich-text':
 							
 							/*
 							 * if you are displaying rich text you may want to process the 

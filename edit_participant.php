@@ -115,7 +115,7 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
 			
 			if ( is_array( $_POST[ $column->name ] ) ) $value = $_POST[ $column->name ];
 			
-				elseif  ( 'textarea' == $column->form_element && $options['rich_text_editor'] ) $value = $_POST[ $column->name ];
+				elseif  ( 'rich-text' == $column->form_element && $options['rich_text_editor'] ) $value = $_POST[ $column->name ];
 
 			else $value = esc_html( stripslashes( $_POST[ $column->name ] ) );
 			
@@ -168,8 +168,8 @@ if ( is_object( Participants_Db::$validation_errors ) ) {
     
     $field_class = ( $column->validation != 'no' ? "required-field" : '' ) . ( in_array( $column->form_element, array( 'text-line','date' ) ) ? ' regular-text' : '' );
 
-
-		if ( Participants_Db::backend_user() && 'textarea' == $column->form_element && $options['rich_text_editor'] ) {
+		if ( 'rich-text' == $column->form_element && $options['rich_text_editor'] ) {
+      
 
       wp_editor(
                 $value,

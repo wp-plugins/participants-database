@@ -125,8 +125,8 @@ class Participants_Db {
     // define an array of all available form element types
     self::$element_types = array(
         'Text-line' => 'text-line',
-        'Text Area' => 'text-field',
-        'Rich Text' => 'textarea',
+        'Text Area' => 'text-area',
+        'Rich Text' => 'rich-text',
         'Checkbox' => 'checkbox',
         'Radio Buttons' => 'radio',
         'Dropdown List' => 'dropdown',
@@ -1216,12 +1216,16 @@ class Participants_Db {
               
               $new_value = self::_prepare_array_mysql($post[$column_atts->name]);
             }
+          } elseif ('rich-text' == $column_atts->form_element) {
+            
+            global $allowedposttags;
+            $new_value = wp_kses(stripslashes($post[$column_atts->name]), $allowedposttags);
           } elseif ('date' == $column_atts->form_element) {
 
             $date = self::parse_date($post[$column_atts->name], $column_atts);
 
             $new_value = $date ? $date : NULL;
-          } elseif (self::backend_user() && 'textarea' == $column_atts->form_element && $options['rich_text_editor']) {
+          } elseif (self::backend_user() && 'rich-text' == $column_atts->form_element && $options['rich_text_editor']) {
 
             $new_value = wpautop(stripslashes($post[$column_atts->name]));
           } elseif ('password' == $column_atts->form_element) {
@@ -1599,8 +1603,8 @@ class Participants_Db {
 
       case 'multi-select':
       case 'multi-checkbox':
-      case 'text-field':
-      case 'textarea':
+      case 'text-area':
+      case 'rich-text':
         $datatype = 'TEXT';
         break;
 
@@ -1878,7 +1882,7 @@ class Participants_Db {
       // all the text-area fields
       case 'values':
       case 'help_text':
-        return array('type' => 'text-field');
+        return array('type' => 'text-area');
 
       // drop-down fields
       case 'form_element':

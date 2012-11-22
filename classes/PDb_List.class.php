@@ -616,7 +616,7 @@ class PDb_List extends PDb_Shortcode {
             &&
             !empty($this->options['single_record_page'])
             &&
-            !in_array($this->get_field_type($column), array('textarea', 'link'))
+            !in_array($this->get_field_type($column), array('rich-text', 'link'))
             );
   }
 

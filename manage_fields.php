@@ -425,7 +425,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 						break;
 
 					case 'description':
-						$type = 'text-field';
+						$type = 'text-area';
 						break;
 
 					case 'order':

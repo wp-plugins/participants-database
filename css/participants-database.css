@@ -104,6 +104,21 @@
 .PDb-single .image-field-wrap {
    float: none;
 }
+.edit-participant .wp-editor-wrap {
+  max-width: 600px;
+}
+.edit-participant .wp-editor-area {
+    background-color: #FFFFFF;
+    border: 2px solid #DFDFDF;
+    color: #333333;
+    height: 20em;
+}
+.pdb-list span.textarea {
+  display: block;
+  max-height: 5em;
+  max-width: 150px;
+  overflow: auto;
+}
 
 /* LIST SHORTCODE */
 

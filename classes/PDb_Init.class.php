@@ -726,11 +726,11 @@ class PDb_Init
                                                         ),
                                   'donations'   => array(
                                                         'title' => 'Donations Made',
-                                                        'form_element' => 'text-field',
+                                                        'form_element' => 'text-area',
                                                       ),
                                   'volunteered' => array(
                                                         'title' => 'Time Volunteered',
-                                                        'form_element' => 'text-field',
+                                                        'form_element' => 'text-area',
                                                         'help_text' => 'how much time they have volunteered',
                                                       ),
 

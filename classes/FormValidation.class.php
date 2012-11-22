@@ -115,8 +115,8 @@ class FormValidation {
 
 			switch ( $field_atts->form_element ) {
 
-				case 'textarea':
-				case 'text-field':
+				case 'rich-text':
+				case 'text-area':
 					$element = 'textarea';
 					break;
 

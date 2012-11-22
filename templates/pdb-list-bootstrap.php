@@ -166,7 +166,7 @@ self::$pagination->set_wrap_tag_close( '</div>' );
 							
 							break;
 							
-						case 'textarea':
+						case 'rich-text':
 							
 							/*
 							 * if you are displaying rich text you may want to process the 

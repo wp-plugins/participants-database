@@ -202,7 +202,7 @@ class PDb_Settings extends Plugin_Settings {
         'title'      =>__('Required Field Marker', 'participants-database' ),
         'group'      => 'main',
         'options'    =>array(
-          'type'       => 'text-field',
+          'type'       => 'text-area',
           'help_text'  => __('html added to field title for required fields if selected above (the %s is replaced by the title of the field)', 'participants-database' ),
           'value'      => '%s<span class="reqd">*</span>',
           )
@@ -435,7 +435,7 @@ class PDb_Settings extends Plugin_Settings {
         'title'      =>__('Signup Response Email', 'participants-database' ),
         'group'      => 'signup',
         'options'    => array(
-          'type'        =>'text-field',
+          'type'        =>'text-area',
           'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. You can only use placeholders for fields that are present in the signup form, including hidden fields.', 'participants-database' ),
 					/* translators: the %s will be the name of the website */
           'value'       =>sprintf( __('<p>Thank you, [first_name], for signing up with %s.</p><p>You may complete your registration with additional information or update your information by visiting this private link at any time: <a href="[record_link]">[record_link]</a>.</p>', 'participants-database' ),get_bloginfo('name') ),
@@ -447,7 +447,7 @@ class PDb_Settings extends Plugin_Settings {
         'title'      =>__('Signup Thanks Message', 'participants-database' ),
         'group'      => 'signup',
         'options'    => array(
-          'type'        =>'text-field',
+          'type'        =>'text-area',
           'help_text'   => __('Note to display on the web page after someone has submitted a signup form. Can include HTML and placeholders (see above)', 'participants-database' ),
           'value'       =>__('<p>Thank you, [first_name] for signing up!</p><p>You will receive an email acknowledgement shortly. You may complete your registration with additional information or update your information by visiting the link provided in the email.</p>', 'participants-database' ),
           )
@@ -495,7 +495,7 @@ class PDb_Settings extends Plugin_Settings {
         'title'      =>__('Signup Notification Email'),
         'group'      => 'signup',
         'options'    => array(
-          'type'        =>'text-field',
+          'type'        =>'text-area',
           'help_text'   => __('notification email body. The [admin_record_link] tag will supply the URL for editing the record in the admin.'),
           'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul><p>Edit this new record <a href="[admin_record_link]">here.</a></p>'),
           )
@@ -535,7 +535,7 @@ class PDb_Settings extends Plugin_Settings {
         'title'      =>__('Duplicate Record Error Message', 'participants-database' ),
         'group'      => 'signup',
         'options'    => array(
-          'type'        =>'text-field',
+          'type'        =>'text-area',
           'help_text'   => __('This validation error message will be shown if a signup is made with a "check field" that matches an existing record.', 'participants-database' ),
           'value'       =>__('A record with that %s already exists. Please choose another.', 'participants-database' ),
           )
@@ -650,7 +650,7 @@ class PDb_Settings extends Plugin_Settings {
         'title'      =>__('Record Update Notification Email', 'participants-database' ),
         'group'      => 'record',
         'options'    => array(
-          'type'        =>'text-field',
+          'type'        =>'text-area',
           'help_text'   => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. (The field name is under the "name" column on the "Manage Database Fields" page.)  Also available is [date] which will show the date and time of the update and [admin_record_link] tag for a link to edit the record in the admin.', 'participants-database' ),
           'value'       =>__('<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] [last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</li><li>Phone: [phone]</li><li>Email: [email]</li></ul><p>Edit this record <a href="[admin_record_link]">here.</a></p>', 'participants-database' ),
           )

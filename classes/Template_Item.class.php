@@ -51,7 +51,7 @@ class Template_Item {
    */
   protected function print_value( $string ) {
     
-    echo _prepare_display_value( $string );
+    echo prepare_display_value( $string );
     
   }
   

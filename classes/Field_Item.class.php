@@ -109,7 +109,7 @@ class Field_Item extends Template_Item {
             &&
             ! empty( $this->options['single_record_page'] )
             &&
-            ! in_array( $this->form_element, array('textarea', 'link' ) )
+            ! in_array( $this->form_element, array('rich-text', 'link' ) )
             &&
             $this->record_id
             );

@@ -600,7 +600,7 @@ class PDb_List_Admin
 
               break;
 
-           case 'textarea':
+           case 'rich-text':
 
               if ( ! empty( $value[ $column ] ) ) $display_value = '<span class="textarea">' . $value[ $column ] . '</span>';
 							else $display_value = '';
