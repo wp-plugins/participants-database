@@ -50,6 +50,8 @@ class PDb_Signup extends PDb_Shortcode {
 
 	// holds the body of the notification email
 	private $notify_body;
+  // holds the current email body
+  var $current_body;
 	
 	private $thanks_message;
 
@@ -320,6 +322,8 @@ class PDb_Signup extends PDb_Shortcode {
 
 	/**
    * sends a mesage through the WP mail handler function
+   * 
+   * @todo these email functions should be handled by an email class 
    *
    * @param string $recipients comma-separated list of email addresses
    * @param string $subject    the subject of the email
@@ -329,11 +333,41 @@ class PDb_Signup extends PDb_Shortcode {
 	private function _mail( $recipients, $subject, $body ) {
 
 		// error_log(__METHOD__.' with: '.$recipients.' '.$subject.' '.$body );
+    
+    $this->current_body = $body;
+    
+    if ( $this->options['html_email'] ) add_action( 'phpmailer_init', array( $this, 'set_alt_body') );
 
 		$sent = wp_mail( $recipients, $subject, $body, $this->email_header );
 
 		if ( false === $sent ) error_log( __METHOD__.' sending returned false' );
 
 	}
+  
+  /**
+   * set the PHPMailer AltBody property with the text body of the email
+   * 
+   * @param object $phpmailer an object of type PHPMailer
+   * @return null
+   */
+  public function set_alt_body( &$phpmailer ) {
+    
+    if ( is_object( $phpmailer )) $phpmailer->AltBody = $this->_make_text_body ($this->_proc_tags( $this->current_body ));
+  }
+  
+  /**
+   * strips the HTML out of an HTML email message body to provide the text body
+   * 
+   * this is a fairly crude conversion here. I should include some kind of 
+   * library to do this properly. 
+   * 
+   * 
+   * @param string $HTML the HTML body of the email
+   * @return string
+   */
+  private function _make_text_body( $HTML ) {
+    
+    return strip_tags( preg_replace('#(</[p|h1|h2|h3|h4|h5|h6|div|tr|li]{1,3} *>)#i', "\r", $HTML) );
+  }
 
 }

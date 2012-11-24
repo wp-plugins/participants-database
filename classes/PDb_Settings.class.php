@@ -497,7 +497,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array(
           'type'        =>'text-area',
           'help_text'   => __('notification email body. The [admin_record_link] tag will supply the URL for editing the record in the admin.'),
-          'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul><p>Edit this new record <a href="[admin_record_link]">here.</a></p>'),
+          'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul><p>Edit this new record here: <a href="[admin_record_link]">[admin_record_link]</a></p>'),
           )
         );
 		

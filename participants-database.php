@@ -239,6 +239,7 @@ class Participants_Db {
 
     if (0 != $options['html_email']) {
       $type = 'text/html; charset="' . get_option('blog_charset') . '"';
+      add_filter('wp_mail_content_type', function() { return 'text/html';});
     } else {
       $type = 'text/plain; charset=us-ascii';
     }
