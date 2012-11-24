@@ -263,32 +263,63 @@ class Participants_Db {
 
     // define the plugin admin menu pages
     add_menu_page(
-            self::$plugin_title, self::$plugin_title, '', self::PLUGIN_NAME, array(__CLASS__, 'include_admin_file')
+            self::$plugin_title,
+            self::$plugin_title, 
+            '', 
+            self::PLUGIN_NAME, array(__CLASS__, 'include_admin_file')
     );
 
-    $listpage = add_submenu_page(
-            self::PLUGIN_NAME, __('List Participants', 'participants-database'), __('List Participants', 'participants-database'), self::$plugin_options['record_edit_capability'], self::$plugin_page . '-list_participants', array('PDb_List_Admin', 'initialize')
-            /* array( __CLASS__, 'include_admin_file' ) */
+    add_submenu_page(
+            self::PLUGIN_NAME, 
+            __('List Participants', 'participants-database'), 
+            __('List Participants', 'participants-database'), 
+            self::$plugin_options['record_edit_capability'], 
+            self::$plugin_page . '-list_participants', array('PDb_List_Admin', 'initialize')
     );
 
-    $addpage = add_submenu_page(
-            self::PLUGIN_NAME, __('Add Participant', 'participants-database'), __('Add Participant', 'participants-database'), self::$plugin_options['record_edit_capability'], self::$plugin_page . '-edit_participant', array(__CLASS__, 'include_admin_file')
+    add_submenu_page(
+            self::PLUGIN_NAME, 
+            __('Add Participant', 'participants-database'), 
+            __('Add Participant', 'participants-database'), 
+            self::$plugin_options['record_edit_capability'], 
+            self::$plugin_page . '-edit_participant', 
+            array(__CLASS__, 'include_admin_file')
     );
 
-    $managepage = add_submenu_page(
-            self::PLUGIN_NAME, __('Manage Database Fields', 'participants-database'), __('Manage Database Fields', 'participants-database'), 'manage_options', self::$plugin_page . '-manage_fields', array(__CLASS__, 'include_admin_file')
+    add_submenu_page(
+            self::PLUGIN_NAME, 
+            __('Manage Database Fields', 'participants-database'), 
+            __('Manage Database Fields', 'participants-database'), 
+            'manage_options', 
+            self::$plugin_page . 
+            '-manage_fields', 
+            array(__CLASS__, 'include_admin_file')
     );
 
-    $uploadpage = add_submenu_page(
-            'participants-database', __('Import CSV File', 'participants-database'), __('Import CSV File', 'participants-database'), 'manage_options', self::$plugin_page . '-upload_csv', array(__CLASS__, 'include_admin_file')
+    add_submenu_page(
+            'participants-database', 
+            __('Import CSV File', 'participants-database'), 
+            __('Import CSV File', 'participants-database'), 
+            'manage_options', 
+            self::$plugin_page . '-upload_csv', 
+            array(__CLASS__, 'include_admin_file')
     );
 
-    $settingspage = add_submenu_page(
-            self::PLUGIN_NAME, __('Settings', 'participants-database'), __('Settings', 'participants-database'), 'manage_options', self::$plugin_page . '_settings_page', array(self::$plugin_settings, 'show_settings_form')
+    add_submenu_page(
+            self::PLUGIN_NAME, 
+            __('Settings', 'participants-database'), 
+            __('Settings', 'participants-database'), 
+            'manage_options', 
+            self::$plugin_page . '_settings_page', 
+            array(self::$plugin_settings, 'show_settings_form')
     );
 
-    $editpage = add_submenu_page(
-            '', __('Edit Record', 'participants-database'), __('Edit Record', 'participants-database'), self::$plugin_options['record_edit_capability'], self::$plugin_page . '_edit_participant'
+    add_submenu_page(
+            '', 
+            __('Edit Record', 'participants-database'), 
+            __('Edit Record', 'participants-database'), 
+            self::$plugin_options['record_edit_capability'], 
+            self::$plugin_page . '_edit_participant'
     );
   }
 
@@ -1975,6 +2006,16 @@ class Participants_Db {
               $value = vsprintf($pattern, $link);
             }
           }
+          break;
+          
+        case 'rich-text':
+          
+          /*
+           * what we need to do here is add the missing markup (wpautop does 
+           * this) and then remove all line breaks and such so the whole thing 
+           * looks like one field
+           */
+          $value = preg_replace( '/^\s+|\n|\r|\s+$/m', '', wpautop($value, true));
           break;
 
         default:
