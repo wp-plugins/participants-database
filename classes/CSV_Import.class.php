@@ -61,16 +61,16 @@ abstract class CSV_Import {
 
           if ($this->insert_count > 0) {
 
-            $this->set_error_heading($this->insert_count . ' ' . _n('record added', 'records added', $this->insert_count, $this->i10n_context), '', false);
+            $this->set_error_heading(sprintf(_n('%s record added', '%s records added', $this->insert_count, $this->i10n_context), $this->insert_count), '', false);
           }
           if ($this->update_count > 0) {
 
-            $this->set_error_heading($this->update_count . ' ' . _n('matching record updated', 'matching records updated', $this->insert_count, $this->i10n_context), '', false);
+            $this->set_error_heading(sprintf(_n('%s matching record updated', '%s matching records updated', $this->update_count, $this->i10n_context), $this->update_count), '', false);
           }
 
           if ($this->skip_count > 0) {
 
-            $this->set_error_heading($this->skip_count . ' ' . _n('duplicate record skipped', 'duplicate records skipped', $this->insert_count, $this->i10n_context), '', false);
+            $this->set_error_heading(sprintf(_n('%s duplicate record skipped', '%s duplicate records skipped', $this->skip_count, $this->i10n_context), $this->skip_count), '', false);
           }
           if ($this->update_count == 0 and $this->insert_count == 0) {
 
@@ -164,7 +164,8 @@ abstract class CSV_Import {
       error_log(__METHOD__ . ' CSV parse error:' . print_r($this->CSV->error_info, 1));
 
     /*
-     * build the column names
+     * build the column names from the CSV if we have one and it's different from 
+     * the CSV columns defined by the database
      */
     $this->import_columns();
 

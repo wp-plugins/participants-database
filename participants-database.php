@@ -1111,19 +1111,19 @@ class Participants_Db {
      */
     if ($action == 'insert' and $options['unique_email'] !== 0) {
 
-      $field = $options['unique_field'];
+      $match_field = $options['unique_field'];
 
-      if (isset($post[$field]) && !empty($post[$field]) && self::field_value_exists($post[$field], $field)) {
+      if (isset($post[$match_field]) && !empty($post[$match_field]) && self::field_value_exists($post[$match_field], $match_field)) {
 
         switch ($options['unique_email']) {
 
           case 1:
 
             // record with same field value exists...get the id and update the existing record
-            if ('id' == strtolower($field))
-              $participant_id = $post[$field];
+            if ('id' == strtolower($match_field))
+              $participant_id = $post[$match_field];
             else
-              $participant_id = self::_get_participant_id_by_term($field, $post[$field]);
+              $participant_id = self::_get_participant_id_by_term($match_field, $post[$match_field]);
             // get the first one
             if (is_array($participant_id))
               $participant_id = current($participant_id);
@@ -1136,11 +1136,19 @@ class Participants_Db {
 
             // set the error message
             if (is_object(self::$validation_errors))
-              self::$validation_errors->add_error($field, 'duplicate');
+              self::$validation_errors->add_error($match_field, 'duplicate');
             $action = 'skip';
             // go on validating the rest of the form
             break;
         }
+      } elseif ( $options['unique_email'] == 1 and 'id' == strtolower($match_field) and isset($post[$match_field]) ) {
+        /*
+         * if the "OVERWRITE" option is set to "id" and the record contains an id, use it to create the record
+         */
+        $participant_id = intval($post[$match_field]);
+        if ( 0 !== $participant_id ) {
+          $action = 'insert';
+        } else $participant_id = false;
       }
     }
 
@@ -1170,11 +1178,11 @@ class Participants_Db {
     $columns = array();
 
     // determine the set of columns to process 
-    $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : 'new';
+    $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
 
     // gather the submit values and add them to the query
     foreach (self::get_column_atts($column_set) as $column_atts) :
-
+    
       // the validation object is only instantiated when this method is called
       // by a form submission
       if (is_object(self::$validation_errors)) {
@@ -1186,6 +1194,9 @@ class Participants_Db {
       switch ($column_atts->name) {
 
         case 'id':
+          $new_value = $participant_id;
+          break;
+        
         case 'date_updated':
         case 'date_recorded':
         case 'last_accessed':

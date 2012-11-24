@@ -1,4 +1,5 @@
 <?php
+
 /**
  * pagination class for wordpress themes and plugins
  *

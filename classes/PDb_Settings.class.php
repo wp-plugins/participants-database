@@ -536,7 +536,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text-area',
-          'help_text'   => __('This validation error message will be shown if a signup is made with a "check field" that matches an existing record.', 'participants-database' ),
+          'help_text'   => __('If "Show a validation error message" is selected above, this message will be shown if a signup is made with a "check field" that matches an existing record.', 'participants-database' ),
           'value'       =>__('A record with that %s already exists. Please choose another.', 'participants-database' ),
           )
         );

@@ -122,7 +122,7 @@ It is possible to have multiple images per record, just add more image fields.
 
 No, these signups and records are separate from people who can register on your site as users. If there are things only registered users can do (such as a forum or comments), they will have to register or sign in as usual.
 
-The idea is to use the database as a roster of volunteers, supporters, etc. for the organization, not the website. If there is a popular call for it, I can try to make this plugin's signups also be site users, but I am not sure if it's possible.
+The idea is to use the database as a roster of volunteers, supporters, etc. for the organization, not the website.
 
 = People are signing up, but emails are not getting sent =
 
@@ -189,10 +189,13 @@ You can no doubt come up with many variations on this.
 * added "match other field" validation option for field double-checks
 * added default sort order for the admin list
 * placeholder tags may now be used in email subject lines
-* new form element: "Rich Text" so now you can have a form element either be a plain textarea or a rich text editor
+* new form element: "Rich Text" a textarea element with a rich text editor
+* new form element: "Password" stored as a WP-compatible hash
 * added 'search results only' functionality for list shortcode
 * list searches now update the list without reloading the page (using AJAX)
 * you can define a "default image" to show when no image has been uploaded into a record
+* CSV export now requires admin privileges
+* improved handling of rich text content displays
 
 = 1.3.7 =
 * fixed potential problem with timestamp fields having their datatype changed
@@ -391,6 +394,9 @@ You can no doubt come up with many variations on this.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.4 =
+Major upgrade with improvements across the board, many new features
 
 = 1.3.7 =
 Important bugfix and minor improvements

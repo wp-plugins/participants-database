@@ -135,8 +135,8 @@ class PDb_List_Admin
 		// output the pagination controls
 		self::$pagination->links();
 		
-		// print the CSV export form
-		self::_print_export_form();
+		// print the CSV export form (admin users only)
+		if ( current_user_can('manage_options') ) self::_print_export_form();
 		
 		// print the plugin footer
 		Participants_Db::plugin_footer();
