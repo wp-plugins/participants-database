@@ -160,15 +160,18 @@ this is a more detailed template showing how the parts of the display can be cus
 							break;
 							
 						case 'rich-text':
+						case 'text-area':
 							
 							/*
 							 * if you are displaying rich text you may want to process the 
-							 * output through wpautop like this: echo wpautop( $value ) see 
+							 * output through wpautop like this: wpautop( $value ) see 
 							 * http://codex.wordpress.org/Function_Reference/wpautop
 							 */
-              ?>
-              <span class="textarea"><?php echo $value ?></span>
-              <?php
+							printf(
+										 '<span class="%s">%s</span>',
+										 $this->field->form_element == 'rich-text' ? 'textarea richtext' : 'textarea',
+										 $value
+										 );
 							
               break;
 							
@@ -220,7 +223,30 @@ this is a more detailed template showing how the parts of the display can be cus
   
   /* PAGINATION
    * 
-   * this is how you add the pagination controls
+   * this is how you customize the pagination controls
+   *
+   * the properties array can have these values (omit to use default value):
+	 *                'current_page_class' the class name for the current page link
+	 *                'disabled_class'     the class to apply to disabled links
+	 *                'anchor_wrap'        whether to wrap the disabled link in an 'a' tag
+	 *                'first_last'         whether to show the first and last page links
+	 *                'wrappers'           array of values with the HTML to wrap the links in:
+	 *                                            'wrap_tag'            tag name of the outside wrapper
+	 *                                            'wrap_class'          class of the outside wrapper
+	 *                                            'all_button_wrap_tag' the tag name to wrap the buttons
+	 *                                            'button_wrap_tag'     the tag name to use for each button
+	 *
+	 *                                            
    */
-  $this->show_pagination_control(); ?>
+	$this->pagination->set_props(array(
+																		 'first_last' => false,
+																		 'current_page_class'=>'currentpage',
+																		 'wrappers' => array(
+																												'wrap_tag' => 'div',
+																												'wrap_class' => 'pagination',
+																												'all_button_wrap_tag' => 'ul',
+																												'button_wrap_tag' => 'li',
+																												)
+																		 ));
+	$this->pagination->show();?>
 </div>

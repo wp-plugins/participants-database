@@ -120,36 +120,52 @@
   overflow: auto;
 }
 
-/* LIST SHORTCODE */
+/* LIST */
+.pdb-list th {
+  padding: 5px 5px 0 0;
+  text-align: center;
+}
+.pdb-list fieldset,
+.pdb-list table caption {
+  margin: 1em 0;
+}
 
 /* pagination */
-.pdb_list .pagination {
+.pdb-list .pagination {
 	overflow:auto;
 }
-.pdb_list .pagination ul {
+.pdb-list .pagination ul {
 	margin:0;
 	list-style:none;
 }
-.pdb_list .pagination li.currentpage,
-.pdb_list .pagination a {
+.pdb-list .pagination li span,
+.pdb-list .pagination a {
 	float:left;
 	margin: 0 3px;
 	padding: 1px 5px;
 	border: 1px solid #aaa;
 	border-radius: 2px;
 }
-.pdb_list .pagination li.currentpage:first-child,
-.pdb_list .pagination li:first-child a {
+.pdb-list .pagination li:first-of-type span,
+.pdb-list .pagination li:first-of-type a {
+  margin-left:0;
+}
+.pdb-list .pagination li:last-of-type span,
+.pdb-list .pagination li:last-of-type a {
+  margin-right:0;
+}
+.pdb-list .pagination li.currentpage:first-child,
+.pdb-list .pagination li:first-child a {
 	margin-left:0;
 }
-.pdb_list .pagination a {
+.pdb-list .pagination a {
 	text-decoration:none;
 }
-.pdb_list .pagination a:hover,
-.pdb_list .pagination li.currentpage {
+.pdb-list .pagination a:hover,
+.pdb-list .pagination li.currentpage {
 	background-color: #cccccc;
 }
-.pdb_list .pagination label {    
+.pdb-list .pagination label {    
 	float: left;
 	margin: 8px 6px 0 0;
 }

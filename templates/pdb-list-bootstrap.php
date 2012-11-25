@@ -170,23 +170,17 @@ $this->pagination->set_wrappers( array(
 							
 						case 'rich-text':
 							
-							/*
-							 * if you are displaying rich text you may want to process the 
-							 * output through wpautop like this: echo wpautop( $value ) see 
-							 * http://codex.wordpress.org/Function_Reference/wpautop
-							 */
-              ?>
-              <span class="textarea"><?php echo $value ?></span>
-              <?php
+							printf(
+										 '<span class="%s">%s</span>',
+										 $this->field->form_element == 'rich-text' ? 'textarea richtext' : 'textarea',
+										 $value
+										 );
 							
               break;
 							
 						case 'text-line':
 						default:
 						
-							/*
-							 * if the make links setting is enabled, try to make a link out of the field
-							 */
 							if ( $this->options['make_links'] && ! $this->field->is_single_record_link() ) {
 								
 								$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
@@ -224,4 +218,15 @@ $this->pagination->set_wrappers( array(
 
     <?php endif; // $record_count > 0 ?>
 	</table>
-  <?php $this->pagination->show(); ?>
+  <?php
+	// set up the bootstrap pagination classes and wrappers
+	$this->pagination->set_props(array(
+																		 'first_last' => false,
+																		 'current_page_class'=>'active',
+																		 'wrappers' => array(
+																												'wrap_class' => 'pagination pagination-large pagination-centered',
+																												),
+																		 ));
+	$this->pagination->show();
+	
+	?>

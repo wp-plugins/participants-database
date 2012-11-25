@@ -79,7 +79,7 @@
 	</table>
   <?php
   /*
-   * PAGINATION
+   * this shortcut function presents a pagination control with default layout
    */
   $this->show_pagination_control();
   ?>

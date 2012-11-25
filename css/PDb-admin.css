@@ -76,6 +76,16 @@ input[type="checkbox"],
     float: left;
     margin-right: 10px;
 }
+.inline-controls input[type='text'],
+.inline-controls input[type='checkbox'],
+.inline-controls select {
+  float: none;
+  display: inline;
+}
+.checkmark {
+  font-size:19px;
+  padding:0 0 0 8px;
+}
 .emphasized {
   color: #7C0000;
   font-weight: normal;

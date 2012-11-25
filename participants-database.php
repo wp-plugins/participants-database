@@ -972,7 +972,15 @@ class Participants_Db {
           $return = $value;
           break;
         }
-
+        
+      case 'text-area':
+        
+        $return = sprintf('<span class="textarea">%s</span>',$value );
+        break;
+      case 'rich-text':
+        
+        $return = sprintf('<span class="textarea richtext">%s</span>',$value );
+        break;
       default :
 
         $return = $value;

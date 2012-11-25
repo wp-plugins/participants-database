@@ -5,14 +5,15 @@
  *
  *
  * @package    WordPress
- * @author     Original Author http://www.goodphptutorials.com/out/Simple_PHP_MySQL_Pagination
- * @author     Rolanbd Barker <webdesign@xnau.com>
+ * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, xnau webdesign
  * @license    GPL2
  * @version    1.2
  *
+ * adapted from: http://www.goodphptutorials.com/out/Simple_PHP_MySQL_Pagination
+ *
  * 08-08-12 added support for bootstrap-style pagination HTML
- *          with methoeds for setting the class of the current page indicator and an option
+ *          with methods for setting the class of the current page indicator and an option
  *          to wrap the current page indicator numeral with a dummy anchor tag
  */
 class Pagination {
@@ -49,10 +50,10 @@ class Pagination {
    * Wrapper for the pagination links
    *
    * @var array
-   *        'open'        open html for the whole control
-   *        'close'       close html for the whole control
-   *        'all_buttons' tag to wrap the buttons (defaults to 'ul')
-   *        'button'      tag to wrap each button (defaults to 'li')
+   *        'wrap_tag'            tag name for the overall wrapper; default: div
+   *        'wrap_class'          classname for the overall wrapper; default: pagination 
+   *        'all_button_wrap_tag' tag to wrap the buttons; default: ul
+   *        'button_wrap_tag'     tag to wrap each button; default: li
    */
   public $wrappers;
 
@@ -64,14 +65,28 @@ class Pagination {
   private $current_page_class;
 
   /**
+   * class name for a disabled link
+   *
+   * @var string
+   */
+  private $disabled_class;
+
+  /**
    * flag to select wrapping dummy anchor tag around current page link
    *
    * @var bool
    */
-  private $anchor_wrap = false;
+  private $anchor_wrap;
 
   /**
-   * was the object instantiates by a filtering operation?
+   * flag to enable first/last page links
+   *
+   * @var bool
+   */
+  private $first_last;
+
+  /**
+   * was the object instantiated by a filtering operation?
    * 
    * @var bool
    */
@@ -81,13 +96,10 @@ class Pagination {
    * Class Constructor
    *
    * @param array $args
-   *                page int the current page
-   *                size int the number of records to show per page
-   *                total_records int the total records in the full query
-   *                link string the URL for page links
-   *                wrap_tag string tag to wrap the pagination links (an unordered list) in, defaults
-   *                                to '<div class="pagination">'
-   *                wrap_tag_close - the closing tag for the wrapper (default: '</div>')
+   *                'page'          int the current page
+   *                'size'          int the number of records to show per page
+   *                'total_records' int the total records in the full query
+   *                'link'          string the URL for page links
    */
   function __construct($args) {
     extract(wp_parse_args($args, array(
@@ -96,7 +108,10 @@ class Pagination {
                 'total_records' => false,
                 'link' => '',
                 'current_page_class' => 'currentpage',
+                'disabled_class' => 'disabled',
                 'filtering' => 0,
+                'anchor_wrap' => false,
+                'first_last' => true,
             )));
     $this->setPage($page);
     $this->setSize($size);
@@ -104,12 +119,67 @@ class Pagination {
     $this->setLink($link);
     $this->filtering = $filtering;
     $this->set_wrappers();
-
+    $this->set_anchor_wrap($anchor_wrap);
     $this->current_page_class = $current_page_class;
+    $this->disabled_class = $disabled_class;
   }
 
   /**
-   * Set's the current page
+   * echoes the pagination links
+   *
+   */
+  public function links() {
+    echo $this->create_links();
+  }
+
+  /* alias of above func that doesn't output if an AJAX filtering refresh is happening */
+
+  public function show() {
+
+    if (!$this->filtering)
+      echo $this->create_links();
+  }
+
+  /**
+   * sets various object properties
+   *
+   * for use in the template
+   *
+   * @param array $props an array of properties to set
+   *                current_page_class string the class name for the current page link
+   *                disabled_class     string the class to apply to disabled links
+   *                anchor_wrap        bool   whether to wrap the disabled link in an 'a' tag (true) or span (false)
+   *                first_last         bool   whether to show the first and last page links
+   *                wrappers           array  the HTML to wrap the links in (see set_wrappers())
+   */
+  public function set_props($array) {
+
+    foreach ($array as $prop => $value) {
+
+      switch ($prop) {
+
+        case 'current_page_class':
+        case 'disabled_class':
+
+          if (is_string($value))
+            $this->$prop = $value;
+          break;
+        case 'anchor_wrap':
+        case 'first_last':
+
+          $this->$prop = (bool) $value;
+          break;
+        case 'wrappers':
+
+          if (is_array($value))
+            $this->set_wrappers($value);
+          break;
+      }
+    }
+  }
+
+  /**
+   * Sets the current page
    *
    * @param unknown_type $page
    */
@@ -118,7 +188,7 @@ class Pagination {
   }
 
   /**
-   * Set's the records per page
+   * Sets the records per page
    *
    * @param integer $size
    */
@@ -150,8 +220,8 @@ class Pagination {
   public function set_wrappers($wrappers = array()) {
 
     $defaults = array(
-        'wrap_tag' => '<div class="pagination">',
-        'wrap_tag_close' => '</div>',
+        'wrap_class' => 'pagination',
+        'wrap_tag' => 'div',
         'all_button_wrap_tag' => 'ul',
         'button_wrap_tag' => 'li',
     );
@@ -174,7 +244,7 @@ class Pagination {
    *
    * @param bool $flag
    */
-  public function set_anchor_wrap($flag = false) {
+  public function set_anchor_wrap($flag) {
 
     $this->anchor_wrap = $flag;
   }
@@ -239,7 +309,7 @@ class Pagination {
       return null;
     }
 
-    $output = null;
+    $output = '';
     //$output = '<span id="total_page">Page (' . $currentPage . '/' . $totalPages . ')</span>&nbsp;';
 
     $loopStart = 1;
@@ -258,51 +328,63 @@ class Pagination {
       }
     }
 
-    $button_pattern = '<' . $button_wrap_tag . ' class="%1$s"><a href="%2$s">%3$s</a></' . $button_wrap_tag . '>';
+    $button_pattern = '<' . $button_wrap_tag . ' class="%2$s"><a href="%1$s">%3$s</a></' . $button_wrap_tag . '>';
+    $disabled_pattern = $this->anchor_wrap ?
+            '<' . $button_wrap_tag . ' class="%2$s"><a href="#">%3$s</a></' . $button_wrap_tag . '> ' :
+            '<' . $button_wrap_tag . ' class="%2$s"><span>%3$s</span></' . $button_wrap_tag . '> ';
 
-    if ($loopStart != 1) {
-      $output .= sprintf($button_pattern, 'disabledpage', sprintf($link, 1), __('First', 'participants-database'));
+    // add the first page link
+    if ($this->first_last) {
+      $output .= sprintf(
+              ($loopStart != 1 ? $disabled_pattern : $button_pattern), 
+              sprintf($link, 1), 
+              ($loopStart != 1 ? $this->disabled_class : 'firstpage'), 
+              __('First', 'participants-database')
+      );
     }
 
-    if ($currentPage > 1) {
-      $output .= sprintf($button_pattern, 'nextpage', sprintf($link, $currentPage - 1), __('Previous', 'participants-database'));
-    }
+    // add the previous page link
+    $output .= sprintf(
+            ($currentPage > 1 ? $button_pattern : $disabled_pattern), 
+            sprintf($link, $currentPage - 1), 
+            ($currentPage > 1 ? 'nextpage' : $this->disabled_class), 
+            __('Previous', 'participants-database')
+    );
 
     for ($i = $loopStart; $i <= $loopEnd; $i++) {
-      if ($i == $currentPage) {
-        $output .= sprintf(
-                ( $this->anchor_wrap ? '<' . $button_wrap_tag . ' class="%s"><a href="#">%s</a></' . $button_wrap_tag . '> ' : '<' . $button_wrap_tag . ' class="%s">%s</' . $button_wrap_tag . '> '), $this->current_page_class, $i
-        );
-      } else {
-        $output .= sprintf('<' . $button_wrap_tag . '><a href="' . $link . '">', $i) . $i . '</a></' . $button_wrap_tag . '> ';
-      }
+
+      $output .= sprintf(
+              ($i == $currentPage ? $disabled_pattern : $button_pattern), 
+              sprintf($link, $i), 
+              ($i == $currentPage ? $this->current_page_class : ''), 
+              $i
+      );
     }
 
-    if ($currentPage < $totalPages) {
-      $output .= sprintf($button_pattern, 'nextpage', sprintf($link, $currentPage + 1), __('Next', 'participants-database'));
+    $output .= sprintf(
+            ($currentPage < $totalPages ? $button_pattern : $disabled_pattern), 
+            sprintf($link, $currentPage + 1), 
+            ($currentPage < $totalPages ? 'nextpage' : $this->disabled_class), 
+            __('Next', 'participants-database')
+    );
+
+    if ($this->first_last) {
+
+      $output .= sprintf(
+              ($loopEnd != $totalPages ? $disabled_pattern : $button_pattern), 
+              sprintf($link, $totalPages), 
+              ($loopEnd != $totalPages ? 'lastpage' : $this->disabled_class), 
+              __('Last', 'participants-database')
+      );
     }
 
-    if ($loopEnd != $totalPages) {
-      $output .= sprintf($button_pattern, 'lastpage', sprintf($link, $totalPages), __('Last', 'participants-database'));
-    }
-
-    return $wrap_tag . '<' . $all_button_wrap_tag . '>' . $output . '</' . $all_button_wrap_tag . '>' . $wrap_tag_close;
-  }
-
-  /**
-   * echoes the pagination links
-   *
-   */
-  public function links() {
-    echo $this->create_links();
-  }
-
-  /* alias of above func that doesn't output if an AJAX filtering refresh is happening */
-
-  public function show() {
-
-    if (!$this->filtering)
-      echo $this->create_links();
+    return sprintf(
+            '<%1$s class="%2$s"><%3$s>%4$s</%3$s></%1$s>', 
+            $wrap_tag, 
+            $wrap_class, 
+            $all_button_wrap_tag, 
+            $output
+    );
   }
 
 }
