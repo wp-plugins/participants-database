@@ -10,7 +10,7 @@
   var $module = 'single';
   
   // class for the wrapper
-  var $wrap_class = 'edit-participant';
+  var $wrap_class = 'pdb-single';
   
   // methods
   
@@ -23,7 +23,7 @@
 		// define shortcode-specific attributes to use
 		$add_atts = array(
                       'id' => '',
-                      'class' => 'PDb-single',
+                      'class' => $this->wrap_class,
                       'term' => 'id' ,
                       );
     
