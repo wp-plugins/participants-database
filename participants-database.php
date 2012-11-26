@@ -315,6 +315,15 @@ class Participants_Db {
     );
 
     add_submenu_page(
+            'participants-database', 
+            __('Setup Guide', 'participants-database'), 
+            __('Setup Guide', 'participants-database'), 
+            'manage_options', 
+            self::$plugin_page . '-setup_guide', 
+            array(__CLASS__, 'include_admin_file')
+    );
+
+    add_submenu_page(
             '', 
             __('Edit Record', 'participants-database'), 
             __('Edit Record', 'participants-database'), 

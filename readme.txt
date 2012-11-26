@@ -86,7 +86,12 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 5. Additonal features and instructions can be found on the help tab of the plugin's settings page
 
 = Using the Plugin: =
-Go to the [plugin use instructions](http://wordpress.org/extend/plugins/participants-database/other_notes/) page for a more detailed explanation.
+
+This is a cmplex plugin that can be configured in many ways. I am happy to answer support questions, but please read the documentation I have provided. More often than not, your questions will be answered there.
+
+I have created a [Quick Setup Guide](http://xnau.com/participants-database-quick-setup-guide/) for an example setup to get you started.
+
+Go to the [plugin use instructions](http://wordpress.org/extend/plugins/participants-database/other_notes/) page for a more detailed explanation of the plugin's features.
 
 == Frequently Asked Questions ==
 
@@ -188,6 +193,7 @@ You can no doubt come up with many variations on this.
 * added random sort for list output
 * added "match other field" validation option for field double-checks
 * added default sort order for the admin list
+* hidden fields can now capture cookie values as well as server values, WP user data, etc.
 * placeholder tags may now be used in email subject lines
 * new form element: "Rich Text" a textarea element with a rich text editor
 * new form element: "Password" stored as a WP-compatible hash
@@ -396,7 +402,7 @@ You can no doubt come up with many variations on this.
 == Upgrade Notice ==
 
 = 1.4 =
-Major upgrade with improvements across the board, many new features
+Major upgrade with improvements across the board, many new features. NOTICE: Display changes could occur, check all pages using the plugin after upgrading.
 
 = 1.3.7 =
 Important bugfix and minor improvements
@@ -577,7 +583,9 @@ If you are good with CSS, you can easily make the link look like a button.
 
 All shortcodes now use a template to determine how they are presented. Plugin default templates are found in the "templates" directory in the plugin directory.
 
-If you want to customize your template, copy the template file you want to use as a starting point to a "templates" dierctory in your theme:  `wp-content/themes/your-theme/templates/`. Create the directory if it doesn't exist; if it does exist, just place the the template file in there. Template files use the naming convention: pdb-{shortcode name}-{template name}.php. So, for instance, the default template for the `[pdb_signup]` shortcode is "pdb-signup-default.php" If you want to create your own template file, you would rename it something like: "pdb-signup-mytemplate.php" then, call it in the shortcode like this: `[pdb_signup template="mytemplate"]`.
+If you want to customize your template, copy the template file you want to use as a starting point to a "templates" dierctory in your theme:  `wp-content/themes/your-theme/templates/`. Create the directory if it doesn't exist; if it does exist, just place the the template file in there. IMPORTANT: if you modify the templates in the shortcode directory, your changes will be lost when you upgrade the plugin. Copy them to your theme directory in a directory named "templates." The path will look something like this: `(WP ROOT)/wp-content/themes/yourtheme/templates/pdb-signup-customtemplate.php`
+
+Template files use the naming convention: pdb-{shortcode name}-{template name}.php. So, for instance, the default template for the `[pdb_signup]` shortcode is "pdb-signup-default.php" If you want to create your own template file, you would rename it something like: "pdb-signup-mytemplate.php" then, call it in the shortcode like this: `[pdb_signup template="mytemplate"]`.
 
 The default template files include comments to help you develop your own templates easily.
 

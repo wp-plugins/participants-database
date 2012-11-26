@@ -155,7 +155,7 @@ class PDb_Signup extends PDb_Shortcode {
         $this->_send_email();
 			
         // mark the record as sent to prevent duplicate emails
-        set_transient( 'signup-'.$this->participant_id, 'sent', 86400 );
+        set_transient( 'signup-'.$this->participant_id, 'sent', 120 );
         
       }
 			
