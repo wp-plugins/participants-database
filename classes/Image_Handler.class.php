@@ -135,7 +135,7 @@ abstract class Image_Handler {
    *
    * @param string $image absolute path to the default image file
    */
-  abstract function set_default_image( $image );
+  abstract function set_default_image( $image = false );
   
   /**
    * process the filename to test it's validity, set it's path and find its properties
