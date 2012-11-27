@@ -108,7 +108,7 @@ abstract class Image_Handler {
    */
   public function get_image_html() {
     
-    $pattern = $this->file_exists ? '%s<img src="%s" />%s' : '%s%s%s';
+    $pattern = $this->file_exists ? '%s<img src="%s" class="PDb-list-image" />%s' : '%s%s%s';
     
     return sprintf( $pattern, sprintf( $this->open, $this->classname, $this->image_uri, basename($this->image_uri) ), $this->image_uri, $this->close );
     
@@ -135,7 +135,7 @@ abstract class Image_Handler {
    *
    * @param string $image absolute path to the default image file
    */
-  abstract function set_default_image( $image );
+  abstract function set_default_image( $image = false );
   
   /**
    * process the filename to test it's validity, set it's path and find its properties

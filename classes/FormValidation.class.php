@@ -117,6 +117,7 @@ class FormValidation {
 
 				case 'rich-text':
 				case 'text-area':
+				case 'textarea':
 					$element = 'textarea';
 					break;
 

@@ -15,8 +15,6 @@
 
 class PDb_Init
 {
-    // this is the current db version
-    const VERSION = '0.6';
 
     // arrays for building default field set
     public static $internal_fields;
@@ -164,8 +162,8 @@ class PDb_Init
         $wpdb->query($sql);
 
         // save the db version
-        add_option( Participants_Db::$db_version );
-        update_option( Participants_Db::$db_version, self::VERSION );
+        add_option( Participants_Db::$db_version_option );
+        update_option( Participants_Db::$db_version_option, Participans_Db::$db_version );
 
         // now load the default values into the database
         $i = 0;
@@ -210,7 +208,46 @@ class PDb_Init
 
       endif;// end of the fresh install
 
-      if ( false === get_option( Participants_Db::$db_version ) || '0.1' == get_option( Participants_Db::$db_version ) ) {
+      
+				
+      error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
+      
+    }
+
+    private function _deactivate()
+    {
+				
+				error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
+    }
+
+    private function _uninstall()
+    {
+
+        global $wpdb;
+
+        // delete tables
+        $sql = 'DROP TABLE `'.Participants_Db::$fields_table.'`, `'.Participants_Db::$participants_table.'`, `'.Participants_Db::$groups_table.'`;';
+        $wpdb->query( $sql );
+
+        // remove options
+        delete_option( Participants_Db::$participants_db_options );
+				delete_option( Participants_Db::$db_version_option );
+
+				// clear transients
+				delete_transient( 'pdb_last_record' );
+				
+        error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
+        
+    }
+    
+    /**
+     * performs an update to the database if needed
+     */
+    public function on_update() {
+      
+      global $wpdb;
+      
+      if ( false === get_option( Participants_Db::$db_version_option ) || '0.1' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
          * updates version 0.1 database to 0.2
@@ -226,10 +263,10 @@ class PDb_Init
         if ( false !== $wpdb->query( $sql ) ) {
 
           // in case the option doesn't exist
-          add_option( Participants_Db::$db_version );
+          add_option( Participants_Db::$db_version_option );
 
           // set the version number this step brings the db to
-          update_option( Participants_Db::$db_version, '0.2' );
+          update_option( Participants_Db::$db_version_option, '0.2' );
 
         }
 				
@@ -250,7 +287,7 @@ class PDb_Init
 
       }
 
-      if ( '0.2' == get_option( Participants_Db::$db_version ) ) {
+      if ( '0.2' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
          * updates version 0.2 database to 0.3
@@ -264,13 +301,13 @@ class PDb_Init
         if ( false !== $wpdb->query( $sql ) ) {
 
           // set the version number this step brings the db to
-          update_option( Participants_Db::$db_version, '0.3' );
+          update_option( Participants_Db::$db_version_option, '0.3' );
 
         }
 
       }
 
-      if ( '0.3' == get_option( Participants_Db::$db_version ) ) {
+      if ( '0.3' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
          * updates version 0.3 database to 0.4
@@ -336,11 +373,11 @@ class PDb_Init
 				endif;
 				
 				// set the version number this step brings the db to
-				update_option( Participants_Db::$db_version, '0.4' );
+				update_option( Participants_Db::$db_version_option, '0.4' );
 
       }
 
-      if ( '0.4' == get_option( Participants_Db::$db_version ) ) {
+      if ( '0.4' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
          * updates version 0.4 database to 0.5
@@ -353,7 +390,7 @@ class PDb_Init
         if ( false !== $wpdb->query( $sql ) ) {
 
           // set the version number this step brings the db to
-          update_option( Participants_Db::$db_version, '0.5' );
+          update_option( Participants_Db::$db_version_option, '0.5' );
 
         }
 
@@ -361,7 +398,7 @@ class PDb_Init
 			
 			/* this fixes an error I made in the 0.5 DB update
 			*/
-			if ( '0.5' == get_option( Participants_Db::$db_version ) && false === Participants_Db::get_participant() ) {
+			if ( '0.5' == get_option( Participants_Db::$db_version_option ) && false === Participants_Db::get_participant() ) {
 				
 				// define the arrays for loading the initial db records
       	$this->_define_init_arrays();
@@ -399,7 +436,7 @@ class PDb_Init
        * this is to fix a problem with the timestamp having it's datatype
        * changed when the field attributes are edited
        */
-			if ( '0.5' == get_option( Participants_Db::$db_version ) ) {
+			if ( '0.5' == get_option( Participants_Db::$db_version_option ) ) {
 
         $sql = "SHOW FIELDS FROM ".Participants_Db::$participants_table." WHERE `field` IN ('date_recorded','date_updated')";
         $field_info = $wpdb->get_results( $sql );
@@ -460,7 +497,7 @@ class PDb_Init
         if ( false !== $wpdb->query( $sql ) ) {
 
           // update the stored DB version number
-          update_option( Participants_Db::$db_version, '0.55' );
+          update_option( Participants_Db::$db_version_option, '0.55' );
 
         }
 			
@@ -470,7 +507,7 @@ class PDb_Init
 			 * this database version adds the "last_accessed" column to the main database
 			 * 
 			 */
-			if ( '0.55' == get_option( Participants_Db::$db_version ) ) { 
+			if ( '0.55' == get_option( Participants_Db::$db_version_option ) ) { 
 			
 				/*
 				 * add the "last_accessed" column
@@ -494,40 +531,14 @@ class PDb_Init
         if ( false !== $wpdb->insert( Participants_Db::$fields_table, $data ) ) {
 
           // update the stored DB version number
-          update_option( Participants_Db::$db_version, '0.6' );
+          update_option( Participants_Db::$db_version_option, '0.6' );
 
         }
 			
 			}
-				
-      error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
       
-    }
-
-    private function _deactivate()
-    {
-				
-				error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
-    }
-
-    private function _uninstall()
-    {
-
-        global $wpdb;
-
-        // delete tables
-        $sql = 'DROP TABLE `'.Participants_Db::$fields_table.'`, `'.Participants_Db::$participants_table.'`, `'.Participants_Db::$groups_table.'`;';
-        $wpdb->query( $sql );
-
-        // remove options
-        delete_option( Participants_Db::$participants_db_options );
-				delete_option( Participants_Db::$db_version );
-
-				// clear transients
-				delete_transient( 'pdb_last_record' );
-				
-        error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
-        
+      error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );
+      
     }
 
     /**

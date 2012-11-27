@@ -48,7 +48,9 @@ class Participants_Db {
   // table for groups defninitions
   public static $groups_table;
   // current Db version
-  public static $db_version;
+  public static $db_version = '0.6';
+  // name of the WP option where the current db version is stored
+  public static $db_version_option = 'PDb_Db_version';
   // current version of plugin
   public static $plugin_version;
   // plugin options name
@@ -102,9 +104,6 @@ class Participants_Db {
     self::$participants_table = $wpdb->prefix . str_replace('-', '_', self::PLUGIN_NAME);
     self::$fields_table = self::$participants_table . '_fields';
     self::$groups_table = self::$participants_table . '_groups';
-
-    // name of the WP option where the current db version is stored
-    self::$db_version = 'PDb_Db_version';
 
     // set the plugin version
     self::$plugin_version = self::_get_plugin_data('Version');
@@ -163,6 +162,14 @@ class Participants_Db {
       foreach ($internal_columns as $column)
         self::$internal_columns[] = $column[0];
     }
+    
+    /*
+     * checks for the need to update the DB
+     * 
+     * this is to allow for updates to occur in many different ways
+     */
+    if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
+      PDb_Init::on_update();
 
     add_filter('query_vars', array(__CLASS__, 'register_queryvars'));
 
@@ -987,6 +994,7 @@ class Participants_Db {
         }
         
       case 'text-area':
+      case 'textarea':
         
         $return = sprintf('<span class="textarea">%s</span>',$value );
         break;
@@ -1411,7 +1419,7 @@ class Participants_Db {
     // fill in some convenience values
     global $current_user;
 
-    $default_record['by'] = $current_user->display_name;
+    if ( is_object( $current_user ) ) $default_record['by'] = $current_user->display_name;
     $default_record['when'] = date(get_option('date_format'));
     $default_record['private_id'] = self::generate_pid();
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
