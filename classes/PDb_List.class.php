@@ -207,7 +207,8 @@ class PDb_List extends PDb_Shortcode {
           $this->columns[] = $field;
 
           // add the field to the record object
-          $record->{$field_object->name} = $field_object;
+          // illegal names will be ignored
+          if ( isset( $record->{$field_object->name} ) ) $record->{$field_object->name} = $field_object;
         }
       }
     }
