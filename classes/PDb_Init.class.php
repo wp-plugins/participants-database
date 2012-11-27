@@ -493,6 +493,20 @@ class PDb_Init
 				 * add the "read-only" column
 				 */
 				$sql = "ALTER TABLE ".Participants_Db::$fields_table." ADD COLUMN `readonly` BOOLEAN DEFAULT 0 AFTER `signup`";
+        
+        $wpdb->query( $sql );
+        
+        /*
+         * change the old 'textarea' field type to the new 'text-area'
+         */
+        $sql = "
+          UPDATE ".Participants_Db::$fields_table."
+          SET `form_element` = replace(`form_element`, \"textarea\", \"text-area\")";
+        $wpdb->query( $sql ); 
+        $sql = "
+          UPDATE ".Participants_Db::$fields_table."
+          SET `form_element` = replace(`form_element`, \"text-field\", \"text-line\") ";
+        
 
         if ( false !== $wpdb->query( $sql ) ) {
 
