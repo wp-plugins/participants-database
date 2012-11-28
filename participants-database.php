@@ -2200,7 +2200,7 @@ class Participants_Db {
    *
    * sets an error if it fails
    */
-  private function _make_uploads_dir($dir) {
+  public function _make_uploads_dir($dir) {
 
     $savedmask = umask(0);
 
