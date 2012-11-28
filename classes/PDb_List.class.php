@@ -77,8 +77,8 @@ class PDb_List extends PDb_Shortcode {
         'list_limit' => $this->page_list_limit,
         'class' => 'participants-database',
         'filter' => '',
-        'orderby' => 'date_recorded',
-        'order' => 'desc',
+        'orderby' => current($this->sortables),
+        'order' => 'asc',
         'fields' => '',
         'display_count' => 'false',
         'template' => 'default',
@@ -109,7 +109,7 @@ class PDb_List extends PDb_Shortcode {
   }
 
   /**
-   * prints a signup form called by a shortcode
+   * prints a list of records called by a shortcode
    *
    * this function is called statically to instantiate the PDb_List object,
    * which captures the output and returns it for display
@@ -167,6 +167,7 @@ class PDb_List extends PDb_Shortcode {
         'size' => $this->shortcode_atts['list_limit'],
         'total_records' => $this->num_records,
         'filtering' => $this->shortcode_atts['filtering'],
+        'add_variables' => http_build_query($this->filter) . '#' . $this->list_anchor,
     );
 
     // instantiate the pagination object
@@ -707,7 +708,7 @@ class PDb_List extends PDb_Shortcode {
       unset($values[$this->list_page]);
     }
 
-    return $URI_parts[0] . '?' . $this->_filter_query($values) . $this->list_page . '=%s#' . $this->list_anchor;
+    return $URI_parts[0] . '?' . $this->_filter_query($values) . $this->list_page . '=%s';// . $this->list_anchor;
   }
 
   /**
