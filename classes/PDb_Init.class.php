@@ -163,7 +163,7 @@ class PDb_Init
 
         // save the db version
         add_option( Participants_Db::$db_version_option );
-        update_option( Participants_Db::$db_version_option, Participans_Db::$db_version );
+        update_option( Participants_Db::$db_version_option, Participants_Db::$db_version );
 
         // now load the default values into the database
         $i = 0;
