@@ -162,14 +162,6 @@ class Participants_Db {
       foreach ($internal_columns as $column)
         self::$internal_columns[] = $column[0];
     }
-    
-    /*
-     * checks for the need to update the DB
-     * 
-     * this is to allow for updates to occur in many different ways
-     */
-    if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
-      PDb_Init::on_update();
 
     add_filter('query_vars', array(__CLASS__, 'register_queryvars'));
 
@@ -235,6 +227,14 @@ class Participants_Db {
     load_plugin_textdomain('participants-database', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
     self::$plugin_title = __('Participants Database', 'participants-database');
+    
+    /*
+     * checks for the need to update the DB
+     * 
+     * this is to allow for updates to occur in many different ways
+     */
+    if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
+      PDb_Init::on_update();
 
     // set the email content headers
     if (!isset(self::$plugin_options)) {
@@ -1000,7 +1000,7 @@ class Participants_Db {
         break;
       case 'rich-text':
         
-        $return = sprintf('<span class="textarea richtext">%s</span>',$value );
+        $return = sprintf('<span class="textarea richtext">%s</span>',wpautop($value) );
         break;
       default :
 
