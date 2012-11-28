@@ -38,7 +38,8 @@ class PDb_Image extends Image_Handler {
    */
   public function set_image_directory() {
     
-    $this->image_directory = get_bloginfo('url').DIRECTORY_SEPARATOR.Participants_Db::$plugin_options['image_upload_location'];
+    $this->image_directory = ABSPATH.DIRECTORY_SEPARATOR.Participants_Db::$plugin_options['image_upload_location'];
+    $this->image_directory_uri = site_url().DIRECTORY_SEPARATOR.Participants_Db::$plugin_options['image_upload_location'];
     
   }
   
@@ -62,7 +63,7 @@ class PDb_Image extends Image_Handler {
     // check that the file exists, then set the absolute path
     if ( $this->_file_exists( ABSPATH.$this->default_image ) ) {
       
-      $this->default_image = get_bloginfo('url').DIRECTORY_SEPARATOR.$this->default_image;
+      $this->default_image = site_url().DIRECTORY_SEPARATOR.$this->default_image;
       
     } else $this->default_image = false; 
     
