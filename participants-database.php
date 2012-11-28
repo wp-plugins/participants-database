@@ -1206,8 +1206,14 @@ class Participants_Db {
     $new_value = false;
     $columns = array();
 
-    // determine the set of columns to process 
-    $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
+    // determine the set of columns to process
+    if ( $_POST['action'] == 'signup') {
+      
+      $column_set = 'signup';
+    } else {
+      
+      $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
+    }
 
     // gather the submit values and add them to the query
     foreach (self::get_column_atts($column_set) as $column_atts) :
