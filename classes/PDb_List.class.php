@@ -77,7 +77,7 @@ class PDb_List extends PDb_Shortcode {
         'list_limit' => $this->page_list_limit,
         'class' => 'participants-database',
         'filter' => '',
-        'orderby' => current($this->sortables),
+        'orderby' => (is_array($this->sortables)?current($this->sortables):'date_updated'),
         'order' => 'asc',
         'fields' => '',
         'display_count' => 'false',
@@ -410,7 +410,10 @@ class PDb_List extends PDb_Shortcode {
         $output[] = '</fieldset>';
       }
 
-      if ($this->_sort_filter_mode() == 'sort' || $this->_sort_filter_mode() == 'both') {
+      if (
+              ($this->_sort_filter_mode() == 'sort' || $this->_sort_filter_mode() == 'both') and 
+              ( ! empty( $this->sortables ) and is_array( $this->sortables ) ) 
+              ) {
 
         $output[] = '<fieldset class="widefat">';
 
