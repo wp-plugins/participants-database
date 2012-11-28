@@ -349,7 +349,7 @@ class PDb_Settings extends Plugin_Settings {
           (
           'type'        => 'checkbox',
           'help_text'   => __("This enables list search results that are updated without reloading the page. It requires Javascript, but search will still work if Javascript is disabled in the user's browser.", 'participants-database' ),
-          'value'       => 1,
+          'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
         );

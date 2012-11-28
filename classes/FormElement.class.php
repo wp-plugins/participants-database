@@ -175,6 +175,7 @@ class FormElement {
         break;
 
       case 'text-area':
+      case 'textarea':
         $this->_text_field();
         break;
       
