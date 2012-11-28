@@ -187,6 +187,9 @@ You can no doubt come up with many variations on this.
 
 == Changelog ==
 
+= 1.4.2 =
+* fixes for several reported bugs
+
 = 1.4 =
 * now using templates for all shortcode output
 * added 'read only' attribute for fields
@@ -400,6 +403,9 @@ You can no doubt come up with many variations on this.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.4.2 =
+Bugfix addressing several issues, including image display, signup form validation problems, and multi-page searches and sorts on lists.
 
 = 1.4 =
 Major upgrade with improvements across the board, many new features. NOTICE: Display changes could occur, check all pages using the plugin after upgrading.
