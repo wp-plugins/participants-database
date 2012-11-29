@@ -45,7 +45,7 @@ class PDb_CSV_Import extends CSV_Import {
     $this->upload_directory = Participants_Db::$plugin_options['image_upload_location'];
   
     // check for the target directory; attept to create if it doesn't exist
-    return is_dir( $this->root_path.$this->upload_directory ) ? true : Participants_Db::_make_uploads_dir( $upload_location ) ;
+    return is_dir( $this->root_path.$this->upload_directory ) ? true : Participants_Db::_make_uploads_dir( $this->upload_directory ) ;
     
   }
   

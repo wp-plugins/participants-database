@@ -259,9 +259,10 @@ abstract class PDb_Shortcode {
   public function the_group() {
 
     // the first time through, use current()
-    $function = $this->current_group_pointer == 1 ? 'current' : 'next';
-
-    $this->group = new Field_Group_Item(call_user_func($function, &$this->record), $this->module);
+    if ($this->current_group_pointer == 1)
+      $this->group = new Field_Group_Item(current($this->record), $this->module);
+    else
+      $this->group = new Field_Group_Item(next($this->record), $this->module);
 
     $this->reset_field_counter();
 
@@ -287,11 +288,17 @@ abstract class PDb_Shortcode {
   public function the_field() {
 
     // the first time through, use current()
-    $function = $this->current_field_pointer == 1 ? 'current' : 'next';
-
-    $this->field = is_object($this->group) ?
-            new Field_Item(call_user_func($function, &$this->group->fields)) :
-            new Field_Item(call_user_func($function, &$this->record->fields), $this->record->record_id);
+    if ( $this->current_field_pointer == 1 ) {
+      if (is_object($this->group) )
+       $this->field = new Field_Item( current($this->group->fields) );
+      else
+       $this->field = new Field_Item( current($this->record->fields) );
+    } else {
+      if (is_object($this->group) )
+        $this->field = new Field_Item( next($this->group->fields) );
+      else
+        $this->field = new Field_Item( next($this->record->fields), $this->record->record_id );
+    }
 
     if ($this->field->form_element == 'hidden') {
 
@@ -378,7 +385,9 @@ abstract class PDb_Shortcode {
           // set the current value of the field
           $this->_set_field_value($field);
 
-          // add the field to the record object
+          /*
+           * add the field object to the record object
+           */
           $this->record->$group['name']->fields->{$field->name} = $field;
 
           //error_log( __METHOD__.' field:'.print_r( $field,1 ) ) ;
@@ -442,7 +451,8 @@ abstract class PDb_Shortcode {
             
     }
     
-    $sql .= ' ORDER BY v.order';
+    // this orders the hidden fields at the top of the list
+    $sql .= ' ORDER BY v.form_element = "hidden" DESC, v.order';
             
     return $wpdb->get_results( $sql, OBJECT_K );
   
@@ -700,10 +710,17 @@ abstract class PDb_Shortcode {
 
 		}
 
-		// add the "record_link" tag
+		// add some extra tags
+    foreach( array('id','private_id') as $v ) {
+      
+      $tags[] = '['.$v.']';
+      $values[] = $this->participant_values[$v];
+    }
 		$tags[] = '[record_link]';
 		$values[] = $this->registration_page;
-				
+    
+    $tags[] = '[admin_record_link]';
+    $values[] = Participants_Db::get_admin_record_link($this->participant_values['id']);
 
 		$placeholders = array();
 		

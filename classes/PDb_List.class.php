@@ -26,7 +26,9 @@ class PDb_List extends PDb_Shortcode {
   var $module = 'list';
   // class for the wrapper
   var $wrap_class = 'pdb-list';
-  // holds the current instance of the class
+  /**
+   * @var object temporarily holds an instance of the object
+   */
   static $instance;
   // holds the main query for building the list
   static $list_query;
@@ -70,6 +72,8 @@ class PDb_List extends PDb_Shortcode {
     // set the list limit value; this can be overridden by the shortcode atts later
     $this->page_list_limit = (!isset($_POST['list_limit']) or !is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? Participants_Db::$plugin_options['list_limit'] : $_POST['list_limit'];
 
+    $this->sortables = Participants_Db::get_sortables();
+
     // define the default settings for the shortcode
     $shortcode_defaults = array(
         'sort' => 'false',
@@ -77,8 +81,8 @@ class PDb_List extends PDb_Shortcode {
         'list_limit' => $this->page_list_limit,
         'class' => 'participants-database',
         'filter' => '',
-        'orderby' => 'date_recorded',
-        'order' => 'desc',
+        'orderby' => (empty($this->sortables) ? 'date_updated' : current($this->sortables) ),
+        'order' => 'asc',
         'fields' => '',
         'display_count' => 'false',
         'template' => 'default',
@@ -94,8 +98,6 @@ class PDb_List extends PDb_Shortcode {
 
     $this->_set_display_columns();
 
-    $this->sortables = Participants_Db::get_sortables();
-
     $this->_setup_i18n();
 
     // enqueue the filter/sort AJAX script
@@ -109,7 +111,7 @@ class PDb_List extends PDb_Shortcode {
   }
 
   /**
-   * prints a signup form called by a shortcode
+   * prints a list of records called by a shortcode
    *
    * this function is called statically to instantiate the PDb_List object,
    * which captures the output and returns it for display
@@ -119,8 +121,7 @@ class PDb_List extends PDb_Shortcode {
    */
   public static function print_record($params) {
 
-    if (!isset(self::$instance))
-      self::$instance = new PDb_List($params);
+    self::$instance = new PDb_List($params);
 
     return self::$instance->output;
   }
@@ -167,6 +168,7 @@ class PDb_List extends PDb_Shortcode {
         'size' => $this->shortcode_atts['list_limit'],
         'total_records' => $this->num_records,
         'filtering' => $this->shortcode_atts['filtering'],
+        'add_variables' => http_build_query($this->filter) . '#' . $this->list_anchor,
     );
 
     // instantiate the pagination object
@@ -207,7 +209,8 @@ class PDb_List extends PDb_Shortcode {
           $this->columns[] = $field;
 
           // add the field to the record object
-          $record->{$field_object->name} = $field_object;
+          // illegal names will be ignored
+          if ( isset( $record->{$field_object->name} ) ) $record->{$field_object->name} = $field_object;
         }
       }
     }
@@ -408,7 +411,10 @@ class PDb_List extends PDb_Shortcode {
         $output[] = '</fieldset>';
       }
 
-      if ($this->_sort_filter_mode() == 'sort' || $this->_sort_filter_mode() == 'both') {
+      if (
+              ($this->_sort_filter_mode() == 'sort' || $this->_sort_filter_mode() == 'both') and 
+              ( ! empty( $this->sortables ) and is_array( $this->sortables ) ) 
+              ) {
 
         $output[] = '<fieldset class="widefat">';
 
@@ -706,7 +712,7 @@ class PDb_List extends PDb_Shortcode {
       unset($values[$this->list_page]);
     }
 
-    return $URI_parts[0] . '?' . $this->_filter_query($values) . $this->list_page . '=%s#' . $this->list_anchor;
+    return $URI_parts[0] . '?' . $this->_filter_query($values) . $this->list_page . '=%s';// . $this->list_anchor;
   }
 
   /**

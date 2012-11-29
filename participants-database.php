@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.4
+  Version: 1.4.3
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -48,7 +48,9 @@ class Participants_Db {
   // table for groups defninitions
   public static $groups_table;
   // current Db version
-  public static $db_version;
+  public static $db_version = '0.6';
+  // name of the WP option where the current db version is stored
+  public static $db_version_option = 'PDb_Db_version';
   // current version of plugin
   public static $plugin_version;
   // plugin options name
@@ -102,9 +104,6 @@ class Participants_Db {
     self::$participants_table = $wpdb->prefix . str_replace('-', '_', self::PLUGIN_NAME);
     self::$fields_table = self::$participants_table . '_fields';
     self::$groups_table = self::$participants_table . '_groups';
-
-    // name of the WP option where the current db version is stored
-    self::$db_version = 'PDb_Db_version';
 
     // set the plugin version
     self::$plugin_version = self::_get_plugin_data('Version');
@@ -228,6 +227,14 @@ class Participants_Db {
     load_plugin_textdomain('participants-database', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
     self::$plugin_title = __('Participants Database', 'participants-database');
+    
+    /*
+     * checks for the need to update the DB
+     * 
+     * this is to allow for updates to occur in many different ways
+     */
+    if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
+      PDb_Init::on_update();
 
     // set the email content headers
     if (!isset(self::$plugin_options)) {
@@ -239,7 +246,7 @@ class Participants_Db {
 
     if (0 != $options['html_email']) {
       $type = 'text/html; charset="' . get_option('blog_charset') . '"';
-      add_filter('wp_mail_content_type', function() { return 'text/html';});
+      add_filter('wp_mail_content_type', array( __CLASS__, 'set_content_type'));
     } else {
       $type = 'text/plain; charset=us-ascii';
     }
@@ -250,6 +257,10 @@ class Participants_Db {
     //self::include_scripts();
     // this processes form submits before any output so that redirects can be used
     self::process_page_request();
+  }
+  
+  public function set_content_type() {
+    return 'text/html';
   }
 
   public function plugin_menu() {
@@ -983,12 +994,13 @@ class Participants_Db {
         }
         
       case 'text-area':
+      case 'textarea':
         
         $return = sprintf('<span class="textarea">%s</span>',$value );
         break;
       case 'rich-text':
         
-        $return = sprintf('<span class="textarea richtext">%s</span>',$value );
+        $return = sprintf('<span class="textarea richtext">%s</span>',(self::$plugin_options['enable_wpautop'] ? wpautop($value) : $value ) );
         break;
       default :
 
@@ -1194,8 +1206,14 @@ class Participants_Db {
     $new_value = false;
     $columns = array();
 
-    // determine the set of columns to process 
-    $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
+    // determine the set of columns to process
+    if ( $_POST['action'] == 'signup') {
+      
+      $column_set = 'signup';
+    } else {
+      
+      $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
+    }
 
     // gather the submit values and add them to the query
     foreach (self::get_column_atts($column_set) as $column_atts) :
@@ -1341,8 +1359,8 @@ class Participants_Db {
       // get the new record id for the return
       $participant_id = $wpdb->insert_id;
 
-      // hang on to the id of the last record for a day
-      set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 24));
+      // if in the admin hang on to the id of the last record for an hour
+      if ( is_admin() ) set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 1));
     }
 
     return $participant_id;
@@ -1387,7 +1405,7 @@ class Participants_Db {
     // get the id of the last record stored
     $prev_record_id = get_transient(self::$last_record);
 
-    if ($prev_record_id) {
+    if ( is_admin() and $prev_record_id) {
 
       $previous_record = self::get_participant($prev_record_id);
 
@@ -1407,7 +1425,7 @@ class Participants_Db {
     // fill in some convenience values
     global $current_user;
 
-    $default_record['by'] = $current_user->display_name;
+    if ( is_object( $current_user ) ) $default_record['by'] = $current_user->display_name;
     $default_record['when'] = date(get_option('date_format'));
     $default_record['private_id'] = self::generate_pid();
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
@@ -2182,7 +2200,7 @@ class Participants_Db {
    *
    * sets an error if it fails
    */
-  private function _make_uploads_dir($dir) {
+  public function _make_uploads_dir($dir) {
 
     $savedmask = umask(0);
 

@@ -100,6 +100,7 @@ class Pagination {
    *                'size'          int the number of records to show per page
    *                'total_records' int the total records in the full query
    *                'link'          string the URL for page links
+   *                'add_variables' additional GET string to add
    */
   function __construct($args) {
     extract(wp_parse_args($args, array(
@@ -112,11 +113,12 @@ class Pagination {
                 'filtering' => 0,
                 'anchor_wrap' => false,
                 'first_last' => true,
+                'add_variables' => '',
             )));
     $this->setPage($page);
     $this->setSize($size);
     $this->setTotalRecords($total_records);
-    $this->setLink($link);
+    $this->setLink($link,$add_variables);
     $this->filtering = $filtering;
     $this->set_wrappers();
     $this->set_anchor_wrap($anchor_wrap);
@@ -210,8 +212,11 @@ class Pagination {
    *
    * @param string $url
    */
-  function setLink($url) {
-    $this->link = $url;
+  function setLink($url, $add_variables) {
+    
+    if ( ! empty($add_variables) )
+      $add_variables = false !== strpos($url,'?') ? '&'.$add_variables : '?'.$add_variables;
+    $this->link = $url.$add_variables;
   }
 
   /**

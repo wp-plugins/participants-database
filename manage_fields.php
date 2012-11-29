@@ -104,7 +104,7 @@ if ( isset( $_POST['action'] ) ) {
 
 			// use the wp function to clear out any irrelevant POST values
 			$atts = shortcode_atts( array(
-																		'name'  => PDb_make_name( stripslashes($_POST['title']) ),
+																		'name'  => PDb_make_name( $_POST['title'] ),
 																		'title' => htmlspecialchars( stripslashes($_POST['title']),ENT_QUOTES, "UTF-8", false ),//PDb_prep_title($_POST['title']),
 																		'group' => $_POST['group'],
 																		'order' => $_POST['order'],
@@ -499,9 +499,19 @@ function PDb_header( $string ) {
 
 }
 
+/**
+ * 
+ * makes a legal database column name
+ * 
+ * @param string the proposed name
+ * @retun string the legal name
+ */
 function PDb_make_name( $string ) {
-
-	return strtolower(str_replace( array( ' ','-',"'",'"','%','\\','#','$','.'),array('_','_','','','pct','','','',''), stripslashes( $string ) ) );
+  
+  // first scrub non-letter characters
+  $name = strtolower(str_replace( array( ' ','-',"'",'"','%','\\','#','.'),array('_','_','','','pct','','',''), stripslashes( substr($string, 0, 64 ) ) ) );
+  // now allow only proper unicode letters, numerals and legal symbols
+  return preg_replace('#[^\p{L}\p{N}\$_]#u', '', $name );
 
 }
 

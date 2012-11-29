@@ -222,6 +222,19 @@ class PDb_Settings extends Plugin_Settings {
         );
 
     $this->plugin_settings[] = array(
+        'name'       =>'enable_wpautop',
+        'title'      =>__('Use WordPress Auto Formatting', 'participants-database' ),
+        'group'      =>'main',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('Use WordPress&#39; auto formatting on rich text fields.', 'participants-database' ),
+          'value'       => 1,
+          'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
         'name'       =>'html_email',
         'title'      =>__('Send HTML Email', 'participants-database' ),
         'group'      =>'main',
@@ -349,7 +362,7 @@ class PDb_Settings extends Plugin_Settings {
           (
           'type'        => 'checkbox',
           'help_text'   => __("This enables list search results that are updated without reloading the page. It requires Javascript, but search will still work if Javascript is disabled in the user's browser.", 'participants-database' ),
-          'value'       => 1,
+          'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
         );
