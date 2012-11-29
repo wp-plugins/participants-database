@@ -378,7 +378,9 @@ abstract class PDb_Shortcode {
           // set the current value of the field
           $this->_set_field_value($field);
 
-          // add the field to the record object
+          /*
+           * add the field object to the record object
+           */
           $this->record->$group['name']->fields->{$field->name} = $field;
 
           //error_log( __METHOD__.' field:'.print_r( $field,1 ) ) ;
@@ -442,7 +444,8 @@ abstract class PDb_Shortcode {
             
     }
     
-    $sql .= ' ORDER BY v.order';
+    // this orders the hidden fields at the top of the list
+    $sql .= ' ORDER BY v.form_element = "hidden" DESC, v.order';
             
     return $wpdb->get_results( $sql, OBJECT_K );
   

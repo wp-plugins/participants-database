@@ -1000,7 +1000,7 @@ class Participants_Db {
         break;
       case 'rich-text':
         
-        $return = sprintf('<span class="textarea richtext">%s</span>',wpautop($value) );
+        $return = sprintf('<span class="textarea richtext">%s</span>',(self::$plugin_options['enable_wpautop'] ? wpautop($value) : $value ) );
         break;
       default :
 

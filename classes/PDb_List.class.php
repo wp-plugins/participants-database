@@ -70,6 +70,8 @@ class PDb_List extends PDb_Shortcode {
     // set the list limit value; this can be overridden by the shortcode atts later
     $this->page_list_limit = (!isset($_POST['list_limit']) or !is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? Participants_Db::$plugin_options['list_limit'] : $_POST['list_limit'];
 
+    $this->sortables = Participants_Db::get_sortables();
+
     // define the default settings for the shortcode
     $shortcode_defaults = array(
         'sort' => 'false',
@@ -77,7 +79,7 @@ class PDb_List extends PDb_Shortcode {
         'list_limit' => $this->page_list_limit,
         'class' => 'participants-database',
         'filter' => '',
-        'orderby' => (is_array($this->sortables)?current($this->sortables):'date_updated'),
+        'orderby' => (empty($this->sortables) ? 'date_updated' : current($this->sortables) ),
         'order' => 'asc',
         'fields' => '',
         'display_count' => 'false',
@@ -93,8 +95,6 @@ class PDb_List extends PDb_Shortcode {
     $this->registration_page_url = get_bloginfo('url') . '/' . ( isset($this->options['registration_page']) ? $this->options['registration_page'] : '' );
 
     $this->_set_display_columns();
-
-    $this->sortables = Participants_Db::get_sortables();
 
     $this->_setup_i18n();
 
