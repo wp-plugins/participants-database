@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.4.2
+  Version: 1.4.3
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -1359,8 +1359,8 @@ class Participants_Db {
       // get the new record id for the return
       $participant_id = $wpdb->insert_id;
 
-      // hang on to the id of the last record for a day
-      set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 24));
+      // if in the admin hang on to the id of the last record for an hour
+      if ( is_admin() ) set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 1));
     }
 
     return $participant_id;
@@ -1405,7 +1405,7 @@ class Participants_Db {
     // get the id of the last record stored
     $prev_record_id = get_transient(self::$last_record);
 
-    if ($prev_record_id) {
+    if ( is_admin() and $prev_record_id) {
 
       $previous_record = self::get_participant($prev_record_id);
 

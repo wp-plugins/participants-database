@@ -26,7 +26,9 @@ class PDb_List extends PDb_Shortcode {
   var $module = 'list';
   // class for the wrapper
   var $wrap_class = 'pdb-list';
-  // holds the current instance of the class
+  /**
+   * @var object temporarily holds an instance of the object
+   */
   static $instance;
   // holds the main query for building the list
   static $list_query;
@@ -119,8 +121,7 @@ class PDb_List extends PDb_Shortcode {
    */
   public static function print_record($params) {
 
-    if (!isset(self::$instance))
-      self::$instance = new PDb_List($params);
+    self::$instance = new PDb_List($params);
 
     return self::$instance->output;
   }
