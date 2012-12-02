@@ -37,10 +37,9 @@ class PDb_Image extends Image_Handler {
    *
    */
   public function set_image_directory() {
-    
-    $this->image_directory = ABSPATH.DIRECTORY_SEPARATOR.Participants_Db::$plugin_options['image_upload_location'];
-    $this->image_directory_uri = site_url().DIRECTORY_SEPARATOR.Participants_Db::$plugin_options['image_upload_location'];
-    
+
+    $this->image_directory = ABSPATH . '/' . Participants_Db::$plugin_options['image_upload_location'];
+    $this->image_directory_uri = site_url() . '/' . Participants_Db::$plugin_options['image_upload_location'];
   }
   
   /**

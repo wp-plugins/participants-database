@@ -187,6 +187,12 @@ You can no doubt come up with many variations on this.
 
 == Changelog ==
 
+= 1.4.3 =
+* fixed bug that prevented a new uploads directory from being created in some cases
+* it is now possible to have two different list shortcodes on the same page
+* using WP auto formatting is not optional on rich-text fields
+* fixed incompatibility with PHP 5.4
+
 = 1.4.2 =
 * fixes for several reported bugs
 
@@ -552,6 +558,8 @@ You can activate list searching and/or sorting for your users to control how the
 There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
 
 It's also possible to perform a "search" on the list with parameters in the URL. This would be handy if you wanted to create a link to the list that would only show certain results. For instance, if you wanted to make a link to the list that showed only results from the city of Phoenix you would add these variables to the URL: `?search_field=city&value=phoenix` Add that to the end of a link to the page where the `[pdb_list]` shortcode is, and it will only show records with a city value of 'phoenix.' This also means you can create your own search functionality, the primary limitation being you can only do this for one field at a time.
+
+Please note that list searching, sorting and pagination will not work properly if there is more than one list on a page.  
 
 = Filtering which Records Get Shown with the List Shortcode =
 

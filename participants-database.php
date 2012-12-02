@@ -152,12 +152,14 @@ class Participants_Db {
 
       self::$internal_columns = array();
 
-      $internal_columns = $wpdb->get_results('SELECT f.name 
+      $internal_columns = $wpdb->get_results(
+                                             'SELECT f.name 
 																						 	FROM ' . self::$fields_table . ' f 
 																							INNER JOIN ' . self::$groups_table . ' g 
 																							ON f.group = g.name 
-																							WHERE g.display = 0'
-              , ARRAY_N);
+																							WHERE g.display = 0',
+                                              ARRAY_N
+                                              );
 
       foreach ($internal_columns as $column)
         self::$internal_columns[] = $column[0];
@@ -277,15 +279,17 @@ class Participants_Db {
             self::$plugin_title,
             self::$plugin_title, 
             '', 
-            self::PLUGIN_NAME, array(__CLASS__, 'include_admin_file')
+            self::PLUGIN_NAME, array(__CLASS__, 'include_admin_file'), 
+            array('PDb_List_Admin', 'initialize')
     );
-
+    
     add_submenu_page(
             self::PLUGIN_NAME, 
             __('List Participants', 'participants-database'), 
             __('List Participants', 'participants-database'), 
             self::$plugin_options['record_edit_capability'], 
-            self::$plugin_page . '-list_participants', array('PDb_List_Admin', 'initialize')
+            self::$plugin_page . '-list_participants', 
+            array('PDb_List_Admin', 'initialize')
     );
 
     add_submenu_page(
@@ -302,8 +306,7 @@ class Participants_Db {
             __('Manage Database Fields', 'participants-database'), 
             __('Manage Database Fields', 'participants-database'), 
             'manage_options', 
-            self::$plugin_page . 
-            '-manage_fields', 
+            self::$plugin_page . '-manage_fields', 
             array(__CLASS__, 'include_admin_file')
     );
 
@@ -417,7 +420,7 @@ class Participants_Db {
     $ajax_params = array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'filterNonce' => wp_create_nonce('pdb-list-filter-nonce'),
-        'postID' => $wp_query->post->ID,
+        'postID' => ( is_object($wp_query) ? $wp_query->post->ID : '' ),
     );
     wp_localize_script('list-filter', 'PDb_ajax', $ajax_params);
   }
@@ -1303,9 +1306,6 @@ class Participants_Db {
             $date = self::parse_date($post[$column_atts->name], $column_atts);
 
             $new_value = $date ? $date : NULL;
-          } elseif (self::backend_user() && 'rich-text' == $column_atts->form_element && $options['rich_text_editor']) {
-
-            $new_value = wpautop(stripslashes($post[$column_atts->name]));
           } elseif ('password' == $column_atts->form_element) {
 
             if (!empty($post[$column_atts->name]))

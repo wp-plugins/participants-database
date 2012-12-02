@@ -30,9 +30,6 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
     box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
     border-color: rgba(197, 99, 59, 0.5);
 }
-.pdb-signup th {
-    width:200px;
-}
 fieldset.widefat,
 #PDb_footer {
     padding:7px;
@@ -81,6 +78,7 @@ input[type="checkbox"],
 .inline-controls select {
   float: none;
   display: inline;
+  margin-right:0;
 }
 .checkmark {
   font-size:19px;

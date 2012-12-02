@@ -292,7 +292,7 @@ abstract class PDb_Shortcode {
       if (is_object($this->group) )
        $this->field = new Field_Item( current($this->group->fields) );
       else
-       $this->field = new Field_Item( current($this->record->fields) );
+       $this->field = new Field_Item( current($this->record->fields), $this->record->record_id );
     } else {
       if (is_object($this->group) )
         $this->field = new Field_Item( next($this->group->fields) );

@@ -215,8 +215,8 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('enable the rich text editor on "Rich Text" fields (works only for logged-in WP users, and "Text Area" fields will remain plain text)', 'participants-database' ),
-          'value'       => 0,
+          'help_text'   => __('enable the rich text editor on "Rich Text" fields. If deselected, "rich-text" fields will appear as text-area fields.', 'participants-database' ),
+          'value'       => 1,
           'options'     => array( 1, 0 ),
           ),
         );

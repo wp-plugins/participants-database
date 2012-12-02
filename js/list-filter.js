@@ -51,7 +51,9 @@ jQuery(document).ready(function ($) {
           url: PDb_ajax.ajaxurl,
           data: submission,
           success: function(html,status) {
-            $('#pdb-list').replaceWith(html);
+            var parts = html.split("%%%");
+            $('#pdb-list').replaceWith(parts[0]);
+            $('.pagination').replaceWith(parts[1]);
           },
           error:function(jqXHR,status,errorThrown){
             console.log('Participants Database JS error status:'+status+' error:'+errorThrown);

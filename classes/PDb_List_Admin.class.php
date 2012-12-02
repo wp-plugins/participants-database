@@ -378,7 +378,7 @@ class PDb_List_Admin
 	<form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" >
     <input type="hidden" name="action" value="sort">
     
-    <fieldset class="widefat">
+    <fieldset class="widefat inline-controls">
     <legend><?php _e('Show only records with', 'participants-database' )?>:</legend>
     <?php
 			//build the list of columns available for filtering
@@ -421,7 +421,7 @@ class PDb_List_Admin
       <input name="submit" type="submit" value="<?php echo self::$i18n['clear']?>">
     </fieldset>
     
-    <fieldset class="widefat">
+    <fieldset class="widefat inline-controls">
     <legend><?php _e('Sort by', 'participants-database' )?>:</legend>
     	<?php
 		
@@ -459,7 +459,7 @@ class PDb_List_Admin
 		<form id="list_form"  method="post"  onKeyPress="return checkEnter(event)" >
     	<?php FormElement::print_hidden_fields( array( 'action'=>'list_action' ) )?>
       <input type="hidden" id="select_count" value="0" />
-      <div style="margin-top:10px">
+      <fieldset class="widefat inline-controls">
   
         <input type="submit" name="submit" value="<?php echo self::$i18n['delete_checked'] ?>" onClick="return delete_confirm();" class="unarmed" id="delete_button" >
         <?php $list_limit = FormElement::get_element( array( 
@@ -467,15 +467,15 @@ class PDb_List_Admin
 																														'name'=>'list_limit', 
 																														'value'=>self::$page_list_limit, 
 																														'attributes'=>array( 
-																																								'style'=>'width:2.2em',
-																																								'maxLength'=>'2'
+																																								'style'=>'width:2.8em',
+																																								'maxLength'=>'3'
 																																								) 
 																														) 
 																										 )?>
         <span style="padding-left:20px"><?php printf( __( 'Show %s items per page.', 'participants-database' ),$list_limit )?>
         <?php FormElement::print_element( array( 'type'=>'submit', 'name'=>'submit','value'=>self::$i18n['change']) )?>
         </span>
-      </div>
+      </fieldset>
 
     <?php
   }
@@ -711,7 +711,7 @@ class PDb_List_Admin
 
       // print the "select all" header ?>
       <th scope="col" style="width:6em">
-        <?php /* translators: uses the check symbol in a phrase that means "check all" */ _e( '&#10004; all', 'participants-database' )?>
+        <?php /* translators: uses the check symbol in a phrase that means "check all" */ printf('<span class="checkmark" >&#10004;</span> %s',__( 'all', 'participants-database' ) )?>
         <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" style="top: 2px; margin-left: 4px;">
       </th>
       <?php

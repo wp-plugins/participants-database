@@ -16,7 +16,7 @@
   margin-left:0px;
 }
 .pdb-signup .checkbox .helptext {
-   display: inline-block;
+  display: inline-block;
 }
 
 /* RECORD FORM */
@@ -39,7 +39,8 @@
   margin-top: 2em;
   margin-bottom: 1em;
 }
-.edit-participant .helptext, .participants_db .helptext {
+.edit-participant .helptext, 
+.participants_db .helptext {
   text-align:left;
   vertical-align:top;
 }
@@ -60,8 +61,8 @@
   margin-bottom:0;
 }
 .edit-participant .form-table tr.hidden {
-	visibility:hidden;
-	position:absolute;
+  visibility:hidden;
+  position:absolute;
 }
 .edit-participant .uploaded-image {
   width:auto;
@@ -87,10 +88,10 @@
   max-width: 600px;
 }
 .edit-participant .wp-editor-area {
-    background-color: #FFFFFF;
-    border: 2px solid #DFDFDF;
-    color: #333333;
-    height: 20em;
+  background-color: #FFFFFF;
+  border: 2px solid #DFDFDF;
+  color: #333333;
+  height: 20em;
 }
 .pdb-list span.textarea {
   display: block;
@@ -102,8 +103,7 @@
 /* LIST */
 
 .pdb-list th {
-  padding: 5px 5px 0 0;
-  text-align: center;
+  padding: 4px 7px 2px;;
 }
 .pdb-list fieldset,
 .pdb-list table caption {
@@ -112,19 +112,19 @@
 
 /* pagination */
 .pdb-list .pagination {
-	overflow:auto;
+  overflow:auto;
 }
 .pdb-list .pagination ul {
-	margin:0;
-	list-style:none;
+  margin:0;
+  list-style:none;
 }
 .pdb-list .pagination li span,
 .pdb-list .pagination a {
-	float:left;
-	margin: 0 3px;
-	padding: 1px 5px;
-	border: 1px solid #aaa;
-	border-radius: 2px;
+  float:left;
+  margin: 0 3px;
+  padding: 1px 5px;
+  border: 1px solid #aaa;
+  border-radius: 2px;
 }
 .pdb-list .pagination li:first-of-type span,
 .pdb-list .pagination li:first-of-type a {
@@ -136,44 +136,50 @@
 }
 .pdb-list .pagination li.currentpage:first-child,
 .pdb-list .pagination li:first-child a {
-	margin-left:0;
+  margin-left:0;
 }
 .pdb-list .pagination a {
-	text-decoration:none;
+  text-decoration:none;
 }
 .pdb-list .pagination a:hover,
 .pdb-list .pagination li.currentpage {
-	background-color: #cccccc;
+  background-color: #cccccc;
 }
 .pdb-list .pagination label {    
-	float: left;
-	margin: 8px 6px 0 0;
+  float: left;
+  margin: 8px 6px 0 0;
 }
 
 /* SINGLE */
+.pdb-single .section {
+  clear: both;
+}
+.pdb-single dd,
+.pdb-single dt {
+}
 .pdb-single dd {
   overflow:auto;
+  margin-bottom: 1.625em;
 }
 .pdb-single dt {
-   clear: both;
-   float: left;
-   font-weight: bold;
-   margin: 0 10px 1.625em 0;
-   width: 140px;
-   line-height: 1;
+  clear: both;
+  float: left;
+  font-weight: bold;
+  margin: 0 10px 1.625em 0;
+  width: 140px;
 }
 .pdb-single dt.blank-field {
-   width: 100%;
+  width: 100%;
 }
 .pdb-single .image-field-wrap {
-   float: left;
-   margin-right:10px;
+  float: left;
+  margin-right:10px;
 }
 .pdb-single .image-field-wrap img {
   height: 3em;
 }
 .pdb-single .image-field-wrap {
-   float: none;
+  float: none;
 }
 .pdb-single span.textarea {
   height: auto;
@@ -182,32 +188,32 @@
 /* images */
 
 .image-field-wrap {
-   display: block;
+  display: block;
 }
 .image-field-wrap.empty {
-   height: auto;
+  height: auto;
 }
 .image-field-wrap img {
-   height: 50px;
-   width: auto;
+  height: 50px;
+  width: auto;
 }
 
 /* ERRORS / MESSAGES */
 
 .pdb-error {
-	display:inline-block;
-	padding:4px 7px;
-	background-color: #FFEBE8;
-	box-shadow:0 0 6px #CC0000 inset;
-	margin:0.5em 0;
+  display:inline-block;
+  padding:4px 7px;
+  background-color: #FFEBE8;
+  box-shadow:0 0 6px #CC0000 inset;
+  margin:0.5em 0;
 }
 .pdb-error li {
-	margin:0.5em 20px;
+  margin:0.5em 20px;
 }
 .pdb-message {
-	padding:4px 7px;
-	background-color: #C4F092;
-	box-shadow:0 0 6px #2DAA00 inset;
+  padding:4px 7px;
+  background-color: #C4F092;
+  box-shadow:0 0 6px #2DAA00 inset;
 }
 .pdb-error p, .pdb-message p {
   margin:0;

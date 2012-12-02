@@ -81,12 +81,12 @@ class PDb_List extends PDb_Shortcode {
         'list_limit' => $this->page_list_limit,
         'class' => 'participants-database',
         'filter' => '',
-        'orderby' => (empty($this->sortables) ? 'date_updated' : current($this->sortables) ),
+        'orderby' => 'date_updated',
         'order' => 'asc',
         'fields' => '',
         'display_count' => 'false',
         'template' => 'default',
-        'filtering' => false, // this is set to true if we're coming here from an AJAX call
+        'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
     );
 
     // run the parent class initialization to set up the parent methods 
@@ -133,11 +133,11 @@ class PDb_List extends PDb_Shortcode {
 
     // set some local variables for use in the template
     $filter_mode = $this->_sort_filter_mode();
-    $display_count = $this->shortcode_atts['display_count'];
+    $display_count = $this->shortcode_atts['display_count'] == 'true' or $this->shortcode_atts['display_count'] == '1';
     $record_count = $this->num_records;
     $records = $this->records;
     $fields = $this->display_columns;
-    $single_record_link = isset($this->options['single_record_page']) ? get_page_link($this->options['single_record_page']) : '';
+    $single_record_link = isset($this->options['single_record_page']) ? get_page_link($this->options['single_record_page']) : $_POST['pagelink'];
     $records_per_page = $this->shortcode_atts['list_limit'];
     $filtering = $this->shortcode_atts['filtering'];
 
@@ -163,7 +163,7 @@ class PDb_List extends PDb_Shortcode {
 
     // set up the pagination object
     $pagination_defaults = array(
-        'link' => $this->get_page_link($_SERVER['REQUEST_URI']),
+        'link' => ( $this->shortcode_atts['filtering'] ? urldecode($_POST['pagelink']) : $this->get_page_link($_SERVER['REQUEST_URI']) ),
         'page' => isset($_GET[$this->list_page]) ? $_GET[$this->list_page] : '1',
         'size' => $this->shortcode_atts['list_limit'],
         'total_records' => $this->num_records,
@@ -449,6 +449,7 @@ class PDb_List extends PDb_Shortcode {
     $class_att = $class ? 'class="' . $class . '"' : '';
     $output[] = '<form method="post" id="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
     $output[] = '<input type="hidden" name="action" value="pdb_list_filter">';
+    $output[] = '<input type="hidden" name="pagelink" value="' . $this->get_page_link($_SERVER['REQUEST_URI']) . '">';
 
     if ($print)
       echo $this->output_HTML($output);
@@ -535,15 +536,16 @@ class PDb_List extends PDb_Shortcode {
    */
   public function show_pagination_control() {
 
-    // this only happens if we're not processing an AJAX call
-    if (!$this->shortcode_atts['filtering']) {
+    // set the wrapper HTML parameters
+    $this->pagination->set_wrappers($this->pagination_wrap);
+    
+    /*
+     * add a split point if this is an AJAX call
+     */
+    $split_point = $this->shortcode_atts['filtering'] ? '%%%' : '';
 
-      // set the wrapper HTML parameters
-      $this->pagination->set_wrappers($this->pagination_wrap);
-
-      // print the control
-      echo $this->pagination->create_links();
-    }
+    // print the control
+    echo $split_point.$this->pagination->create_links();
   }
 
   /**
