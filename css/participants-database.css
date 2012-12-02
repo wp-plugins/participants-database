@@ -159,27 +159,21 @@
 }
 .pdb-single dd {
   overflow:auto;
-  margin-bottom: 1.625em;
+  margin: 0 0 1.625em 0.8em;
 }
 .pdb-single dt {
-  clear: both;
-  float: left;
   font-weight: bold;
-  margin: 0 10px 1.625em 0;
-  width: 140px;
+  margin: 0;
 }
 .pdb-single dt.blank-field {
   width: 100%;
-}
-.pdb-single .image-field-wrap {
-  float: left;
-  margin-right:10px;
 }
 .pdb-single .image-field-wrap img {
   height: 3em;
 }
 .pdb-single .image-field-wrap {
   float: none;
+  margin-right:10px;
 }
 .pdb-single span.textarea {
   height: auto;
