@@ -60,7 +60,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'main',
         'options'    =>array(
           'type'        => 'text',
-          'help_text'   => __("this defines where the uploaded files will go, relative to the WordPress root.<br />Don't put it in the plugin folder, the images and files could get deleted when the plugin is updated.", 'participants-database' ),
+          'help_text'   => __("This defines where the uploaded files will go, relative to the WordPress root. The default location is '/wp-content/uploads/participants-database'<br />Don't put it in the plugin folder, the images and files could get deleted when the plugin is updated.", 'participants-database' ),
           'value'       => Participants_Db::$uploads_path,
           )
         );
@@ -84,7 +84,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    =>array(
           'type'        => 'text',
           'help_text'   => __("Path (relative to WP root) of an image file to show if no image has been defined for an image field. Leave blank for no default image.", 'participants-database' ),
-          'value'       => 'wp-content/plugins/'.'participants-database'.'/ui/no-image.png',
+          'value'       => '/wp-content/plugins/participants-database/ui/no-image.png',
           )
         );
 
@@ -179,7 +179,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'main',
         'options'    =>array(
           'type'        =>'text',
-          'help_text'   => __('the CSS style applied to an input or text field that is missing or has not passed validation', 'participants-database' ),
+          'help_text'   => __('the CSS style applied to an input or text field that is missing or has not passed validation. This must be a valid CSS rule', 'participants-database' ),
           'value'       => __('border: 1px solid red', 'participants-database' ),
           )
         );
@@ -215,7 +215,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => __('enable the rich text editor on "Rich Text" fields. If deselected, "rich-text" fields will appear as text-area fields.', 'participants-database' ),
+          'help_text'   => __('enable the rich text editor on "rich-text" fields for front-end users. If deselected, "rich-text" fields will appear as text-area fields. This does not affect admin users, who always have the use of the rich-text editor.', 'participants-database' ),
           'value'       => 1,
           'options'     => array( 1, 0 ),
           ),
@@ -254,7 +254,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your setting looks like this: %s %s', 'participants-database' ), date(get_option('date_format')), ( Participants_Db::php_version() >= 5.3 ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
+          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database' ), date(get_option('date_format')), (function_exists('date_create') ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
@@ -807,6 +807,41 @@ class PDb_Settings extends Plugin_Settings {
  
 	
 	}
+  
+  /**
+   * validate settings
+   * 
+   * we define a number of validation tests for submitted settings
+   * 
+   * @param array $settings an array of all the settings andtheir submitted values
+   * @return array the sanitized array
+   */
+  public function validate( $settings ) {
+    
+    foreach ( $settings as $name => $value ) {
+      
+      switch ($name) {
+        
+        case 'empty_field_message':
+        case 'invalid_field_message':
+        case 'nonmatching_field_message':
+          
+          $settings[$name] = strip_tags($value);
+          break;
+          
+        case 'field_error_style':
+          
+          // test for CSS rule consistency
+          $value = rtrim($value,';').';';
+          $num_matches = preg_match_all("%[ ]?([^:<> ]+\:[^:;<>]+;)%", $value, $matches);
+          if ( $num_matches > 0 ) {
+            $settings[$name] = implode('',$matches[1]);
+          } else $settings[$name] = '';
+          break;
+      }
+    }
+    return $settings;
+  }
 
 }
 ?>

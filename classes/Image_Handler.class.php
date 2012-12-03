@@ -99,10 +99,31 @@ abstract class Image_Handler {
    * returns the HTML for the image
    */
   public function get_image_html() {
+    
+    /*
+     * we can't use is_admin during an ajax request, so we have to test the WP 
+     * global as well
+     */
+    $show_filename = (is_admin() && ! defined('DOING_AJAX'));
 
-    $pattern = $this->file_exists ? '%s<img src="%s" class="PDb-list-image" />%s' : '%s%s%s';
+    $pattern = $this->file_exists ?
+            (
+             $show_filename ?
+                    '%1$s<img src="%2$s" class="PDb-list-image" /><span class="image-filename">%4$s</span>%3$s' :
+                    '%1$s<img src="%2$s" class="PDb-list-image" />%3$s'
+            ) :
+            '%1$s%2$s%3$s';
 
-    return sprintf($pattern, sprintf($this->open, $this->classname, $this->image_uri, basename($this->image_uri)), $this->image_uri, $this->close);
+    return sprintf($pattern,
+            sprintf($this->open, 
+                    $this->classname, 
+                    $this->image_uri, 
+                    basename($this->image_uri)
+                    ), 
+            $this->image_uri, 
+            $this->close,
+            $this->image_file
+            );
   }
 
   /**
@@ -133,6 +154,7 @@ abstract class Image_Handler {
    * sets the path to the file, sets dimensions, sets file_exists flag
    */
   protected function _file_setup($filename = false) {
+    
 
     if (!$filename)
       $filename = $this->setup['filename'];
@@ -155,8 +177,6 @@ abstract class Image_Handler {
       if (!$this->file_exists) {
         
         if (!empty($this->default_image)) {
-
-          $filename = $this->default_image;
 
           $status = $this->defaultclass;
           $this->image_file = basename($filename);
@@ -188,7 +208,6 @@ abstract class Image_Handler {
   protected function _testfile($filename) {
 
     if ($this->_file_exists($filename)) {
-
       
       $this->image_file = basename($filename);
       $this->image_uri = $this->image_directory_uri.$this->image_file;
@@ -287,6 +306,28 @@ abstract class Image_Handler {
         '<span class="%s">',
         '</span>'
     );
+  }
+  
+  /**
+   * adds a final slash to a directory name if there is none
+   * 
+   * @param string $path the path to test for an end slash
+   * @return string the $path with a slash at the end
+   */
+  public function end_slash( $path ) {
+    
+    return rtrim($path,'/').'/';
+  }
+  /**
+   * makes sure there is one and only one slash between directory names in a concatenated path, and it ends in a slash
+   * 
+   * @param string $path1    first part of the path
+   * @param string $path2    second part of the path
+   * @param bool   $endslash determines whether to end the path with a slash or not
+   */
+  public function concatenate_directory_path( $path1, $path2, $endslash = true ) {
+    
+    return rtrim( $path1, '/' ) . '/' . ltrim( rtrim( $path2, '/' ), '/' ) . ( $endslash ? '/' : '' );
   }
 
 }

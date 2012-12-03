@@ -279,8 +279,7 @@ class Participants_Db {
             self::$plugin_title,
             self::$plugin_title, 
             '', 
-            self::PLUGIN_NAME, array(__CLASS__, 'include_admin_file'), 
-            array('PDb_List_Admin', 'initialize')
+            self::PLUGIN_NAME, array(__CLASS__, 'include_admin_file')
     );
     
     add_submenu_page(
@@ -420,7 +419,7 @@ class Participants_Db {
     $ajax_params = array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'filterNonce' => wp_create_nonce('pdb-list-filter-nonce'),
-        'postID' => ( is_object($wp_query) ? $wp_query->post->ID : '' ),
+        'postID' => ( isset($wp_query->post) ? $wp_query->post->ID : '' ),
     );
     wp_localize_script('list-filter', 'PDb_ajax', $ajax_params);
   }
@@ -961,8 +960,11 @@ class Participants_Db {
 
       case 'multi-checkbox' :
       case 'multi-select-other' :
+        
+        $multivalues = self::unserialize_array($value);
+        if ( empty( $multivalues['other'] ) ) unset($multivalues['other']);
 
-        $return = implode(', ', (array) self::unserialize_array($value));
+        $return = implode(', ', (array) $multivalues);
         break;
 
       case 'link' :
@@ -2145,7 +2147,7 @@ class Participants_Db {
 
     $options = get_option(self::$participants_db_options);
 
-    if (!is_dir(ABSPATH . $options['image_upload_location'])) {
+    if ( !is_dir( Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) ) ) {
 
       if (false === self::_make_uploads_dir($options['image_upload_location']))
         return false;
@@ -2179,7 +2181,7 @@ class Participants_Db {
       return false;
     }
 
-    if (false === move_uploaded_file($file['tmp_name'], ABSPATH . $options['image_upload_location'] . $new_filename)) {
+    if (false === move_uploaded_file($file['tmp_name'], Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename)) {
 
       self::$validation_errors->add_error($name, __('The file could not be saved.', 'participants-database'));
 

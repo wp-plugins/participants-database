@@ -187,10 +187,17 @@ You can no doubt come up with many variations on this.
 
 == Changelog ==
 
+= 1.4.4 =
+* improvements to single record display template and stylesheet; less likely to break
+* better notations and help text
+* several minor bugfixes
+* uploaded images and files pathing is now harder to break
+* AJAX list searches are now compatible with pagination
+
 = 1.4.3 =
 * fixed bug that prevented a new uploads directory from being created in some cases
 * it is now possible to have two different list shortcodes on the same page
-* using WP auto formatting is not optional on rich-text fields
+* using WP auto formatting is now optional on rich-text fields
 * fixed incompatibility with PHP 5.4
 
 = 1.4.2 =
@@ -409,6 +416,9 @@ You can no doubt come up with many variations on this.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.4.4 =
+General bugfix and UI enhancement release including improvements to the single record display
 
 = 1.4.2 =
 Bugfix addressing several issues, including image display, signup form validation problems, and multi-page searches and sorts on lists.

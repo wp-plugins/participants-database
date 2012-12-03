@@ -378,6 +378,9 @@ abstract class PDb_Shortcode {
         //error_log ( __METHOD__.' group fields: '. print_r( $this->_get_group_fields( $group['name'] ), 1 )  );
 
         foreach ($this->_get_group_fields($group['name']) as $field) {
+          
+          // add the module property
+          $field->module = $this->module;
 
           // add the field to the list of fields
           $this->columns[] = $field;
@@ -545,7 +548,7 @@ abstract class PDb_Shortcode {
 			
 			case 'image-upload':
 			
-				$value = empty( $value ) ? '' : $value; //Participants_Db::get_image_uri( $value );
+				$value = empty( $value ) ? '' : $value;
 				
 				break;
 				

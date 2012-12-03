@@ -39,6 +39,9 @@ class PDb_List_Admin
 	
 	// name of the list anchor element
 	static $list_anchor = 'participants-list';
+  
+  // name of the list limit transient
+  static $limit_cookie = 'pdb-admin-list-limit';
 	
 	// the number of records after filtering
 	static $num_records;
@@ -69,9 +72,11 @@ class PDb_List_Admin
 		self::_setup_i18n();
     
     self::$options = get_option( Participants_Db::$participants_db_options );
+    
+    get_currentuserinfo();
 
     // set the list limit value
-    self::$page_list_limit = ( ! isset( $_POST['list_limit'] ) or ! is_numeric( $_POST['list_limit'] ) or $_POST['list_limit'] < 1 ) ? self::$options['list_limit'] : $_POST['list_limit'];
+    self::set_list_limit();
     
     self::$registration_page_url = get_bloginfo('url').'/'.( isset( self::$options['registration_page'] ) ? self::$options['registration_page'] : '' );
 
@@ -193,8 +198,11 @@ class PDb_List_Admin
 					break;
 					
 				case self::$i18n['change']:
+          
+          global $user_ID;
 				
-					Participants_Db::$plugin_settings->update_option( 'list_limit', self::$page_list_limit );
+          set_transient(self::$limit_cookie.'-'.$user_ID, self::$page_list_limit );
+					//Participants_Db::$plugin_settings->update_option( 'list_limit', self::$page_list_limit );
 					break;
 					
 				default:
@@ -528,8 +536,7 @@ class PDb_List_Admin
       <tr>
         <?php // print delete check ?>
         <td>
-          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id']?>"><?php _e( 'Edit', 'participants-database' )?></a> |
-          <input type="checkbox" name="pid[]" value="<?php echo $value['id']?>" onClick="addSelects( this.checked )">
+          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id']?>"><?php _e( 'Edit', 'participants-database' )?></a> <input type="checkbox" name="pid[]" value="<?php echo $value['id']?>" onClick="addSelects( this.checked )">
         </td>
         <?php
 
@@ -712,7 +719,7 @@ class PDb_List_Admin
       // print the "select all" header ?>
       <th scope="col" style="width:6em">
         <?php /* translators: uses the check symbol in a phrase that means "check all" */ printf('<span class="checkmark" >&#10004;</span> %s',__( 'all', 'participants-database' ) )?>
-        <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" style="top: 2px; margin-left: 4px;">
+        <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" >
       </th>
       <?php
 
@@ -725,6 +732,22 @@ class PDb_List_Admin
               );
       }
 
+    }
+    
+    /**
+     * sets the admin list limit value
+     * 
+     */
+    private function set_list_limit() {
+      
+      global $user_ID;
+      
+      $limit_value = self::$options['list_limit'];
+      if ( $transient = get_transient(self::$limit_cookie.'-'.$user_ID) )
+        $limit_value = $transient;
+      if ( isset( $_POST['list_limit'] ) && is_numeric( $_POST['list_limit'] ) && $_POST['list_limit'] > 1 )
+        $limit_value = $_POST['list_limit'];
+      self::$page_list_limit = $limit_value;
     }
 		
 		/**

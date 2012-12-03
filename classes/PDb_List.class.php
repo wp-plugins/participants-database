@@ -52,6 +52,8 @@ class PDb_List extends PDb_Shortcode {
   var $filter;
   // holds plugin options array
   var $options;
+  // holdes the search error style statement
+  var $search_error_style = '';
   // holds the wrapper HTML for the pagination control
   // the first two elements wrap the whole control, the third wraps the buttons, the fourth wraps each button
   var $pagination_wrap = array(
@@ -358,18 +360,23 @@ class PDb_List extends PDb_Shortcode {
       /*
        * add the user search. These must be made secure as it is direct input from the browser 
        */
-      if (
-              isset($this->filter['value']) && 
-              !empty($this->filter['value']) && 
-              'none' != $this->filter['search_field'] && 
-              in_array($this->filter['search_field'],$this->display_columns)
-              ) {
+      if ( isset($_POST['action']) and $_POST['action'] == 'pdb_list_filter') {
+        if (
+                isset($this->filter['value']) && 
+                !empty($this->filter['value']) && 
+                'none' != $this->filter['search_field'] && 
+                in_array($this->filter['search_field'],$this->display_columns)
+                ) {
 
-        $clauses[] = sprintf(
-                ($this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"'), 
-                $this->display_columns[array_search($this->filter['search_field'], $this->display_columns)], 
-                mysql_real_escape_string($this->filter['value'])
-                );
+          $clauses[] = sprintf(
+                  ($this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"'), 
+                  $this->display_columns[array_search($this->filter['search_field'], $this->display_columns)], 
+                  mysql_real_escape_string($this->filter['value'])
+                  );
+        } elseif ( empty($this->filter['value']) ) 
+          $this->search_error('value');
+        elseif ( 'none' == $this->filter['search_field'] )
+          $this->search_error ('search');
       }
 
       // assemble there WHERE clause
@@ -392,6 +399,7 @@ class PDb_List extends PDb_Shortcode {
 
     if ($this->_sort_filter_mode() != 'none' && !$this->shortcode_atts['filtering']) {
 
+      $output[] = $this->search_error_style;
       $output[] = '<div class="pdb-searchform">';
       $output[] = '<div class="pdb-error pdb-search-error" style="display:none">';
       $output[] = sprintf('<p id="search_field_error">%s</p>', __('Please select a column to search in.', 'participants-database'));
@@ -789,6 +797,22 @@ class PDb_List extends PDb_Shortcode {
     $this->filter['value'] = $post['value'];
 
     return $this->filter['search_field'] . $this->filter['operator'] . $this->filter['value'];
+  }
+  
+  /**
+   * sets the search error so it will be shown to the user
+   * 
+   * @param string $type sets the error type
+   * @return string the CSS style rule to add
+   */
+  public function search_error( $type ) {
+    
+    $css = array('.pdb-search-error');
+    
+    if ($type == 'search') $css[] = '#search_field_error';
+    if ($type == 'value' ) $css[] = '#value_error';
+    
+    $this->search_error_style = sprintf('<style>.pdb-search-error p { display:none } %s { display:inline-block !important }</style>', implode( ', ', $css) );
   }
 
   /**

@@ -38,8 +38,8 @@ class PDb_Image extends Image_Handler {
    */
   public function set_image_directory() {
 
-    $this->image_directory = ABSPATH . '/' . Participants_Db::$plugin_options['image_upload_location'];
-    $this->image_directory_uri = site_url() . '/' . Participants_Db::$plugin_options['image_upload_location'];
+    $this->image_directory = $this->concatenate_directory_path( ABSPATH, Participants_Db::$plugin_options['image_upload_location'] );
+    $this->image_directory_uri = $this->concatenate_directory_path( site_url(), Participants_Db::$plugin_options['image_upload_location'] );
   }
   
   /**
@@ -60,9 +60,9 @@ class PDb_Image extends Image_Handler {
     }
     
     // check that the file exists, then set the absolute path
-    if ( $this->_file_exists( ABSPATH.$this->default_image ) ) {
+    if ( $this->_file_exists( ABSPATH . $this->default_image ) ) {
       
-      $this->default_image = site_url().DIRECTORY_SEPARATOR.$this->default_image;
+      $this->default_image = $this->concatenate_directory_path( site_url(), $this->default_image, false );
       
     } else $this->default_image = false; 
     

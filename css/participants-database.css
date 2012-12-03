@@ -28,8 +28,8 @@
 .edit-participant textarea,
 .participants_db textarea,
 .participants_db input[type='text'],
-.edit-participant  input[type='text'],
-.edit-participant  input[type='checkbox'],
+.edit-participant input[type='text'],
+.edit-participant input[type='checkbox'],
 .multicheckbox label,
 .link-element label {
   float:left;
@@ -70,20 +70,6 @@
   float:left;
   margin-right:10px;
 }
-.selectother label {
-  float: left;
-  margin: 0 6px 0 3px;
-  width: auto;
-}
-.selectother {
-  border: 1px solid #DDDDDD;
-  overflow: auto;
-  padding: 2px 5px;
-}
-.dropdown-other select {
-    float: left;
-    margin-right: 10px;
-}
 .edit-participant .wp-editor-wrap {
   max-width: 600px;
 }
@@ -93,11 +79,25 @@
   color: #333333;
   height: 20em;
 }
-.pdb-list span.textarea {
-  display: block;
-  max-height: 5em;
-  max-width: 150px;
+
+/* Select Other */
+.selectother label {
+  float: left;
+  margin: 0 6px 0 3px;
+  width: auto;
+}
+.selectother {
+  display: inline-block;
+  border: 1px solid #DDDDDD;
   overflow: auto;
+  padding: 5px;
+}
+.selectother input[type=text] {
+  margin-right:0;
+}
+.dropdown-other select {
+    float: left;
+    margin-right: 10px;
 }
 
 /* LIST */
@@ -108,6 +108,25 @@
 .pdb-list fieldset,
 .pdb-list table caption {
   margin: 1em 0;
+}
+.pdb-list fieldset {
+  border: none;
+}
+.pdb-list span.textarea {
+  display: block;
+  max-height: 5em;
+  max-width: 150px;
+  overflow: auto;
+}
+.pdb-searchform input[type=text],
+.pdb-searchform input[type=submit],
+.pdb-searchform select,
+.pdb-searchform label.checkbox {
+  margin: 0 5px 0 0;
+}
+.pdb-searchform input[type=checkbox],
+.pdb-searchform input[type=radio] {
+  margin-left:5px;
 }
 
 /* pagination */
@@ -151,29 +170,24 @@
 }
 
 /* SINGLE */
-.pdb-single .section {
-  clear: both;
-}
-.pdb-single dd,
-.pdb-single dt {
+.pdb-single dl {
+	overflow: auto;
 }
 .pdb-single dd {
   overflow:auto;
   margin: 0 0 1.625em 0.8em;
 }
 .pdb-single dt {
-  font-weight: bold;
-  margin: 0;
-}
-.pdb-single dt.blank-field {
-  width: 100%;
+	float: left;
+	font-weight: bold;
+	width: 140px;
+	margin: 0 10px 1.625em 0;
 }
 .pdb-single .image-field-wrap img {
   height: 3em;
 }
 .pdb-single .image-field-wrap {
   float: none;
-  margin-right:10px;
 }
 .pdb-single span.textarea {
   height: auto;

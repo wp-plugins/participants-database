@@ -22,12 +22,26 @@ this is a more detailed template showing how the parts of the display can be cus
   if ( $filter_mode != 'none' && ! $filtering ) : ?>
   <div class="pdb-searchform">
   
+		<?php
+		/* this element is where error and feedback messages are shown to the user.
+		 * It is only visible if there is a message
+     * 
+     * don't change the classnames or IDs, they are requted for the error messagees to show up properly
+     * do change the strings in the "_e" functions for your message preference
+		 */?>
     <div class="pdb-error pdb-search-error" style="display:none">
       <p id="search_field_error"><?php _e( 'Please select a column to search in.', 'participants-database' )?></p>
       <p id="value_error"><?php _e( 'Please type in something to search for.', 'participants-database' )?></p>
     </div>
 
-    <?php $this->search_sort_form_top(); ?>
+    <?php
+		/* this method prints the top of the search/sort form
+		 *
+		 * if you want to put the search on a different page, you can specify the
+		 * target page in this method, and the search results will be shown on that
+		 * page
+		 */
+		$this->search_sort_form_top(); ?>
 
     <?php if ( $filter_mode == 'filter' || $filter_mode == 'both' ) : ?>
 

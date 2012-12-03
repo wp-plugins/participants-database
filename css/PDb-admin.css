@@ -80,6 +80,9 @@ input[type="checkbox"],
   display: inline;
   margin-right:0;
 }
+#checkall {
+  margin:4px 0;
+}
 .checkmark {
   font-size:19px;
   padding:0 0 0 8px;
@@ -129,6 +132,26 @@ body[class*='participants-database'] .text-block {
   max-height: 5em;
   max-width: 150px;
   overflow: auto;
+}
+.image-filename {
+  display: inline-block;
+  margin: 0 0 0 10px;
+}
+/* set placeholder colors */
+::-webkit-input-placeholder {
+    color: #AAAAAA;
+}
+:-moz-placeholder {
+  color: #AAAAAA !important;
+}
+:-ms-input-placeholder {
+  color: #AAAAAA;
+}
+:focus::-webkit-input-placeholder {
+  color:transparent;
+}
+:focus:-moz-placeholder {
+  color: transparent !important;
 }
 
 /* manage fields */
