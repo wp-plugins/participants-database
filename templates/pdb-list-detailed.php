@@ -11,7 +11,6 @@ this is a more detailed template showing how the parts of the display can be cus
 <!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
 <?php
-
   /*
    * SEARCH/SORT FORM
    *
@@ -113,17 +112,46 @@ this is a more detailed template showing how the parts of the display can be cus
       <tr>
         <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
 
-          <?php $value = $this->field->value;
-          if ( ! $this->field->is_empty( $value ) ) : ?>
+          <?php $value = $this->field->value; // we do this just to make the variable name shorter ?>
           <td>
           	<?php 
-						// wrap the item in a link if it's enabled for this field
+						/* wrap the item in a link if it's enabled for this field: this uses
+						 * the global setting. If you want to customize the field on which to
+						 * place the link to the record detail page, change the "test" to
+						 * something like this:
+						 * if ( $this->field->name == 'field_name' ) {
+						 *
+						 * if you do this, check out the case below where we make a clickable
+						 * link: it does the same test so we don't duplicate the field. You'll
+						 * have to modify that in the same way
+						 */
 						if ( $this->field->is_single_record_link() ) {
               echo Participants_Db::make_link(
-                $single_record_link,             // URL of the single record page
-                $value,                          // field value
-                '<a href="%1$s" title="%2$s" >', // template for building the link
-                array( 'pdb'=>$this->field->record_id )    // record ID to get the record
+								
+								/* URL of the single record page: replace this to specify a single
+								 * record page for this template. It doesn't have to be the whole
+								 * URL, you can use just the slug or relative part of the page URL
+								 * like this: '/single-record', Be sure to quote literal values and
+								 * include the comma at the end.
+                 * 
+                 * it's also possible to define the link in the shortcode like this 
+                 * [pdb_list single_record_link=single-page] if your [pdb_single] 
+                 * shortcode is on a page named 'single-page'.
+								 */
+                $single_record_link,
+								
+								// field value
+                $value,
+								
+								/* template for building the link: this would be the place to include
+								 * anything special you want to add to the link
+								 */
+                '<a href="%1$s" title="%2$s" >',
+								
+								/* record ID to get the record. You can add other variables to the link
+								 * if you want by adding more name/value pairs to the array
+								 */
+                array( 'pdb'=>$this->field->record_id )
               );
             } ?>
 
@@ -144,7 +172,7 @@ this is a more detailed template showing how the parts of the display can be cus
 								/*
 								 * if you want to specify a format, include it as the second 
 								 * argument in this function; otherwise, it will default to 
-								 * the site setting
+								 * the site setting. See PHP date() for formatting codes
 								 */
 								$this->show_date( $value, false );
 								
@@ -155,7 +183,7 @@ this is a more detailed template showing how the parts of the display can be cus
 						
 							/*
 							 * this function shows the values as a comma separated list
-							 * you can customize the glue that joins the array elements
+							 * you can customize the glue string that joins the array elements
 							 */
 							$this->show_array( $value, $glue = ', ' );
 							
@@ -174,16 +202,38 @@ this is a more detailed template showing how the parts of the display can be cus
 							break;
 							
 						case 'rich-text':
+							
+							printf(
+										 /* we wrap long text in this span so we can control it's size
+										  * when presented in a list
+										  */
+										 '<span class="%s">%s</span>',
+										 
+										 // this adds our CSS class
+										 'textarea richtext',
+										 
+										 /*
+											* here, we process the rich text output through wpautop. This is needed
+											* to automatically create paragraphs in rich text. You can take this out
+											* if you don't want to use WP auto-paragraphs. See 
+											* http://codex.wordpress.org/Function_Reference/wpautop
+											*/
+										 wpautop($value)
+										 
+										 );
+							
+              break;
+						
 						case 'text-area':
 							
-							/*
-							 * if you are displaying rich text you may want to process the 
-							 * output through wpautop like this: wpautop( $value ) see 
-							 * http://codex.wordpress.org/Function_Reference/wpautop
-							 */
 							printf(
+										 /* we wrap long text in this span so we can control it's size
+										  * when presented in a list
+										  */
 										 '<span class="%s">%s</span>',
-										 $this->field->form_element == 'rich-text' ? 'textarea richtext' : 'textarea',
+										 // the CSS class
+										 'textarea',
+										 // the text
 										 $value
 										 );
 							

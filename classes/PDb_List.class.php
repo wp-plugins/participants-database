@@ -42,6 +42,8 @@ class PDb_List extends PDb_Shortcode {
   var $list_anchor = 'participants-list';
   // holds the url of the registrations page
   var $registration_page_url;
+  // holds the url to the single record page
+  var $single_record_url = false;
   // holds the columns to display in the list
   var $display_columns;
   // holds the list of sortable columns
@@ -86,6 +88,7 @@ class PDb_List extends PDb_Shortcode {
         'orderby' => 'date_updated',
         'order' => 'asc',
         'fields' => '',
+        'single_record_link' =>'',
         'display_count' => 'false',
         'template' => 'default',
         'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
@@ -101,6 +104,8 @@ class PDb_List extends PDb_Shortcode {
     $this->_set_display_columns();
 
     $this->_setup_i18n();
+    
+    $this->_set_single_record_url();
 
     // enqueue the filter/sort AJAX script
     if ($this->_sort_filter_mode() !== 'none' and $this->options['ajax_search'] == 1)
@@ -139,7 +144,7 @@ class PDb_List extends PDb_Shortcode {
     $record_count = $this->num_records;
     $records = $this->records;
     $fields = $this->display_columns;
-    $single_record_link = isset($this->options['single_record_page']) ? get_page_link($this->options['single_record_page']) : $_POST['pagelink'];
+    $single_record_link = $this->single_record_url;
     $records_per_page = $this->shortcode_atts['list_limit'];
     $filtering = $this->shortcode_atts['filtering'];
 
@@ -626,7 +631,7 @@ class PDb_List extends PDb_Shortcode {
             &&
             $column == $this->options['single_record_link_field']
             &&
-            !empty($this->options['single_record_page'])
+            false !== $this->single_record_url
             &&
             !in_array($this->get_field_type($column), array('rich-text', 'link'))
             );
@@ -813,6 +818,24 @@ class PDb_List extends PDb_Shortcode {
     if ($type == 'value' ) $css[] = '#value_error';
     
     $this->search_error_style = sprintf('<style>.pdb-search-error p { display:none } %s { display:inline-block !important }</style>', implode( ', ', $css) );
+  }
+  
+  /**
+   * sets the single record page url
+   * 
+   */
+  private function _set_single_record_url() {
+    
+    if (isset($this->options['single_record_page']))
+      $this->single_record_url = $this->options['single_record_page'];
+    if (!empty($this->shortcode_atts['single_record_link']))
+      $this->single_record_url = Participants_Db::get_id_by_slug($this->shortcode_atts['single_record_link']);
+    if (isset($_POST['pagelink']))
+      $this->single_record_url = Participants_Db::get_id_by_slug($_POST['pagelink']);
+    
+    $this->single_record_url = get_page_link($this->single_record_url);
+    
+    error_log(__METHOD__.' set to:'.$this->single_record_url);
   }
 
   /**

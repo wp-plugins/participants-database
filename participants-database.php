@@ -218,7 +218,7 @@ class Participants_Db {
     // if the setting was made in previous versions and is a slug, convert it to a post ID
     if (isset(self::$plugin_options['registration_page']) && !is_numeric(self::$plugin_options['registration_page'])) {
 
-      self::$plugin_options['registration_page'] = self::_get_ID_by_slug(self::$plugin_options['registration_page']);
+      self::$plugin_options['registration_page'] = self::get_id_by_slug(self::$plugin_options['registration_page']);
 
       update_option(self::$participants_db_options, self::$plugin_options);
     }
@@ -2238,7 +2238,7 @@ class Participants_Db {
     // if the setting was made in previous versions and is a slug, convert it to a post ID
     if (!is_numeric($options['registration_page'])) {
 
-      $options['registration_page'] = self::_get_ID_by_slug($options['registration_page']);
+      $options['registration_page'] = self::get_id_by_slug($options['registration_page']);
 
       update_option(self::$participants_db_options, $options);
     }
@@ -2271,7 +2271,7 @@ class Participants_Db {
    *
    * this is to provide backwards-compatibility with previous versions that used a page-slug to point to the [pdb_record] page.
    */
-  private function _get_ID_by_slug($page_slug) {
+  public function get_id_by_slug($page_slug) {
 
     $page = get_page_by_path($page_slug);
 
