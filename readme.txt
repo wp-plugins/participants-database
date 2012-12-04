@@ -7,7 +7,7 @@ Tested up to: 3.4.2
 Stable tag: 1.4.3
 License: GPLv2
 
-Build and maintain a fully customizable database of participants or volunteers with signup forms, admin backend, custom lists, and CSV support.
+Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
 
 == Description ==
 
@@ -25,11 +25,11 @@ This database could be of use to any organization that needs to build and mainta
 * shortcode for inserting a configurable sign-up short form into WordPress pages, posts, etc.
 * completing the sign-up form can direct visitors to another page for a thank you message or reward
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
-* shortcode for displaying the list on the site, including the ability to select and order columns to display, sorting and filtering rules to dertermine which records are shown and in what order
+* shortcode for displaying the list on the site, including the ability to select and order columns to display, sorting and filtering rules to determine which records are shown and in what order
 * email notification and confirmation with secure individual access link
 * email notification when a user edits a record
 * searchable, sortable record listings in the WordPress admin
-* many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, etc.
+* many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, rich text, etc.
 * export CSV files for interacting with other databases, mass email, print records
 * import CSV files to add large numbers of records from spreadsheets such as Open Office or Google Docs
 * form can be organized into groups of fields, making long forms easier to navigate and fill out
@@ -38,13 +38,13 @@ This database could be of use to any organization that needs to build and mainta
 
 The heart of this plugin is the participants database, which is completely configurable. It comes pre-filled with standard fields such as name, address, phone, etc., but you can define any fields you want, including the type of field, validation, help text and a print title for each field. Fields are also organized into groups so large amounts of information can be better managed, and long forms broken up into logical sections.
 
-Fields can be defined as text-lines, text-areas, single and multiple-select dropdowns, checkboxes, radio buttons or image uploads. Each field has its own validation which can be required, not required, or validated with a regular expression.
+Fields can be defined as text-lines, text-areas, rich text (with a rich-text editor), single and multiple-select dropdowns, checkboxes, radio buttons or image uploads. Each field has its own validation which can be required, not required, or validated with a regular expression.
 
 = Sign Up Form =
 
 The plugin provides a shortcode for a sign-up form that presents a customizable subset of the fields for a quick signup. For example, your signup form could ask only for a name and email address, creating an easy point-of-entry for new members, supporters or volunteers. The signup can generate two emails: one to an administrator to notify them of the signup, and also to the person signing up. Their email can contain a link to their full record, which they can return and fill out at their leisure. This full form (which is placed on the website with another shortcode) can include any information you want to collect from your signups.
 
-Signup forms are now produced by a template, making it easy to add extra functionality and match the presentation of the form to your theme.
+Signup forms are produced by a template, making it easy to add extra functionality and match the presentation of the form to your theme.
 
 = Frontend Form =
 
@@ -87,7 +87,7 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 
 = Using the Plugin: =
 
-This is a cmplex plugin that can be configured in many ways. I am happy to answer support questions, but please read the documentation I have provided. More often than not, your questions will be answered there.
+This is a complex plugin that can be configured in many ways. I am happy to answer support questions, but please read the documentation I have provided. More often than not, your questions will be answered there.
 
 I have created a [Quick Setup Guide](http://xnau.com/participants-database-quick-setup-guide/) for an example setup to get you started.
 
@@ -111,7 +111,7 @@ Their record is added to the database with the information provided in the signu
 
 This form appears on the page where you have placed the `[pdb_record]` shortcode. It is an expanded version of the signup form.
 
-An individual record can be edited on the frontend of your website by someone who has the private link to that record. The purpose here is to let people maintain their own records. It's also possible to put things like survey questions in the form so you can get feedback from people. You have complete control over what fields appear on this form. Fields can be desginated as showing up on the signup form, on the frontend user's form, and on the backend admin form.
+An individual record can be edited on the frontend of your website by someone who has the private link to that record. The purpose here is to let people maintain their own records. It's also possible to put things like survey questions in the form so you can get feedback from people. You have complete control over what fields appear on this form. Fields can be designated as showing up on the signup form, on the frontend user's form, and on the backend admin form.
 
 = What if I just want them to sign up and fill out all their info at that point? =
 
@@ -143,7 +143,7 @@ Finally, your emails may be getting caught in spam filters. If you find the plug
 
 The form will only appear if someone uses a valid private link to access the page. All that's required for a private link is a valid "pid" value has to be included in the URI. (it looks like "pid=TH65J" in the link) This code can be seen in the record if you want to make your own links.
 
-= I don't want Adminstrative Fields showing up on the user's edit record page. How do I control that? =
+= I don't want Administrative Fields showing up on the user's edit record page. How do I control that? =
 
 You can control which groups of fields show up in the frontend record edit screen (the one with the `[pdb_record]` shortcode) by going to the "manage database fields" page, clicking on the "field groups" tab and deselecting the "display" checkbox for those field groups you don't want shown on the frontend.
 
@@ -307,7 +307,7 @@ You can no doubt come up with many variations on this.
 * fixed skipped validation on thanks page redirect to new page
 
 = 1.2.4 =
-* fixed bug in `[pdb_list]` shorcode display filter
+* fixed bug in `[pdb_list]` shortcode display filter
 
 = 1.2.3 =
 * added access level control setting for records
@@ -619,7 +619,7 @@ If you are good with CSS, you can easily make the link look like a button.
 
 All shortcodes now use a template to determine how they are presented. Plugin default templates are found in the "templates" directory in the plugin directory.
 
-If you want to customize your template, copy the template file you want to use as a starting point to a "templates" dierctory in your theme:  `wp-content/themes/your-theme/templates/`. Create the directory if it doesn't exist; if it does exist, just place the the template file in there. IMPORTANT: if you modify the templates in the shortcode directory, your changes will be lost when you upgrade the plugin. Copy them to your theme directory in a directory named "templates." The path will look something like this: `(WP ROOT)/wp-content/themes/yourtheme/templates/pdb-signup-customtemplate.php`
+If you want to customize your template, copy the template file you want to use as a starting point to a "templates" directory in your theme:  `wp-content/themes/your-theme/templates/`. Create the directory if it doesn't exist; if it does exist, just place the the template file in there. IMPORTANT: if you modify the templates in the shortcode directory, your changes will be lost when you upgrade the plugin. Copy them to your theme directory in a directory named "templates." The path will look something like this: `(WP ROOT)/wp-content/themes/yourtheme/templates/pdb-signup-customtemplate.php`
 
 Template files use the naming convention: pdb-{shortcode name}-{template name}.php. So, for instance, the default template for the `[pdb_signup]` shortcode is "pdb-signup-default.php" If you want to create your own template file, you would rename it something like: "pdb-signup-mytemplate.php" then, call it in the shortcode like this: `[pdb_signup template="mytemplate"]`.
 
@@ -627,7 +627,7 @@ The default template files include comments to help you develop your own templat
 
 = Single Record Templates =
 
-**Please Note:** As of version 1.4 the way the single record template works has changed. It is now consistent with the other templates, but different from the way it worked before. The old templates will still work, but you should update them to the new way of doing things. If you look at your custom template and the pdb-single-default.php template provided, you'll easily see how to conver it to the new way of doing the templates.
+**Please Note:** As of version 1.4 the way the single record template works has changed. It is now consistent with the other templates, but different from the way it worked before. The old templates will still work, but you should update them to the new way of doing things. If you look at your custom template and the pdb-single-default.php template provided, you'll easily see how to convert it to the new way of doing the templates.
 
 Templates for the single record shortcode include an array that can be used to prevent any fields from displaying. Let's say you wanted to exclude the city, state and postcode. In that case the array would be filled with those names like this:
 
@@ -691,4 +691,4 @@ If you are importing a CSV into a database that has records in it, then there ar
 
 I do monitor the WP forums and comments page on my own website for support requests. I very much appreciate bugs being brought to my attention, so please let me know if things are broken or not working as expected.
 
-I only ask that you read the documentation before posting with support requests because it will save us both valuable time. Many of the issues people have are due to imporoper setup or use of the plugin...this is partly due, I know, to shortcomings in the documentation. It is a complex plugin with lots of options, so it can be difficult to explain how it works in a way that everybody will understand.
+I only ask that you read the documentation before posting with support requests because it will save us both valuable time. Many of the issues people have are due to improper setup or use of the plugin...this is partly due, I know, to shortcomings in the documentation. It is a complex plugin with lots of options, so it can be difficult to explain how it works in a way that everybody will understand.
