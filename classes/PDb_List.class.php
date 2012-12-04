@@ -708,6 +708,9 @@ class PDb_List extends PDb_Shortcode {
 
   /**
    * strips the page number out of the URI so it can be used as a link to other pages
+   * 
+   * we also strip out the request string for filtering values as they are added 
+   * from the 'add_variables' element of the pagination config array
    *
    * @param string $uri the incoming URI, usually $_SERVER['REQUEST_URI']
    *
@@ -727,7 +730,7 @@ class PDb_List extends PDb_Shortcode {
       unset($values[$this->list_page]);
     }
 
-    return $URI_parts[0] . '?' . $this->_filter_query($values) . $this->list_page . '=%s';// . $this->list_anchor;
+    return $URI_parts[0] . '?' . $this->list_page . '=%s';
   }
 
   /**

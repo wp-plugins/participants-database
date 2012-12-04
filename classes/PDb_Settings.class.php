@@ -416,7 +416,7 @@ class PDb_Settings extends Plugin_Settings {
         'group'      => 'signup',
         'options'    => array(
           'type'        =>'text',
-          'help_text'   => __('the "From" address on signup receipt emails. If the recipient hits "reply", their reply will go to this address', 'participants-database' ),
+          'help_text'   => __('the "From" address on signup receipt emails. If the recipient hits "reply", their reply will go to this address. It is a good idea to use an email address from the same domain as this website.', 'participants-database' ),
           'value'       => get_bloginfo( 'admin_email' ),
           )
         );

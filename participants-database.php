@@ -1212,7 +1212,7 @@ class Participants_Db {
     $columns = array();
 
     // determine the set of columns to process
-    if ( $_POST['action'] == 'signup') {
+    if ( isset($_POST['action']) && $_POST['action'] == 'signup') {
       
       $column_set = 'signup';
     } else {
@@ -1283,7 +1283,7 @@ class Participants_Db {
                 }
               }
 
-              $value_array['other'] = implode(',', $value_array['other']);
+              if (isset($value_array['other']) && is_array($value_array['other'])) $value_array['other'] = implode(',', $value_array['other']);
             }
 
             $new_value = self::_prepare_array_mysql($value_array);
@@ -1744,7 +1744,7 @@ class Participants_Db {
             $sent = wp_mail(
                     $options['email_signup_notify_addresses'],
                     self::proc_tags($options['record_update_email_subject'], $participant_id),
-                    self::proc_tags($options['record_update_email_body'], $participant_id),
+                    self::proc_tags($options['record_update_email_body'], $participant_id,'all'),
                     self::$email_headers
             );
           }
@@ -2314,7 +2314,10 @@ class Participants_Db {
     // add the date tag
     $tags[] = '[date]';
     $values[] = date(get_option('date_format'), self::parse_date());
-
+    
+    // add the admin record link tag
+    $tags[] = '[admin_record_link]';
+    $values[] = self::get_admin_record_link($participant_id);
 
     $placeholders = array();
 

@@ -138,8 +138,10 @@ class Pagination {
 
   public function show() {
 
-    if (!$this->filtering)
-      echo $this->create_links();
+    if ($this->filtering)
+      echo '%%%';
+    
+    echo $this->create_links();
   }
 
   /**

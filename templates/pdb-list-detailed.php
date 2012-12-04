@@ -261,10 +261,6 @@ this is a more detailed template showing how the parts of the display can be cus
             	</a>
             <?php endif ?>
             </td>
-            
-        <?php else : // if the field is empty ?>
-        <td></td>
-        <?php endif ?>
         
 			<?php endwhile; // fields ?>
       </tr>

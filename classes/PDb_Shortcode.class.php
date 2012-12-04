@@ -373,7 +373,10 @@ abstract class PDb_Shortcode {
 
       if ($this->_has_group_fields($group['name'])) {
 
+        //add the group array as an object
         $this->record->$group['name'] = (object) $group;
+        // create an object for the groups fields
+        $this->record->$group['name']->fields = new stdClass();
 
         //error_log ( __METHOD__.' group fields: '. print_r( $this->_get_group_fields( $group['name'] ), 1 )  );
 
