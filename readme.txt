@@ -137,6 +137,8 @@ The most common reason emails are not being sent is because the WP application c
 
 Another common source of email trouble is other plugins that send email. It is not uncommon for such plugins to "hijack" the WP mail function and this can break it for other plugins. Try turning off other plugins that send email to see who the troublemaker is.
 
+Finally, your emails may be getting caught in spam filters. If you find the plugin's emails in the spam folder, using a "from" email from the same domain as the site can help. If you are using HTML email (the default) keep it short and don't include lots of links, images or spammy words.
+
 = I don't see anything on the page where I put the `[pdb_record]` shortcode. What's up? =
 
 The form will only appear if someone uses a valid private link to access the page. All that's required for a private link is a valid "pid" value has to be included in the URI. (it looks like "pid=TH65J" in the link) This code can be seen in the record if you want to make your own links.
@@ -585,6 +587,16 @@ To correctly compare dates, the field *must* be defined as a date field form ele
 
 The "Strict Date Format" setting affects how the shortcode filters are interpreted, so if this is checked, the date format in your filter argument must match the date format set in your WP General Settings.
 
+= Numeric Sorting =
+
+By default all sorting of lists is done alphabetically, which means that if you have a field that is numeric (like prices or rating points) you will not get a numeric sort if you use that field to sort the list. If you need to do this, you must manually edit the database to make your numeric field work like a number and not a word. Here's how you do that:
+
+Get into your database using PHPMyAdmin or similar application. Click on the structure tab of the 'participants_database' table. This shows you the types of all the fields that are used to store the data. You will recognize the names, and most of them will be of type TINYTEXT. You need to change the field type for only the fields where your numbers are stored.
+
+Click on the little pencil to edit the field where you have numbers. You need to decide the range of numbers you will be using. Lets say you need to be able to go up to 9999 with two decimal places. Change the type from TINYTEXT to DECIMAL. In the LENGTH/VALUES field, put the size of number you want to use...our example would be 4,2 giving you up to four figures to the left of the dot and two to the right. Save it and now your sorts on that field will be numeric. This also applies to comparisons in the shortcode filter.
+
+Please note that non-numeric characters cannot be stored in a DECIMAL field, including commas and currency symbols.
+
 = Only Showing List Items When a User Searches =
 
 You can set up the list so no listings will show until a user makes a search. Just add a filter for id=0, like this: `[pdb_list filter="id=0"]` since there is no record with that ID, nothing will show. The user search will override that and show the result of their search, but this is a special case.
@@ -639,23 +651,27 @@ Here is a quick tutorial to add a field that tracks the page the signup form is 
 
 2. Make that field a hidden type
 
-3. for the default value, put "post->post_title" 
+3. for the default value, put "post->post_title" (without the quotes)
 
 4. This will fill in the title of the page the signup form appears on. 
 
 When the form is submitted, the information in the hidden field will be included.
 
-At the moment, only two WordPress objects are available: $post and $current_user. You can look these up in the codex to see what properties you can access. The way this works is simple: just put the name of the property in the default value field for the hidden field. For instance "current_user->user_login" will put in the user login of a logged-in user. You don't need the dollar sign, it will ignore it if you do put it in.
+At the moment, two WordPress objects are available: $post and $current_user. You can look these up in the codex to see what properties you can access. The way this works is simple: just put the name of the property in the default value field for the hidden field. For instance "current_user->user_login" will put in the user login of a logged-in user. You don't need the dollar sign, it will ignore it if you do put it in.
 
 If you just want to put in a fixed value, the hidden field will include any string you put into the "default" for the field.
+
+You can also access some PHP "Superglobals." For instance, to get the IP of the user, put this into the default: "SERVER:REMOTE_ADDR" You can access these superglobals: POST, GET, REQUEST, COOKIE, SERVER. This means you can get the value of a cookie and put it into the form, saving it when the form is submitted. You don't need the '$_' that is used in PHP. A good reference for what is possible can be found here: <http://php.net/manual/en/language.variables.superglobals.php>
 
 For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden fields are also present in the form presented by the `[pdb_record]` shortcode. These fields are visible and editable in the admin edit page.
 
 = Image Uploads =
 
-Images can now be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'Image Upload Location' setting will always determine the location for the images.
+Images can now be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'Image Upload Location' setting will always determine the location for the images. The images are stored in the database as filenames without any path information.
 
-IMPORTANT: Don't store images in the plugin directory (as was the default before version 1.3.2) they could be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
+The plugin has a "default image" that will be shown if no image is present. You can create your own, but you shouldn't keep it in the plugin folder. Keep it in the uploads directory or in your theme directory. Change the "Default Image" setting to point to your image. If you don't want anything to show if no image is present, make the "Default Image" setting blank.
+
+IMPORTANT: Don't store images in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
 
 = Importing CSV Files =
 
@@ -669,8 +685,10 @@ In particular, if your data has both double and single quotes (which are also ap
 
 The "Image Upload Location" setting in the plugin is important here because that is where the plugin will place the uploaded CSV. The default setting for this is 'wp-content/uploads/participants-database/' If the plugin does not find the directory specified in the "Image Upload Location" setting, it will attempt to create it. It should notify you if it fails, and you may have to create the directory manually (using an FTP client, for instance) to get the CSV import to work.
 
+If you are importing a CSV into a database that has records in it, then there are three modes for that you can use, determined by the "Duplicate Record Preference" under the Signup tab. You can choose to import all records as new records, leaving the existing records alone. Or-- by choosing a field to match, either update the existing records with the uploaded information or skip importing any record that matches an existing record. The field you choose for a match should be a unique field...if it is not, messy, unpredictable things can happen.
+
 = Plugin Support =
 
 I do monitor the WP forums and comments page on my own website for support requests. I very much appreciate bugs being brought to my attention, so please let me know if things are broken or not working as expected.
 
-I only ask that you read the documentation before posting with support requests because it will save us both valuable time. Many of the issues people have are due to imporoper setup or use of the plugin...this is partly due, I know, to shorcomings in the documentation. It is a complex plugin with lots of options, so it can be difficult to explain how it works in a way that everybody will understand.
+I only ask that you read the documentation before posting with support requests because it will save us both valuable time. Many of the issues people have are due to imporoper setup or use of the plugin...this is partly due, I know, to shortcomings in the documentation. It is a complex plugin with lots of options, so it can be difficult to explain how it works in a way that everybody will understand.
