@@ -108,7 +108,7 @@ class PDb_List_Admin
 		global $wpdb;
 		
 		// get the number of records returned
-		self::$num_records = count( $wpdb->get_results( self::$list_query, ARRAY_A ) );
+		self::$num_records = $wpdb->get_var( str_replace('*', 'COUNT(*)', self::$list_query) );
 		
 		// set the pagination object
 		self::$pagination = new Pagination( array(

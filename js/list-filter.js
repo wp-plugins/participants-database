@@ -22,7 +22,8 @@ jQuery(document).ready(function ($) {
       clear_error_messages();
       // validate and process form here
       var submitButton = event.target;
-      if (submitButton.value === "Search") {
+      submission.submit = submitButton.value;
+      if (submitButton.value === PDb_ajax.i18n.search) {
         if ($('select[name="search_field"]').val() === "none") {
           $("#search_field_error").show();
           isError = true;
@@ -34,7 +35,7 @@ jQuery(document).ready(function ($) {
         if(isError){
           errormsg.show();
         }
-      } else if (submitButton.value === "Clear") {
+      } else if (submitButton.value === PDb_ajax.i18n.clear) {
         $('select[name="search_field"]').val('none');
         $('input[name="value"]').val('');
         clear_error_messages();
@@ -65,7 +66,7 @@ jQuery(document).ready(function ($) {
     filterform.find('input[type="submit"]').live('click',function(event) {
       // process the 'clear' submit only'
       var submitButton = event.target;
-      if (submitButton.value === "Clear") {
+      if (submitButton.value === PDb_ajax.i18n.clear) {
         if (event.preventDefault) {
           event.preventDefault();
         } else {
