@@ -141,12 +141,12 @@ this is a more detailed template showing how the parts of the display can be cus
                 $single_record_link,
 								
 								// field value
-                $value,
+                empty($value) ? $this->field->default : $value,
 								
 								/* template for building the link: this would be the place to include
 								 * anything special you want to add to the link
 								 */
-                '<a href="%1$s" title="%2$s" >',
+                '<a href="%1$s" title="%2$s" >%2$s</a>',
 								
 								/* record ID to get the record. You can add other variables to the link
 								 * if you want by adding more name/value pairs to the array

@@ -228,8 +228,7 @@ class PDb_List extends PDb_Shortcode {
           $this->columns[] = $field;
 
           // add the field to the record object
-          // illegal names will be ignored
-          if ( isset( $record->{$field_object->name} ) ) $record->{$field_object->name} = $field_object;
+          $record->{$field_object->name} = $field_object;
         }
       }
     }
@@ -283,7 +282,7 @@ class PDb_List extends PDb_Shortcode {
     $order_clause = $this->filter['sortBy'] == 'random' ? ' ORDER BY RAND()' : ' ORDER BY `' . $this->filter['sortBy'] . '` ' . $this->filter['ascdesc'];
 
     // assemble the base query
-    $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $order_clause;
+    // $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $order_clause;
 
     /* at this point, we have our base query, now we need to add any WHERE clauses
      */
@@ -875,16 +874,13 @@ class PDb_List extends PDb_Shortcode {
    */
   private function _set_single_record_url() {
     
-    if (isset($this->options['single_record_page']))
-      $this->single_record_url = $this->options['single_record_page'];
     if (!empty($this->shortcode_atts['single_record_link']))
-      $this->single_record_url = Participants_Db::get_id_by_slug($this->shortcode_atts['single_record_link']);
-    if (isset($_POST['pagelink']))
-      $this->single_record_url = Participants_Db::get_id_by_slug($_POST['pagelink']);
+      $page_id = Participants_Db::get_id_by_slug($this->shortcode_atts['single_record_link']);
+    elseif (isset($this->options['single_record_page']))
+      $page_id = $this->options['single_record_page'];
+    else $page_id = false;
     
-    $this->single_record_url = get_page_link($this->single_record_url);
-    
-    error_log(__METHOD__.' set to:'.$this->single_record_url);
+    $this->single_record_url = get_page_link($page_id);
   }
 
   /**
