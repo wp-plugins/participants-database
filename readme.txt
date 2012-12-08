@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 2.8.4
 Tested up to: 3.4.2
-Stable tag: 1.4.4
+Stable tag: 1.4.5
 License: GPLv2
 
 Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
@@ -188,6 +188,12 @@ You can no doubt come up with many variations on this.
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.4.5 =
+* AJAX search/sort internationalization
+* fixed pagination issues with WP query-string page links
+* improvements and expanded commenting in pdb-list-detailed template
+* added database update failsafe to ensure database is in sync
 
 = 1.4.4 =
 * improvements to single record display template and stylesheet; less likely to break
@@ -418,6 +424,9 @@ You can no doubt come up with many variations on this.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.4.5 =
+Several minor issues fixed, database update code ensures the database is in sync, pagination issues solved, improvements to pdb-list-detailed template
 
 = 1.4.4 =
 General bugfix and UI enhancement release including improvements to the single record display
