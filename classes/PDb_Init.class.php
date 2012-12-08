@@ -247,6 +247,11 @@ class PDb_Init
       
       global $wpdb;
       
+      // determine the actual version status of the database
+      self::_set_database_real_version();
+      
+      if (WP_DEBUG) error_log('participants database db version determined to be: '.get_option( Participants_Db::$db_version_option ) );
+      
       if ( false === get_option( Participants_Db::$db_version_option ) || '0.1' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
@@ -269,21 +274,21 @@ class PDb_Init
           update_option( Participants_Db::$db_version_option, '0.2' );
 
         }
-				
-				// load some preset values into new column
-				$values = array( 
-												'first_name' => 1,
-												'last_name'  => 2,
-												'city'       => 3,
-												'state'      => 4 
-												);
-				foreach( $values as $field => $value ) {
-					$wpdb->update( 
-												Participants_Db::$fields_table,
-												array('display_column' => $value ),
-												array( 'name' => $field )
-												);
-				}
+
+        // load some preset values into new column
+        $values = array( 
+                        'first_name' => 1,
+                        'last_name'  => 2,
+                        'city'       => 3,
+                        'state'      => 4 
+                        );
+        foreach( $values as $field => $value ) {
+          $wpdb->update( 
+                        Participants_Db::$fields_table,
+                        array('display_column' => $value ),
+                        array( 'name' => $field )
+                        );
+        }
 
       }
 
@@ -429,6 +434,8 @@ class PDb_Init
           }
 
         }
+        // set the version number this step brings the db to
+        update_option( Participants_Db::$db_version_option, '0.5.1' );
 				
 			}
 
@@ -436,7 +443,7 @@ class PDb_Init
        * this is to fix a problem with the timestamp having it's datatype
        * changed when the field attributes are edited
        */
-			if ( '0.5' == get_option( Participants_Db::$db_version_option ) ) {
+			if ( '0.51' == get_option( Participants_Db::$db_version_option ) ) {
 
         $sql = "SHOW FIELDS FROM ".Participants_Db::$participants_table." WHERE `field` IN ('date_recorded','date_updated')";
         $field_info = $wpdb->get_results( $sql );
@@ -554,6 +561,51 @@ class PDb_Init
       error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );
       
     }
+    
+    /**
+     * performs a series of tests on the database to determine it's actual version
+     * 
+     * this is beacuse it is apparently possible for the database version option 
+     * to be incorrect or missing
+     */
+    private function _set_database_real_version() {
+
+      global $wpdb;
+
+      // set up the option starting with the first version
+      add_option(Participants_Db::$db_version_option);
+      update_option(Participants_Db::$db_version_option, '0.1');
+
+      // check to see if the update to 0.2 has been performed
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$fields_table . ' LIKE "column"');
+      if (empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.2');
+      else return;
+
+      $column_test = $wpdb->get_results('SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = "' . Participants_Db::$fields_table . '" AND COLUMN_NAME = "values"');
+      if ( strtolower($column_test[0]->DATA_TYPE) == 'longtext')
+        // we're skipping update 3
+        update_option(Participants_Db::$db_version_option, '0.4');
+      else return;
+
+      // check to see if this update has been performed
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$fields_table . ' LIKE "import"');
+      if (empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.51');
+      else return;
+      
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$fields_table . ' LIKE "readonly"');
+      if (!empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.55');
+      else return;
+      
+      // check to see if the update to 0.2 has been performed
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$participants_table . ' LIKE "last_accessed"');
+      if (!empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.6');
+      else return;
+      
+  }
 
     /**
      * defines arrays containg a starting set of fields, groups, etc.

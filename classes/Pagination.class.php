@@ -112,7 +112,7 @@ class Pagination {
                 'disabled_class' => 'disabled',
                 'filtering' => 0,
                 'anchor_wrap' => false,
-                'first_last' => true,
+                'first_last' => false,
                 'add_variables' => '',
             )));
     $this->setPage($page);
@@ -124,6 +124,7 @@ class Pagination {
     $this->set_anchor_wrap($anchor_wrap);
     $this->current_page_class = $current_page_class;
     $this->disabled_class = $disabled_class;
+    $this->first_last = $first_last; 
   }
 
   /**
