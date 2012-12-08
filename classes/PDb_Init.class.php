@@ -582,24 +582,26 @@ class PDb_Init
         update_option(Participants_Db::$db_version_option, '0.2');
       else return;
 
+      // check for version 0.4
       $column_test = $wpdb->get_results('SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = "' . Participants_Db::$fields_table . '" AND COLUMN_NAME = "values"');
       if ( strtolower($column_test[0]->DATA_TYPE) == 'longtext')
-        // we're skipping update 3
+        // we're skipping update 3 because all it does is insert default values
         update_option(Participants_Db::$db_version_option, '0.4');
       else return;
 
-      // check to see if this update has been performed
+      // check for version 0.51
       $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$fields_table . ' LIKE "import"');
       if (empty($column_test))
         update_option(Participants_Db::$db_version_option, '0.51');
       else return;
       
+      // check for version 0.55
       $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$fields_table . ' LIKE "readonly"');
       if (!empty($column_test))
         update_option(Participants_Db::$db_version_option, '0.55');
       else return;
       
-      // check to see if the update to 0.2 has been performed
+      // check for version 0.6
       $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$participants_table . ' LIKE "last_accessed"');
       if (!empty($column_test))
         update_option(Participants_Db::$db_version_option, '0.6');

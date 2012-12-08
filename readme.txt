@@ -551,7 +551,7 @@ Here is the full list of parameters you can use with the `[pdb_list]` shortcode 
 * list_limit - sets the number of records to list per page (defaults to the plugin setting value) `[pdb_list list_limit="5"]`
 * class - lets you set the CSS class of the container (defaults to 'participants-database') `[pdb_list class="full-list centered"]`
 * filter - lets you determine which records are shown (see the usage notes for an explanation) `[pdb_list filter="event_date>oct 13,2011&state=NY"]`
-* orderby - order the list by one of the columns `[pdb_list orderby="event_date"]`
+* orderby - order the list by one of the columns `[pdb_list orderby="event_date"]` It's also possible to order the list randomly with `orderby=random`
 * order - determines whether the list is ordered in ascending (asc) or descending (desc) order `[pdb_list order="asc"]`
 * display_count - if set to 'true' will display a total of all records displayed `[pdb_list display_count="true"]`
 
@@ -565,13 +565,13 @@ If you want to get tricky with the CSS, each header column has a class name that
 
 **Searching and Sorting The List**
 
-You can activate list searching and/or sorting for your users to control how the list is displayed. Like this `[pdb_list search="true"]` or `[pdb_list sort="true"]` The user can select which field they want to search through a dropdown. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
+You can activate list searching and/or sorting for your users with tese attributes: `[pdb_list search="true"]` or `[pdb_list sort="true"]` These attributes will enable a search form and/or sort form displayed above the list. The user can select which field they want to search through a dropdown and type in a search term. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
 
 There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
 
 It's also possible to perform a "search" on the list with parameters in the URL. This would be handy if you wanted to create a link to the list that would only show certain results. For instance, if you wanted to make a link to the list that showed only results from the city of Phoenix you would add these variables to the URL: `?search_field=city&value=phoenix` Add that to the end of a link to the page where the `[pdb_list]` shortcode is, and it will only show records with a city value of 'phoenix.' This also means you can create your own search functionality, the primary limitation being you can only do this for one field at a time.
 
-Please note that list searching, sorting and pagination will not work properly if there is more than one list on a page.  
+Please note that user list searching, sorting and pagination will not work properly if there is more than one list on a page. The shortcode filtering and sorting will work as exprected, however.
 
 = Filtering which Records Get Shown with the List Shortcode =
 
@@ -611,7 +611,9 @@ One application for the list filtering option allows you to control whether a re
 
 To show an individual record on the website, use the `[pdb_single]` shortcode. You must include the id of the record in the URL, so there must be 'pdb=1333' at the end of the page URL. The '1333' in this example would be the actual id number of the record you want to show.
 
-You can put a link to the single record in the participant list by defining the page on which the `[pdb_single]` is placed, and the column where you want the link to appear. In the plugin settings, general settings tab, look for "Single Record Page": set that to the page where your `[pdb_single]` shortcode is. Then, go to "Single Record Link Field" and choose which field will be the link to the single record page. You can set the link on any text field or an image field. If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW".
+You can put a link to the single record in the participant list by defining the page on which the `[pdb_single]` is placed, and the column where you want the link to appear. In the plugin settings, general settings tab, look for "Single Record Page": set that to the page where your `[pdb_single]` shortcode is. Then, go to "Single Record Link Field" and choose which field will be the link to the single record page. You can set the link on any text field or an image field.
+
+If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW". You must use the "detailed" list template for this to work.
 
 If you are good with CSS, you can easily make the link look like a button.
 

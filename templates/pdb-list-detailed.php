@@ -126,6 +126,17 @@ this is a more detailed template showing how the parts of the display can be cus
 						 * have to modify that in the same way
 						 */
 						if ( $this->field->is_single_record_link() ) {
+              
+              /*
+               * normally, when a value is empty, nothing is shown...but if the field 
+               * has been designated as the single record link, we must have something 
+               * to click on, so, we use the default value of the field if there is no 
+               * stored value. This makes it possible to create a 'static' link to the 
+               * single record by defining a read-only field with a default value
+               */
+              $value = empty($value) ? $this->field->default : $value;
+              
+              // create the link
               echo Participants_Db::make_link(
 								
 								/* URL of the single record page: replace this to specify a single
@@ -141,12 +152,12 @@ this is a more detailed template showing how the parts of the display can be cus
                 $single_record_link,
 								
 								// field value
-                empty($value) ? $this->field->default : $value,
+                $value,
 								
 								/* template for building the link: this would be the place to include
 								 * anything special you want to add to the link
 								 */
-                '<a href="%1$s" title="%2$s" >%2$s</a>',
+                '<a href="%1$s" title="%2$s" >',
 								
 								/* record ID to get the record. You can add other variables to the link
 								 * if you want by adding more name/value pairs to the array
