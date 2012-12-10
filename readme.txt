@@ -189,6 +189,9 @@ You can no doubt come up with many variations on this.
 
 == Changelog ==
 
+= 1.4.5.1 =
+* bugfix for admin list javascript bug that deletes all records on a page if you try to delete a record
+
 = 1.4.5 =
 * AJAX search/sort internationalization
 * fixed pagination issues with WP query-string page links
@@ -424,6 +427,9 @@ You can no doubt come up with many variations on this.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.4.5.1 =
+Important bugfix for admin list bug that can delete all records on the page if you delete a record
 
 = 1.4.5 =
 Several minor issues fixed, database update code ensures the database is in sync, pagination issues solved, improvements to pdb-list-detailed template
