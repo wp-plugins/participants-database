@@ -340,7 +340,6 @@ class PDb_List_Admin
         var x = window.confirm( plural ? L10n.records : L10n.record );
         armDelbutton(x);
         check_state = !x;
-        checkedAll();
         return x;
       }
 
