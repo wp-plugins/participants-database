@@ -30,9 +30,6 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
     box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
     border-color: rgba(197, 99, 59, 0.5);
 }
-.pdb-signup th {
-    width:200px;
-}
 fieldset.widefat,
 #PDb_footer {
     padding:7px;
@@ -81,6 +78,10 @@ input[type="checkbox"],
 .inline-controls select {
   float: none;
   display: inline;
+  margin-right:0;
+}
+#checkall {
+  margin:4px 0;
 }
 .checkmark {
   font-size:19px;
@@ -131,6 +132,26 @@ body[class*='participants-database'] .text-block {
   max-height: 5em;
   max-width: 150px;
   overflow: auto;
+}
+.image-filename {
+  display: inline-block;
+  margin: 0 0 0 10px;
+}
+/* set placeholder colors */
+::-webkit-input-placeholder {
+    color: #AAAAAA;
+}
+:-moz-placeholder {
+  color: #AAAAAA !important;
+}
+:-ms-input-placeholder {
+  color: #AAAAAA;
+}
+:focus::-webkit-input-placeholder {
+  color:transparent;
+}
+:focus:-moz-placeholder {
+  color: transparent !important;
 }
 
 /* manage fields */

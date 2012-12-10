@@ -15,8 +15,6 @@
 
 class PDb_Init
 {
-    // this is the current db version
-    const VERSION = '0.6';
 
     // arrays for building default field set
     public static $internal_fields;
@@ -164,8 +162,8 @@ class PDb_Init
         $wpdb->query($sql);
 
         // save the db version
-        add_option( Participants_Db::$db_version );
-        update_option( Participants_Db::$db_version, self::VERSION );
+        add_option( Participants_Db::$db_version_option );
+        update_option( Participants_Db::$db_version_option, Participants_Db::$db_version );
 
         // now load the default values into the database
         $i = 0;
@@ -210,7 +208,51 @@ class PDb_Init
 
       endif;// end of the fresh install
 
-      if ( false === get_option( Participants_Db::$db_version ) || '0.1' == get_option( Participants_Db::$db_version ) ) {
+      
+				
+      error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
+      
+    }
+
+    private function _deactivate()
+    {
+				
+				error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
+    }
+
+    private function _uninstall()
+    {
+
+        global $wpdb;
+
+        // delete tables
+        $sql = 'DROP TABLE `'.Participants_Db::$fields_table.'`, `'.Participants_Db::$participants_table.'`, `'.Participants_Db::$groups_table.'`;';
+        $wpdb->query( $sql );
+
+        // remove options
+        delete_option( Participants_Db::$participants_db_options );
+				delete_option( Participants_Db::$db_version_option );
+
+				// clear transients
+				delete_transient( 'pdb_last_record' );
+				
+        error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
+        
+    }
+    
+    /**
+     * performs an update to the database if needed
+     */
+    public function on_update() {
+      
+      global $wpdb;
+      
+      // determine the actual version status of the database
+      self::_set_database_real_version();
+      
+      if (WP_DEBUG) error_log('participants database db version determined to be: '.get_option( Participants_Db::$db_version_option ) );
+      
+      if ( false === get_option( Participants_Db::$db_version_option ) || '0.1' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
          * updates version 0.1 database to 0.2
@@ -226,31 +268,31 @@ class PDb_Init
         if ( false !== $wpdb->query( $sql ) ) {
 
           // in case the option doesn't exist
-          add_option( Participants_Db::$db_version );
+          add_option( Participants_Db::$db_version_option );
 
           // set the version number this step brings the db to
-          update_option( Participants_Db::$db_version, '0.2' );
+          update_option( Participants_Db::$db_version_option, '0.2' );
 
         }
-				
-				// load some preset values into new column
-				$values = array( 
-												'first_name' => 1,
-												'last_name'  => 2,
-												'city'       => 3,
-												'state'      => 4 
-												);
-				foreach( $values as $field => $value ) {
-					$wpdb->update( 
-												Participants_Db::$fields_table,
-												array('display_column' => $value ),
-												array( 'name' => $field )
-												);
-				}
+
+        // load some preset values into new column
+        $values = array( 
+                        'first_name' => 1,
+                        'last_name'  => 2,
+                        'city'       => 3,
+                        'state'      => 4 
+                        );
+        foreach( $values as $field => $value ) {
+          $wpdb->update( 
+                        Participants_Db::$fields_table,
+                        array('display_column' => $value ),
+                        array( 'name' => $field )
+                        );
+        }
 
       }
 
-      if ( '0.2' == get_option( Participants_Db::$db_version ) ) {
+      if ( '0.2' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
          * updates version 0.2 database to 0.3
@@ -264,13 +306,13 @@ class PDb_Init
         if ( false !== $wpdb->query( $sql ) ) {
 
           // set the version number this step brings the db to
-          update_option( Participants_Db::$db_version, '0.3' );
+          update_option( Participants_Db::$db_version_option, '0.3' );
 
         }
 
       }
 
-      if ( '0.3' == get_option( Participants_Db::$db_version ) ) {
+      if ( '0.3' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
          * updates version 0.3 database to 0.4
@@ -336,11 +378,11 @@ class PDb_Init
 				endif;
 				
 				// set the version number this step brings the db to
-				update_option( Participants_Db::$db_version, '0.4' );
+				update_option( Participants_Db::$db_version_option, '0.4' );
 
       }
 
-      if ( '0.4' == get_option( Participants_Db::$db_version ) ) {
+      if ( '0.4' == get_option( Participants_Db::$db_version_option ) ) {
 
         /*
          * updates version 0.4 database to 0.5
@@ -353,7 +395,7 @@ class PDb_Init
         if ( false !== $wpdb->query( $sql ) ) {
 
           // set the version number this step brings the db to
-          update_option( Participants_Db::$db_version, '0.5' );
+          update_option( Participants_Db::$db_version_option, '0.5' );
 
         }
 
@@ -361,7 +403,7 @@ class PDb_Init
 			
 			/* this fixes an error I made in the 0.5 DB update
 			*/
-			if ( '0.5' == get_option( Participants_Db::$db_version ) && false === Participants_Db::get_participant() ) {
+			if ( '0.5' == get_option( Participants_Db::$db_version_option ) && false === Participants_Db::get_participant() ) {
 				
 				// define the arrays for loading the initial db records
       	$this->_define_init_arrays();
@@ -392,6 +434,8 @@ class PDb_Init
           }
 
         }
+        // set the version number this step brings the db to
+        update_option( Participants_Db::$db_version_option, '0.5.1' );
 				
 			}
 
@@ -399,7 +443,7 @@ class PDb_Init
        * this is to fix a problem with the timestamp having it's datatype
        * changed when the field attributes are edited
        */
-			if ( '0.5' == get_option( Participants_Db::$db_version ) ) {
+			if ( '0.51' == get_option( Participants_Db::$db_version_option ) ) {
 
         $sql = "SHOW FIELDS FROM ".Participants_Db::$participants_table." WHERE `field` IN ('date_recorded','date_updated')";
         $field_info = $wpdb->get_results( $sql );
@@ -456,11 +500,25 @@ class PDb_Init
 				 * add the "read-only" column
 				 */
 				$sql = "ALTER TABLE ".Participants_Db::$fields_table." ADD COLUMN `readonly` BOOLEAN DEFAULT 0 AFTER `signup`";
+        
+        $wpdb->query( $sql );
+        
+        /*
+         * change the old 'textarea' field type to the new 'text-area'
+         */
+        $sql = "
+          UPDATE ".Participants_Db::$fields_table."
+          SET `form_element` = replace(`form_element`, \"textarea\", \"text-area\")";
+        $wpdb->query( $sql ); 
+        $sql = "
+          UPDATE ".Participants_Db::$fields_table."
+          SET `form_element` = replace(`form_element`, \"text-field\", \"text-line\") ";
+        
 
         if ( false !== $wpdb->query( $sql ) ) {
 
           // update the stored DB version number
-          update_option( Participants_Db::$db_version, '0.55' );
+          update_option( Participants_Db::$db_version_option, '0.55' );
 
         }
 			
@@ -470,7 +528,7 @@ class PDb_Init
 			 * this database version adds the "last_accessed" column to the main database
 			 * 
 			 */
-			if ( '0.55' == get_option( Participants_Db::$db_version ) ) { 
+			if ( '0.55' == get_option( Participants_Db::$db_version_option ) ) { 
 			
 				/*
 				 * add the "last_accessed" column
@@ -494,41 +552,62 @@ class PDb_Init
         if ( false !== $wpdb->insert( Participants_Db::$fields_table, $data ) ) {
 
           // update the stored DB version number
-          update_option( Participants_Db::$db_version, '0.6' );
+          update_option( Participants_Db::$db_version_option, '0.6' );
 
         }
 			
 			}
-				
-      error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
+      
+      error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );
       
     }
+    
+    /**
+     * performs a series of tests on the database to determine it's actual version
+     * 
+     * this is beacuse it is apparently possible for the database version option 
+     * to be incorrect or missing
+     */
+    private function _set_database_real_version() {
 
-    private function _deactivate()
-    {
-				
-				error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
-    }
+      global $wpdb;
 
-    private function _uninstall()
-    {
+      // set up the option starting with the first version
+      add_option(Participants_Db::$db_version_option);
+      update_option(Participants_Db::$db_version_option, '0.1');
 
-        global $wpdb;
+      // check to see if the update to 0.2 has been performed
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$fields_table . ' LIKE "column"');
+      if (empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.2');
+      else return;
 
-        // delete tables
-        $sql = 'DROP TABLE `'.Participants_Db::$fields_table.'`, `'.Participants_Db::$participants_table.'`, `'.Participants_Db::$groups_table.'`;';
-        $wpdb->query( $sql );
+      // check for version 0.4
+      $column_test = $wpdb->get_results('SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = "' . Participants_Db::$fields_table . '" AND COLUMN_NAME = "values"');
+      if ( strtolower($column_test[0]->DATA_TYPE) == 'longtext')
+        // we're skipping update 3 because all it does is insert default values
+        update_option(Participants_Db::$db_version_option, '0.4');
+      else return;
 
-        // remove options
-        delete_option( Participants_Db::$participants_db_options );
-				delete_option( Participants_Db::$db_version );
-
-				// clear transients
-				delete_transient( 'pdb_last_record' );
-				
-        error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
-        
-    }
+      // check for version 0.51
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$fields_table . ' LIKE "import"');
+      if (empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.51');
+      else return;
+      
+      // check for version 0.55
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$fields_table . ' LIKE "readonly"');
+      if (!empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.55');
+      else return;
+      
+      // check for version 0.6
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$participants_table . ' LIKE "last_accessed"');
+      if (!empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.6');
+      else return;
+      
+  }
 
     /**
      * defines arrays containg a starting set of fields, groups, etc.

@@ -124,7 +124,7 @@ class Field_Item extends Template_Item {
     
     $label = $this->prepare_display_value( $this->title );
     
-    if ( $this->options['mark_required_fields'] && $this->validation != 'no' ) {
+    if ( $this->options['mark_required_fields'] && $this->validation != 'no' && $this->module != 'single' ) {
       
       $label = sprintf( $this->options['required_field_marker'], $label );
       

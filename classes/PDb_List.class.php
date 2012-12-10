@@ -26,7 +26,9 @@ class PDb_List extends PDb_Shortcode {
   var $module = 'list';
   // class for the wrapper
   var $wrap_class = 'pdb-list';
-  // holds the current instance of the class
+  /**
+   * @var object temporarily holds an instance of the object
+   */
   static $instance;
   // holds the main query for building the list
   static $list_query;
@@ -40,6 +42,8 @@ class PDb_List extends PDb_Shortcode {
   var $list_anchor = 'participants-list';
   // holds the url of the registrations page
   var $registration_page_url;
+  // holds the url to the single record page
+  var $single_record_url = false;
   // holds the columns to display in the list
   var $display_columns;
   // holds the list of sortable columns
@@ -50,6 +54,8 @@ class PDb_List extends PDb_Shortcode {
   var $filter;
   // holds plugin options array
   var $options;
+  // holdes the search error style statement
+  var $search_error_style = '';
   // holds the wrapper HTML for the pagination control
   // the first two elements wrap the whole control, the third wraps the buttons, the fourth wraps each button
   var $pagination_wrap = array(
@@ -70,6 +76,8 @@ class PDb_List extends PDb_Shortcode {
     // set the list limit value; this can be overridden by the shortcode atts later
     $this->page_list_limit = (!isset($_POST['list_limit']) or !is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? Participants_Db::$plugin_options['list_limit'] : $_POST['list_limit'];
 
+    $this->sortables = Participants_Db::get_sortables();
+
     // define the default settings for the shortcode
     $shortcode_defaults = array(
         'sort' => 'false',
@@ -77,12 +85,13 @@ class PDb_List extends PDb_Shortcode {
         'list_limit' => $this->page_list_limit,
         'class' => 'participants-database',
         'filter' => '',
-        'orderby' => 'date_recorded',
-        'order' => 'desc',
+        'orderby' => 'date_updated',
+        'order' => 'asc',
         'fields' => '',
+        'single_record_link' =>'',
         'display_count' => 'false',
         'template' => 'default',
-        'filtering' => false, // this is set to true if we're coming here from an AJAX call
+        'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
     );
 
     // run the parent class initialization to set up the parent methods 
@@ -94,13 +103,25 @@ class PDb_List extends PDb_Shortcode {
 
     $this->_set_display_columns();
 
-    $this->sortables = Participants_Db::get_sortables();
-
     $this->_setup_i18n();
+    
+    $this->_set_single_record_url();
 
     // enqueue the filter/sort AJAX script
-    if ($this->_sort_filter_mode() !== 'none' and $this->options['ajax_search'] == 1)
+    if ($this->_sort_filter_mode() !== 'none' and $this->options['ajax_search'] == 1) {
+
+      global $wp_query;
+
+      $ajax_params = array(
+          'ajaxurl' => admin_url('admin-ajax.php'),
+          'filterNonce' => wp_create_nonce('pdb-list-filter-nonce'),
+          'postID' => ( isset($wp_query->post) ? $wp_query->post->ID : '' ),
+          'i18n' => $this->i18n
+      );
+      wp_localize_script('list-filter', 'PDb_ajax', $ajax_params);
+      
       wp_enqueue_script('list-filter');
+    }
 
     // set up the iteration data
     $this->_setup_iteration();
@@ -109,7 +130,7 @@ class PDb_List extends PDb_Shortcode {
   }
 
   /**
-   * prints a signup form called by a shortcode
+   * prints a list of records called by a shortcode
    *
    * this function is called statically to instantiate the PDb_List object,
    * which captures the output and returns it for display
@@ -119,8 +140,7 @@ class PDb_List extends PDb_Shortcode {
    */
   public static function print_record($params) {
 
-    if (!isset(self::$instance))
-      self::$instance = new PDb_List($params);
+    self::$instance = new PDb_List($params);
 
     return self::$instance->output;
   }
@@ -132,11 +152,11 @@ class PDb_List extends PDb_Shortcode {
 
     // set some local variables for use in the template
     $filter_mode = $this->_sort_filter_mode();
-    $display_count = $this->shortcode_atts['display_count'];
+    $display_count = $this->shortcode_atts['display_count'] == 'true' or $this->shortcode_atts['display_count'] == '1';
     $record_count = $this->num_records;
     $records = $this->records;
     $fields = $this->display_columns;
-    $single_record_link = isset($this->options['single_record_page']) ? get_page_link($this->options['single_record_page']) : '';
+    $single_record_link = $this->single_record_url;
     $records_per_page = $this->shortcode_atts['list_limit'];
     $filtering = $this->shortcode_atts['filtering'];
 
@@ -162,11 +182,12 @@ class PDb_List extends PDb_Shortcode {
 
     // set up the pagination object
     $pagination_defaults = array(
-        'link' => $this->get_page_link($_SERVER['REQUEST_URI']),
+        'link' => ( $this->shortcode_atts['filtering'] ? urldecode($_POST['pagelink']) : $this->get_page_link($_SERVER['REQUEST_URI']) ),
         'page' => isset($_GET[$this->list_page]) ? $_GET[$this->list_page] : '1',
         'size' => $this->shortcode_atts['list_limit'],
         'total_records' => $this->num_records,
         'filtering' => $this->shortcode_atts['filtering'],
+        'add_variables' => http_build_query($this->filter) . '#' . $this->list_anchor,
     );
 
     // instantiate the pagination object
@@ -239,39 +260,89 @@ class PDb_List extends PDb_Shortcode {
         'value' => '',
         'operator' => 'LIKE',
         'sortBy' => $this->shortcode_atts['orderby'],
-        'ascdesc' => $this->shortcode_atts['order']
+        'ascdesc' => $this->shortcode_atts['order'],
+        'submit' => '',
     );
 
-    // merge the defaults with the $_REQUEST array so if there are any new values coming in, they're included
+    /* filtering parameters can come from three sources: the shortcode, $_POST (AJAX) 
+     * and $_GET (pagination and non-AJAX search form submissions) We merge the $_POST 
+     * and $_GET values with the defaults to get our initial set of filtering parameters. 
+     * Then we process the shortcode filter, skipping any specific column filters that 
+     * were brought in from the $_POST or $_GET. The processed values are kept in the 
+     * filter property
+     */
     $this->filter = shortcode_atts($default_values, $_REQUEST);
 
-    // if we've got a valid orderby, use it. Check $_POST first, shortcode second
-    $orderby = isset($this->filter['sortBy']) ? $this->filter['sortBy'] : $this->shortcode_atts['orderby'];
-    $orderby = Participants_Db::is_column($orderby) ? $orderby : ( $orderby == 'random' ? 'random' : current($this->sortables) );
-    $this->filter['sortBy'] = $orderby;
+    /* validate the sorting parameters 
+     */
+    $this->filter['sortBy'] = Participants_Db::is_column($this->filter['sortBy']) ? $this->filter['sortBy'] : ( $this->filter['sortBy'] == 'random' ? 'random' : 'date_updated' );
+    $this->filter['ascdesc'] = in_array(strtoupper($this->filter['ascdesc']), array('ASC', 'DESC')) ? strtoupper($this->filter['ascdesc']) : 'ASC';
 
-    $order = isset($this->filter['ascdesc']) ? strtoupper($this->filter['ascdesc']) : strtoupper($this->shortcode_atts['order']);
-    $order = in_array($order, array('ASC', 'DESC')) ? $order : 'ASC';
-    $this->filter['ascdesc'] = strtolower($order);
+    // assemble the ORDER BY clause
+    $order_clause = $this->filter['sortBy'] == 'random' ? ' ORDER BY RAND()' : ' ORDER BY `' . $this->filter['sortBy'] . '` ' . $this->filter['ascdesc'];
 
-    $order_clause = $orderby == 'random' ? ' ORDER BY RAND()' : ' ORDER BY `' . $orderby . '` ' . $order;
+    // assemble the base query
+    // $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $order_clause;
 
-    $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $order_clause;
+    /* at this point, we have our base query, now we need to add any WHERE clauses
+     */
 
-    if (isset($_POST['submit']) && $_POST['submit'] == $this->i18n['clear']) {
+    // add the shortcode filtering statements
+    $clauses = $this->_process_shortcode_filter();
 
+    /*
+     * process the user search, which has been placed in the filter property. These 
+     * values must be made secure as it is direct input from the browser 
+     */
+    
+    if (  empty($this->filter['submit']) ) {
+      // do nothing
+    } elseif ($this->filter['submit'] == $this->i18n['clear']) {
+
+      // process the "clear" submission
       $this->filter['value'] = '';
       $this->filter['search_field'] = 'none';
 
-      // go back to the first page
+      // a "clear" will take us back to the first page
       $_GET[$this->list_page] = 1;
-    }
+    } elseif (
+            !empty($this->filter['value']) &&
+            'none' != $this->filter['search_field'] &&
+            in_array($this->filter['search_field'], $this->display_columns)
+    ) {
+      
+      // we have a valid search, add it to the where clauses
+      $clauses[] = sprintf(
+              ($this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"'), 
+              $this->display_columns[array_search($this->filter['search_field'], $this->display_columns)], 
+              mysql_real_escape_string($this->filter['value'])
+      );
+    } elseif ( $this->filter['submit'] != $this->i18n['sort'] && empty($this->filter['value']))
+      $this->search_error('value');
+    elseif ( $this->filter['submit'] != $this->i18n['sort'] && 'none' == $this->filter['search_field'])
+      $this->search_error('search');
 
+    // assemble there WHERE clause
+    $where_clause = empty($clauses) ? '' : ' WHERE ' . implode(' AND ', $clauses);
+
+    $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $where_clause . $order_clause;
+
+    if (WP_DEBUG)
+      error_log(__METHOD__ . ' list query= ' . $this->list_query);
+  }
+  
+  /**
+   * processes the shortcode filter string
+   * 
+   * @return array an array of where clauses
+   */
+  private function _process_shortcode_filter() {
+
+    $clauses = array();
+    
     if (isset($this->shortcode_atts['filter'])) {
 
       $statements = explode('&', html_entity_decode($this->shortcode_atts['filter']));
-
-      $clauses = array();
 
       foreach ($statements as $statement) {
 
@@ -279,19 +350,16 @@ class PDb_List extends PDb_Shortcode {
 
         if ($operator === 0)
           continue; // no valid operator; skip to the next statement
-
-          
-// get the parts
+        
+        // get the parts
         list( $string, $column, $op_char, $target ) = $matches;
-
-        if (!Participants_Db::is_column($column) or (!empty($this->filter['value']) && $column == $this->filter['search_field'] )) {
-
-          /*
-           * the column specified was not valid or was used in a user search 
-           * query which overrides the shortcode; skip to the next one
-           */
+        
+        /*
+         * if the column is not valid or if the column is being searched in by 
+         * an overriding filter, skip this statement
+         */
+        if (!Participants_Db::is_column($column) or (!empty($this->filter['value']) && $column == $this->filter['search_field'] ))
           continue;
-        }
 
         $field_atts = Participants_Db::get_field_atts($column);
 
@@ -346,37 +414,15 @@ class PDb_List extends PDb_Shortcode {
          * a filter for 'id=0'
          */
         if (isset($this->filter['value']) and !empty($this->filter['value']) and $column == 'id' and $target == '0')
-          break;
+          continue;
 
         // add the clause
         $clauses[] = sprintf('`%s` %s %s%s%s', $column, $operator, $delimiter[0], $target, $delimiter[1]);
-      }// foreach $statements
+      }// each $statement
       
-      /*
-       * add the user search. These must be made secure as it is direct input from the browser 
-       */
-      if (
-              isset($this->filter['value']) && 
-              !empty($this->filter['value']) && 
-              'none' != $this->filter['search_field'] && 
-              in_array($this->filter['search_field'],$this->display_columns)
-              ) {
-
-        $clauses[] = sprintf(
-                ($this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"'), 
-                $this->display_columns[array_search($this->filter['search_field'], $this->display_columns)], 
-                mysql_real_escape_string($this->filter['value'])
-                );
-      }
-
-      // assemble there WHERE clause
-      $where_clause = empty($clauses) ? '' : ' WHERE ' . implode(' AND ', $clauses);
-
-      $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $where_clause . $order_clause;
-    }
-
-    if (WP_DEBUG)
-      error_log(__METHOD__ . ' list query= ' . $this->list_query);
+    }// done processing shortcode filter statements
+    
+    return $clauses;
   }
 
   /**
@@ -389,6 +435,7 @@ class PDb_List extends PDb_Shortcode {
 
     if ($this->_sort_filter_mode() != 'none' && !$this->shortcode_atts['filtering']) {
 
+      $output[] = $this->search_error_style;
       $output[] = '<div class="pdb-searchform">';
       $output[] = '<div class="pdb-error pdb-search-error" style="display:none">';
       $output[] = sprintf('<p id="search_field_error">%s</p>', __('Please select a column to search in.', 'participants-database'));
@@ -408,7 +455,10 @@ class PDb_List extends PDb_Shortcode {
         $output[] = '</fieldset>';
       }
 
-      if ($this->_sort_filter_mode() == 'sort' || $this->_sort_filter_mode() == 'both') {
+      if (
+              ($this->_sort_filter_mode() == 'sort' || $this->_sort_filter_mode() == 'both') and 
+              ( ! empty( $this->sortables ) and is_array( $this->sortables ) ) 
+              ) {
 
         $output[] = '<fieldset class="widefat">';
 
@@ -443,6 +493,7 @@ class PDb_List extends PDb_Shortcode {
     $class_att = $class ? 'class="' . $class . '"' : '';
     $output[] = '<form method="post" id="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
     $output[] = '<input type="hidden" name="action" value="pdb_list_filter">';
+    $output[] = '<input type="hidden" name="pagelink" value="' . $this->get_page_link($_SERVER['REQUEST_URI']) . '">';
 
     if ($print)
       echo $this->output_HTML($output);
@@ -496,7 +547,7 @@ class PDb_List extends PDb_Shortcode {
         'type' => 'dropdown',
         'name' => 'sortBy',
         'value' => $this->filter['sortBy'],
-        'options' => $this->sortables,
+        'options' => array(''=>''  ) + $this->sortables,
         'class' => 'search-item',
     );
     $output[] = FormElement::get_element($element);
@@ -507,8 +558,8 @@ class PDb_List extends PDb_Shortcode {
         'value' => $this->filter['ascdesc'],
         'class' => 'checkbox inline search-item',
         'options' => array(
-            __('Ascending', 'participants-database') => 'asc',
-            __('Descending', 'participants-database') => 'desc'
+            __('Ascending', 'participants-database') => 'ASC',
+            __('Descending', 'participants-database') => 'DESC'
         ),
     );
     $output[] = FormElement::get_element($element);
@@ -529,15 +580,16 @@ class PDb_List extends PDb_Shortcode {
    */
   public function show_pagination_control() {
 
-    // this only happens if we're not processing an AJAX call
-    if (!$this->shortcode_atts['filtering']) {
+    // set the wrapper HTML parameters
+    $this->pagination->set_wrappers($this->pagination_wrap);
+    
+    /*
+     * add a split point if this is an AJAX call
+     */
+    $split_point = $this->shortcode_atts['filtering'] ? '%%%' : '';
 
-      // set the wrapper HTML parameters
-      $this->pagination->set_wrappers($this->pagination_wrap);
-
-      // print the control
-      echo $this->pagination->create_links();
-    }
+    // print the control
+    echo $split_point.$this->pagination->create_links();
   }
 
   /**
@@ -610,7 +662,7 @@ class PDb_List extends PDb_Shortcode {
             &&
             $column == $this->options['single_record_link_field']
             &&
-            !empty($this->options['single_record_page'])
+            false !== $this->single_record_url
             &&
             !in_array($this->get_field_type($column), array('rich-text', 'link'))
             );
@@ -687,6 +739,9 @@ class PDb_List extends PDb_Shortcode {
 
   /**
    * strips the page number out of the URI so it can be used as a link to other pages
+   * 
+   * we also strip out the request string for filtering values as they are added 
+   * from the 'add_variables' element of the pagination config array
    *
    * @param string $uri the incoming URI, usually $_SERVER['REQUEST_URI']
    *
@@ -702,11 +757,25 @@ class PDb_List extends PDb_Shortcode {
     } else {
 
       parse_str($URI_parts[1], $values);
-
+      
+      // take out the list page number
       unset($values[$this->list_page]);
+      
+      /* clear out our filter variables so that all that's left in the URI are 
+       * variables from WP or any other source-- this is mainly so query string 
+       * page id can work with the pagination links
+       */
+      $filter_atts = array(
+        'search_field',
+        'value',
+        'operator',
+        'sortBy',
+        'ascdesc',
+      );
+      foreach( $filter_atts as $att ) unset($values[$att]);
     }
 
-    return $URI_parts[0] . '?' . $this->_filter_query($values) . $this->list_page . '=%s#' . $this->list_anchor;
+    return $URI_parts[0] . '?' . http_build_query($values) . '&' . $this->list_page . '=%s';
   }
 
   /**
@@ -720,14 +789,14 @@ class PDb_List extends PDb_Shortcode {
   }
 
   /**
-   * builds a URI querys string from the filter parameters
+   * builds a URI query string from the filter parameters
    *
    * @param  array  $values the incoming finter values
    * @return string URL-encoded filter parameters, empty string if filter is not active
    */
   private function _filter_query($values) {
 
-    if (!empty($values) and $values['search_field'] != 'none') {
+    if (!empty($values)) {
 
       return http_build_query(array_merge($values, $this->filter)) . '&';
     } else
@@ -781,6 +850,37 @@ class PDb_List extends PDb_Shortcode {
     $this->filter['value'] = $post['value'];
 
     return $this->filter['search_field'] . $this->filter['operator'] . $this->filter['value'];
+  }
+  
+  /**
+   * sets the search error so it will be shown to the user
+   * 
+   * @param string $type sets the error type
+   * @return string the CSS style rule to add
+   */
+  public function search_error( $type ) {
+    
+    $css = array('.pdb-search-error');
+    
+    if ($type == 'search') $css[] = '#search_field_error';
+    if ($type == 'value' ) $css[] = '#value_error';
+    
+    $this->search_error_style = sprintf('<style>.pdb-search-error p { display:none } %s { display:inline-block !important }</style>', implode( ', ', $css) );
+  }
+  
+  /**
+   * sets the single record page url
+   * 
+   */
+  private function _set_single_record_url() {
+    
+    if (!empty($this->shortcode_atts['single_record_link']))
+      $page_id = Participants_Db::get_id_by_slug($this->shortcode_atts['single_record_link']);
+    elseif (isset($this->options['single_record_page']))
+      $page_id = $this->options['single_record_page'];
+    else $page_id = false;
+    
+    $this->single_record_url = get_page_link($page_id);
   }
 
   /**

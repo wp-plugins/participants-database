@@ -175,11 +175,13 @@ class FormElement {
         break;
 
       case 'text-area':
+      case 'textarea':
         $this->_text_field();
         break;
       
       case 'rich-text':
-        $this->_rich_text_field();
+        if ( Participants_Db::$plugin_options['rich_text_editor'] ) $this->_rich_text_field();
+        else $this->_text_field();
         break;
 
       case 'checkbox':

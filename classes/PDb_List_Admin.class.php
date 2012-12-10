@@ -39,6 +39,9 @@ class PDb_List_Admin
 	
 	// name of the list anchor element
 	static $list_anchor = 'participants-list';
+  
+  // name of the list limit transient
+  static $limit_cookie = 'pdb-admin-list-limit';
 	
 	// the number of records after filtering
 	static $num_records;
@@ -69,9 +72,11 @@ class PDb_List_Admin
 		self::_setup_i18n();
     
     self::$options = get_option( Participants_Db::$participants_db_options );
+    
+    get_currentuserinfo();
 
     // set the list limit value
-    self::$page_list_limit = ( ! isset( $_POST['list_limit'] ) or ! is_numeric( $_POST['list_limit'] ) or $_POST['list_limit'] < 1 ) ? self::$options['list_limit'] : $_POST['list_limit'];
+    self::set_list_limit();
     
     self::$registration_page_url = get_bloginfo('url').'/'.( isset( self::$options['registration_page'] ) ? self::$options['registration_page'] : '' );
 
@@ -85,7 +90,8 @@ class PDb_List_Admin
 														'value'        => '',
 														'operator'     => 'LIKE',
 														'sortBy'       => self::$options['admin_default_sort'],
-														'ascdesc'      => self::$options['admin_default_sort_order']
+														'ascdesc'      => self::$options['admin_default_sort_order'],
+                            'submit'       => '',
 														);
 		
 		// merge the defaults with the $_REQUEST array so if there are any new values coming in, they're included
@@ -93,9 +99,8 @@ class PDb_List_Admin
 		
 		// process delete and items-per-page form submissions
 		self::_process_general();
-		
-		$submit = isset( $_POST['submit'] ) ? empty( $_POST['submit'] ) ? '' : $_POST['submit'] : '';
-		self::_process_search( $submit );
+    
+		self::_process_search( self::$filter['submit'] );
 		
 		if ( WP_DEBUG ) error_log( __METHOD__.' list query= '.self::$list_query );
 		
@@ -103,7 +108,7 @@ class PDb_List_Admin
 		global $wpdb;
 		
 		// get the number of records returned
-		self::$num_records = count( $wpdb->get_results( self::$list_query, ARRAY_A ) );
+		self::$num_records = $wpdb->get_var( str_replace('*', 'COUNT(*)', self::$list_query) );
 		
 		// set the pagination object
 		self::$pagination = new Pagination( array(
@@ -113,6 +118,7 @@ class PDb_List_Admin
 																	'total_records' => self::$num_records,
 																	'wrap_tag'      => '<div class="pagination"><label>'._x('Page', 'noun; page number indicator', 'participants-database' ).':</label> ',
 																	'wrap_tag_close'=> '</div>',
+                                  'add_variables' => http_build_query(self::$filter) . '#pdb-list-admin',
 																	));
 		
 		// get the records for this page, adding the pagination limit clause
@@ -151,29 +157,41 @@ class PDb_List_Admin
 	 * @return string the re-constituted URI
 	 */
 	public function get_page_link( $uri ) {
-	
-		$URI_parts = explode( '?', $uri );
-		
-		if ( empty( $URI_parts[1] ) ) {
-		
-			$values = array();
-		
-		} else {
-		
-			parse_str( $URI_parts[1], $values );
-			
-			unset( $values[ self::$list_page ] );
-			
-		}
-		
-		return $URI_parts[0].'?'.http_build_query( array_merge( $values, self::$filter ) ).'&'.self::$list_page.'=%s#'.self::$list_anchor;
+
+    $URI_parts = explode('?', $uri);
+
+    if (empty($URI_parts[1])) {
+
+      $values = array();
+    } else {
+
+      parse_str($URI_parts[1], $values);
+      
+      // take out the list page number
+      unset($values[self::$list_page]);
+      
+      /* clear out our filter variables so that all that's left in the URI are 
+       * variables from WP or any other source-- this is mainly so query string 
+       * page id can work with the pagination links
+       */
+      $filter_atts = array(
+        'search_field',
+        'value',
+        'operator',
+        'sortBy',
+        'ascdesc',
+        'submit',
+      );
+      foreach( $filter_atts as $att ) unset($values[$att]);
+    }
+
+    return $URI_parts[0] . '?' . http_build_query($values) . '&' . self::$list_page . '=%s';
 	
 	}
 	
 	
 	/**	
-	 * processes all the general list actions: delete and  set items-per-page;
-	 * these are only available in the admin
+	 * processes all the general list actions: delete and  set items-per-page
 	 */
 	private function _process_general() {
 		
@@ -193,8 +211,11 @@ class PDb_List_Admin
 					break;
 					
 				case self::$i18n['change']:
+          
+          global $user_ID;
 				
-					Participants_Db::$plugin_settings->update_option( 'list_limit', self::$page_list_limit );
+          set_transient(self::$limit_cookie.'-'.$user_ID, self::$page_list_limit );
+					//Participants_Db::$plugin_settings->update_option( 'list_limit', self::$page_list_limit );
 					break;
 					
 				default:
@@ -277,7 +298,7 @@ class PDb_List_Admin
 				self::$list_query .= ' ORDER BY `'.mysql_real_escape_string(self::$filter['sortBy']).'` '.mysql_real_escape_string(self::$filter['ascdesc']);
 		
 				// go back to the first page to display the newly sorted/filtered list
-				$_GET[ self::$list_page ] = 1;
+				if ( isset( $_POST['submit'] ) ) $_GET[ self::$list_page ] = 1;
 				
 				break;
 				
@@ -286,7 +307,7 @@ class PDb_List_Admin
 				self::$filter['value'] = '';
 				self::$filter['search_field'] = 'none';
 		
-				// go back to the first page
+				// go back to the first page if the search has just been submitted
 				$_GET[ self::$list_page ] = 1;
 				
 			default:
@@ -303,60 +324,69 @@ class PDb_List_Admin
 	private function _admin_top() {
 	?>
 	<script type="text/javascript" language="javascript">
-    var L10n = {"record":"<?php _e("Do you really want to delete the selected record?", 'participants-database' )?>","records":"<?php _e("Do you really want to delete the selected records?", 'participants-database' )?>"};
-  
-    function delete_confirm() {
-			var plural = ( document.getElementById('select_count').value > 1 ) ? true : false;
-      var x = window.confirm( plural ? L10n.records : L10n.record );
-      if (x)
-        return true
-      else
-        return false
-    }
-		
-    check_state=false;
-    function checkedAll (form_id) {
-      var form = document.getElementById(form_id);
-      if (check_state == false) {
-               check_state = true
-      } else {
-               check_state = false;
-							 armDelbutton(false);
+      
+      var L10n = {
+        "record":"<?php _e("Do you really want to delete the selected record?", 'participants-database' )?>",
+        "records":"<?php _e("Do you really want to delete the selected records?", 'participants-database' )?>"
+      },
+      check_state = false;
+      
+      window.onload=function(){
+        armDelbutton(false)
+      };
+
+      function delete_confirm() {
+        var plural = ( document.getElementById('select_count').value > 1 ) ? true : false;
+        var x = window.confirm( plural ? L10n.records : L10n.record );
+        armDelbutton(x);
+        check_state = !x;
+        return x;
       }
-      for (var i =0; i < form.elements.length; i++) {
-				if ( form.elements[i].type == 'checkbox' && form.elements[i].name != 'checkall' ) {
-        	form.elements[i].checked = check_state;
-					addSelects( check_state );
-				}
+
+      function checkedAll () {
+        var form = document.getElementById('list_form');
+        if (check_state == false) {
+                 check_state = true
+        } else {
+                 check_state = false;
+                 armDelbutton(false);
+        }
+        for (var i =0; i < form.elements.length; i++) {
+          if ( form.elements[i].type == 'checkbox' && form.elements[i].name != 'checkall' && form.elements[i].checked != check_state ) {
+            form.elements[i].checked = check_state;
+            addSelects( check_state );
+          }
+        }
       }
-    }
-		
-		function addSelects( selected ) {
-			var count_element = document.getElementById('select_count');
-			var count = count_element.value;
-			if ( selected === true ) count++;
-			else {
-				count--;
-				document.getElementById('checkall').checked = false;
-			}
-			if ( count < 0 ) count = 0;
-			armDelbutton(count > 0);
-			count_element.value = count;
-		}
-		
-		function armDelbutton( state ) {
-			var delbutton = document.getElementById('delete_button');
-			delbutton.setAttribute('class',state?'armed':'unarmed');
-		}
-			
-		
-		function checkEnter(e){
-		 e = e || event;
-		 return (e.keyCode || event.which || event.charCode || 0) !== 13;
-		}
+
+      function addSelects( selected ) {
+        var count_element = document.getElementById('select_count');
+        var count = count_element.value;
+        if ( selected === true ) count++;
+        else {
+          count--;
+          document.getElementById('checkall').checked = false;
+        }
+        if ( count < 0 ) count = 0;
+        armDelbutton(count > 0);
+        count_element.value = count;
+      }
+
+      function armDelbutton( state ) {
+        var delbutton = document.getElementById('delete_button');
+        delbutton.setAttribute('class',state?'armed':'unarmed');
+        delbutton.disabled=state?false:true;
+      }
+
+
+      function checkEnter(e){
+       e = e || event;
+       return (e.keyCode || event.which || event.charCode || 0) !== 13;
+      }
     
   </script>
-  <div class="wrap pdb_list">
+  <a id="pdb-list-admin" name="pdb-list-admin"></a>
+  <div class="wrap pdb-list">
     <h2><?php echo Participants_Db::$plugin_title?></h2>
     <h3><?php printf( _n( 'List Participants: %s record found, sorted by:', 'List Participants: %s records found, sorted by:', self::$num_records ), self::$num_records )?> 
 		<?php echo Participants_Db::column_title( self::$filter['sortBy'] ) ?>.</h3>
@@ -378,7 +408,7 @@ class PDb_List_Admin
 	<form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" >
     <input type="hidden" name="action" value="sort">
     
-    <fieldset class="widefat">
+    <fieldset class="widefat inline-controls">
     <legend><?php _e('Show only records with', 'participants-database' )?>:</legend>
     <?php
 			//build the list of columns available for filtering
@@ -421,7 +451,7 @@ class PDb_List_Admin
       <input name="submit" type="submit" value="<?php echo self::$i18n['clear']?>">
     </fieldset>
     
-    <fieldset class="widefat">
+    <fieldset class="widefat inline-controls">
     <legend><?php _e('Sort by', 'participants-database' )?>:</legend>
     	<?php
 		
@@ -459,23 +489,23 @@ class PDb_List_Admin
 		<form id="list_form"  method="post"  onKeyPress="return checkEnter(event)" >
     	<?php FormElement::print_hidden_fields( array( 'action'=>'list_action' ) )?>
       <input type="hidden" id="select_count" value="0" />
-      <div style="margin-top:10px">
+      <fieldset class="widefat inline-controls">
   
-        <input type="submit" name="submit" value="<?php echo self::$i18n['delete_checked'] ?>" onClick="return delete_confirm();" class="unarmed" id="delete_button" >
+        <input type="submit" name="submit" value="<?php echo self::$i18n['delete_checked'] ?>" onClick="return delete_confirm();" id="delete_button" >
         <?php $list_limit = FormElement::get_element( array( 
 																														'type'=>'text-line', 
 																														'name'=>'list_limit', 
 																														'value'=>self::$page_list_limit, 
 																														'attributes'=>array( 
-																																								'style'=>'width:2.2em',
-																																								'maxLength'=>'2'
+																																								'style'=>'width:2.8em',
+																																								'maxLength'=>'3'
 																																								) 
 																														) 
 																										 )?>
         <span style="padding-left:20px"><?php printf( __( 'Show %s items per page.', 'participants-database' ),$list_limit )?>
         <?php FormElement::print_element( array( 'type'=>'submit', 'name'=>'submit','value'=>self::$i18n['change']) )?>
         </span>
-      </div>
+      </fieldset>
 
     <?php
   }
@@ -528,8 +558,7 @@ class PDb_List_Admin
       <tr>
         <?php // print delete check ?>
         <td>
-          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id']?>"><?php _e( 'Edit', 'participants-database' )?></a> |
-          <input type="checkbox" name="pid[]" value="<?php echo $value['id']?>" onClick="addSelects( this.checked )">
+          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id']?>"><?php _e( 'Edit', 'participants-database' )?></a> <input type="checkbox" name="pid[]" value="<?php echo $value['id']?>" onClick="addSelects( this.checked )">
         </td>
         <?php
 
@@ -711,8 +740,8 @@ class PDb_List_Admin
 
       // print the "select all" header ?>
       <th scope="col" style="width:6em">
-        <?php /* translators: uses the check symbol in a phrase that means "check all" */ _e( '&#10004; all', 'participants-database' )?>
-        <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" style="top: 2px; margin-left: 4px;">
+        <?php /* translators: uses the check symbol in a phrase that means "check all" */ printf('<span class="checkmark" >&#10004;</span> %s',__( 'all', 'participants-database' ) )?>
+        <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" >
       </th>
       <?php
 
@@ -725,6 +754,22 @@ class PDb_List_Admin
               );
       }
 
+    }
+    
+    /**
+     * sets the admin list limit value
+     * 
+     */
+    private function set_list_limit() {
+      
+      global $user_ID;
+      
+      $limit_value = self::$options['list_limit'];
+      if ( $transient = get_transient(self::$limit_cookie.'-'.$user_ID) )
+        $limit_value = $transient;
+      if ( isset( $_POST['list_limit'] ) && is_numeric( $_POST['list_limit'] ) && $_POST['list_limit'] > 1 )
+        $limit_value = $_POST['list_limit'];
+      self::$page_list_limit = $limit_value;
     }
 		
 		/**

@@ -100,6 +100,7 @@ class Pagination {
    *                'size'          int the number of records to show per page
    *                'total_records' int the total records in the full query
    *                'link'          string the URL for page links
+   *                'add_variables' additional GET string to add
    */
   function __construct($args) {
     extract(wp_parse_args($args, array(
@@ -111,17 +112,19 @@ class Pagination {
                 'disabled_class' => 'disabled',
                 'filtering' => 0,
                 'anchor_wrap' => false,
-                'first_last' => true,
+                'first_last' => false,
+                'add_variables' => '',
             )));
     $this->setPage($page);
     $this->setSize($size);
     $this->setTotalRecords($total_records);
-    $this->setLink($link);
+    $this->setLink($link,$add_variables);
     $this->filtering = $filtering;
     $this->set_wrappers();
     $this->set_anchor_wrap($anchor_wrap);
     $this->current_page_class = $current_page_class;
     $this->disabled_class = $disabled_class;
+    $this->first_last = $first_last; 
   }
 
   /**
@@ -136,8 +139,10 @@ class Pagination {
 
   public function show() {
 
-    if (!$this->filtering)
-      echo $this->create_links();
+    if ($this->filtering)
+      echo '%%%';
+    
+    echo $this->create_links();
   }
 
   /**
@@ -210,8 +215,11 @@ class Pagination {
    *
    * @param string $url
    */
-  function setLink($url) {
-    $this->link = $url;
+  function setLink($url, $add_variables) {
+    
+    if ( ! empty($add_variables) )
+      $add_variables = false !== strpos($url,'?') ? '&'.$add_variables : '?'.$add_variables;
+    $this->link = $url.$add_variables;
   }
 
   /**

@@ -63,8 +63,6 @@ $exclude = array();
      
     <?php endif ?>
     
-    <dl>
-    
       <?php // this prints out all the fields in the group
 			foreach( $group->fields as $field ) : 
               
@@ -73,14 +71,17 @@ $exclude = array();
 					$empty_class = empty( $value ) ? 'blank-field' : '';
       
       ?>
+    
+    <dl>
       
       <dt class="<?php echo $field->name.' '.$empty_class?>"><?php echo $field->title ?></dt>
       
       <dd class="<?php echo $field->name.' '.$empty_class?>"><?php echo $value ?></dd>
+      
+    </dl>
   
     	<?php endforeach; // end of the fields loop ?>
     
-    </dl>
     
   </div>
   

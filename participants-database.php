@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.4
+  Version: 1.4.5
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -48,7 +48,9 @@ class Participants_Db {
   // table for groups defninitions
   public static $groups_table;
   // current Db version
-  public static $db_version;
+  public static $db_version = '0.6';
+  // name of the WP option where the current db version is stored
+  public static $db_version_option = 'PDb_Db_version';
   // current version of plugin
   public static $plugin_version;
   // plugin options name
@@ -103,9 +105,6 @@ class Participants_Db {
     self::$fields_table = self::$participants_table . '_fields';
     self::$groups_table = self::$participants_table . '_groups';
 
-    // name of the WP option where the current db version is stored
-    self::$db_version = 'PDb_Db_version';
-
     // set the plugin version
     self::$plugin_version = self::_get_plugin_data('Version');
 
@@ -153,12 +152,14 @@ class Participants_Db {
 
       self::$internal_columns = array();
 
-      $internal_columns = $wpdb->get_results('SELECT f.name 
+      $internal_columns = $wpdb->get_results(
+                                             'SELECT f.name 
 																						 	FROM ' . self::$fields_table . ' f 
 																							INNER JOIN ' . self::$groups_table . ' g 
 																							ON f.group = g.name 
-																							WHERE g.display = 0'
-              , ARRAY_N);
+																							WHERE g.display = 0',
+                                              ARRAY_N
+                                              );
 
       foreach ($internal_columns as $column)
         self::$internal_columns[] = $column[0];
@@ -217,7 +218,7 @@ class Participants_Db {
     // if the setting was made in previous versions and is a slug, convert it to a post ID
     if (isset(self::$plugin_options['registration_page']) && !is_numeric(self::$plugin_options['registration_page'])) {
 
-      self::$plugin_options['registration_page'] = self::_get_ID_by_slug(self::$plugin_options['registration_page']);
+      self::$plugin_options['registration_page'] = self::get_id_by_slug(self::$plugin_options['registration_page']);
 
       update_option(self::$participants_db_options, self::$plugin_options);
     }
@@ -228,6 +229,14 @@ class Participants_Db {
     load_plugin_textdomain('participants-database', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
     self::$plugin_title = __('Participants Database', 'participants-database');
+    
+    /*
+     * checks for the need to update the DB
+     * 
+     * this is to allow for updates to occur in many different ways
+     */
+    if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
+      PDb_Init::on_update();
 
     // set the email content headers
     if (!isset(self::$plugin_options)) {
@@ -239,7 +248,7 @@ class Participants_Db {
 
     if (0 != $options['html_email']) {
       $type = 'text/html; charset="' . get_option('blog_charset') . '"';
-      add_filter('wp_mail_content_type', function() { return 'text/html';});
+      add_filter('wp_mail_content_type', array( __CLASS__, 'set_content_type'));
     } else {
       $type = 'text/plain; charset=us-ascii';
     }
@@ -250,6 +259,10 @@ class Participants_Db {
     //self::include_scripts();
     // this processes form submits before any output so that redirects can be used
     self::process_page_request();
+  }
+  
+  public function set_content_type() {
+    return 'text/html';
   }
 
   public function plugin_menu() {
@@ -268,13 +281,14 @@ class Participants_Db {
             '', 
             self::PLUGIN_NAME, array(__CLASS__, 'include_admin_file')
     );
-
+    
     add_submenu_page(
             self::PLUGIN_NAME, 
             __('List Participants', 'participants-database'), 
             __('List Participants', 'participants-database'), 
             self::$plugin_options['record_edit_capability'], 
-            self::$plugin_page . '-list_participants', array('PDb_List_Admin', 'initialize')
+            self::$plugin_page . '-list_participants', 
+            array('PDb_List_Admin', 'initialize')
     );
 
     add_submenu_page(
@@ -291,8 +305,7 @@ class Participants_Db {
             __('Manage Database Fields', 'participants-database'), 
             __('Manage Database Fields', 'participants-database'), 
             'manage_options', 
-            self::$plugin_page . 
-            '-manage_fields', 
+            self::$plugin_page . '-manage_fields', 
             array(__CLASS__, 'include_admin_file')
     );
 
@@ -400,15 +413,6 @@ class Participants_Db {
     //wp_enqueue_script( 'jquery' );
     //wp_enqueue_script( 'pdb-shortcode' );
     //wp_enqueue_script( 'jq-placeholder');
-
-    global $wp_query;
-
-    $ajax_params = array(
-        'ajaxurl' => admin_url('admin-ajax.php'),
-        'filterNonce' => wp_create_nonce('pdb-list-filter-nonce'),
-        'postID' => $wp_query->post->ID,
-    );
-    wp_localize_script('list-filter', 'PDb_ajax', $ajax_params);
   }
 
   /**
@@ -947,8 +951,11 @@ class Participants_Db {
 
       case 'multi-checkbox' :
       case 'multi-select-other' :
+        
+        $multivalues = self::unserialize_array($value);
+        if ( empty( $multivalues['other'] ) ) unset($multivalues['other']);
 
-        $return = implode(', ', (array) self::unserialize_array($value));
+        $return = implode(', ', (array) $multivalues);
         break;
 
       case 'link' :
@@ -983,12 +990,13 @@ class Participants_Db {
         }
         
       case 'text-area':
+      case 'textarea':
         
         $return = sprintf('<span class="textarea">%s</span>',$value );
         break;
       case 'rich-text':
         
-        $return = sprintf('<span class="textarea richtext">%s</span>',$value );
+        $return = sprintf('<span class="textarea richtext">%s</span>',(self::$plugin_options['enable_wpautop'] ? wpautop($value) : $value ) );
         break;
       default :
 
@@ -1194,8 +1202,14 @@ class Participants_Db {
     $new_value = false;
     $columns = array();
 
-    // determine the set of columns to process 
-    $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
+    // determine the set of columns to process
+    if ( isset($_POST['action']) && $_POST['action'] == 'signup') {
+      
+      $column_set = 'signup';
+    } else {
+      
+      $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
+    }
 
     // gather the submit values and add them to the query
     foreach (self::get_column_atts($column_set) as $column_atts) :
@@ -1260,7 +1274,7 @@ class Participants_Db {
                 }
               }
 
-              $value_array['other'] = implode(',', $value_array['other']);
+              if (isset($value_array['other']) && is_array($value_array['other'])) $value_array['other'] = implode(',', $value_array['other']);
             }
 
             $new_value = self::_prepare_array_mysql($value_array);
@@ -1285,9 +1299,6 @@ class Participants_Db {
             $date = self::parse_date($post[$column_atts->name], $column_atts);
 
             $new_value = $date ? $date : NULL;
-          } elseif (self::backend_user() && 'rich-text' == $column_atts->form_element && $options['rich_text_editor']) {
-
-            $new_value = wpautop(stripslashes($post[$column_atts->name]));
           } elseif ('password' == $column_atts->form_element) {
 
             if (!empty($post[$column_atts->name]))
@@ -1341,8 +1352,8 @@ class Participants_Db {
       // get the new record id for the return
       $participant_id = $wpdb->insert_id;
 
-      // hang on to the id of the last record for a day
-      set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 24));
+      // if in the admin hang on to the id of the last record for an hour
+      if ( is_admin() ) set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 1));
     }
 
     return $participant_id;
@@ -1387,7 +1398,7 @@ class Participants_Db {
     // get the id of the last record stored
     $prev_record_id = get_transient(self::$last_record);
 
-    if ($prev_record_id) {
+    if ( is_admin() and $prev_record_id) {
 
       $previous_record = self::get_participant($prev_record_id);
 
@@ -1407,7 +1418,7 @@ class Participants_Db {
     // fill in some convenience values
     global $current_user;
 
-    $default_record['by'] = $current_user->display_name;
+    if ( is_object( $current_user ) ) $default_record['by'] = $current_user->display_name;
     $default_record['when'] = date(get_option('date_format'));
     $default_record['private_id'] = self::generate_pid();
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
@@ -1724,7 +1735,7 @@ class Participants_Db {
             $sent = wp_mail(
                     $options['email_signup_notify_addresses'],
                     self::proc_tags($options['record_update_email_subject'], $participant_id),
-                    self::proc_tags($options['record_update_email_body'], $participant_id),
+                    self::proc_tags($options['record_update_email_body'], $participant_id,'all'),
                     self::$email_headers
             );
           }
@@ -2127,7 +2138,7 @@ class Participants_Db {
 
     $options = get_option(self::$participants_db_options);
 
-    if (!is_dir(ABSPATH . $options['image_upload_location'])) {
+    if ( !is_dir( Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) ) ) {
 
       if (false === self::_make_uploads_dir($options['image_upload_location']))
         return false;
@@ -2161,7 +2172,7 @@ class Participants_Db {
       return false;
     }
 
-    if (false === move_uploaded_file($file['tmp_name'], ABSPATH . $options['image_upload_location'] . $new_filename)) {
+    if (false === move_uploaded_file($file['tmp_name'], Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename)) {
 
       self::$validation_errors->add_error($name, __('The file could not be saved.', 'participants-database'));
 
@@ -2182,7 +2193,7 @@ class Participants_Db {
    *
    * sets an error if it fails
    */
-  private function _make_uploads_dir($dir) {
+  public function _make_uploads_dir($dir) {
 
     $savedmask = umask(0);
 
@@ -2218,7 +2229,7 @@ class Participants_Db {
     // if the setting was made in previous versions and is a slug, convert it to a post ID
     if (!is_numeric($options['registration_page'])) {
 
-      $options['registration_page'] = self::_get_ID_by_slug($options['registration_page']);
+      $options['registration_page'] = self::get_id_by_slug($options['registration_page']);
 
       update_option(self::$participants_db_options, $options);
     }
@@ -2251,7 +2262,7 @@ class Participants_Db {
    *
    * this is to provide backwards-compatibility with previous versions that used a page-slug to point to the [pdb_record] page.
    */
-  private function _get_ID_by_slug($page_slug) {
+  public function get_id_by_slug($page_slug) {
 
     $page = get_page_by_path($page_slug);
 
@@ -2294,7 +2305,10 @@ class Participants_Db {
     // add the date tag
     $tags[] = '[date]';
     $values[] = date(get_option('date_format'), self::parse_date());
-
+    
+    // add the admin record link tag
+    $tags[] = '[admin_record_link]';
+    $values[] = self::get_admin_record_link($participant_id);
 
     $placeholders = array();
 

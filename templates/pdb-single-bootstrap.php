@@ -22,8 +22,6 @@ $exclude = array();
     
     <?php $this->group->print_description( '<p>', '</p>' ) ?>
     
-    <dl class="dl-horizontal">
-    
       <?php while ( $this->have_fields() ) : $this->the_field();
       
           // skip any field found in the exclude array
@@ -33,14 +31,17 @@ $exclude = array();
 					$empty_class = $this->get_empty_class( $this->field );
       
       ?>
+    
+    <dl class="dl-horizontal">
       
       <dt class="<?php echo $this->field->name.' '.$empty_class?>"><?php $this->field->print_label() ?></dt>
       
       <dd class="<?php echo $this->field->name.' '.$empty_class?>"><?php $this->field->print_value() ?></dd>
+      
+    </dl>
   
     	<?php endwhile; // end of the fields loop ?>
     
-    </dl>
     
   </section>
   
