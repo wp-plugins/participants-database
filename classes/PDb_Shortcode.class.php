@@ -473,7 +473,7 @@ abstract class PDb_Shortcode {
     
     $sql = 'SELECT count(*)  
             FROM '.Participants_Db::$fields_table.' v 
-            WHERE v.group = "'.$group.'" 
+            WHERE v.group = "%s" 
             ';
     switch ( $this->module ) {
       
@@ -487,7 +487,7 @@ abstract class PDb_Shortcode {
     
     $sql .= ' ORDER BY v.order';
             
-    $result = $wpdb->get_var( $wpdb->prepare($sql ) );
+    $result = $wpdb->get_var( $wpdb->prepare($sql,$group ) );
     
     return (bool) $result > 0;
   

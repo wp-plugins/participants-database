@@ -189,6 +189,12 @@ You can no doubt come up with many variations on this.
 
 == Changelog ==
 
+= 1.4.5.2 =
+* fixes several issues brought up by the WP 3.5 release:
+* admin section tabs
+* plugin icon
+* $wpdb->prepare new regimen
+
 = 1.4.5.1 =
 * bugfix for admin list javascript bug that deletes all records on a page if you try to delete a record
 
@@ -427,6 +433,9 @@ You can no doubt come up with many variations on this.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.4.5.2 =
+Important update for WordPress 3.5 users
 
 = 1.4.5.1 =
 Important bugfix for admin list bug that can delete all records on the page if you delete a record

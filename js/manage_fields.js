@@ -21,10 +21,11 @@ jQuery(document).ready(function($){
     $("#fields-tabs form").attr("autocomplete", "off");
 
   // set up the UI tabs
-  $("#fields-tabs").tabs( {
-                            fx: { opacity: "show", duration: "fast" },
-                            cookie: { expires:1 }
-                          });
+  $("#fields-tabs").tabs({
+    active:0,
+    hide:100,
+    show:100
+  });
 
   // set up the delete functionality
 

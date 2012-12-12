@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.4.5.1
+  Version: 1.4.5.2
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -310,7 +310,7 @@ class Participants_Db {
     );
 
     add_submenu_page(
-            'participants-database', 
+            self::PLUGIN_NAME, 
             __('Import CSV File', 'participants-database'), 
             __('Import CSV File', 'participants-database'), 
             'manage_options', 
@@ -361,7 +361,7 @@ class Participants_Db {
       wp_enqueue_script('jquery-ui-tabs');
       wp_enqueue_script('jquery-ui-sortable');
       wp_enqueue_script('jquery-ui-dialog');
-      wp_enqueue_script('cookie');
+      //wp_enqueue_script('cookie');
       wp_enqueue_script('jq-placeholder');
       wp_enqueue_script('admin');
     }
@@ -1086,7 +1086,7 @@ class Participants_Db {
     if (!$table)
       $table = self::$participants_table;
 
-    return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table;"));
+    return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM %s", $table));
   }
 
   /**
@@ -1707,7 +1707,7 @@ class Participants_Db {
      * because another script can instantiate the object in order to add a
      * feedback message
      */
-    if (!is_object(self::$validation_errors))
+    if (!is_object(self::$validation_errors) and ! is_admin())
       self::$validation_errors = new FormValidation();
 
     switch ($_POST['action']) :
