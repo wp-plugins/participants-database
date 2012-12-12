@@ -483,12 +483,7 @@ class PDb_Init
         }
 
         // delete the default record
-        $wpdb->query( 
-          $wpdb->prepare( 
-            "DELETE FROM ".Participants_Db::$participants_table."
-             WHERE private_id = 'RPNE2'"
-          )
-        );
+        $wpdb->query( $wpdb->prepare( "DELETE FROM ".Participants_Db::$participants_table." WHERE private_id = '%s'", 'RPNE2'));
 				
 				// add the new private ID admin column setting because we eliminated the redundant special setting
 				$options = get_option( Participants_Db::$participants_db_options );

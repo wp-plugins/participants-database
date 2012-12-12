@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 2.8.4
 Tested up to: 3.4.2
-Stable tag: 1.4.5
+Stable tag: 1.4.5.1
 License: GPLv2
 
 Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
@@ -188,6 +188,12 @@ You can no doubt come up with many variations on this.
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.4.5.2 =
+* fixes several issues brought up by the WP 3.5 release:
+* admin section tabs
+* plugin icon
+* $wpdb->prepare new regimen
 
 = 1.4.5.1 =
 * bugfix for admin list javascript bug that deletes all records on a page if you try to delete a record
@@ -427,6 +433,9 @@ You can no doubt come up with many variations on this.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.4.5.2 =
+Important update for WordPress 3.5 users
 
 = 1.4.5.1 =
 Important bugfix for admin list bug that can delete all records on the page if you delete a record

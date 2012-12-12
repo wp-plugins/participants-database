@@ -301,7 +301,7 @@ a.dragger {
     color: #777777;
     text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
     display: inline-block;
-    padding: 4px 14px 7px;
+    padding: 4px 14px 8px;
     text-decoration: none;
     margin: 0 6px -1px 0;
     -moz-border-radius: 5px 5px 0 0;
@@ -312,10 +312,12 @@ a.dragger {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
-.ui-tabs-nav li.ui-tabs-selected a, .ui-tabs-nav li.ui-state-focus a {
-    border-width: 1px;
+.ui-tabs-nav li.ui-tabs-selected a, 
+.ui-tabs-nav li.ui-state-active a,
+.ui-tabs-nav li a:focus {
     color: #333333;
     background-color:#ffffff;
+    outline:none;
 }
 .ui-tabs-panel {
     clear: both;

@@ -162,12 +162,10 @@ if ( isset( $_POST['action'] ) ) {
 			global $wpdb;
 			//$wpdb->hide_errors();
 
-			$group_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM '.Participants_Db::$fields_table.' WHERE `group` = "' . $_POST['delete'].'"' ) );
+			$group_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM '.Participants_Db::$fields_table.' WHERE `group` = "%s"', $_POST['delete'] ) );
 
-			if ( $group_count == 0 ) $result = $wpdb->query('
-																												DELETE FROM '.Participants_Db::$groups_table.'
-																												WHERE `name` = "'.$wpdb->escape($_POST['delete']).'"'
-																											);
+			if ( $group_count == 0 )
+        $result = $wpdb->query( $wpdb->prepare('DELETE FROM '.Participants_Db::$groups_table.' WHERE `name` = "%s"', $_POST['delete']  ) );
 
 			break;
 
@@ -404,7 +402,7 @@ foreach ( $error_msgs as $error ) echo '<p>'.$error.'</p>'; ?>
 		foreach ( $groups as $group => $group_values ) {
 			if ( $group == 'internal' ) continue;
 
-			$group_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM '.Participants_Db::$fields_table.' WHERE `group` = "' . $group.'"' ) );
+			$group_count = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM '.Participants_Db::$fields_table.' WHERE `group` = "%s"', $group ) );
 
 			?>
 			<tr>

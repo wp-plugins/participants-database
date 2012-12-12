@@ -39,7 +39,7 @@
      */
     if ( isset( $this->shortcode_atts['id'] ) and ! empty( $this->shortcode_atts['id'] ) ) {
       $id = $this->shortcode_atts['id'];
-    }
+    } else $id = 0;
 		// override the shortcode att if the value is in the URI
     if ( isset( $_GET['pdb'] ) ) {
       $id = $_GET['pdb'];

@@ -9,7 +9,7 @@
 <ol>
 <li>Place the &#8220;&#91;pdb_signup]&#8221; shortcode on the page where you want your signup from to appear.</li>
 <li>Go to the plugin settings page and click on the &#8220;Signup Form&#8221; tab.</li>
-<li>Set the &#8220;Thanks Page&#8221; setting to point to the page you want them to go to after they sign up. Place the &#8220;&#91;pdb_thanks]&#8221; shortcode on that page somewhere.</li>
+<li>Set the &#8220;Thanks Page&#8221; setting to point to the page you want them to go to after they sign up. Place the &#8220;&#91;pdb_signup_thanks]&#8221; shortcode on that page somewhere.</li>
 <li>When the person who signed up clicks on the link provided them in the email, they will go to a page where they can fill out the rest of the form with information for their record.</li>
 <li>Click on the &#8220;Record Form&#8221; tab and set the &#8220;Participant Record Page&#8221; setting to point to the page where you want them to go to edit their record. Put the &#8220;&#91;pdb_record]&#8221; shortcode on that page. This shortcode won&#8217;t show anything unless it is visited with the special private link provided to the user in the receipt email.</li>
 </ol>
