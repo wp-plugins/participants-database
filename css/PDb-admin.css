@@ -321,6 +321,8 @@ a.dragger {
 }
 .ui-tabs-panel {
     clear: both;
+    position: relative;
+    left:0;
 }
 .ui-tabs-panel h3 {
     font: italic normal normal 24px/29px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;

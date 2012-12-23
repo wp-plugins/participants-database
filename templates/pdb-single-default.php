@@ -44,7 +44,7 @@ $exclude = array();
 					$empty_class = $this->get_empty_class( $this->field );
       
       ?>
-    <dl>
+    <dl class="pdb-<?php echo $this->field->name.' '.$this->field->form_element.' '.$empty_class?>">
       
       <dt class="<?php echo $this->field->name.' '.$empty_class?>"><?php $this->field->print_label() ?></dt>
       

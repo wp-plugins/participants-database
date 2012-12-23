@@ -21,10 +21,15 @@ jQuery(document).ready(function($){
     $("#fields-tabs form").attr("autocomplete", "off");
 
   // set up the UI tabs
+  var lastTab = 'pdb-manage-fields-tab',
+  effect = { effect: 'fadeToggle', duration: 100 };
   $("#fields-tabs").tabs({
-    active:0,
-    hide:100,
-    show:100
+    hide:effect,
+    show:effect,
+    active:$.cookie(lastTab),
+    activate: function(event, ui){
+        $.cookie(lastTab, ui.newTab.index(), { expires: 365 });
+    }
   });
 
   // set up the delete functionality

@@ -311,9 +311,7 @@ class PDb_List extends PDb_Shortcode {
             in_array($this->filter['search_field'], $this->display_columns)
     ) {
       
-      $value = urldecode($this->filter['value']);
-      $encoding = mb_detect_encoding($value.'a',array('utf-8', 'windows-1251','windows-1252','ISO-8859-1'));
-      $this->filter['value'] = mb_convert_encoding($value,'utf-8',$encoding);
+      $this->filter['value'] = $this->to_utf8($this->filter['value']);
       
       // we have a valid search, add it to the where clauses
       $clauses[] = sprintf(
@@ -888,7 +886,7 @@ class PDb_List extends PDb_Shortcode {
   }
   
   /**
-   * converts a URL-encoded utf-8 character to the correct form
+   * converts a URL-encoded character to the correct utf-8 form
    *
    * @param string $string the string to convert to UTF-8
    * @return string the converted string

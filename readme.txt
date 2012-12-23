@@ -189,6 +189,13 @@ You can no doubt come up with many variations on this.
 
 == Changelog ==
 
+= 1.4.6 =
+* added image delete checkbox (doesn't delete file, only database reference)
+* image handle file validation avoids costly CURL calls in validating files
+* improved list AJAX javascript
+* fixed admin page name conflict with some plugins
+* international characters now work properly in user searches
+
 = 1.4.5.2 =
 * fixes several issues brought up by the WP 3.5 release:
 * admin section tabs
@@ -433,6 +440,9 @@ You can no doubt come up with many variations on this.
 * No internationalization
 
 == Upgrade Notice ==
+
+= 1.4.6 =
+Important update with several bugfixes and improvements
 
 = 1.4.5.2 =
 Important update for WordPress 3.5 users

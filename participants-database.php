@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.4.5.2
+  Version: 1.4.6
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -78,6 +78,10 @@ class Participants_Db {
   public static $css_prefix = 'pdb_';
   // holds the form validation errors
   public static $validation_errors;
+  // holds an admin status or error message
+  static $admin_message = '';
+  // holds the type of admin message
+  static $admin_message_type;
   // name of the transient record used to hold the last record
   public static $last_record = 'pdb_last_record';
   // this gets set if a shortcode is called on a page
@@ -361,7 +365,7 @@ class Participants_Db {
       wp_enqueue_script('jquery-ui-tabs');
       wp_enqueue_script('jquery-ui-sortable');
       wp_enqueue_script('jquery-ui-dialog');
-      //wp_enqueue_script('cookie');
+      wp_enqueue_script('cookie');
       wp_enqueue_script('jq-placeholder');
       wp_enqueue_script('admin');
     }
@@ -1333,6 +1337,8 @@ class Participants_Db {
       // error_log( __METHOD__.' errors exist; returning');
 
       return false;
+    } elseif ( !empty( self::$admin_message ) and 'error' == self::$admin_message_type ) {
+      return false;
     }
 
     // add in the column names
@@ -1706,6 +1712,8 @@ class Participants_Db {
      * instantiate the validation object if we need to. This is necessary
      * because another script can instantiate the object in order to add a
      * feedback message
+     * 
+     * we don't validate in the admin, they will be allowed to leave required field unfilled
      */
     if (!is_object(self::$validation_errors) and ! is_admin())
       self::$validation_errors = new FormValidation();
@@ -1728,7 +1736,7 @@ class Participants_Db {
         // if we are submitting from the frontend, we're done
         if (!is_admin()) {
 
-          self::$validation_errors->add_error('', $options['record_updated_message']);
+          if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error('', $options['record_updated_message']);
 
           if ($options['send_record_update_notify_email']) {
 
@@ -1748,16 +1756,17 @@ class Participants_Db {
 
           case 'Apply' :
             wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant&id=' . $participant_id);
-            break;
+            exit;
 
           case 'Next' :
             wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant');
-            break;
+            exit;
 
           case 'Submit' :
-            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id);
-
           default :
+            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id);
+            exit;
+
         }
         break;
 
@@ -2146,7 +2155,7 @@ class Participants_Db {
 
     if (!is_uploaded_file($file['tmp_name'])) {
 
-      self::$validation_errors->add_error($name, __('There is something wrong with the file you tried to upload. Try another.', 'participants-database'));
+      self::_show_validation_error(__('There is something wrong with the file you tried to upload. Try another.', 'participants-database'), $name);
 
       return false;
     }
@@ -2156,7 +2165,7 @@ class Participants_Db {
     // check the type of file to make sure it is an image file
     if (!in_array($fileinfo[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WBMP))) {
 
-      self::$validation_errors->add_error($name, __('You may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'));
+      self::_show_validation_error(__('You may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'),$name);
 
       return false;
     }
@@ -2167,14 +2176,14 @@ class Participants_Db {
 
     if ($file['size'] > $options['image_upload_limit'] * 1024) {
 
-      self::$validation_errors->add_error($name, sprintf(__('The image you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), $options['image_upload_limit']));
+      self::_show_validation_error(sprintf(__('The image you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), $options['image_upload_limit']),$name);
 
       return false;
     }
 
     if (false === move_uploaded_file($file['tmp_name'], Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename)) {
 
-      self::$validation_errors->add_error($name, __('The file could not be saved.', 'participants-database'));
+      self::_show_validation_error(__('The file could not be saved.', 'participants-database'));
 
       return false;
     }
@@ -2451,6 +2460,40 @@ class Participants_Db {
       $p = '/' . $p . '/';
     }
     return preg_replace($pattern, $replace, $dateString);
+  }
+  
+  /**
+   * sets an admin area error message
+   * 
+   * @param string $message the message to be dislayed
+   * @param string $type the type of message: 'updated' (yellow) or 'error' (red)
+   */
+  public function set_admin_message($message, $type='error'){
+    self::$admin_message = $message;
+    self::$admin_message_type = $type;
+  }
+  
+  /**
+   * sets the admin message
+   */
+  public function admin_message() {
+    if (!empty(self::$admin_message)){
+      printf ('<div class="%s">
+       <p>%s</p>
+    </div>', self::$admin_message_type, self::$admin_message);
+      //self::$admin_message = '';
+    }
+  }
+  
+  /**
+   * shows a validation error message
+   * 
+   * @param string $error the message to show
+   * @param string $name the field on which the error was called
+   */
+  private function _show_validation_error( $error, $name = '' ) {
+    if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error($name, $error );
+    else self::set_admin_message($error);
   }
 
   /**

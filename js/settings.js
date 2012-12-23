@@ -11,10 +11,15 @@ jQuery(document).ready(function($) {
   });
   var wrapclass = $('.wrap').attr('class');
   $(".wrap").removeClass().addClass( wrapclass+" main" );
+  var lastTab = 'pdb-settings-page-tab',
+  effect = { effect: 'fadeToggle', duration: 200 };
   $('.ui-tabs').tabs({
-    active:0,
-    hide:100,
-    show:100
+    hide:effect,
+    show:effect,
+    active:$.cookie(lastTab),
+    activate: function(event, ui){
+        $.cookie(lastTab, ui.newTab.index(), { expires: 365 });
+    }
   }).bind( 'tabsselect', function( event,ui) {
     var activeclass = $(ui.tab).attr('href').replace( /^#/, '');
     $(".wrap").removeClass().addClass( wrapclass+" "+activeclass );

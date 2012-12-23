@@ -57,6 +57,8 @@ if ($participant_values) :
   if (is_object(Participants_Db::$validation_errors)) {
 
     echo Participants_Db::$validation_errors->get_error_html();
+  } else {
+    Participants_Db::admin_message();
   }
   ?>
     <form method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>" enctype="multipart/form-data" autocomplete="off" >
