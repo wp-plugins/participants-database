@@ -366,7 +366,7 @@ class Participants_Db {
       wp_enqueue_script('admin');
     }
 
-    if (false !== stripos($hook, 'settings_page')) {
+    if (false !== stripos($hook, 'participants-database_settings_page')) {
       wp_enqueue_script('settings_script');
     }
 

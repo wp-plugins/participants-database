@@ -60,7 +60,7 @@ class PDb_Image extends Image_Handler {
     }
     
     // check that the file exists, then set the absolute path
-    if ( $this->_file_exists( ABSPATH . $this->default_image ) ) {
+    if ( !empty($this->default_image) and is_file( $this->concatenate_directory_path( ABSPATH, $this->default_image, false ) ) ) {
       
       $this->default_image = $this->concatenate_directory_path( site_url(), $this->default_image, false );
       

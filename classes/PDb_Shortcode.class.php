@@ -385,11 +385,11 @@ abstract class PDb_Shortcode {
           // add the module property
           $field->module = $this->module;
 
-          // add the field to the list of fields
-          $this->columns[] = $field;
-
           // set the current value of the field
           $this->_set_field_value($field);
+
+          // add the field to the list of fields
+          $this->columns[$field->name] = $field;
 
           /*
            * add the field object to the record object

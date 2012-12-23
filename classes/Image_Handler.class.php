@@ -99,16 +99,10 @@ abstract class Image_Handler {
    * returns the HTML for the image
    */
   public function get_image_html() {
-    
-    /*
-     * we can't use is_admin during an ajax request, so we have to test the WP 
-     * global as well
-     */
-    $show_filename = (is_admin() && ! defined('DOING_AJAX'));
 
     $pattern = $this->file_exists ?
             (
-             $show_filename ?
+             $this->in_admin() ?
                     '%1$s<img src="%2$s" class="PDb-list-image" /><span class="image-filename">%4$s</span>%3$s' :
                     '%1$s<img src="%2$s" class="PDb-list-image" />%3$s'
             ) :
@@ -154,33 +148,67 @@ abstract class Image_Handler {
    * sets the path to the file, sets dimensions, sets file_exists flag
    */
   protected function _file_setup($filename = false) {
-    
 
-    if (!$filename)
+    if (false === $filename)
       $filename = $this->setup['filename'];
+    
+    $status = 'untested';
+    
+    switch (true) {
+      
+      case (empty($filename)):
+        
+        $status = $this->_showing_default_image();
+        break;
+      
+      case ($this->test_absolute_path_image($filename)) :
+        $status = 'absolute';
+        $this->image_file = basename($filename);
+        $this->image_uri = $filename;
+        $this->file_exists = true;
+        $this->_set_dimensions();
+        break;
+      
+      default:
 
-    $status = 'absolute';
+        /*
+         * set the image file path with the full system path to the image
+         * directory as defined in the plugin settings
+         */
+        $filename = $this->concatenate_directory_path( $this->image_directory, basename($filename), false );
+  
+        $status = 'basename';
+        $this->_testfile($filename);
+  
+        // if we still have no valid image, drop in the default
+        if (!$this->file_exists) {
+         $status = $this->_showing_default_image($filename);
+        } else {
+         $this->_set_dimensions();
+        }
+        
+      
+    }
 
-    $this->file_exists = $this->_testfile($filename);
-
-    // test the filename as-is in case it's an absolute path
-    if (!$this->file_exists) {
-
-      // test the default image path as defined in the sttings
-      $filename = $this->image_directory . basename($filename);
-
-      $status = 'basename';
-
-      $this->file_exists = $this->_testfile($filename);
-
-      // if we still have no valid image, drop in the default
-      if (!$this->file_exists) {
+    $this->classname .= ' ' . $status;
+  }
+  
+  /**
+   * sets up the image display if no image file is found
+   *
+   * @param string $filename the name of the file which wasn't found for the purpose
+   *                         of showing what the db contains
+   * @return string status
+   */
+  protected function _showing_default_image($filename = false){
         
         if (!empty($this->default_image)) {
 
-          $status = $this->defaultclass;
-          $this->image_file = basename($filename);
+          if ($filename) $this->image_file = basename($filename);
+          else $this->image_file = '';
           $this->image_uri = $this->default_image;
+          $this->_set_dimensions();
+          $status = $this->defaultclass;
           $this->file_exists = true;
           
         } else {
@@ -189,21 +217,17 @@ abstract class Image_Handler {
           $this->image_file = '';
           $status = $this->emptyclass;
         }
-      }
-    }
-
-    $this->classname .= ' ' . $status;
-
-    if ($this->file_exists) {
-
-      $this->_set_dimensions();
-    }
+        
+        return $status;
+    
   }
 
   /**
    * tests a file and sets properties if extant
    *
    * @param string $filename a path to a file, relative to the WP root
+   *
+   * sets the file_exists flag to true if the file exists
    */
   protected function _testfile($filename) {
 
@@ -212,29 +236,31 @@ abstract class Image_Handler {
       $this->image_file = basename($filename);
       $this->image_uri = $this->image_directory_uri.$this->image_file;
       $this->file_exists = true;
-
-      return true;
     }
-
-    return false;
   }
 
   /**
-   * does an image file exist
+   * does an image file exist?
    *
    * this is needed because on some systems file_exists() gives a false negative
    *
+   * @param string $filepath a full system filepath to an image file
+   *
    */
-  protected function _file_exists($filename) {
+  protected function _file_exists($filepath) {
 
     // first use the standard function
-    if (is_file($filename))
+    if (is_file($filepath)){
       return true;
+    }
 
+    /*
+     * if we're testing an absolute pate
+     */
     if (function_exists('curl_exec')) {
 
       // check the header with cURL
-      return $this->url_exists($filename);
+      return $this->url_exists($this->concatenate_directory_path($this->image_directory_uri,basename($filepath),false));
     }
 
     // we give up, can't find the file
@@ -243,6 +269,12 @@ abstract class Image_Handler {
 
   /**
    * uses cURL to test if a file exists
+   *
+   * This must be used as a last resort, it can take a long tome to get the
+   * server's response in some cases
+   *
+   * @param string $url the absolute url of the file to test
+   * @return bool
    */
   function url_exists($url) {
 
@@ -258,9 +290,33 @@ abstract class Image_Handler {
     curl_close($handle);
     return $connectable;
   }
+  
+  /**
+   * tests an image at an absolute address
+   * 
+   * @param string $src absolute path to an image file to test
+   * 
+   * sets $file_exists to true if found
+   */
+  function test_absolute_path_image($src) {
+    
+    if ($this->test_url_validity($src) and false !== @getimagesize($src)) {
+      return $this->file_exists = true;
+    }
+  }
+  
+  /**
+   * test an absolute path for validity; must have both the http protocol and a filename
+   *
+   * @param string $url the path to test
+   * @return bool
+   */
+  public function test_url_validity($url) {
+    return 0 !== preg_match("#^https?://.+/.+\..{2,4}$#",$url);
+  }
 
   /**
-   * seta the dimension properties
+   * sets the dimension properties
    *
    */
   private function _set_dimensions() {
@@ -319,7 +375,8 @@ abstract class Image_Handler {
     return rtrim($path,'/').'/';
   }
   /**
-   * makes sure there is one and only one slash between directory names in a concatenated path, and it ends in a slash
+   * makes sure there is one and only one slash between directory names in a
+   * concatenated path, and it ends in a slash
    * 
    * @param string $path1    first part of the path
    * @param string $path2    second part of the path
@@ -328,6 +385,16 @@ abstract class Image_Handler {
   public function concatenate_directory_path( $path1, $path2, $endslash = true ) {
     
     return rtrim( $path1, '/' ) . '/' . ltrim( rtrim( $path2, '/' ), '/' ) . ( $endslash ? '/' : '' );
+  }
+  /**
+   * indicates whether the user is in the admin section, taking into account that
+   * AJAX requests look like they are in the admin, but they're not
+   *
+   * @return bool
+   */
+  public function in_admin() {
+    
+    return is_admin() && ! defined('DOING_AJAX');
   }
 
 }

@@ -719,11 +719,13 @@ class FormElement {
 		if ( isset( $this->options[ 'max_file_size' ] ) ) $max_size = $this->options[ 'max_file_size' ];
 		else $max_size = ( ini_get( 'post_max_size' ) / 2 ) * 1048576;// half it to give a cushion
 		
-		$this->_addline( $this->print_hidden_fields( array( 'MAX_FILE_SIZE'=>$max_size ) ) );
+		$this->_addline( $this->print_hidden_fields( array( 'MAX_FILE_SIZE'=>$max_size,$this->name=>$this->value ) ) );
 		
 		$this->_addline( $this->_input_tag( 'file' ) );
-		
-		$this->_addline( $this->print_hidden_fields( array( $this->name=>$this->value ) ) );
+    
+    // add the delete checkbox if there is a file defined
+    // we still have a lot of work to do to properly implement this feature: see dev notes
+    if ( ! empty($this->value)) $this->_addline( '<label class="file-delete">'.__('delete','participants-database').$this->_input_tag('checkbox','',false).'</label>' );
 		
 	}
 

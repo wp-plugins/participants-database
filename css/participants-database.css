@@ -23,7 +23,7 @@
 
 .edit-participant  input[type='checkbox'] {
   position:relative;
-  top:4px;
+  top:2px;
 }
 .edit-participant textarea,
 .participants_db textarea,
@@ -34,6 +34,9 @@
 .link-element label {
   float:left;
   margin-right:10px;
+}
+.edit-participant input[type='checkbox'] {
+	margin-right: 3px;
 }
 .edit-participant h3 {
   margin-top: 2em;
@@ -78,6 +81,9 @@
   border: 2px solid #DFDFDF;
   color: #333333;
   height: 20em;
+}
+.edit-participant label.file-delete {
+	display: block;
 }
 
 /* Select Other */

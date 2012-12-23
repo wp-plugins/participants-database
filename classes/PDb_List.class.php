@@ -311,6 +311,10 @@ class PDb_List extends PDb_Shortcode {
             in_array($this->filter['search_field'], $this->display_columns)
     ) {
       
+      $value = urldecode($this->filter['value']);
+      $encoding = mb_detect_encoding($value.'a',array('utf-8', 'windows-1251','windows-1252','ISO-8859-1'));
+      $this->filter['value'] = mb_convert_encoding($value,'utf-8',$encoding);
+      
       // we have a valid search, add it to the where clauses
       $clauses[] = sprintf(
               ($this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"'), 
@@ -881,6 +885,19 @@ class PDb_List extends PDb_Shortcode {
     else $page_id = false;
     
     $this->single_record_url = get_page_link($page_id);
+  }
+  
+  /**
+   * converts a URL-encoded utf-8 character to the correct form
+   *
+   * @param string $string the string to convert to UTF-8
+   * @return string the converted string
+   */
+  function to_utf8( $string ) {
+    
+    $value = urldecode($string);
+    $encoding = mb_detect_encoding($value.'a',array('utf-8', 'windows-1251','windows-1252','ISO-8859-1'));
+    return mb_convert_encoding($value,'utf-8',$encoding); 
   }
 
   /**
