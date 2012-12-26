@@ -543,7 +543,7 @@ abstract class PDb_Shortcode {
 			
 				if ( ! empty( $value ) ) {
 				
-					$value = date( get_option( 'date_format' ), Participants_Db::parse_date( $value ) );
+					$value = date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $value ) );
 					
 				}
 				

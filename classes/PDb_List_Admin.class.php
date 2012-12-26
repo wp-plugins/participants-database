@@ -595,7 +595,7 @@ class PDb_List_Admin
 							if ( ! empty( $value[ $column ] ) ) {
 							
 								$time = preg_match( '#^[0-9-]+$#', $value[ $column ] ) > 0 ? (int) $value[ $column ] : strtotime( $value[ $column ] );
-								$display_value = $value[ $column ] == '0000-00-00 00:00:00' ? '' : date( get_option('date_format','r'), $time );
+								$display_value = $value[ $column ] == '0000-00-00 00:00:00' ? '' : date_i18n( get_option('date_format','r'), $time );
 								
 							} else $display_value = '';
 							

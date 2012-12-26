@@ -950,7 +950,7 @@ class Participants_Db {
 
       case 'date' :
 
-        $return = empty($value) ? '' : date(get_option('date_format'), self::parse_date($value));
+        $return = empty($value) ? '' : date_i18n(get_option('date_format'), self::parse_date($value));
         break;
 
       case 'multi-checkbox' :
@@ -2313,7 +2313,7 @@ class Participants_Db {
 
     // add the date tag
     $tags[] = '[date]';
-    $values[] = date(get_option('date_format'), self::parse_date());
+    $values[] = date_i18n(get_option('date_format'), self::parse_date());
     
     // add the admin record link tag
     $tags[] = '[admin_record_link]';
