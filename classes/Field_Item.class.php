@@ -143,10 +143,12 @@ class Field_Item extends Template_Item {
     $this->print_CSS_class( $this->form_element, false );
     
   }
-  
+  /**
+   * prints a CSS classname based on the field name
+   */
   public function print_element_id() {
     
-    $this->print_CSS_class( $this->name, false  );
+    $this->print_CSS_class( $this->name, true  );
     
   }
   

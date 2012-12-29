@@ -75,7 +75,7 @@ class Participants_Db {
   // a list of all the form element types available
   public static $element_types;
   // this is can be prefixed on CSS classes or id to keep a namespace
-  public static $css_prefix = 'pdb_';
+  public static $css_prefix = 'pdb-';
   // holds the form validation errors
   public static $validation_errors;
   // holds an admin status or error message

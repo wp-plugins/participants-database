@@ -28,7 +28,7 @@ $exclude = array();
 	
   <?php while ( $this->have_groups() ) : $this->the_group(); ?>
   
-  <div class="section" id="<?php echo $this->group->name ?>">
+  <div class="section" id="<?php echo Participants_Db::$css_prefix.$this->group->name ?>">
   
     <?php $this->group->print_title( '<h2>', '</h2>' ) ?>
     
@@ -44,7 +44,7 @@ $exclude = array();
 					$empty_class = $this->get_empty_class( $this->field );
       
       ?>
-    <dl class="pdb-<?php echo $this->field->name.' '.$this->field->form_element.' '.$empty_class?>">
+    <dl class="<?php echo Participants_Db::$css_prefix.$this->field->name.' '.$this->field->form_element.' '.$empty_class?>">
       
       <dt class="<?php echo $this->field->name.' '.$empty_class?>"><?php $this->field->print_label() ?></dt>
       

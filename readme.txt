@@ -2,8 +2,8 @@
 Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
-Requires at least: 2.8.4
-Tested up to: 3.4.2
+Requires at least: 3.0
+Tested up to: 3.5
 Stable tag: 1.4.5.2
 License: GPLv2
 
@@ -195,6 +195,7 @@ You can no doubt come up with many variations on this.
 * improved list AJAX javascript
 * fixed admin page name conflict with some plugins
 * international characters now work properly in user searches
+* internationalization of date display
 
 = 1.4.5.2 =
 * fixes several issues brought up by the WP 3.5 release:
