@@ -68,7 +68,7 @@ class PDb_List extends PDb_Shortcode {
   /**
    * initializes and outputs the list on the frontend as called by the shortcode
    *
-   * @param array $atts display customization parameters
+   * @param array $params display customization parameters
    *                    from the shortcode
    */
   public function __construct($params) {
@@ -773,11 +773,12 @@ class PDb_List extends PDb_Shortcode {
         'operator',
         'sortBy',
         'ascdesc',
+        'submit',
       );
       foreach( $filter_atts as $att ) unset($values[$att]);
     }
 
-    return $URI_parts[0] . '?' . http_build_query($values) . '&' . $this->list_page . '=%s';
+    return $URI_parts[0] . '?' . (count($values)>0 ? http_build_query($values) . '&' : '') . $this->list_page . '=%s';
   }
 
   /**

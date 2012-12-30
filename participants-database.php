@@ -2358,9 +2358,10 @@ class Participants_Db {
       $post = get_post($_POST['postID']);
     
     // grab the shortcode out of the page content
-    preg_match( '#\[pdb_list([^\]]*)\]#', $post->post_content, $matches );
+    preg_match( '#(?<!\[)\[pdb_list([^\]]*)\]#', $post->post_content, $matches );
     // put the attributes array together
     $atts = shortcode_parse_atts(trim($matches[1]));
+    // add the AJAX filtering flag
     $atts['filtering'] = 1;
     // output the filtered shortcode content
     header("Content-Type:	text/html");

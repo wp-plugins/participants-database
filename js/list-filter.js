@@ -1,3 +1,8 @@
+/*
+ * Participants Database Plugin
+ * 
+ * handles AJAX list filtering and sorting
+ */
 jQuery(document).ready(function ($) {
   "use strict";
   var isError,
@@ -9,8 +14,6 @@ jQuery(document).ready(function ($) {
   
   submission.filterNonce = PDb_ajax.filterNonce;
   submission.postID = PDb_ajax.postID;
-  
-  //console.log( 'submission JSON='+submission );
   
   if (filterform.attr('ref')=='update'){
     filterform.find('input[type="submit"]').live('click',function(event) {
