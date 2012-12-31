@@ -97,7 +97,7 @@ class Participants_Db {
   // list of reserved field names
   public static $reserved_names = array('source', 'subsource', 'id', 'private_id', 'record_link', 'action', 'submit', 'name', 'day', 'month', 'year', 'hour', 'date', 'minute');
 
-  public function initialize() {
+  public static function initialize() {
 
     // register the class autoloading
     spl_autoload_extensions('.php');
@@ -217,7 +217,7 @@ class Participants_Db {
     endif; // end integrity check and fix
   }
 
-  function admin_init() {
+  public static function admin_init() {
 
     // if the setting was made in previous versions and is a slug, convert it to a post ID
     if (isset(self::$plugin_options['registration_page']) && !is_numeric(self::$plugin_options['registration_page'])) {
@@ -228,7 +228,7 @@ class Participants_Db {
     }
   }
 
-  public function init() {
+  public static function init() {
 
     load_plugin_textdomain('participants-database', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
@@ -269,7 +269,7 @@ class Participants_Db {
     return 'text/html';
   }
 
-  public function plugin_menu() {
+  public static function plugin_menu() {
 
     // intialize the plugin settings
     // we do this here because we need the object for the plugin menus
@@ -349,7 +349,7 @@ class Participants_Db {
     );
   }
 
-  public function admin_includes($hook) {
+  public static function admin_includes($hook) {
 
     wp_register_script('cookie', plugins_url('js/jquery_cookie.js', __FILE__));
     wp_register_script('manage_fields', plugins_url('js/manage_fields.js', __FILE__));
@@ -781,7 +781,7 @@ class Participants_Db {
    * columns in this database remain even after they've been deleted from the fields database, so we 
    * don't use the results of this func for anything that only uses active columns
    */
-  public function get_columns() {
+  public static function get_columns() {
 
     global $wpdb;
 
@@ -818,7 +818,7 @@ class Participants_Db {
    * @param string $filter sets the context of the display and determines the set of columns to return
    * @return object the object is ordered first by the order of the group, then by the field order
    */
-  public function get_column_atts($filter = 'new') {
+  public static function get_column_atts($filter = 'new') {
 
     global $wpdb;
 
@@ -1698,7 +1698,7 @@ class Participants_Db {
   }
 
   // processes any POST requests for the submitted edit page
-  public function process_page_request() {
+  public static function process_page_request() {
 
     $options = get_option(self::$participants_db_options);
 
@@ -2530,7 +2530,7 @@ class Participants_Db {
   /**
    * parses the text header to extract plugin info
    */
-  private function _get_plugin_data($key = 'Name') {
+  private static function _get_plugin_data($key = 'Name') {
 
     if (!defined('ABSPATH'))
       return '';

@@ -287,7 +287,7 @@ class Plugin_Settings {
 	 *
 	 * note: the header is displayed by WP; this is only what would go under that
 	 */
-	public function options_section() {
+	public function options_section( $section ) {
 	
 	}
 
