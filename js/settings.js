@@ -16,18 +16,36 @@ jQuery(document).ready(function($) {
   var wrapclass = $('.wrap').attr('class');
   $(".wrap").removeClass().addClass( wrapclass+" main" );
   var lastTab = 'pdb-settings-page-tab',
-  effect = { effect: 'fadeToggle', duration: 200 };
-  $('.ui-tabs').tabs({
-    hide:effect,
-    show:effect,
-    active:$.cookie(lastTab),
-    activate: function(event, ui){
-        $.cookie(lastTab, ui.newTab.index(), { expires: 365 });
+  effect = {
+    effect: 'fadeToggle', 
+    duration: 200
+  };
+  if ( $.versioncompare("1.9",$.ui.version) == 1 ) {
+    var tabsetup = { 
+      fx: {
+        opacity: "show",  
+        duration: "fast"
+      },
+      cookie: {
+        expires:1
+      } 
     }
-  }).bind( 'tabsselect', function( event,ui) {
-    var activeclass = $(ui.tab).attr('href').replace( /^#/, '');
-    $(".wrap").removeClass().addClass( wrapclass+" "+activeclass );
-  });
-  if ($.browser.mozilla)
-    $("form").attr("autocomplete", "off");
+  } else {
+    var tabsetup = {
+      hide:effect,
+      show:effect,
+      active:$.cookie(lastTab),
+      activate: function(event, ui){
+        $.cookie(lastTab, ui.newTab.index(), {
+          expires: 365
+        });
+      }
+    }
+}
+$('.ui-tabs').tabs(tabsetup).bind( 'tabsselect', function( event,ui) {
+  var activeclass = $(ui.tab).attr('href').replace( /^#/, '');
+  $(".wrap").removeClass().addClass( wrapclass+" "+activeclass );
+});
+if ($.browser.mozilla)
+  $("form").attr("autocomplete", "off");
 });

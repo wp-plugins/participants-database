@@ -92,7 +92,6 @@ input[type="checkbox"],
   font-weight: normal;
   text-transform: uppercase;
 }
-
 body[class*='participants-database'] .selectother input[type=text] {
 	width:auto;
 }
@@ -106,6 +105,12 @@ table.spreadsheet {
 }
 body[class*='participants-database'] .text-block {
     max-width: 35em;
+    font-size: 1.3em;
+    line-height: 1;
+}
+body[class*='participants-database'] .text-block p,
+body[class*='participants-database'] .text-block li {
+    line-height: 1.2;
 }
 #delete_button.unarmed {
     opacity:0.5;

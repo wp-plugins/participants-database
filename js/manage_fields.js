@@ -22,15 +22,33 @@ jQuery(document).ready(function($){
 
   // set up the UI tabs
   var lastTab = 'pdb-manage-fields-tab',
-  effect = { effect: 'fadeToggle', duration: 100 };
-  $("#fields-tabs").tabs({
-    hide:effect,
-    show:effect,
-    active:$.cookie(lastTab),
-    activate: function(event, ui){
-        $.cookie(lastTab, ui.newTab.index(), { expires: 365 });
-    }
-  });
+  effect = {
+    effect: 'fadeToggle', 
+    duration: 100
+  };
+  if ( $.versioncompare("1.9",$.ui.version) == 1 ) {
+    $("#fields-tabs").tabs( {
+      fx: {
+        opacity: "show", 
+        duration: "fast"
+      },
+      cookie: {
+        expires:1
+      }
+    });
+  } else {
+    $("#fields-tabs").tabs({
+      hide:effect,
+      show:effect,
+      active:$.cookie(lastTab),
+      activate: function(event, ui){
+        $.cookie(lastTab, ui.newTab.index(), {
+          expires: 365
+        });
+      }
+    });
+  }
+  
 
   // set up the delete functionality
 

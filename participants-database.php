@@ -2170,9 +2170,16 @@ class Participants_Db {
       return false;
     }
 
-    // make sure the filename is OK:
-    $new_filename = preg_replace(
-            array("/\s+/", "/[^-\.\w]+/"), array("_", ""), trim($file['name']));
+    /*
+     * make sure the filename is good, then check it for uniqueness, adding a suffix if it's not
+     */
+    $new_filename = preg_replace(array("/\s+/", "/[^-\.\w]+/"), array("_", ""), trim($file['name']));
+    $index = 1;
+    while ( file_exists(Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename) ) {
+      $filename_parts = pathinfo($new_filename);
+      $new_filename = preg_replace('#_[0-9]+$#','',$filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
+      $index++;
+    }
 
     if ($file['size'] > $options['image_upload_limit'] * 1024) {
 
