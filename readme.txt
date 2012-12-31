@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.4.5.2
+Stable tag: 1.4.6
 License: GPLv2
 
 Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
@@ -196,6 +196,7 @@ You can no doubt come up with many variations on this.
 * fixed admin page name conflict with some plugins
 * international characters now work properly in user searches
 * internationalization of date display
+* image uploads now won't overwrite existing files of the same name by adding an index to the name
 
 = 1.4.5.2 =
 * fixes several issues brought up by the WP 3.5 release:
@@ -444,102 +445,6 @@ You can no doubt come up with many variations on this.
 
 = 1.4.6 =
 Important update with several bugfixes and improvements
-
-= 1.4.5.2 =
-Important update for WordPress 3.5 users
-
-= 1.4.5.1 =
-Important bugfix for admin list bug that can delete all records on the page if you delete a record
-
-= 1.4.5 =
-Several minor issues fixed, database update code ensures the database is in sync, pagination issues solved, improvements to pdb-list-detailed template
-
-= 1.4.4 =
-General bugfix and UI enhancement release including improvements to the single record display
-
-= 1.4.2 =
-Bugfix addressing several issues, including image display, signup form validation problems, and multi-page searches and sorts on lists.
-
-= 1.4 =
-Major upgrade with improvements across the board, many new features. NOTICE: Display changes could occur, check all pages using the plugin after upgrading.
-
-= 1.3.7 =
-Important bugfix and minor improvements
-
-= 1.3.6 =
-Minor improvements to `[pdb_list]` shortcode search and sort, bug fixes for select/other form fields
-
-= 1.3.5 =
-Bug fix release: several bugs fixed, new record total disply option for the list display
-
-= 1.3.4 =
-Important upgrade including several bug fixes, two new features and improved error handling and documentation
-
-= 1.3.3 =
-Bug fix release affecting several minor problems: image path; email plugin conflicts; admin CSS; group name change issues
-
-= 1.3.2 =
-Fixes for several minor issues; image files are now portable
-
-= 1.3.1 =
-Bugfix for sites not using rewrites; Added Italian translation
-
-= 1.3 =
-Major feature upgrade with several fixes and enhancements-- see the changelog
-
-= 1.2.8.2 =
-very important fix for all installations that installed at or after 1.2.5 
-
-= 1.2.8.1 =
-bugfux update fixing images not saving sometimes
-
-= 1.2.8 =
-minor upgrade (new button text settings for record form) and bugfix (csv exports failing on some installations)
-
-= 1.2.7 =
-Fix validation errors on signup form when record form fields are required
-
-= 1.2.6 =
-Fix display issue with blank date fields  
-
-= 1.2.5 =
-Important bug fix and feature enhancement upgrade allowing clickable links in list presentation
-
-= 1.2.4 =
-Bugfix for pdb_list shortcode, filtering with equality was failing under some circumstances
-
-= 1.2.3 =
-Important feature enhancement upgrade: added filtering and sorting to list shortcode; added an access control setting for editing, adding and viewing records; fixed problems with date filtering and sorting
-
-= 1.2.2 =
-Minor bugfix and feature upgrade; added ability to show groups and group descriptions in the signup form; multiselects in signup form bug fixed
-
-= 1.2.1 =
-Important feature upgrade includes an option to send users to a different page after signing up, and several other major enhancements for the backend
-
-= 1.2 =
-Major upgrade adds a couple of minor features including email notifications for user record updates
-
-= 1.1.3 =
-Important upgrade fixes a couple of bugs, better input values handing for forms and enhanced forms security
-
-= 1.1.2 =
-Upgrade fixes private record link for sites using query links
-
-= 1.1.1 =
-Bigfix primarily addesses content placement issues with shortcodes
-
-= 1.1 =
-Major upgrade includes new list display shorcode, more control over CSV exporting and minor improvements all around
-
-= 1.0.1 =
-Bug fix for incorrect private id assignment
-
-= 1.0 =
-Major upgrade includes internationalization, improvements to CSV import/export, and a new image upload field.
-
-= 0.9.6 =
-Important upgrade fixes 2 bugs and provides improved functionality.
 
 == Using the Plugin ==
 
