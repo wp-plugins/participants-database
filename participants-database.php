@@ -170,6 +170,8 @@ class Participants_Db {
     }
 
     add_filter('query_vars', array(__CLASS__, 'register_queryvars'));
+    add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array(__CLASS__, 'add_plugin_action_links') );
+    add_filter( 'plugin_row_meta', array(__CLASS__, 'add_plugin_meta_links'), 10, 2 );
 
     // set the WP hooks to finish setting up the plugin
     add_action('init', array(__CLASS__, 'init'));
@@ -2541,6 +2543,39 @@ class Participants_Db {
     $plugin_data = get_plugin_data(__FILE__);
 
     return $plugin_data[$key];
+  }
+  /**
+   * filters the plugins action links shown on the plugins page to add a link to 
+   * the settings page
+   * 
+   * @param array $links
+   * @return array
+   */
+  public static function add_plugin_action_links($links) {
+    return array_merge($links, array('settings' => '<a href="' . admin_url('admin.php?page=participants-database_settings_page') . '">Settings</a>'));
+  }
+
+  /**
+   * adds links and modifications to plugin list meta row
+   * 
+   * @param array  $links
+   * @param string $file
+   * @return array
+   */
+  public static function add_plugin_meta_links($links, $file) {
+
+    $plugin = plugin_basename(__FILE__);
+
+    // create link
+    if ($file == $plugin) {
+    
+      //error_log( ' meta links: '.print_r( $links,1 ));
+      
+      $links[1] = str_replace('Roland Barker','xn&lowast;au webdesign',$links[1]);
+      $links[] = '<a href="http://wordpress.org/support/view/plugin-reviews/participants-database">Submit a rating or review</a>';
+      $links[] = '<span style="color:#6B4001;">Free tech support and continued development relies on your support: <a class="button" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P5TNMURN5JBZA">contribute</a></span>';
+    }
+    return $links;
   }
 
 }

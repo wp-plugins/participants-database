@@ -72,6 +72,20 @@ All records can be exported as a CSV-formatted text file that can be read by spr
 
 Records can also be mass-imported with a CSV file, allowing you to use existing lists from spreadsheets, or for offline compilation of records using a spreadsheet such as Open Office or Google Docs. A blank spreadsheet can be exported from the plugin to get people started in entering records offline.
 
+= Internationalization and Translations =
+
+This plugin is fully compliant with WordPress Internationalization standards and includes partial translations in Italian and Polish, and a complete translation in Slovak. All of the front-end text is user-customizable, so even if a translation isn't available for your language, your users will be able to use the plugin in their language.
+
+*Translation Credits*
+
+* Slovak: Branco Radenovich [WebHostingGeeks.com](http://webhostinggeeks.com/blog/)
+
+* Polish: Piotr Kubala
+
+* Italian: Mario Conte
+
+If you are multi-lingual and feel like contributing a translation, please [contact me.](mailtosupport@xnau.com)
+
 == Installation ==
 
 1. Download the zip file, and unzip it on your computer.

@@ -335,6 +335,8 @@ class FormElement {
     
     $this->add_class( 'date_field' );
     
+    $this->value = date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $this->value ) );
+    
     $this->_addline( $this->_input_tag() );
     
   }

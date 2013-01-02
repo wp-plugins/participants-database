@@ -538,16 +538,6 @@ abstract class PDb_Shortcode {
 		}
 			
 		switch ( $field->form_element ) {
-		// format the date if it's a date field
-			case 'date':
-			
-				if ( ! empty( $value ) ) {
-				
-					$value = date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $value ) );
-					
-				}
-				
-				break;
 			
 			case 'image-upload':
 			
