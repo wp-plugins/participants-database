@@ -203,6 +203,12 @@ You can no doubt come up with many variations on this.
 
 == Changelog ==
 
+= 1.4.7 =
+* internationalized dates are now displaying consistenyly on all screens
+* email headers are now set on a per-message basis to avoid conflicts with text-only emails
+* several bug fixes relating to date localization
+* added Slovak translation by Branco Radenovich
+
 = 1.4.6 =
 * added image delete checkbox (doesn't delete file, only database reference)
 * image handle file validation avoids costly CURL calls in validating files
@@ -457,8 +463,9 @@ You can no doubt come up with many variations on this.
 
 == Upgrade Notice ==
 
-= 1.4.6 =
-Important update with several bugfixes and improvements
+= 1.4.7 =
+
+Bugfix release with improvements to international date displays and site email functions
 
 == Using the Plugin ==
 
