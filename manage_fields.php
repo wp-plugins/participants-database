@@ -72,6 +72,14 @@ if ( isset( $_POST['action'] ) ) {
 
             }
           }
+          /*
+           * enforce the values for a captcha field
+           */
+          if ( $row['form_element'] == 'captcha' ) {
+            $row['validation'] = 'captcha';
+            foreach( array('display_column','admin_column','CSV','persistent','sortable') as $c ) $row[$c] = 0;
+            $row['signup'] = 1;
+          }
 
 
 					// remove the fields we won't be updating

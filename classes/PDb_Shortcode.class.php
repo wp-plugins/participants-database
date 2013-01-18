@@ -455,6 +455,10 @@ abstract class PDb_Shortcode {
         
         $sql .= ' AND v.signup = 1';
         break;
+      
+      default:
+        
+        $sql .= ' AND v.form_element <> "captcha"';
             
     }
     

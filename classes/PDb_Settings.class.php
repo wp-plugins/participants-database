@@ -182,6 +182,18 @@ class PDb_Settings extends Plugin_Settings {
           'value'      => __('The %s field must match.', 'participants-database' ),
           )
         );
+    
+
+    $this->plugin_settings[] = array(
+        'name'       =>'captcha_field_message',
+        'title'      =>__('Failed CAPTCHA Message', 'participants-database' ),
+        'group'      =>'pdb-main',
+        'options'    =>array(
+          'type'       =>'text',
+          'help_text'  => __("the message shown when the CAPTCHA (verify human) test failed", 'participants-database' ),
+          'value'      => __('Pleast try the %s question again.', 'participants-database' ),
+          )
+        );
 
     $this->plugin_settings[] = array(
         'name'       =>'field_error_style',

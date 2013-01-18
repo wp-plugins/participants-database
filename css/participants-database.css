@@ -18,6 +18,10 @@
 .pdb-signup .checkbox .helptext {
   display: inline-block;
 }
+.math-captcha {
+  display:inline-block;
+  margin-right:10px;
+}
 
 /* RECORD FORM */
 
@@ -210,6 +214,11 @@
 .image-field-wrap img {
   height: 50px;
   width: auto;
+}
+.pdb-record .image-field-wrap,
+.pdb-record .file-link-wrap {
+  float: left;
+  margin-right:10px;
 }
 
 /* ERRORS / MESSAGES */

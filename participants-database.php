@@ -845,7 +845,7 @@ class Participants_Db {
       case 'backend':
       default:
 
-        $where = 'WHERE v.name NOT IN ( "id" ) ';
+        $where = 'WHERE v.name NOT IN ( "id", "captcha" ) ';
     }
 
     $sql = 'SELECT v.*, g.order FROM ' . self::$fields_table . ' v INNER JOIN ' . self::$groups_table . ' g ON v.group = g.name ' . $where . ' ORDER BY g.order, v.order';
@@ -1285,6 +1285,9 @@ class Participants_Db {
             $date = self::parse_date($post[$column_atts->name], $column_atts);
 
             $new_value = $date ? $date : NULL;
+          } elseif ('captcha' == $column_atts->form_element) {
+            
+            $new_value = false;
           } elseif ('password' == $column_atts->form_element) {
 
             if (!empty($post[$column_atts->name]))
@@ -1960,6 +1963,7 @@ class Participants_Db {
             'options' => array(
                 __('Not Required', 'participants-database') => 'no',
                 __('Required', 'participants-database') => 'yes',
+                'CAPTCHA' => 'captcha',
             ),
             'attributes' => array('other' => 'regex/match'),
         );
@@ -2151,7 +2155,9 @@ class Participants_Db {
       return false;
     }
     
-    // test the file extension for a match with the allowed extensions
+    /* get the allowed file types and test the uploaded file for an allowed file 
+     * extension
+     */
     $extensions = empty($field_atts->values) ? $options['allowed_file_types'] : implode(',', self::unserialize_array($field_atts->values));
     $test = preg_match('#^(.+)\.('.implode('|',array_map('trim',explode(',',$extensions))).')$#',$file['name'],$matches);
     
@@ -2168,7 +2174,7 @@ class Participants_Db {
     } else {
       
       // validate and construct the new filename using only the allowed file extension
-      $new_filename = preg_replace(array('#\.#',"/\s+/", "/[^-\.\w]+/"), array("-", "_", ""), $matches[1] ) . '.' . $matches[2];
+      $new_filename = preg_replace(array('#\.#', "/\s+/", "/[^-\.\w]+/"), array("-", "_", ""), $matches[1] ) . '.' . $matches[2];
       // now make sure the name is unique by adding an index if needed
       $index = 1;
       while ( file_exists(Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename) ) {
@@ -2216,7 +2222,7 @@ class Participants_Db {
      */
 
     else
-      return /* get_bloginfo('wpurl').DIRECTORY_SEPARATOR.$options['image_upload_location']. */$new_filename;
+      return $new_filename;
   }
 
   /**

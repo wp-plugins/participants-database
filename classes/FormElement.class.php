@@ -79,6 +79,9 @@ class FormElement {
   
   // the size attribute of the input tag
   public $size;
+  
+  // a random key for a simple cipher
+  static $key = 'dk4Rul2Qs';
 
 	// sets the height and width of the textarea element
 	private $textarea_dims = array( 'rows'=> 2, 'cols'=> 40 );
@@ -116,6 +119,7 @@ class FormElement {
         'File Upload Field'    => 'file-upload',
         'Hidden Field'         => 'hidden',
         'Password Field'       => 'password',
+        'CAPTCHA'              => 'captcha',
     );
   
   /**
@@ -268,6 +272,10 @@ class FormElement {
 			case 'file':
 			case 'file-upload':
         $this->_upload('file');
+        break;
+      
+      case 'captcha':
+        $this->_captcha();
         break;
 
       default:
@@ -766,9 +774,48 @@ if ( 'image' == $type)
    * there will be at least two types of captcha produced here: a simple match 
    * captcha and a reCaptcha; the default is the math captcha
    * 
-   * @param string $type selects the type of captcha to produce
+   * @param string $type selects the type of captcha to produce; currently only 'math' type
    * 
    */
+  private function _captcha($type = 'math') {
+    
+    $this->size = 3;
+    
+    /* generate the math question. We try to make it a simple arithmetic problem
+     */
+    $operators = array(
+        '&times;'  => 'bcmul',
+      /*'&divide;' => 'bcdiv',*/
+        '+'        => 'bcadd',
+        '&minus;'  => 'bcsub',
+    );
+    $o = array_rand($operators);
+    switch ($o){
+      case '&times;':
+        $a = rand( 1, 10 );
+        $b = rand( 1, 5 );
+        break;
+      case '&minus;':
+        $a = rand( 2, 10 );
+        do { $b = rand( 1, 9 ); } while($b>=$a);
+        break;
+      default:
+        $a = rand( 1, 10 );
+        $b = rand( 1, 10 );
+    }
+    $math_string = $a .' ' . $o . ' ' . $b . ' = ?';
+    $validation = '#^' . call_user_func($operators[$o], $a, $b ) . '$#';
+    if (is_array($this->value)) $this->value = $this->value[1];
+    /*
+     * the $info array will be used to pass values to the validation object; What 
+     * we are calling 'nonce' is actually the XOR-encrypted regex. If we need to 
+     * expand the types of CAPTCHAS in the future, we can use this to tell the 
+     * validation object how to validate the field
+     */
+    $info = array('type'=>$type,'nonce'=>FormValidation::xcrypt($validation,self::$key));
+    $this->_addline($this->_input_tag('hidden', urlencode(json_encode($info)), false, true ));
+    $this->_addline( '<span class="math-captcha">' . $math_string . '</span>' . $this->_input_tag('text', false, false, true ) );
+  }
 
   /************************ 
 	* SUB-ELEMENTS

@@ -189,11 +189,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 = Is a CAPTCHA available for the forms? =
 
-There will be in the future, but for now, I'm suggesting this:
-
-Create a text-line field with the question "what is the sum of 10 and 7?" then put in a regex to verify the answer: #^17$#
-
-You can no doubt come up with many variations on this.
+Currently, there is a "math" captcha that can be used in the signup form. The instructions for use appear on the "using the plugin" page.
 
 == Screenshots ==
 
@@ -202,6 +198,12 @@ You can no doubt come up with many variations on this.
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.5 =
+* new field type: file upload, allows uploading of any file in the list of allowed types
+* a couple of significant bug fixes
+* file upload size limit is now a number to type in instead of a dropdown
+* added several hooks for use by other plugins and themes
 
 = 1.4.7 =
 * internationalized dates are now displaying consistenyly on all screens
@@ -500,6 +502,22 @@ This plugin uses a number of different shortcodes to place it's functionality in
 4. `[pdb_single]` - This shows a single record as determined by the record ID present in the URL used to access the page. It is possible to set a link to the single record in the record list, allowing for a detail display of a single record.
 5. `[pdb_signup_thanks]` - If you want to send the people who use the signup form to another page after they submit, you can use this shortcode to display the thankyou message. This is not needed if you have them just go back to the signup page, the signup shortcode will take care if it.
 
+= The Signup Form =
+
+This form is designed to be a simple way for your users to sign up. The fields that appear in the signup form are the ones with "signup" checked in the "manage database fields" page. You can put any type of field and any number of fields into your signup form. Check the "signup" tab in the settings to make sure it's set up to work the way you want.
+
+= Signup Form CAPTCHA =
+
+CAPTCHA fields are a common way to prevent spammers from automatically filling out your signup form. To add a CAPTCHA field, add a field on the "manage database fields" page and set it to be a "captcha" field. The other settings you need to use will be automatically filled in. At present, there is only one kind of CAPTCHA integrated into the plugin: the "math" captcha, which asks the user to answer a simple arithmetic question. On the "general" settings tab is the message that is shown if the CAPTCHA is not correctly filled in so you can change it to say whatever you want.
+
+The CAPTCHA field may only be used in the signup form.
+
+= Setting Up the Signup Form "Thank You" Page =
+
+To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the `[pdb_signup_thanks]` shortcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
+
+It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.
+
 = Showing a List of Records on Your Website =
 
 You can use the `[pdb_list]` shortcode to show the records on your site. Just put the shortcode where you want it to show up.
@@ -600,12 +618,6 @@ Templates for the single record shortcode include an array that can be used to p
 
 These fields will now be excluded from the display. The template offers many other opportunities to customize the output of the `[pdb_single]` shortcode to match your theme.
 
-= Setting Up the Signup Form "Thank You" Page =
-
-To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the `[pdb_signup_thanks]` shortcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
-
-It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.
-
 = Hidden Signup Fields =
 
 There is a field type called "hidden" that can be used to add dynamic values to the signup form submissions. For instance, if you had the signup form in multiple locations on your blog, you could know which page the user was on when they signed up because the page name would be placed in a hidden field. 
@@ -630,13 +642,21 @@ You can also access some PHP "Superglobals." For instance, to get the IP of the 
 
 For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden fields are also present in the form presented by the `[pdb_record]` shortcode. These fields are visible and editable in the admin edit page.
 
-= Image Uploads =
+= Image Upload Fields =
 
-Images can now be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'Image Upload Location' setting will always determine the location for the images. The images are stored in the database as filenames without any path information.
+To allow your users to upload images, add an "image upload" field to the form. The images are stored in the "file upload location" set in the general settings. Only the name of the file is saved in the database, it looks for an image of that name in the file upload location. It is also necessary to have the image file types you wish to allow users to upload in the "Allowed File Types" setting. The image type is determined by the file extension and is typically one of 'jpg', 'png', or 'gif'.
 
 The plugin has a "default image" that will be shown if no image is present. You can create your own, but you shouldn't keep it in the plugin folder. Keep it in the uploads directory or in your theme directory. Change the "Default Image" setting to point to your image. If you don't want anything to show if no image is present, make the "Default Image" setting blank.
 
 IMPORTANT: Don't store images in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
+
+= File Upload Fields =
+
+To allow your users to upload files (other than images), use the "file upload" field type. In the settings under the "general" tab is a setting allowing you to globally determine which file types you are allowing users to upload. The type is determined by the file extension, and a set of most likely file types in included as a default. You should edit this to only include file types you want users to upload. Is is also possible to set the allowed types on a per-field basis. Just put the allowed file type extensions into the "values" field of the file upload field definition on the "manage database fields" page.
+
+It is important to be aware that allowing users to upload files is risky, so be sure to limit your allowed types to those that are reasonably safe. NEVER allow "executable" files to be uploaded (such as PHP or PERL scripts) unless you are a security expert. Basic precautions have been taken to make it difficult for malicious files to be uploaded, but you are depending on your web server being properly configured to prevent things like image files that are really executable scripts from being actually executed. Do a little research on securing file uploads in WordPress to get some ideas on how you can do this with some safety.
+
+All files will be uploaded into the "file upload location" as defined in the settings.
 
 = Importing CSV Files =
 

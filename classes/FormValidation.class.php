@@ -40,7 +40,7 @@ class FormValidation {
      * get our error messages from the plugin options
      * 
      */
-    foreach ( array( 'invalid','empty','nonmatching','duplicate' ) as $error_type ) {
+    foreach ( array( 'invalid','empty','nonmatching','duplicate','captcha' ) as $error_type ) {
       $this->error_messages[$error_type] = $options[$error_type.'_field_message'];
     }
 		$this->error_style = $options['field_error_style'];
@@ -60,7 +60,7 @@ class FormValidation {
 	 * validation status array
 	 *
 	 * @param string $value       the submitted value of the field
-	 * @param string $column_atts the column atributes object
+	 * @param object $column_atts the column atributes object
 	 *                            validation key can be NULL, 'yes', 'email', regex
 	 * @param array  $post        the post array with all submitted values
 	 */
@@ -123,6 +123,7 @@ class FormValidation {
 
 				case 'text':
 				case 'text-line':
+        case 'captcha':
 					$element = 'input';
 					break;
 					
@@ -227,16 +228,16 @@ class FormValidation {
 	/**
 	 * validates a field submitted to the main database
 	 *
-	 * receives a validation pair and preocesses it, adding any error to the
+	 * receives a validation pair and processes it, adding any error to the
 	 * validation status array
 	 *
 	 * @param string $value       the submitted value of the field
 	 * @param string $name        the name of the field
-	 * @param string $validation  key can be NULL (or absent), 'yes', 'email', regex
+	 * @param string $validation  key can be NULL (or absent), 'yes', 'email', regex, 'captcha'
 	 */
 	private function _validate_field( $value, $name, $validation = NULL ) {
 
-		// error_log( __METHOD__.' validating field '.$name.' of value '.$value.' with '.$validation );
+		//error_log( __METHOD__.' validating field '.$name.' of value '.(is_array($value)?print_r($value,1):$value).' with '.$validation );
 
     $error_type = false;
 
@@ -264,16 +265,30 @@ class FormValidation {
       switch (true) {
         
         /*
-         * if it's not a regex, test to see if it's a valid field name for a match test
+         * we now process sever different types of validation
          */
+  
+        case ( 'email'  == strtolower( $validation ) ) :
+  
+          $regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
+          break;
+        
+        case ( 'captcha' == strtolower( $validation ) ) :
+          
+          // grab the value and the validation key
+          list($info, $value) = $this->post_array[$validation];
+          $info = json_decode(urldecode($info));
+          /* the $info->type value indicates the type of CAPTCHA that was used. 
+           * There is only one type currently: 'math' and it passes in a regex to 
+           * validate the submission with
+           */
+          $regex = $this->xcrypt($info->nonce, FormElement::$key);
+          
+          break;
+        
         case ( isset( $this->post_array[$validation] ) ) :
           
           $test_value = $this->post_array[$validation];
-          break;
-  
-        case ( 'email'== strtolower( $validation ) ) :
-  
-          $regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
           break;
   
         case ( self::_is_regex( $validation ) ) :
@@ -286,7 +301,7 @@ class FormValidation {
       }
   
       if ( false !== $regex && preg_match( $regex, $value ) == 0 ) {
-        $error_type = 'invalid';
+        $error_type = $validation == 'captcha' ? 'captcha': 'invalid';
       } elseif ( false !== $test_value && $value !== $test_value ) {
         $error_type = 'nonmatching';
       }
@@ -348,5 +363,22 @@ class FormValidation {
 		return ucwords( str_replace( array( '_','-' ), ' ', $string ) );
 
 	}
+  /**
+   * encodes or decodes a string using a simple XOR algorithm
+   * 
+   * @param string $string the tring to be encoded/decoded
+   * @param string $key the key to use
+   * @return string
+   */
+  public function xcrypt($string,$key){
+    
+    for( $i = 0; $i < strlen($string); $i++ ) {
+      $pos = $i % strlen($key);
+      $replace = ord($string[$i]) ^ ord($key[$pos]);
+      $string[$i] = chr($replace);
+    }
+    
+    return $string;
+  }
 
 }
