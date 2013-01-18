@@ -98,6 +98,26 @@ class FormElement {
   // holds the internationaliztion strings
   private $i18n;
   
+  // define an array of all available form element types
+  public static $element_types = array(
+        'Text-line'            => 'text-line',
+        'Text Area'            => 'text-area',
+        'Rich Text'            => 'rich-text',
+        'Checkbox'             => 'checkbox',
+        'Radio Buttons'        => 'radio',
+        'Dropdown List'        => 'dropdown',
+        'Date Field'           => 'date',
+        'Dropdown/Other'       => 'dropdown-other',
+        'Multiselect Checkbox' => 'multi-checkbox',
+        'Radio Buttons/Other'  => 'select-other',
+        'Multiselect/Other'    => 'multi-select-other',
+        'Link Field'           => 'link',
+        'Image Upload Field'   => 'image-upload',
+        'File Upload Field'    => 'file-upload',
+        'Hidden Field'         => 'hidden',
+        'Password Field'       => 'password',
+    );
+  
   /**
    * instantiates a FormElement object
 	 * 
@@ -242,9 +262,12 @@ class FormElement {
         break;
         
       case 'image-upload':
+        $this->_upload('image');
+        break;
+      
 			case 'file':
 			case 'file-upload':
-        $this->_upload();
+        $this->_upload('file');
         break;
 
       default:
@@ -336,7 +359,7 @@ class FormElement {
     $this->add_class( 'date_field' );
     
     if (!empty($this->value))
-      $this->value = date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $this->value ) );
+      $this->value = $this->format_date( $this->value );
     
     $this->_addline( $this->_input_tag() );
     
@@ -706,14 +729,20 @@ class FormElement {
 	
 	/**
 	 * builds a file upload element
+   * 
+   * @param string $type the upload type: file or image
 	 */
-	private function _upload() {
+	private function _upload($type) {
 		
-		// if an image is already defined, show it
+		// if a file is already defined, show it
 		if ( ! empty( $this->value ) ) {
 			
-			//$this->_addline( '<img class="uploaded-image" id="image_'.$this->name.'" src="'.$this->value.'" />' );
-			$this->_addline( Participants_Db::prep_field_for_display( $this->value, 'image-upload' ) );
+if ( 'image' == $type)
+        $this->_addline( Participants_Db::prep_field_for_display( $this->value, 'image-upload' ) );
+      else {
+        $pattern = Participants_Db::$plugin_options[ 'make_links' ] ? '<a class="file-link-wrap"  href="' . get_bloginfo('url') . Participants_Db::$plugin_options[ 'image_upload_location' ]. '/' . '%1$s" >%1$s</a>' : '<span class="file-link-wrap"  >%1$s</span>';
+        $this->_addline( sprintf($pattern, $this->value ));
+      }
 			
 		}
 		
@@ -727,10 +756,19 @@ class FormElement {
 		$this->_addline( $this->_input_tag( 'file' ) );
     
     // add the delete checkbox if there is a file defined
-    // we still have a lot of work to do to properly implement this feature: see dev notes
     if ( ! empty($this->value)) $this->_addline( '<label class="file-delete">'.__('delete','participants-database').$this->_input_tag('checkbox','',false).'</label>' );
 		
 	}
+  
+  /**
+   * builds a captcha element
+   * 
+   * there will be at least two types of captcha produced here: a simple match 
+   * captcha and a reCaptcha; the default is the math captcha
+   * 
+   * @param string $type selects the type of captcha to produce
+   * 
+   */
 
   /************************ 
 	* SUB-ELEMENTS
@@ -1008,6 +1046,20 @@ class FormElement {
     if ( $this->is_assoc( $array ) ) return $array;
     
     return array_combine( array_values( $array ), $array );
+    
+  }
+  
+  /**
+   * returns an internationalized date string from a UNIX timestamp
+   * 
+   * @param int $timestamp a UNIX timestamp
+   * @return string a formatted date or empty string if invalid
+   */
+  public static function format_date($timestamp) {
+
+    if ( false !== @date('r',$timestamp)) {
+      return date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $timestamp ) );
+    } else return '';
     
   }
   

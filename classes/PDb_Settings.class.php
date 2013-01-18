@@ -14,16 +14,16 @@ class PDb_Settings extends Plugin_Settings {
     // define the settings sections
     // no need to worry about the namespace, it will be prefixed
     $this->sections = array(
-                            'main'   => __('General Settings', 'participants-database' ),
-                            'signup' => __('Signup Form Settings', 'participants-database' ),
-                            'record' => __('Record Form Settings', 'participants-database' ),
-                            'list'   => __('List Display Settings', 'participants-database' ),
+                            'pdb-main'   => __('General Settings', 'participants-database' ),
+                            'pdb-signup' => __('Signup Form Settings', 'participants-database' ),
+                            'pdb-record' => __('Record Form Settings', 'participants-database' ),
+                            'pdb-list'   => __('List Display Settings', 'participants-database' ),
                             );
 
     self::$section_description = array(
-      'record' => __( 'Settings for the [pdb_record] shortcode, which is used to show a user-editable form on the website.', 'participants-database' ),
-      'list' => __( 'Settings for the [pdb_list] shortcode, which is used to show a list of records from the database.', 'participants-database' ),
-      'signup' => __( 'Settings for the [pdb_signup] shortcode, which is used to show a signup or registration form on the website.', 'participants-database' ),
+      'pdb-record' => __( 'Settings for the [pdb_record] shortcode, which is used to show a user-editable form on the website.', 'participants-database' ),
+      'pdb-list' => __( 'Settings for the [pdb_list] shortcode, which is used to show a list of records from the database.', 'participants-database' ),
+      'pdb-signup' => __( 'Settings for the [pdb_signup] shortcode, which is used to show a signup or registration form on the website.', 'participants-database' ),
     );
 
 
@@ -57,7 +57,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       => 'image_upload_location',
         'title'      => __('File Upload Location', 'participants-database' ),
-        'group'      => 'main',
+        'group'      => 'pdb-main',
         'options'    =>array(
           'type'        => 'text',
           'help_text'   => __("This defines where the uploaded files will go, relative to the WordPress root. The default location is '/wp-content/uploads/participants-database'<br />Don't put it in the plugin folder, the images and files could get deleted when the plugin is updated.", 'participants-database' ),
@@ -67,20 +67,30 @@ class PDb_Settings extends Plugin_Settings {
 
     $this->plugin_settings[] = array(
         'name'       =>'image_upload_limit',
-        'title'      =>__('Image Upload Limit', 'participants-database' ),
-        'group'      => 'main',
+        'title'      =>__('File Upload Limit', 'participants-database' ),
+        'group'      => 'pdb-main',
         'options'    =>array(
-          'type'        =>'dropdown',
-          'help_text'   => __('the maximum allowed file size for an uploaded image', 'participants-database' ),
-          'value'       => '100K',
-					'options'     => array( '10K'=>10,'20K'=>20,'50K'=>50,'100K'=>100,'150K'=>150,'250K'=>250,'500K'=>500, '750K'=>750 ),
+          'type'        =>'text',
+          'help_text'   => __('the maximum allowed file size (in kilobytes) for an uploaded file', 'participants-database' ),
+          'value'       => '100',
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'allowed_file_types',
+        'title'      =>__('Allowed File Types', 'participants-database' ),
+        'group'      => 'pdb-main',
+        'options'    =>array(
+          'type'        =>'text',
+          'help_text'   => __('list the types of files you wish to allow your users to upload by file extension. Please be aware that there are security risks inherent in allowing file uploads.', 'participants-database' ),
+          'value'       => 'txt,pdf,mp3,mp4a,ogg,doc,docx,odt,rtf,zip,jpg,jpeg,gif,png',
           )
         );
 
     $this->plugin_settings[] = array(
         'name'       => 'default_image',
         'title'      => __('Default Image', 'participants-database' ),
-        'group'      => 'main',
+        'group'      => 'pdb-main',
         'options'    =>array(
           'type'        => 'text',
           'help_text'   => __("Path (relative to WP root) of an image file to show if no image has been defined for an image field. Leave blank for no default image.", 'participants-database' ),
@@ -91,7 +101,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'image_link',
         'title'      =>__('Link Image to Fullsize', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -104,7 +114,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'use_plugin_css',
         'title'      =>__('Use the Plugin CSS', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -117,7 +127,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'make_links',
         'title'      =>__('Make Links Clickable', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -130,7 +140,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'email_protect',
         'title'      =>__('Protect Email Addresses', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -143,7 +153,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'empty_field_message',
         'title'      =>__('Missing Field Error Message', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    =>array(
           'type'       =>'text',
           'help_text'  => __('the message shown when a field is required, but left empty (the %s is replaced by the name of the field)', 'participants-database' ),
@@ -154,7 +164,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'invalid_field_message',
         'title'      =>__('Invalid Field Error Message', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    =>array(
           'type'       =>'text',
           'help_text'  => __("the message shown when a field's value does not pass the validation test", 'participants-database' ),
@@ -165,7 +175,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'nonmatching_field_message',
         'title'      =>__('Non-Matching Field Error Message', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    =>array(
           'type'       =>'text',
           'help_text'  => __("the message shown when a field's value does match the value of another field", 'participants-database' ),
@@ -176,7 +186,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'field_error_style',
         'title'      =>__('Field Error Style', 'participants-database' ),
-        'group'      => 'main',
+        'group'      => 'pdb-main',
         'options'    =>array(
           'type'        =>'text',
           'help_text'   => __('the CSS style applied to an input or text field that is missing or has not passed validation. This must be a valid CSS rule', 'participants-database' ),
@@ -187,7 +197,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'mark_required_fields',
         'title'      =>__('Mark Required Fields', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -200,7 +210,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'required_field_marker',
         'title'      =>__('Required Field Marker', 'participants-database' ),
-        'group'      => 'main',
+        'group'      => 'pdb-main',
         'options'    =>array(
           'type'       => 'text-area',
           'help_text'  => __('html added to field title for required fields if selected above (the %s is replaced by the title of the field)', 'participants-database' ),
@@ -211,7 +221,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'rich_text_editor',
         'title'      =>__('Use Rich Text Editor', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -224,7 +234,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'enable_wpautop',
         'title'      =>__('Use WordPress Auto Formatting', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -237,7 +247,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'html_email',
         'title'      =>__('Send HTML Email', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -250,7 +260,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'strict_dates',
         'title'      =>__('Strict Date Format', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -263,7 +273,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'record_edit_capability',
         'title'      =>__('Record Edit Access Level', 'participants-database' ),
-        'group'      => 'main',
+        'group'      => 'pdb-main',
         'options'    =>array(
           'type'        =>'dropdown',
           'help_text'   => __('sets the user access level for adding, editing and listing records. (fields management and plugin settings always require admin level access)', 'participants-database' ),
@@ -276,7 +286,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'admin_default_sort',
         'title'      =>__('Admin List Default Sort', 'participants-database' ),
-        'group'      =>'main',
+        'group'      =>'pdb-main',
         'options'    =>array
           (
           'type'       =>'dropdown',
@@ -289,7 +299,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'admin_default_sort_order',
         'title'      =>__('Admin List Default Sort Order', 'participants-database' ),
-        'group'      => 'main',
+        'group'      => 'pdb-main',
         'options'    =>array(
           'type'        =>'dropdown',
           'help_text'   => __('Sets the default order of the record list in the admin.', 'participants-database' ),
@@ -308,7 +318,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'list_limit',
         'title'      => __('Records per Page', 'participants-database' ),
-        'group'      =>'list',
+        'group'      =>'pdb-list',
         'options'    =>array(
           'type'        =>'text',
           'help_text'   => __('the number of records to show on each page', 'participants-database' ),
@@ -320,7 +330,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'single_record_link_field',
         'title'      =>__('Single Record Link Field', 'participants-database' ),
-        'group'      =>'list',
+        'group'      =>'pdb-list',
         'options'    =>array
           (
           'type'       =>'dropdown',
@@ -332,7 +342,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'single_record_page',
         'title'      =>__('Single Record Page', 'participants-database' ),
-        'group'      =>'list',
+        'group'      =>'pdb-list',
         'options'    =>array
           (
 				  'attributes' => array( 'other' => 'Post ID' ),
@@ -345,7 +355,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'strict_search',
         'title'      =>__('Strict User Searching', 'participants-database' ),
-        'group'      =>'list',
+        'group'      =>'pdb-list',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -357,7 +367,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'ajax_search',
         'title'      =>__('Enable AJAX Search Functionality', 'participants-database' ),
-        'group'      =>'list',
+        'group'      =>'pdb-list',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -376,7 +386,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'signup_button_text',
         'title'      =>__('Signup Button Text', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('text shown on the button to sign up', 'participants-database' ),
@@ -387,7 +397,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'signup_thanks_page',
         'title'      =>__('Signup Thanks Page', 'participants-database' ),
-        'group'      =>'signup',
+        'group'      =>'pdb-signup',
         'options'    =>array
 					(
           'type'       =>'dropdown-other',
@@ -400,7 +410,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       => 'send_signup_receipt_email',
         'title'      => __('Send Signup Response Email', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -413,7 +423,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'receipt_from_address',
         'title'      =>__('Signup Email From Address', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('the "From" address on signup receipt emails. If the recipient hits "reply", their reply will go to this address. It is a good idea to use an email address from the same domain as this website.', 'participants-database' ),
@@ -424,7 +434,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'receipt_from_name',
         'title'      =>__('Signup Email From Name', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('the "From" name on signup receipt emails.', 'participants-database' ),
@@ -435,7 +445,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'signup_receipt_email_subject',
         'title'      =>__('Signup Response Email Subject', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('subject line for the signup response email; placeholder tags can be used (see below)', 'participants-database' ),
@@ -446,7 +456,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'signup_receipt_email_body',
         'title'      =>__('Signup Response Email', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text-area',
           'help_text'   => __('Body of the email a visitor gets when they sign up. It includes a link ([record_link]) back to their record so they can fill it out. Can include HTML, placeholders:[first_name],[last_name],[email],[record_link]. You can only use placeholders for fields that are present in the signup form, including hidden fields.', 'participants-database' ),
@@ -458,7 +468,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'signup_thanks',
         'title'      =>__('Signup Thanks Message', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text-area',
           'help_text'   => __('Note to display on the web page after someone has submitted a signup form. Can include HTML and placeholders (see above)', 'participants-database' ),
@@ -469,7 +479,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       => 'send_signup_notify_email',
         'title'      => __('Send Signup Notification Email', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -483,7 +493,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'email_signup_notify_addresses',
         'title'      =>__('Signup Notification Recipients', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('comma-separated list of email addresses to send signup notifications to', 'participants-database' ),
@@ -494,7 +504,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'email_signup_notify_subject',
         'title'      =>__('Signup Notification Email Subject', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('subject of the notification email; placeholder tags can be used (see above)', 'participants-database' ),
@@ -506,7 +516,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'email_signup_notify_body',
         'title'      =>__('Signup Notification Email'),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text-area',
           'help_text'   => __('notification email body. The [admin_record_link] tag will supply the URL for editing the record in the admin.'),
@@ -517,7 +527,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'unique_field',
         'title'      =>__('Duplicate Record Check Field', 'participants-database' ),
-        'group'      =>'signup',
+        'group'      =>'pdb-signup',
         'options'    =>array
           (
           'type'       =>'dropdown',
@@ -529,7 +539,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'unique_email',
         'title'      => __('Duplicate Record Preference', 'participants-database' ),
-        'group'      =>'signup',
+        'group'      =>'pdb-signup',
         'options'    => array
           (
           'type'        => 'dropdown',
@@ -546,7 +556,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'duplicate_field_message',
         'title'      =>__('Duplicate Record Error Message', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text-area',
           'help_text'   => __('If "Show a validation error message" is selected above, this message will be shown if a signup is made with a "check field" that matches an existing record.', 'participants-database' ),
@@ -557,7 +567,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       => 'signup_show_group_descriptions',
         'title'      => __('Show Field Groups', 'participants-database' ),
-        'group'      => 'signup',
+        'group'      => 'pdb-signup',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -576,7 +586,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'registration_page',
         'title'      =>__('Participant Record Page', 'participants-database' ),
-        'group'      =>'record',
+        'group'      =>'pdb-record',
         'options'    =>array
 					(
           'type'       =>'dropdown-other',
@@ -589,7 +599,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'save_changes_label',
         'title'      =>__('Save Changes Label', 'participants-database' ),
-        'group'      =>'record',
+        'group'      =>'pdb-record',
         'options'    =>array
 					(
           'type'       =>'text',
@@ -601,7 +611,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'save_changes_button',
         'title'      =>__('Save Button Text', 'participants-database' ),
-        'group'      =>'record',
+        'group'      =>'pdb-record',
         'options'    =>array
 					(
           'type'       =>'text',
@@ -613,7 +623,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       => 'show_group_descriptions',
         'title'      => __('Show Group Descriptions', 'participants-database' ),
-        'group'      => 'record',
+        'group'      => 'pdb-record',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -626,7 +636,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'record_updated_message',
         'title'      =>__('Record Updated Message', 'participants-database' ),
-        'group'      =>'record',
+        'group'      =>'pdb-record',
         'options'    =>array(
           'type'       =>'text',
           'help_text'  => __("the message shown when a record form has been successfully submitted", 'participants-database' ),
@@ -637,7 +647,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       => 'send_record_update_notify_email',
         'title'      => __('Send Record Form Update Notification Email', 'participants-database' ),
-        'group'      => 'record',
+        'group'      => 'pdb-record',
         'options'    => array
           (
           'type'        => 'checkbox',
@@ -650,7 +660,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'record_update_email_subject',
         'title'      =>__('Record Update Email Subject', 'participants-database' ),
-        'group'      => 'record',
+        'group'      => 'pdb-record',
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('subject line for the record update notification email; placeholders can be used.', 'participants-database' ),
@@ -661,7 +671,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'record_update_email_body',
         'title'      =>__('Record Update Notification Email', 'participants-database' ),
-        'group'      => 'record',
+        'group'      => 'pdb-record',
         'options'    => array(
           'type'        =>'text-area',
           'help_text'   => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. (The field name is under the "name" column on the "Manage Database Fields" page.)  Also available is [date] which will show the date and time of the update and [admin_record_link] tag for a link to edit the record in the admin.', 'participants-database' ),
@@ -672,7 +682,7 @@ class PDb_Settings extends Plugin_Settings {
     $this->plugin_settings[] = array(
         'name'       =>'no_record_error_message',
         'title'      =>__('Record Not Found Error Message', 'participants-database' ),
-        'group'      => 'record',
+        'group'      => 'pdb-record',
         'options'    => array(
           'type'        =>'text',
           'help_text'   => __('message to show if the record page was accessed without a valid identifier. Leave this empty if you want nothing at all to show.', 'participants-database' ),

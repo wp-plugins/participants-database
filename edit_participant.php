@@ -122,7 +122,7 @@ if ($participant_values) :
 
             if (isset($value)) {
 
-              error_log(__METHOD__ . ' ' . $column->name . ':' . $value);
+              //error_log(basename(__FILE__) . ' ' . $column->name . ':' . $value);
 
               if ($column->name == 'last_accessed' && (!isset($value) or '0000-00-00 00:00:00' == $value ))
                 $value = false;

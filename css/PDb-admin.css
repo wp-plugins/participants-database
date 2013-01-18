@@ -283,7 +283,6 @@ a.dragger {
 #fields-tabs {
     visibility:hidden;
 }
-
 .ui-tabs-nav {
     border-bottom: 1px solid #ccc;
     height: 28px;
@@ -343,7 +342,7 @@ a.dragger {
 }
 /* DIALOG BOXES */
 #dialog-overlay {
-    /* set it to fill the whil screen */
+    /* set it to fill the whole screen */
     width:100%;
     height:100%;
     /* transparency for different browsers */

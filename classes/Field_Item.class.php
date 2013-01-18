@@ -162,6 +162,8 @@ class Field_Item extends Template_Item {
 
 		if ( $this->readonly ) {
       
+      if ( $this->form_element == 'date' ) $this->value = FormElement::format_date($this->value);
+      
       echo '<span class="pdb-readonly '.$this->field_class.'" >'.$this->value.'</span>';
       
     } else {

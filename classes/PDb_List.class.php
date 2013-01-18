@@ -371,7 +371,7 @@ class PDb_List extends PDb_Shortcode {
          * if we're dealing with a date element, the target value needs to be 
          * conditioned to get a correct comparison
          */
-        if ($field_atts->form_element == 'date') {
+        if ($field_atts->form_element == 'date' and !empty($target)) {
 
           $target = Participants_Db::parse_date($target);
 

@@ -3,7 +3,7 @@
  * 
  */
 jQuery(document).ready(function($) {
-  var wrapped = $(".wrap .ui-tabs>h3").wrap("<div class=\"ui-tabs-panel\">");
+  var wrapped = $(".participants_db.wrap .ui-tabs>h3").wrap("<div class=\"ui-tabs-panel\">");
   wrapped.each(function() {
     $(this).parent().append($(this).parent().nextUntil("div.ui-tabs-panel"));
   });
@@ -13,8 +13,8 @@ jQuery(document).ready(function($) {
     if (index > 0)
       $(this).addClass("ui-tabs-hide");
   });
-  var wrapclass = $('.wrap').attr('class');
-  $(".wrap").removeClass().addClass( wrapclass+" main" );
+  var wrapclass = $('.participants_db.wrap').attr('class');
+  $(".participants_db.wrap").removeClass().addClass( wrapclass+" main" );
   var lastTab = 'pdb-settings-page-tab',
   effect = {
     effect: 'fadeToggle', 
@@ -42,9 +42,9 @@ jQuery(document).ready(function($) {
       }
     }
 }
-$('.ui-tabs').tabs(tabsetup).bind( 'tabsselect', function( event,ui) {
+$('.participants_db .ui-tabs').tabs(tabsetup).bind( 'tabsselect', function( event,ui) {
   var activeclass = $(ui.tab).attr('href').replace( /^#/, '');
-  $(".wrap").removeClass().addClass( wrapclass+" "+activeclass );
+  $(".participants_db.wrap").removeClass().addClass( wrapclass+" "+activeclass );
 });
 if ($.browser.mozilla)
   $("form").attr("autocomplete", "off");

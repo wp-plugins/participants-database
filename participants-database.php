@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.4.7
+  Version: 1.5
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -72,8 +72,7 @@ class Participants_Db {
   public static $personal_fields;
   public static $source_fields;
   public static $field_groups;
-  // a list of all the form element types available
-  public static $element_types;
+  
   // this is can be prefixed on CSS classes or id to keep a namespace
   public static $css_prefix = 'pdb-';
   // holds the form validation errors
@@ -124,25 +123,6 @@ class Participants_Db {
     //self::$plugin_options = get_option( self::$participants_db_options );
     // hard-code some image file extensions
     self::$allowed_extensions = array('jpg', 'jpeg', 'gif', 'png');
-
-    // define an array of all available form element types
-    self::$element_types = array(
-        'Text-line' => 'text-line',
-        'Text Area' => 'text-area',
-        'Rich Text' => 'rich-text',
-        'Checkbox' => 'checkbox',
-        'Radio Buttons' => 'radio',
-        'Dropdown List' => 'dropdown',
-        'Date Field' => 'date',
-        'Dropdown/Other' => 'dropdown-other',
-        'Multiselect Checkbox' => 'multi-checkbox',
-        'Radio Buttons/Other' => 'select-other',
-        'Multiselect/Other' => 'multi-select-other',
-        'Link Field' => 'link',
-        'Image Upload Field' => 'image-upload',
-        'Hidden Field' => 'hidden',
-        'Password Field' => 'password',
-    );
 
 
     // install/deactivate and uninstall methods are handled by the PDB_Init class
@@ -959,7 +939,7 @@ class Participants_Db {
       case 'multi-select-other' :
         
         $multivalues = self::unserialize_array($value);
-        if ( empty( $multivalues['other'] ) ) unset($multivalues['other']);
+        if ( is_array($multivalues) and empty( $multivalues['other'] ) ) unset($multivalues['other']);
 
         $return = implode(', ', (array) $multivalues);
         break;
@@ -1581,7 +1561,7 @@ class Participants_Db {
    * prepares an array for storage in the database
    *
    * @param array $array
-   * @return string prepped array in serialized form
+   * @return string prepped array in serialized form or empty if no data
    */
 
   private function _prepare_array_mysql($array) {
@@ -1590,13 +1570,16 @@ class Participants_Db {
       return self::_prepare_string_mysql($array);
 
     $prepped_array = array();
+    
+    $empty = true;
 
     foreach ($array as $key => $value) {
 
+      if ( ! empty($value) ) $empty = false;
       $prepped_array[$key] = self::_prepare_string_mysql($value);
     }
 
-    return serialize($prepped_array);
+    return $empty ? '' : serialize($prepped_array);
   }
 
   /**
@@ -1744,8 +1727,8 @@ class Participants_Db {
 
             $sent = wp_mail(
                     $options['email_signup_notify_addresses'],
-                    self::proc_tags($options['record_update_email_subject'], $participant_id),
-                    self::proc_tags($options['record_update_email_body'], $participant_id,'all'),
+                    self::proc_tags($options['record_update_email_subject'], $participant_id, 'all'),
+                    self::proc_tags($options['record_update_email_body'], $participant_id, 'all'),
                     self::$email_headers
             );
           }
@@ -1969,7 +1952,7 @@ class Participants_Db {
       // drop-down fields
       case 'form_element':
         // populate the dropdown with the available field types from the FormElement class
-        return array('type' => 'dropdown', 'options' => self::$element_types);
+        return array('type' => 'dropdown', 'options' => FormElement::$element_types);
 
       case 'validation':
         return array(
@@ -2129,7 +2112,7 @@ class Participants_Db {
 
 
       
-// default template for links
+    // default template for links
     $linktemplate = $template === false ? '<a href="%1$s" >%2$s</a>' : $template;
 
     $linktext = empty($linktext) ? str_replace(array('http://', 'https://'), '', $URI) : $linktext;
@@ -2140,14 +2123,20 @@ class Participants_Db {
 
   /**
    * handles file uploads
-   *
-   * @param array $upload_file the $_FILES array element corresponding to one file
+   * 
+   * @param string $name the name of the surrent field
+   * @param array  $file the $_FILES array element corresponding to one file
    *
    * return string the path to the uploaded file or false if error
    */
   private function _handle_file_upload($name, $file) {
 
     $options = get_option(self::$participants_db_options);
+    
+    $field_atts = self::get_field_atts($name);
+    $type = 'image-upload' == $field_atts->form_element ? 'image' : 'file';
+    
+    //error_log(__METHOD__.' type:'.$type.' name:'.$name);
 
     if ( !is_dir( Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) ) ) {
 
@@ -2161,31 +2150,55 @@ class Participants_Db {
 
       return false;
     }
-
-    $fileinfo = getimagesize($file['tmp_name']);
-
-    // check the type of file to make sure it is an image file
-    if (!in_array($fileinfo[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WBMP))) {
-
-      self::_show_validation_error(__('You may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'),$name);
+    
+    // test the file extension for a match with the allowed extensions
+    $extensions = empty($field_atts->values) ? $options['allowed_file_types'] : implode(',', self::unserialize_array($field_atts->values));
+    $test = preg_match('#^(.+)\.('.implode('|',array_map('trim',explode(',',$extensions))).')$#',$file['name'],$matches);
+    
+    error_log(__METHOD__.' ext:'.$extensions.' test:'. $test.' matches:'.print_r($matches,1));
+    
+    if ( 0 === $test ) {
+      
+      if ( $type == 'image' )
+        self::_show_validation_error( sprintf(__('For "%s", you may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'), $field_atts->title ), $name);
+      else
+        self::_show_validation_error( sprintf(__('The file selected for "%s" must be one of these types: %s. ', 'participants-database'), $field_atts->title, $extensions), $name);
 
       return false;
+    } else {
+      
+      // validate and construct the new filename using only the allowed file extension
+      $new_filename = preg_replace(array('#\.#',"/\s+/", "/[^-\.\w]+/"), array("-", "_", ""), $matches[1] ) . '.' . $matches[2];
+      // now make sure the name is unique by adding an index if needed
+      $index = 1;
+      while ( file_exists(Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename) ) {
+        $filename_parts = pathinfo($new_filename);
+        $new_filename = preg_replace(array('#_[0-9]+$#'),array(''),$filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
+        $index++;
+      }
     }
-
+    
     /*
-     * make sure the filename is good, then check it for uniqueness, adding a suffix if it's not
+     * we perform a validity check on the image files, this also makes sure only 
+     * images are uploaded in image upload fields and only non-images are uploaded 
+     * in file upload fields
      */
-    $new_filename = preg_replace(array("/\s+/", "/[^-\.\w]+/"), array("_", ""), trim($file['name']));
-    $index = 1;
-    while ( file_exists(Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename) ) {
-      $filename_parts = pathinfo($new_filename);
-      $new_filename = preg_replace('#_[0-9]+$#','',$filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
-      $index++;
+    $fileinfo = getimagesize($file['tmp_name']);
+    $valid_image = in_array($fileinfo[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WBMP));
+
+    if ( $type == 'image' and !$valid_image ) {
+      
+      self::_show_validation_error( sprintf(__('For "%s", you may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'), $field_atts->title ), $name);
+      return false;
+    } elseif ( $type == 'file' and $valid_image ) {
+      
+      self::_show_validation_error(__('The file you tried to upload is not of an allowed type.', 'participants-database'),$name);
+      return false;
     }
 
     if ($file['size'] > $options['image_upload_limit'] * 1024) {
 
-      self::_show_validation_error(sprintf(__('The image you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), $options['image_upload_limit']),$name);
+      self::_show_validation_error(sprintf(__('The file you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), $options['image_upload_limit']),$name);
 
       return false;
     }
@@ -2397,7 +2410,7 @@ class Participants_Db {
     if (preg_match('#^[0-9-]+$#', $string) > 0)
       return $string;
 
-    if (self::$plugin_options['strict_dates'] && function_exists('date_create_from_format')) {
+    if (self::$plugin_options['strict_dates'] and function_exists('date_create_from_format') and ( is_object($column) and $column->group != 'internal' ) ) {
 
       $date = date_create_from_format(get_option('date_format'), $string);
 

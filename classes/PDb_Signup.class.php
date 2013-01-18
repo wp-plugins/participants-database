@@ -146,6 +146,9 @@ class PDb_Signup extends PDb_Shortcode {
 			
 			// print the thank you note
 			$this->_thanks();
+      
+      // filter provides access to the freshly-stored record
+      apply_filters('pdb_after_submit_signup', $this->participant_values);
 
 			/*
        * check to see if the thanks email has been sent and send it if it has not

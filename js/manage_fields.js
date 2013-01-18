@@ -27,7 +27,7 @@ jQuery(document).ready(function($){
     duration: 100
   };
   if ( $.versioncompare("1.9",$.ui.version) == 1 ) {
-    $("#fields-tabs").tabs( {
+    var tabsettings = {
       fx: {
         opacity: "show", 
         duration: "fast"
@@ -35,9 +35,9 @@ jQuery(document).ready(function($){
       cookie: {
         expires:1
       }
-    });
+    };
   } else {
-    $("#fields-tabs").tabs({
+    var tabsettings = {
       hide:effect,
       show:effect,
       active:$.cookie(lastTab),
@@ -46,9 +46,9 @@ jQuery(document).ready(function($){
           expires: 365
         });
       }
-    });
+    };
   }
-  
+  $("#fields-tabs").tabs(tabsettings);
 
   // set up the delete functionality
 
