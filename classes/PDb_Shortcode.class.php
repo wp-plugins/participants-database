@@ -310,9 +310,10 @@ abstract class PDb_Shortcode {
 
       // and call the next field
       $this->the_field();
+    } else {
+      
+      $this->current_field_pointer++;
     }
-
-    $this->current_field_pointer++;
   }
 
   /**
@@ -559,10 +560,10 @@ abstract class PDb_Shortcode {
 				
 			case 'hidden':
 				
-				/* use the dynamic value if the shortcode is signup, otherwise only use
-				 * the dynamic value if there is no perviously set value
+				/* use the dynamic value if the shortcode is signup, otherwise only use the dynamic 
+         * value in the record module if there is no perviously set value
 				 */
-				if ( empty( $value ) or $this->module == 'signup' ) $value = $this->get_dynamic_value( $field->default );
+				if ( $this->module == 'signup' or ( empty( $value ) and $this->module == 'record' ) ) $value = $this->get_dynamic_value( $field->default );
         break;
 				
 		}
@@ -766,7 +767,7 @@ abstract class PDb_Shortcode {
 	 * @param mixed $value the value to test
 	 * @return bool
 	 */
-	private function _empty( $value ) {
+	protected function _empty( $value ) {
 		
 		// if it is an array, collapse it
 		if ( is_array( $value ) ) $value = implode( '', $value );

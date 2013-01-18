@@ -336,7 +336,7 @@ class FormElement {
     $this->add_class( 'date_field' );
     
     if (!empty($this->value))
-      $this->value = date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $this->value ) );
+      $this->value = $this->format_date( $this->value );
     
     $this->_addline( $this->_input_tag() );
     
@@ -1008,6 +1008,20 @@ class FormElement {
     if ( $this->is_assoc( $array ) ) return $array;
     
     return array_combine( array_values( $array ), $array );
+    
+  }
+  
+  /**
+   * returns an internationalized date string from a UNIX timestamp
+   * 
+   * @param int $timestamp a UNIX timestamp
+   * @return string a formatted date or empty string if invalid
+   */
+  public static function format_date($timestamp) {
+
+    if ( false !== @date('r',$timestamp)) {
+      return date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $timestamp ) );
+    } else return '';
     
   }
   

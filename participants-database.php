@@ -959,7 +959,7 @@ class Participants_Db {
       case 'multi-select-other' :
         
         $multivalues = self::unserialize_array($value);
-        if ( empty( $multivalues['other'] ) ) unset($multivalues['other']);
+        if ( is_array($multivalues) and empty( $multivalues['other'] ) ) unset($multivalues['other']);
 
         $return = implode(', ', (array) $multivalues);
         break;
@@ -1590,13 +1590,16 @@ class Participants_Db {
       return self::_prepare_string_mysql($array);
 
     $prepped_array = array();
+    
+    $empty = true;
 
     foreach ($array as $key => $value) {
 
+      if ( ! empty($value) ) $empty = false;
       $prepped_array[$key] = self::_prepare_string_mysql($value);
     }
 
-    return serialize($prepped_array);
+    return $empty ? '' : serialize($prepped_array);
   }
 
   /**
@@ -1744,8 +1747,8 @@ class Participants_Db {
 
             $sent = wp_mail(
                     $options['email_signup_notify_addresses'],
-                    self::proc_tags($options['record_update_email_subject'], $participant_id),
-                    self::proc_tags($options['record_update_email_body'], $participant_id,'all'),
+                    self::proc_tags($options['record_update_email_subject'], $participant_id, 'all'),
+                    self::proc_tags($options['record_update_email_body'], $participant_id, 'all'),
                     self::$email_headers
             );
           }
@@ -2397,7 +2400,7 @@ class Participants_Db {
     if (preg_match('#^[0-9-]+$#', $string) > 0)
       return $string;
 
-    if (self::$plugin_options['strict_dates'] && function_exists('date_create_from_format')) {
+    if (self::$plugin_options['strict_dates'] and function_exists('date_create_from_format') and ( is_object($column) and $column->group != 'internal' ) ) {
 
       $date = date_create_from_format(get_option('date_format'), $string);
 

@@ -60,7 +60,7 @@ class FormValidation {
 	 * validation status array
 	 *
 	 * @param string $value       the submitted value of the field
-	 * @param string $column_atts the column atributes object
+	 * @param object $column_atts the column atributes object
 	 *                            validation key can be NULL, 'yes', 'email', regex
 	 * @param array  $post        the post array with all submitted values
 	 */
@@ -227,7 +227,7 @@ class FormValidation {
 	/**
 	 * validates a field submitted to the main database
 	 *
-	 * receives a validation pair and preocesses it, adding any error to the
+	 * receives a validation pair and processes it, adding any error to the
 	 * validation status array
 	 *
 	 * @param string $value       the submitted value of the field
