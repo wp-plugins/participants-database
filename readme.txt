@@ -199,6 +199,15 @@ Currently, there is a "math" captcha that can be used in the signup form. The in
 
 == Changelog ==
 
+= 1.4.8 =
+* readonly date fields no formatted
+* better handling of multivalue fields
+* internal date fields now correctly formatted
+* improved safeguards against JS code collisions on the admin pages
+* bug where hidden fields cause other fields to be dropped from the display fixed
+* better handling of hidden dynamic values
+* AJAX list filtering no longer loses pagination element
+
 = 1.5 =
 * new field type: file upload, allows uploading of any file in the list of allowed types
 * a couple of significant bug fixes
@@ -465,7 +474,8 @@ Currently, there is a "math" captcha that can be used in the signup form. The in
 
 == Upgrade Notice ==
 
-= 1.4.7 =
+= 1.4.8 =
+* several bugs fixed
 
 Bugfix release with improvements to international date displays and site email functions
 
