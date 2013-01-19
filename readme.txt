@@ -203,6 +203,15 @@ You can no doubt come up with many variations on this.
 
 == Changelog ==
 
+= 1.4.8 =
+* readonly date fields no formatted
+* better handling of multivalue fields
+* internal date fields now correctly formatted
+* improved safeguards against JS code collisions on the admin pages
+* bug where hidden fields cause other fields to be dropped from the display fixed
+* better handling of hidden dynamic values
+* AJAX list filtering no longer loses pagination element
+
 = 1.4.7 =
 * internationalized dates are now displaying consistenyly on all screens
 * email headers are now set on a per-message basis to avoid conflicts with text-only emails
@@ -463,7 +472,8 @@ You can no doubt come up with many variations on this.
 
 == Upgrade Notice ==
 
-= 1.4.7 =
+= 1.4.8 =
+* several bugs fixed
 
 Bugfix release with improvements to international date displays and site email functions
 
