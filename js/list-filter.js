@@ -57,7 +57,11 @@ jQuery(document).ready(function ($) {
           success: function(html,status) {
             var parts = html.split("%%%");
             $('#pdb-list').replaceWith($(parts[0]).find('#pdb-list'));
-            $('.pagination').replaceWith($(parts[1]));
+            if ($('.pagination').length){
+              $('.pagination').replaceWith($(parts[1]));
+            }else{
+              $('#pdb-list').after($(parts[1]));
+            }
           },
           error:function(jqXHR,status,errorThrown){
             console.log('Participants Database JS error status:'+status+' error:'+errorThrown);

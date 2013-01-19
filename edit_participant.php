@@ -122,7 +122,7 @@ if ($participant_values) :
 
             if (isset($value)) {
 
-              error_log(__METHOD__ . ' ' . $column->name . ':' . $value);
+              //error_log(__METHOD__ . ' ' . $column->name . ':' . $value);
 
               if ($column->name == 'last_accessed' && (!isset($value) or '0000-00-00 00:00:00' == $value ))
                 $value = false;
@@ -133,7 +133,7 @@ if ($participant_values) :
 
                   if (!empty($value)) {
 
-                    $value = date(get_option('date_format'), Participants_Db::parse_date($value));
+                    $value = Participants_Db::parse_date($value, $column);
                   }
 
                   break;
