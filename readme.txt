@@ -84,7 +84,7 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * Italian: Mario Conte
 
-If you are multi-lingual and feel like contributing a translation, please [contact me.](mailto:support@xnau.com)
+If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
 == Installation ==
 
