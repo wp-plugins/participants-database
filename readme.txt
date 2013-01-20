@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.4.7
+Stable tag: 1.4.8
 License: GPLv2
 
 Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
@@ -84,7 +84,7 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * Italian: Mario Conte
 
-If you are multi-lingual and feel like contributing a translation, please [contact me.](mailtosupport@xnau.com)
+If you are multi-lingual and feel like contributing a translation, please [contact me.](mailto:support@xnau.com)
 
 == Installation ==
 
@@ -207,12 +207,6 @@ Currently, there is a "math" captcha that can be used in the signup form. The in
 * bug where hidden fields cause other fields to be dropped from the display fixed
 * better handling of hidden dynamic values
 * AJAX list filtering no longer loses pagination element
-
-= 1.5 =
-* new field type: file upload, allows uploading of any file in the list of allowed types
-* a couple of significant bug fixes
-* file upload size limit is now a number to type in instead of a dropdown
-* added several hooks for use by other plugins and themes
 
 = 1.4.7 =
 * internationalized dates are now displaying consistenyly on all screens
