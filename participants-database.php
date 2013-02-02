@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright 2011, 2012 Roland Barker xnau webdesign  (email : webdesign@xnau.com)
+ * Copyright 2011, 2012, 2013 Roland Barker xnau webdesign  (email : webdesign@xnau.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, version 2, as
@@ -333,11 +333,11 @@ class Participants_Db {
 
   public static function admin_includes($hook) {
 
-    wp_register_script('cookie', plugins_url('js/jquery_cookie.js', __FILE__));
-    wp_register_script('manage_fields', plugins_url('js/manage_fields.js', __FILE__));
-    wp_register_script('settings_script', plugins_url('js/settings.js', __FILE__));
-    wp_register_script('jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
-    wp_register_script('admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
+    wp_register_script(self::$css_prefix.'cookie', plugins_url('js/jquery_cookie.js', __FILE__));
+    wp_register_script(self::$css_prefix.'manage_fields', plugins_url('js/manage_fields.js', __FILE__));
+    wp_register_script(self::$css_prefix.'settings_script', plugins_url('js/settings.js', __FILE__));
+    wp_register_script(self::$css_prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
+    wp_register_script(self::$css_prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
     //wp_register_script( 'datepicker', plugins_url( 'js/jquery.datepicker.js', __FILE__ ) );
     //wp_register_script( 'edit_record', plugins_url( 'js/edit.js', __FILE__ ) );
 
@@ -347,22 +347,22 @@ class Participants_Db {
       wp_enqueue_script('jquery-ui-tabs');
       wp_enqueue_script('jquery-ui-sortable');
       wp_enqueue_script('jquery-ui-dialog');
-      wp_enqueue_script('cookie');
-      wp_enqueue_script('jq-placeholder');
-      wp_enqueue_script('admin');
+      wp_enqueue_script(self::$css_prefix.'cookie');
+      wp_enqueue_script(self::$css_prefix.'jq-placeholder');
+      wp_enqueue_script(self::$css_prefix.'admin');
     }
 
     if (false !== stripos($hook, 'participants-database_settings_page')) {
-      wp_enqueue_script('settings_script');
+      wp_enqueue_script(self::$css_prefix.'settings_script');
     }
 
-    if (false !== stripos($hook, 'manage_fields')) {
+    if (false !== stripos($hook, 'participants-database-manage_fields')) {
       /* translators: don't translate the words in brackets {} */
-      wp_localize_script('manage_fields', 'L10n', array(
+      wp_localize_script(self::$css_prefix.'manage_fields', 'L10n', array(
           'must_remove' => '<h4>You must remove all fields from the {name} group before deleting it.</h4>',
           'delete_confirm' => '<h4>Delete the "{name}" {thing}?</h4>',
       ));
-      wp_enqueue_script('manage_fields');
+      wp_enqueue_script(self::$css_prefix.'manage_fields');
     }
 
     wp_register_style('pdb-global-admin', plugins_url('/css/PDb-admin-global.css', __FILE__), false, false);
@@ -392,8 +392,8 @@ class Participants_Db {
     }
 
     wp_register_script('pdb-shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
-    wp_register_script('list-filter', plugin_dir_url(__FILE__) . 'js/list-filter.js', array('jquery'));
-    wp_register_script('jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
+    wp_register_script(self::$css_prefix.'list-filter', plugin_dir_url(__FILE__) . 'js/list-filter.js', array('jquery'));
+    wp_register_script(self::$css_prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
 
     // this is now handled conditionally in the wp_footer action
     //wp_enqueue_script( 'jquery' );
@@ -439,11 +439,14 @@ class Participants_Db {
   /**
    * shows the frontend edit screen called by the [pdb_record] shortcode
    *
-   * requires the 'pid' value in the URI
+   * requires the 'pid' value in the URI or 'id' attribute in the shortcode
+   * 
+   * @param array $atts array of attributes drawn from the shortcode
+   * @return string the HTML of the record edit form
    */
   function record_edit($atts) {
 
-    $atts['id'] = isset($_GET['pid']) ? self::get_participant_id($_GET['pid']) : false;
+    $atts['id'] = isset($_GET['pid']) ? self::get_participant_id($_GET['pid']) : ( isset($atts['id']) ? $atts['id'] : false );
 
     return PDb_Record::print_form($atts);
   }
@@ -833,7 +836,7 @@ class Participants_Db {
 
       case 'frontend':
 
-        $where = 'WHERE g.display = 1 ';
+        $where = 'WHERE g.display = 1 AND v.readonly = 0';
         break;
 
       case 'readonly':
@@ -1410,7 +1413,7 @@ class Participants_Db {
     global $current_user;
 
     if ( is_object( $current_user ) ) $default_record['by'] = $current_user->display_name;
-    $default_record['when'] = date(get_option('date_format'));
+    $default_record['when'] = date_i18n(get_option('date_format'));
     $default_record['private_id'] = self::generate_pid();
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
     $default_record['date_updated'] = date('Y-m-d H:i:s');
@@ -2271,7 +2274,7 @@ class Participants_Db {
       update_option(self::$participants_db_options, $options);
     }
 
-    $page_link = get_page_link($options['registration_page']);
+    $page_link = get_permalink($options['registration_page']);
 
     $delimiter = false !== strpos($page_link, '?') ? '&' : '?';
 

@@ -359,7 +359,7 @@ class PDb_Settings extends Plugin_Settings {
           (
 				  'attributes' => array( 'other' => 'Post ID' ),
           'type'       =>'dropdown-other',
-          'help_text'  => __('this is the page where the [pdb_single] shortcode is located. If you want to assign a post or custom post type, enter the post ID in the "other" box.', 'participants-database' ),
+          'help_text'  => __('this is the page where the [pdb_single] shortcode is located. If you want to assign a post or custom post type, select "Post ID" and enter the post ID in the "other" box.', 'participants-database' ),
           'options'    => $this->_get_pagelist(),
           )
         );
@@ -744,7 +744,7 @@ class PDb_Settings extends Plugin_Settings {
 
     foreach( $columns as $column ) {
 
-      if ( in_array( $column->form_element, array( 'text-line', 'image-upload' ) ) ) $columnlist[ $column->title ] = $column->name;
+      if ( in_array( $column->form_element, array( 'text-line', 'image-upload', 'checkbox' ) ) ) $columnlist[ $column->title ] = $column->name;
 
     }
 

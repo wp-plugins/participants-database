@@ -133,7 +133,7 @@ if ($participant_values) :
 
                   if (!empty($value)) {
 
-                    $value = date(get_option('date_format'), Participants_Db::parse_date($value));
+                    $value = Participants_Db::parse_date($value,$column);
                   }
 
                   break;

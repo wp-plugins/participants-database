@@ -111,8 +111,8 @@ class PDb_List_Admin
 		self::$num_records = $wpdb->get_var( str_replace('*', 'COUNT(*)', self::$list_query) );
 		
 		// set the pagination object
-		self::$pagination = new Pagination( array(
-																	'link'          => self::get_page_link( $_SERVER['REQUEST_URI'] ),
+		self::$pagination = new PDb_Pagination( array(
+																	'link'          => self::prepare_page_link( $_SERVER['REQUEST_URI'] ),
 																	'page'          => isset( $_GET[ self::$list_page ] ) ? $_GET[ self::$list_page ] : '1',
 																	'size'          => self::$page_list_limit,
 																	'total_records' => self::$num_records,
@@ -156,7 +156,7 @@ class PDb_List_Admin
 	 *
 	 * @return string the re-constituted URI
 	 */
-	public function get_page_link( $uri ) {
+	public function prepare_page_link( $uri ) {
 
     $URI_parts = explode('?', $uri);
 
@@ -582,7 +582,7 @@ class PDb_List_Admin
                     ! empty( self::$options['single_record_page'] )
                   ) {
 								
-								$page_link = get_page_link( self::$options['single_record_page'] );
+								$page_link = get_permalink( self::$options['single_record_page'] );
 
                 $display_value = Participants_Db::make_link( $page_link, $display_value, '<a href="%1$s" >%2$s</a>', array( 'pdb'=>$value['id'] ) );
 								
@@ -645,7 +645,7 @@ class PDb_List_Admin
                     ! empty( self::$options['single_record_page'] )
                   ) {
 								
-								$page_link = get_page_link( self::$options['single_record_page'] );
+								$page_link = get_permalink( self::$options['single_record_page'] );
 
                 $display_value = Participants_Db::make_link( $page_link, $value[ $column ], '<a href="%1$s" >%2$s</a>', array( 'pdb'=>$value['id'] ) );
 					 
@@ -715,7 +715,7 @@ class PDb_List_Admin
           <input type="hidden" name="CSV type" value="participant list" />
           <input type="hidden" name="query" value="<?php echo rawurlencode( self::$list_query )?>" />
           <?php
-          $date_string = str_replace( array( '/','#','.','\\',', ',',',' '),'-',date( get_option( 'date_format' ) ) );
+          $date_string = str_replace( array( '/','#','.','\\',', ',',',' '),'-',  date_i18n( get_option( 'date_format' ) ) );
           $suggested_filename = Participants_Db::PLUGIN_NAME.'-'.$date_string.'.csv';
           $namelength = round( strlen( $suggested_filename ) * 0.9 ) ;
           ?>

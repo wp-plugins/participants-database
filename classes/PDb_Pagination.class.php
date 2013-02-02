@@ -16,7 +16,7 @@
  *          with methods for setting the class of the current page indicator and an option
  *          to wrap the current page indicator numeral with a dummy anchor tag
  */
-class Pagination {
+class PDb_Pagination {
 
   /**
    * Current Page
@@ -217,9 +217,10 @@ class Pagination {
    */
   function setLink($url, $add_variables) {
     
+    $delimiter = '';
     if ( ! empty($add_variables) )
-      $add_variables = false !== strpos($url,'?') ? '&'.$add_variables : '?'.$add_variables;
-    $this->link = $url.$add_variables;
+      $delimiter = false !== strpos($url,'?') ? '&' : '?';
+    $this->link = $url.$delimiter.$add_variables;
   }
 
   /**
@@ -307,7 +308,7 @@ class Pagination {
     $totalItems = $this->total_records;
     $perPage = $this->size;
     $currentPage = $this->page;
-    $link = $this->link;
+    $link = urldecode($this->link);
     extract($this->wrappers);
 
     $totalPages = floor($totalItems / $perPage);
@@ -345,7 +346,7 @@ class Pagination {
     if ($this->first_last) {
       $output .= sprintf(
               ($loopStart != 1 ? $disabled_pattern : $button_pattern), 
-              sprintf($link, 1), 
+              $this->_sprintf($link, 1), 
               ($loopStart != 1 ? $this->disabled_class : 'firstpage'), 
               __('First', 'participants-database')
       );
@@ -354,7 +355,7 @@ class Pagination {
     // add the previous page link
     $output .= sprintf(
             ($currentPage > 1 ? $button_pattern : $disabled_pattern), 
-            sprintf($link, $currentPage - 1), 
+            $this->_sprintf($link, $currentPage - 1), 
             ($currentPage > 1 ? 'nextpage' : $this->disabled_class), 
             __('Previous', 'participants-database')
     );
@@ -363,7 +364,7 @@ class Pagination {
 
       $output .= sprintf(
               ($i == $currentPage ? $disabled_pattern : $button_pattern), 
-              sprintf($link, $i), 
+              $this->_sprintf($link, $i), 
               ($i == $currentPage ? $this->current_page_class : ''), 
               $i
       );
@@ -371,7 +372,7 @@ class Pagination {
 
     $output .= sprintf(
             ($currentPage < $totalPages ? $button_pattern : $disabled_pattern), 
-            sprintf($link, $currentPage + 1), 
+            $this->_sprintf($link, $currentPage + 1), 
             ($currentPage < $totalPages ? 'nextpage' : $this->disabled_class), 
             __('Next', 'participants-database')
     );
@@ -380,19 +381,33 @@ class Pagination {
 
       $output .= sprintf(
               ($loopEnd != $totalPages ? $disabled_pattern : $button_pattern), 
-              sprintf($link, $totalPages), 
+              $this->_sprintf($link, $totalPages), 
               ($loopEnd != $totalPages ? 'lastpage' : $this->disabled_class), 
               __('Last', 'participants-database')
       );
     }
 
-    return sprintf(
+    return str_replace(',','%2C',sprintf(
             '<%1$s class="%2$s"><%3$s>%4$s</%3$s></%1$s>', 
             $wrap_tag, 
             $wrap_class, 
             $all_button_wrap_tag, 
-            $output
-    );
+            str_replace('%2C',',',$output)
+    ));
+  }
+  
+  /**
+   * special implementation of sprintf for URL-encoded values
+   * 
+   * we need this because URL-encoded values use the % sign, which confuses sprintf
+   * 
+   * @param string $link
+   * @param int $pagenum
+   * @return string
+   */
+  private function _sprintf($link,$pagenum) {
+    
+    return str_replace(',','%2C',sprintf(str_replace('%2C',',',$link),$pagenum));
   }
 
 }

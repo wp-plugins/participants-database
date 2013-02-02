@@ -43,7 +43,7 @@ class PDb_Signup extends PDb_Shortcode {
 	private $send_notification;
 
 	// holds the notify recipient emails
-	private $notify_recipients;
+	public $notify_recipients;
 
 	// the notification subject line
 	private $notify_subject;
@@ -147,8 +147,12 @@ class PDb_Signup extends PDb_Shortcode {
 			// print the thank you note
 			$this->_thanks();
       
-      // filter provides access to the freshly-stored record
-      apply_filters('pdb_after_submit_signup', $this->participant_values);
+      /*
+       * filter provides access to the freshly-stored record-- actually the whole 
+       * object so things like the email parameters can be altered. The properties 
+       * would need to be public, or we create methods to alter them
+       */
+      apply_filters('pdb_after_submit_signup', $this);
 
 			/*
        * check to see if the thanks email has been sent and send it if it has not
@@ -216,7 +220,7 @@ class PDb_Signup extends PDb_Shortcode {
 		
 		if ( isset( $this->options['signup_thanks_page'] ) and $this->options['signup_thanks_page'] != 'none' ) {
 			
-			$this->submission_page = get_page_link( $this->options['signup_thanks_page'] );
+			$this->submission_page = get_permalink( $this->options['signup_thanks_page'] );
 			
 		} else {
 			
