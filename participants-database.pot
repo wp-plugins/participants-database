@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the Participants Database package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Participants Database 1.4.8\n"
+"Project-Id-Version: Participants Database 1.4.9\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/participants-database\n"
-"POT-Creation-Date: 2013-01-20 23:14:17+00:00\n"
+"POT-Creation-Date: 2013-02-03 19:23:16+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -240,6 +240,22 @@ msgstr ""
 #. translators: uses the check symbol in a phrase that means "check all"
 #: classes/PDb_List_Admin.class.php:743
 msgid "all"
+msgstr ""
+
+#: classes/PDb_Pagination.class.php:350
+msgid "First"
+msgstr ""
+
+#: classes/PDb_Pagination.class.php:359
+msgid "Previous"
+msgstr ""
+
+#: classes/PDb_Pagination.class.php:376
+msgid "Next"
+msgstr ""
+
+#: classes/PDb_Pagination.class.php:385
+msgid "Last"
 msgstr ""
 
 #: classes/PDb_Settings.class.php:17
@@ -525,7 +541,8 @@ msgstr ""
 #: classes/PDb_Settings.class.php:340
 msgid ""
 "this is the page where the [pdb_single] shortcode is located. If you want to "
-"assign a post or custom post type, enter the post ID in the \"other\" box."
+"assign a post or custom post type, select \"Post ID\" and enter the post ID "
+"in the \"other\" box."
 msgstr ""
 
 #: classes/PDb_Settings.class.php:347
@@ -723,6 +740,18 @@ msgid ""
 "record. This also applies to importing records from a CSV file."
 msgstr ""
 
+#: classes/PDb_Settings.class.php:539
+msgid "Create a new record with the submission"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:540
+msgid "Overwrite matching record with new data"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:541
+msgid "Show a validation error message"
+msgstr ""
+
 #: classes/PDb_Settings.class.php:548
 msgid "Duplicate Record Error Message"
 msgstr ""
@@ -880,22 +909,6 @@ msgctxt "message to show if the plugin cannot find the template"
 msgid ""
 "<%1$s>The template %2$s was not found.</%1$s> Please make sure the name is "
 "correct and the template file is in the correct location."
-msgstr ""
-
-#: classes/PDb_Pagination.class.php:350
-msgid "First"
-msgstr ""
-
-#: classes/PDb_Pagination.class.php:359
-msgid "Previous"
-msgstr ""
-
-#: classes/PDb_Pagination.class.php:376
-msgid "Next"
-msgstr ""
-
-#: classes/PDb_Pagination.class.php:385
-msgid "Last"
 msgstr ""
 
 #: edit_participant.php:19
@@ -1212,7 +1225,7 @@ msgid ""
 "field, but cannot edit it. The field will be editable in the admin."
 msgstr ""
 
-#. #-#-#-#-#  plugin.pot (Participants Database 1.4.8)  #-#-#-#-#
+#. #-#-#-#-#  plugin.pot (Participants Database 1.4.9)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: participants-database.php:237
 msgid "Participants Database"
