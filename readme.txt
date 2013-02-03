@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.4.9
+Stable tag: 1.4.9.1
 License: GPLv2
 
 Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
@@ -198,6 +198,11 @@ Currently, there is a "math" captcha that can be used in the signup form. The in
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.4.9.1 =
+Taking defensive precautions against other plugins in the admin:
+* admin.css is more specific about styling tabs
+* no longer using .ui-tabs-hide class to show/hide tabs
 
 = 1.4.9 =
 * single record link doesn't get wrapped with anchor tag in some cases; works reliably now
@@ -480,8 +485,8 @@ Currently, there is a "math" captcha that can be used in the signup form. The in
 
 == Upgrade Notice ==
 
-= 1.4.9 =
-* bugfix release
+= 1.4.9.1 =
+* resolves many issues with other plugins conflicting in the admin
 
 Bugfix release with improvements to international date displays and site email functions
 
