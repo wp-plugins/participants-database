@@ -16,7 +16,7 @@
  *          with methods for setting the class of the current page indicator and an option
  *          to wrap the current page indicator numeral with a dummy anchor tag
  */
-class Pagination {
+class PDb_Pagination {
 
   /**
    * Current Page
