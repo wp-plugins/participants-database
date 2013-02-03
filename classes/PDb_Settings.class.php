@@ -536,9 +536,9 @@ class PDb_Settings extends Plugin_Settings {
           'help_text'   => __('when the submission matches the Duplicate Record Check Field of an existing record. This also applies to importing records from a CSV file.', 'participants-database' ),
           'value'       => 1,
           'options'     => array(
-																 'Create a new record with the submission' => 0,
-																 'Overwrite matching record with new data' => 1,
-																 'Show a validation error message' => 2,
+																 __('Create a new record with the submission', 'participants-database' ) => 0,
+																 __('Overwrite matching record with new data', 'participants-database' ) => 1,
+																 __('Show a validation error message', 'participants-database' ) => 2,
 																 ),
           ),
         );
