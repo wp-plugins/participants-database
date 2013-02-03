@@ -986,19 +986,19 @@ msgstr ""
 "<% 1 $ s> Šablóna% 2 $ s nebol nájdený. </% 1 $ s> Prosím uistite sa, že je "
 "správny názov a súbor šablóny je na správnom mieste."
 
-#: classes/Pagination.class.php:349
+#: classes/PDb_Pagination.class.php:349
 msgid "First"
 msgstr "Prvý"
 
-#: classes/Pagination.class.php:358
+#: classes/PDb_Pagination.class.php:358
 msgid "Previous"
 msgstr "Predchádzajúci"
 
-#: classes/Pagination.class.php:375
+#: classes/PDb_Pagination.class.php:375
 msgid "Next"
 msgstr "Ďalší"
 
-#: classes/Pagination.class.php:384
+#: classes/PDb_Pagination.class.php:384
 msgid "Last"
 msgstr "Naposledy"
 

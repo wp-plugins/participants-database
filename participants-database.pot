@@ -882,19 +882,19 @@ msgid ""
 "correct and the template file is in the correct location."
 msgstr ""
 
-#: classes/Pagination.class.php:350
+#: classes/PDb_Pagination.class.php:350
 msgid "First"
 msgstr ""
 
-#: classes/Pagination.class.php:359
+#: classes/PDb_Pagination.class.php:359
 msgid "Previous"
 msgstr ""
 
-#: classes/Pagination.class.php:376
+#: classes/PDb_Pagination.class.php:376
 msgid "Next"
 msgstr ""
 
-#: classes/Pagination.class.php:385
+#: classes/PDb_Pagination.class.php:385
 msgid "Last"
 msgstr ""
 

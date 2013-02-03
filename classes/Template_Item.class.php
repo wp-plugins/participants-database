@@ -62,9 +62,9 @@ class Template_Item {
    *
    * @param string $string the value to be printed
    */
-  protected function print_value( $string ) {
+  protected function print_value() {
     
-    echo prepare_display_value( $string );
+    echo prepare_display_value($this->value);
     
   }
   

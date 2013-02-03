@@ -43,7 +43,7 @@ class PDb_Signup extends PDb_Shortcode {
 	private $send_notification;
 
 	// holds the notify recipient emails
-	private $notify_recipients;
+	public $notify_recipients;
 
 	// the notification subject line
 	private $notify_subject;
@@ -213,7 +213,7 @@ class PDb_Signup extends PDb_Shortcode {
 		
 		if ( isset( $this->options['signup_thanks_page'] ) and $this->options['signup_thanks_page'] != 'none' ) {
 			
-			$this->submission_page = get_page_link( $this->options['signup_thanks_page'] );
+			$this->submission_page = get_permalink( $this->options['signup_thanks_page'] );
 			
 		} else {
 			

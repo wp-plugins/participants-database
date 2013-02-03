@@ -545,19 +545,19 @@ msgstr "Brak"
 msgid "Settings"
 msgstr "Ustawienia"
 
-#: classes/Pagination.class.php:245
+#: classes/PDb_Pagination.class.php:245
 msgid "First"
 msgstr "Pierwszy"
 
-#: classes/Pagination.class.php:249
+#: classes/PDb_Pagination.class.php:249
 msgid "Previous"
 msgstr "Poprzedni"
 
-#: classes/Pagination.class.php:262
+#: classes/PDb_Pagination.class.php:262
 msgid "Next"
 msgstr "Następny"
 
-#: classes/Pagination.class.php:266
+#: classes/PDb_Pagination.class.php:266
 msgid "Last"
 msgstr "Ostatni"
 

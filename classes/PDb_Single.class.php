@@ -91,7 +91,7 @@
 	 */
 	public static function print_record( $params ) {
 		
-		if ( ! isset( self::$instance ) ) self::$instance = new PDB_Single( $params );
+		if ( ! isset( self::$instance ) ) self::$instance = new PDb_Single( $params );
 		
 		return self::$instance->output;
 		

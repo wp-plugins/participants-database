@@ -84,7 +84,7 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * Italian: Mario Conte
 
-If you are multi-lingual and feel like contributing a translation, please [contact me.](mailtosupport@xnau.com)
+If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
 == Installation ==
 
@@ -202,6 +202,18 @@ You can no doubt come up with many variations on this.
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.4.9 =
+* single record link doesn't get wrapped with anchor tag in some cases; works reliably now
+* script handles were conflicting with some other plugins; script handles are now namespaced
+* admin menu hook was conflicting with some other plugins; admin menu hooks are now more specific
+* readonly fields were erased when record was edited in the frontend
+* all date displays are now internationalized
+* page links with some post types were incorrect; now using "get_permalink()" for all page links
+* PDb_Pagination class was conflicting with some other plugins; renamed to PDb_Pagination
+* checkbox fields now allowed for single page link
+* default images are now not given full-size link
+* checkbox fields now allowed for single page link
 
 = 1.4.8 =
 * readonly date fields no formatted
@@ -472,8 +484,8 @@ You can no doubt come up with many variations on this.
 
 == Upgrade Notice ==
 
-= 1.4.8 =
-* several bugs fixed
+= 1.4.9 =
+* bugfix release
 
 Bugfix release with improvements to international date displays and site email functions
 

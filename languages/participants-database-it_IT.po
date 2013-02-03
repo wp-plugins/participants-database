@@ -519,19 +519,19 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: classes/Pagination.class.php:245
+#: classes/PDb_Pagination.class.php:245
 msgid "First"
 msgstr ""
 
-#: classes/Pagination.class.php:249
+#: classes/PDb_Pagination.class.php:249
 msgid "Previous"
 msgstr ""
 
-#: classes/Pagination.class.php:262
+#: classes/PDb_Pagination.class.php:262
 msgid "Next"
 msgstr ""
 
-#: classes/Pagination.class.php:266
+#: classes/PDb_Pagination.class.php:266
 msgid "Last"
 msgstr ""
 

@@ -31,7 +31,7 @@ class PDb_List extends PDb_Shortcode {
    */
   static $instance;
   // holds the main query for building the list
-  static $list_query;
+  var $list_query;
   // translations strings for buttons
   var $i18n;
   // holds the number of list items to show per page
@@ -118,9 +118,9 @@ class PDb_List extends PDb_Shortcode {
           'postID' => ( isset($wp_query->post) ? $wp_query->post->ID : '' ),
           'i18n' => $this->i18n
       );
-      wp_localize_script('list-filter', 'PDb_ajax', $ajax_params);
+      wp_localize_script(Participants_Db::$css_prefix.'list-filter', 'PDb_ajax', $ajax_params);
       
-      wp_enqueue_script('list-filter');
+      wp_enqueue_script(Participants_Db::$css_prefix.'list-filter');
     }
 
     // set up the iteration data
@@ -182,7 +182,7 @@ class PDb_List extends PDb_Shortcode {
 
     // set up the pagination object
     $pagination_defaults = array(
-        'link' => ( $this->shortcode_atts['filtering'] ? urldecode($_POST['pagelink']) : $this->get_page_link($_SERVER['REQUEST_URI']) ),
+        'link' => ( $this->shortcode_atts['filtering'] ? urldecode($_POST['pagelink']) : $this->prepare_page_link($_SERVER['REQUEST_URI']) ),
         'page' => isset($_GET[$this->list_page]) ? $_GET[$this->list_page] : '1',
         'size' => $this->shortcode_atts['list_limit'],
         'total_records' => $this->num_records,
@@ -191,7 +191,7 @@ class PDb_List extends PDb_Shortcode {
     );
 
     // instantiate the pagination object
-    $this->pagination = new Pagination($pagination_defaults);
+    $this->pagination = new PDb_Pagination($pagination_defaults);
 
     /*
      * get the records for this page, adding the pagination limit clause
@@ -490,12 +490,12 @@ class PDb_List extends PDb_Shortcode {
 
     $output = array();
 
-    $action = $target ? $target : get_page_link($post->ID) . '#' . $this->list_anchor;
+    $action = $target ? $target : get_permalink($post->ID) . '#' . $this->list_anchor;
     $ref = $target ? 'remote' : 'update';
     $class_att = $class ? 'class="' . $class . '"' : '';
     $output[] = '<form method="post" id="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
     $output[] = '<input type="hidden" name="action" value="pdb_list_filter">';
-    $output[] = '<input type="hidden" name="pagelink" value="' . $this->get_page_link($_SERVER['REQUEST_URI']) . '">';
+    $output[] = '<input type="hidden" name="pagelink" value="' . $this->prepare_page_link($_SERVER['REQUEST_URI']) . '">';
 
     if ($print)
       echo $this->output_HTML($output);
@@ -680,9 +680,9 @@ class PDb_List extends PDb_Shortcode {
     $dateformat = $format ? $format : get_option('date_format', 'r');
 
     if ($print)
-      echo date($dateformat, $time);
+      echo date_i18n($dateformat, $time);
     else
-      return date($dateformat, $time);
+      return date_i18n($dateformat, $time);
   }
 
   public function show_array($value, $glue = ', ', $print = true) {
@@ -749,7 +749,7 @@ class PDb_List extends PDb_Shortcode {
    *
    * @return string the re-constituted URI
    */
-  public function get_page_link($uri) {
+  public function prepare_page_link($uri) {
 
     $URI_parts = explode('?', $uri);
 
@@ -778,7 +778,7 @@ class PDb_List extends PDb_Shortcode {
       foreach( $filter_atts as $att ) unset($values[$att]);
     }
 
-    return $URI_parts[0] . '?' . (count($values)>0 ? http_build_query($values) . '&' : '') . $this->list_page . '=%s';
+    return $URI_parts[0] . '?' . (count($values)>0 ? http_build_query($values) . '&' : '') . $this->list_page . '=%1$s';
   }
 
   /**
@@ -883,7 +883,7 @@ class PDb_List extends PDb_Shortcode {
       $page_id = $this->options['single_record_page'];
     else $page_id = false;
     
-    $this->single_record_url = get_page_link($page_id);
+    $this->single_record_url = get_permalink($page_id);
   }
   
   /**
