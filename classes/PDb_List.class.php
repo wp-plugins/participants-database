@@ -31,7 +31,7 @@ class PDb_List extends PDb_Shortcode {
    */
   static $instance;
   // holds the main query for building the list
-  static $list_query;
+  var $list_query;
   // translations strings for buttons
   var $i18n;
   // holds the number of list items to show per page
@@ -687,7 +687,7 @@ class PDb_List extends PDb_Shortcode {
    */
   public function show_date($value, $format = false, $print = true) {
 
-    $time = preg_match('#^[0-9-]+$#', $value) > 0 ? (int) $value : strtotime($value);
+    $time = preg_match('#^[0-9-]+$#', $value) > 0 ? (int) $value : Participants_Db::parse_date($value);
 
     $dateformat = $format ? $format : get_option('date_format', 'r');
 

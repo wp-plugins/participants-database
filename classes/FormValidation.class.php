@@ -30,9 +30,6 @@ class FormValidation {
 	 */
 	public function __construct() {
 
-		// this needs to be changed to eliminate dependency
-		$options = get_option( Participants_Db::$participants_db_options );
-
 		// clear the array
 		$this->errors = array();
 
@@ -40,12 +37,12 @@ class FormValidation {
      * get our error messages from the plugin options
      * 
      */
-    foreach ( array( 'invalid','empty','nonmatching','duplicate','captcha' ) as $error_type ) {
-      $this->error_messages[$error_type] = $options[$error_type.'_field_message'];
+    foreach ( array( 'invalid','empty','nonmatching','duplicate','captcha','identifier' ) as $error_type ) {
+      $this->error_messages[$error_type] = Participants_Db::$plugin_options[$error_type.'_field_message'];
     }
-		$this->error_style = $options['field_error_style'];
+		$this->error_style = Participants_Db::$plugin_options['field_error_style'];
 
-    // set the defualt error wrap HTML for the validation error feedback display
+    // set the default error wrap HTML for the validation error feedback display
     $this->error_html_wrap = array( '<div class="%s">%s</div>','<p>%s</p>' );
 
 	}
@@ -154,6 +151,9 @@ class FormValidation {
 
 	/**
 	 * adds an arbitrary error to the object
+   * 
+   * @param string $name field name
+   * @param string $message message handle or liter message string
 	 */
 	public function add_error( $name, $message ) {
 		

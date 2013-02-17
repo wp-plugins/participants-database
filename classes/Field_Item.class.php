@@ -71,7 +71,9 @@ class Field_Item extends Template_Item {
     if ( $this->is_single_record_link() ) {
       
       $template = '<a class="single-record-link" href="%1$s" title="%2$s" >%2$s</a>';
-      $url = get_permalink($this->options['single_record_page']).'?pdb='.$this->record_id;
+      $url = get_permalink($this->options['single_record_page']);
+      $delimiter = false !== strpos($url, '?') ? '&' : '?';
+      $url = $url . $delimiter . 'pdb='.$this->record_id;
       
       $output = sprintf($template, $url, (empty($this->value)?$this->default:$this->value));
       

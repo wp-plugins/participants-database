@@ -70,6 +70,8 @@ if ($participant_values) :
     foreach (Participants_db::get_column_atts('backend') as $column) :
 
       $id_line = '';
+    
+      $attributes = array();
 
       // set a new section
       if ($column->group != $section) {
@@ -100,7 +102,7 @@ if ($participant_values) :
             <th><?php echo $column_title . ( ( 'hidden' == $column->form_element ) ? ' (hidden)' : '' ) ?></th>
             <td id="<?php echo Participants_Db::$css_prefix . $column->name ?>" >
             <?php
-            $readonly = in_array($column->name, $readonly_columns) ? array('readonly' => 'readonly') : NULL;
+            if( in_array($column->name, $readonly_columns) ) $attributes['readonly'] = 'readonly';
 
             // get the existing value if any
             $value = isset($participant_values[$column->name]) ? Participants_Db::unserialize_array($participant_values[$column->name]) : '';
@@ -133,7 +135,10 @@ if ($participant_values) :
 
                   if (!empty($value)) {
 
-                    $value = Participants_Db::parse_date($value,$column);
+                    $value = Participants_Db::prep_field_for_display($value,$column->form_element);
+                  } else {
+                    // I like this idea, but...
+                    //$attributes['placeholder'] = date(Participants_Db::$date_format);
                   }
 
                   break;
@@ -181,7 +186,7 @@ if ($participant_values) :
                           'name' => $column->name,
                           'options' => $column->values,
                           'class' => $field_class,
-                          'attributes' => $readonly,
+                          'attributes' => $attributes,
                       )
               );
             }
@@ -200,9 +205,9 @@ if ($participant_values) :
             <?php if (is_admin()) : ?>
           <tr>
             <th><h3><?php _e('Save the Record', 'participants-database') ?></h3></th>
-          <td class="submit-buttons"><input class="button-primary" type="submit" value="Submit" name="submit">
-            <input class="button-primary" type="submit" value="Apply" name="submit">
-            <input class="button-primary" type="submit" value="Next" name="submit">
+          <td class="submit-buttons"><input class="button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit">
+            <input class="button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit">
+            <input class="button-primary" type="submit" value="<?php echo self::$i18n['next'] ?>" name="submit">
           </td>
           </tr>
           <tr>
@@ -213,7 +218,7 @@ if ($participant_values) :
             <th><h3><?php echo $options['save_changes_label'] ?></h3></th>
           <td class="submit-buttons">
             <input class="button-primary pdb-submit" type="submit" value="<?php echo $options['save_changes_button'] ?>" name="save">
-            <input name="submit" type="hidden" value="Apply">
+            <input name="submit" type="hidden" value="<?php echo self::$i18n['apply'] ?>">
           </td>
           </tr>
   <?php endif; ?>

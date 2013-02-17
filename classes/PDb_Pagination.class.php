@@ -217,10 +217,9 @@ class PDb_Pagination {
    */
   function setLink($url, $add_variables) {
     
-    $delimiter = '';
     if ( ! empty($add_variables) )
-      $delimiter = false !== strpos($url,'?') ? '&' : '?';
-    $this->link = $url.$delimiter.$add_variables;
+      $add_variables = false !== strpos($url,'?') ? '&'.$add_variables : '?'.$add_variables;
+    $this->link = $url.$add_variables;
   }
 
   /**

@@ -90,7 +90,7 @@ abstract class PDb_Shortcode {
     Participants_Db::$shortcode_present = true;
 
     $this->module = $subclass->module;
-    $this->options = get_option(Participants_Db::$participants_db_options);
+    $this->options = Participants_Db::$plugin_options;
     $this->shortcode_class = get_class($subclass);
 
     $this->shortcode_defaults = array(
@@ -235,6 +235,21 @@ abstract class PDb_Shortcode {
     }
 
     //echo $this->error_html;
+  }
+  
+  /**
+   * gets the current errors
+   * 
+   * @return mixed an array of error messages, or bool false if no errors
+   */
+  public function get_errors() {
+
+    if (is_object(Participants_Db::$validation_errors)) {
+
+      $errors = Participants_Db::$validation_errors->get_validation_errors();
+      if ($this->_empty($errors)) return false;
+      else return $errors;
+    }
   }
 
   /*   * **************
@@ -520,6 +535,16 @@ abstract class PDb_Shortcode {
   
   }
   
+  public function print_retrieve_link($linktext) {
+    
+    if ($this->options['show_retrieve_link'] != 0) {
+      
+      $conj = false !== strpos('?',$_SERVER['REQUEST_URI']) ? '&' : '?';
+      $retrieve_link = $_SERVER['REQUEST_URI'] . $conj . 'retrieve=1';
+      printf('<a href="%s">%s</a>', $retrieve_link, $linktext );
+    }
+  }
+  
   /****************
    * FIELD VALUES
 	 
@@ -682,62 +707,6 @@ abstract class PDb_Shortcode {
     return $value;
     
   }
-
-  /**
-   * replace the tags in text messages
-   *
-   * a tag contains the column name for the value to use: [column_name]
-   *
-   * also processes the [record_link] tag
-   *
-   * @param string $text   the unporcessed text with tags
-   * @param array  $values the values to replace the tags with
-   * @param array  $tags   the tags to look for in the text
-   *
-   * @return string the text with the replacements made
-   *
-   */
-	protected function _proc_tags( $text, $values = array(), $tags = array() ) {
-
-		if ( empty( $values ) ) {
-
-			foreach( $this->columns as $column ) {
-
-				$tags[] = '['.$column->name.']';
-
-				$values[] = Participants_Db::prep_field_for_display( $this->participant_values[$column->name], $column->form_element, false );
-
-			}
-
-		}
-
-		// add some extra tags
-    foreach( array('id','private_id') as $v ) {
-      
-      $tags[] = '['.$v.']';
-      $values[] = $this->participant_values[$v];
-    }
-		$tags[] = '[record_link]';
-		$values[] = $this->registration_page;
-    
-    $tags[] = '[admin_record_link]';
-    $values[] = Participants_Db::get_admin_record_link($this->participant_values['id']);
-
-		$placeholders = array();
-		
-		for ( $i = 1; $i <= count( $tags ); $i++ ) {
-
-			$placeholders[] = '%'.$i.'$s';
-
-		}
-
-		// replace the tags with variables
-		$pattern = str_replace( $tags, $placeholders, $text );
-		
-		// replace the variables with strings
-		return vsprintf( $pattern, $values );
-
-	}
   
   /**
    * closes the form tag

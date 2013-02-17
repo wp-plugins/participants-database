@@ -210,7 +210,7 @@ foreach( $groups as $group ) {
 // this script updates a hidden field when a row is edited so we don't have to update the whole database on submit
 // second bit disables the submit on return behavior
 ?>
-<div class="wrap">
+<div class="wrap participants_db">
 <h2><?php echo Participants_Db::$plugin_title?></h2>
 <h3><?php _e('Manage Database Fields','participants-database' )?></h3>
 <?php

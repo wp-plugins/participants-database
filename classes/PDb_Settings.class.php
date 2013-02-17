@@ -276,9 +276,21 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database' ), date(get_option('date_format')), (function_exists('date_create') ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
+          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database' ), date(isset(Participants_Db::$date_format) ? Participants_Db::$date_format : get_option('date_format')), (function_exists('date_create') ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
+          ),
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'date_format',
+        'title'      =>__('Date Format', 'participants-database' ),
+        'group'      =>'pdb-main',
+        'options'    => array
+          (
+          'type'        => 'text-line',
+          'help_text'   => __('date formatting string for all plugin date displays', 'participants-database' ),
+          'value'       => get_option('date_format'),
           ),
         );
 
@@ -527,14 +539,110 @@ class PDb_Settings extends Plugin_Settings {
 
     $this->plugin_settings[] = array(
         'name'       =>'email_signup_notify_body',
-        'title'      =>__('Signup Notification Email'),
+        'title'      =>__('Signup Notification Email', 'participants-database'),
         'group'      => 'pdb-signup',
         'options'    => array(
           'type'        =>'text-area',
-          'help_text'   => __('notification email body. The [admin_record_link] tag will supply the URL for editing the record in the admin.'),
-          'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul><p>Edit this new record here: <a href="[admin_record_link]">[admin_record_link]</a></p>'),
+          'help_text'   => __('notification email body. The [admin_record_link] tag will supply the URL for editing the record in the admin.', 'participants-database'),
+          'value'       => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul><p>Edit this new record here: <a href="[admin_record_link]">[admin_record_link]</a></p>', 'participants-database'),
           )
         );
+
+    $this->plugin_settings[] = array(
+        'name'       => 'show_retrieve_link',
+        'title'      => __('Enable Lost Private Link', 'participants-database' ),
+        'group'      => 'pdb-signup',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('Show a link on the signup form allowing users to have their private link emailed to them.', 'participants-database' ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'retrieve_link_identifier',
+        'title'      =>__('Lost Private Link ID Field', 'participants-database' ),
+        'group'      => 'pdb-signup',
+        'options'    => array(
+          'type'        =>'dropdown',
+          'help_text'   => __('The field used to identify the user&#39;s account.', 'participants-database' ),
+					'options'     => $this->_get_identifier_columns(),
+          'value'       => $this->_get_email_column(),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'retrieve_link_email_subject',
+        'title'      =>__('Lost Private Link Email Subject', 'participants-database' ),
+        'group'      => 'pdb-signup',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('subject line for the lost private link email', 'participants-database' ),
+          'value'       => sprintf( __("Here is your private link on %s", 'participants-database' ), get_bloginfo('name') ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'retrieve_link_email_body',
+        'title'      =>__('Lost Private Link Email', 'participants-database' ),
+        'group'      => 'pdb-signup',
+        'options'    => array(
+          'type'        =>'text-area',
+          'help_text'   => __('Body of the email sent when a lost private link is requested.', 'participants-database' ),
+					/* translators: the %s will be the name of the website */
+          'value'       =>sprintf( __('<p>A lost private link has been requested on %s.</p><p>Here is your private link: <a href="[record_link]">[record_link]</a>.</p>', 'participants-database' ),get_bloginfo('name') ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       => 'send_retrieve_link_notify_email',
+        'title'      => __('Send Lost Private Link Notification Email', 'participants-database' ),
+        'group'      => 'pdb-signup',
+        'options'    => array
+          (
+          'type'        => 'checkbox',
+          'help_text'   => __('Send an email notification that a lost private link has been requested.', 'participants-database' ),
+          'value'       => 0,
+          'options'     => array( 1, 0 ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'retrieve_link_notify_subject',
+        'title'      =>__('Lost Private Link Notification Email Subject', 'participants-database' ),
+        'group'      => 'pdb-signup',
+        'options'    => array(
+          'type'        =>'text',
+          'help_text'   => __('subject of the notification email; placeholder tags can be used (see above)', 'participants-database' ),
+					/* translators: the %s will be the name of the website */
+          'value'       => sprintf( __('A Lost Private Link has been requested on %s', 'participants-database' ), get_bloginfo('name') ),
+          )
+        );
+
+    $this->plugin_settings[] = array(
+        'name'       =>'retrieve_link_notify_body',
+        'title'      =>__('Lost Private Link Notification Email', 'participants-database'),
+        'group'      => 'pdb-signup',
+        'options'    => array(
+          'type'        =>'text-area',
+          'help_text'   => __('notification email body', 'participants-database'),
+          'value'       => __('<p>A lost private link has been requested by:</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>', 'participants-database'),
+          )
+        );
+		
+    $this->plugin_settings[] = array(
+        'name'       =>'identifier_field_message',
+        'title'      =>__('Retrieve Private Link Error Message', 'participants-database' ),
+        'group'      => 'pdb-signup',
+        'options'    => array(
+          'type'        =>'text-area',
+          'help_text'   => __('Message shown when a record matching the retrieve link idenifier cannot be found', 'participants-database' ),
+          'value'       =>__('A record matching that %s cannot be found.', 'participants-database' ),
+          )
+        );
+
 		
     $this->plugin_settings[] = array(
         'name'       =>'unique_field',
@@ -545,7 +653,7 @@ class PDb_Settings extends Plugin_Settings {
           'type'       =>'dropdown',
           'help_text'  => __('when a signup is submitted or CSV record is imported, this field is checked for a duplicate', 'participants-database' ),
           'options'    => array_merge( $this->_get_display_columns(), array( 'Record ID' => 'id' ) ),
-					'value'      => 'email',
+					'value'      => $this->_get_email_column(),
           )
         );
     $this->plugin_settings[] = array(
@@ -558,9 +666,9 @@ class PDb_Settings extends Plugin_Settings {
           'help_text'   => __('when the submission matches the Duplicate Record Check Field of an existing record. This also applies to importing records from a CSV file.', 'participants-database' ),
           'value'       => 1,
           'options'     => array(
-																 'Create a new record with the submission' => 0,
-																 'Overwrite matching record with new data' => 1,
-																 'Show a validation error message' => 2,
+																 __('Create a new record with the submission', 'participants-database' ) => 0,
+																 __('Overwrite matching record with new data', 'participants-database' ) => 1,
+																 __('Show a validation error message', 'participants-database' ) => 2,
 																 ),
           ),
         );

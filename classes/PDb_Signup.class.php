@@ -27,36 +27,17 @@ class PDb_Signup extends PDb_Shortcode {
   // holds the submission status: false if the form has not been submitted
   private $submitted = false;
 
-	// holds the recipient values after a form submission
-	private $recipient;
+	// holds the current email object
+	public $email_message;
 	
 	// boolean to send the reciept email
 	private $send_reciept;
-
-	// the receipt subject line
-	private $receipt_subject;
-	
-	// holds the body of the signup receipt email
-	private $receipt_body;
 	
 	// boolean to send the notification email
 	private $send_notification;
-
-	// holds the notify recipient emails
-	public $notify_recipients;
-
-	// the notification subject line
-	private $notify_subject;
-
-	// holds the body of the notification email
-	private $notify_body;
+  
   // holds the current email body
   var $current_body;
-	
-	private $thanks_message;
-
-	// header added to receipts and notifications
-	private $email_header;
 
 	// holds the submission values
 	private $post = array();
@@ -98,14 +79,11 @@ class PDb_Signup extends PDb_Shortcode {
       $this->participant_values = Participants_Db::get_default_record();
       
     }
+    
+    if ( isset($_GET['retrieve']) ) $this->module = 'retrieve';
 		
     // run the parent class initialization to set up the parent methods 
     parent::__construct( $this, $params, $add_atts );
-    
-    $this->registration_page = Participants_Db::get_record_link( $this->participant_values['private_id'] );
-    
-    // set up the signup form email preferences
-    $this->_set_email_prefs();
 		
     // set the action URI for the form
 		$this->_set_submission_page();
@@ -143,9 +121,6 @@ class PDb_Signup extends PDb_Shortcode {
 				}
 			
 		} elseif ( $this->submitted ) {
-			
-			// print the thank you note
-			$this->_thanks();
       
       /*
        * filter provides access to the freshly-stored record-- actually the whole 
@@ -165,6 +140,9 @@ class PDb_Signup extends PDb_Shortcode {
         set_transient( 'signup-'.$this->participant_id, 'sent', 120 );
         
       }
+			
+			// print the thank you note
+			if ( is_object($this->email_message) ) $this->_thanks();
 			
 		}
 		
@@ -197,23 +175,6 @@ class PDb_Signup extends PDb_Shortcode {
   }
   
   /**
-   * sets up the signup form email preferences
-   */
-  private function _set_email_prefs() {
-
-		$this->send_reciept = $this->options['send_signup_receipt_email'];
-		$this->send_notification = $this->options['send_signup_notify_email'];
-		$this->notify_recipients = $this->options['email_signup_notify_addresses'];
-		$this->notify_subject = $this->options['email_signup_notify_subject'];
-		$this->notify_body = $this->options['email_signup_notify_body'];
-		$this->receipt_subject = $this->options['signup_receipt_email_subject'];
-		$this->receipt_body = $this->options['signup_receipt_email_body'];
-		$this->thanks_message = $this->options['signup_thanks'];
-		$this->email_header = Participants_Db::$email_headers;
-    
-  }
-  
-  /**
    * sets the form submission page
    */
   private function _set_submission_page() {
@@ -240,19 +201,19 @@ class PDb_Signup extends PDb_Shortcode {
     <form method="post" enctype="multipart/form-data" >
         <?php
         FormElement::print_hidden_fields( array(
-                                                'action'=>'signup',
-                                                'subsource'=>Participants_Db::PLUGIN_NAME,
-                                                'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ),
-                                                'thanks_page' => $this->submission_page
+                                                'action'         => $this->module,
+                                                'subsource'      => Participants_Db::PLUGIN_NAME,
+                                                'shortcode_page' => $_SERVER['REQUEST_URI'],
+                                                'thanks_page'    => $this->submission_page
                                                 ) );
 
   }
 	
-	public function print_submit_button( $class = 'button-primary' ) {
+	public function print_submit_button( $class = 'button-primary', $text = false ) {
 		
 		FormElement::print_element( array(
                                       'type'       => 'submit',
-                                      'value'      => $this->options['signup_button_text'],
+                                      'value'      => ($text === false ? $this->options['signup_button_text'] : $text),
                                       'name'       => 'submit',
                                       'class'      => $class.' pdb-submit',
                                       ) );
@@ -265,7 +226,7 @@ class PDb_Signup extends PDb_Shortcode {
 		ob_start(); ?>
     
 		<div class="<?php echo $this->wrap_class ?> signup-thanks">
-      <?php echo $this->_proc_tags( $this->thanks_message ); ?>
+      <?php echo TemplateEmail::proc_tags( $this->options['signup_thanks'], $this->email_message->get_tags() ); ?>
 		</div>
     
 		<?php $this->output = ob_get_clean();
@@ -297,8 +258,8 @@ class PDb_Signup extends PDb_Shortcode {
    */
 	private function _send_email() {
 
-		if ( $this->send_notification ) $this->_do_notify();
-		if ( $this->send_reciept ) $this->_do_receipt();
+		if ( $this->options['send_signup_notify_email'] ) $this->_do_notify();
+		if ( $this->options['send_signup_receipt_email'] ) $this->_do_receipt();
 	
 	}
 
@@ -306,75 +267,111 @@ class PDb_Signup extends PDb_Shortcode {
 	private function _do_receipt() {
 		
 		if ( ! isset( $this->participant_values['email'] ) || empty( $this->participant_values['email'] ) ) return NULL;
-
-		$this->_mail(
-								 $this->participant_values['email'],
-								 $this->_proc_tags( $this->receipt_subject ),
-								 $this->_proc_tags( $this->receipt_body )
-								 );
+    
+    $this->email_message = new PDb_TemplateEmail(
+                    array(
+                        'recipients' => $this->participant_values['email'],
+                        'subject' => $this->options['signup_receipt_email_subject'],
+                        'body' => $this->options['signup_receipt_email_body'],
+                        'id' => $this->participant_id,
+                    )
+    );
+    $this->email_message->send();
 		
 	}
 
 	// sends a notification email
 	private function _do_notify() {
-		
-		$this->_mail(
-								 $this->notify_recipients, 
-								 $this->_proc_tags( $this->notify_subject ), 
-								 $this->_proc_tags( $this->notify_body ) 
-								 );
-		
-		
-	}
-
-	/**
-   * sends a mesage through the WP mail handler function
-   * 
-   * @todo these email functions should be handled by an email class 
-   *
-   * @param string $recipients comma-separated list of email addresses
-   * @param string $subject    the subject of the email
-   * @param string $body       the body of the email
-   *
-   */
-	private function _mail( $recipients, $subject, $body ) {
-
-		// error_log(__METHOD__.' with: '.$recipients.' '.$subject.' '.$body );
     
-    $this->current_body = $body;
-    
-    if ( $this->options['html_email'] ) add_action( 'phpmailer_init', array( $this, 'set_alt_body') );
-
-		$sent = wp_mail( $recipients, $subject, $body, $this->email_header );
-
-		if ( false === $sent ) error_log( __METHOD__.' sending returned false' );
-
+    $this->email_message = new PDb_TemplateEmail(
+                    array(
+                        'recipients' => $this->options['email_signup_notify_addresses'],
+                        'subject' => $this->options['email_signup_notify_subject'],
+                        'body' => $this->options['email_signup_notify_body'],
+                        'id' => $this->participant_id,
+                    )
+    );
+    $this->email_message->send();
+		
 	}
   
   /**
-   * set the PHPMailer AltBody property with the text body of the email
+   * sends a private link given an email address or other record identifier
    * 
-   * @param object $phpmailer an object of type PHPMailer
-   * @return null
-   */
-  public function set_alt_body( &$phpmailer ) {
-    
-    if ( is_object( $phpmailer )) $phpmailer->AltBody = $this->_make_text_body ($this->_proc_tags( $this->current_body ));
-  }
-  
-  /**
-   * strips the HTML out of an HTML email message body to provide the text body
+   * sends an email to the querent and optionally to the admin
    * 
-   * this is a fairly crude conversion here. I should include some kind of 
-   * library to do this properly. 
+   * checks the querent's IP and allows three tries before access is blocked for a day
    * 
-   * 
-   * @param string $HTML the HTML body of the email
+   * returns a string indicating the result of the operation so a suitable feedback 
+   * message can be shown to the user: 'not found', 'IP blocked', 'email sent'
+   *
+   * @param string $identifier the information used to identify an account
    * @return string
    */
-  private function _make_text_body( $HTML ) {
+  public function send_private_link($identifier) {
     
-    return strip_tags( preg_replace('#(</[p|h1|h2|h3|h4|h5|h6|div|tr|li]{1,3} *>)#i', "\r", $HTML) );
+    $request_ip = str_replace('.','',$_SERVER['REMOTE_ADDR']);
+    $transient = Participants_Db::$css_prefix . 'lost-private-link-timeout-' . $request_ip;
+    // check the timeout: they get three tries and then the IP is blocked for a day
+    $check = get_transient($transient);
+    if ( $check === false ) {
+      set_transient($transient, 1, (60 * 60 * 24) ); 
+    } else {
+      if ($check <= 3) {
+        set_transient($transient, $check++, (60 * 60 * 24) );
+      } else {
+        error_log('Participants Database Plugin: blocked private link request from IP:'. $_SERVER['REMOTE_ADDR']);
+        return 'IP blocked';
+      }
+    }
+    
+    $record_id = get_record_id_by_term($this->options['retrieve_link_identifier'], $identifier);
+    if (!Participants_Db::field_value_exists($record_id,'id')) return 'not found'; // no record was found
+    
+    $this->email_message = new PDb_TemplateEmail(
+                    array(
+                        'recipients' => '',
+                        'subject' => $this->options['retrieve_link_email_subject'],
+                        'body' => $this->options['retrieve_link_email_body'],
+                        'id' => $record_id,
+                    )
+    );
+    $this->email_message->send();
+    
+    if ( 0 != $this->options['send_retrieve_link_notify_email'] ) {
+      $this->email_message = new PDb_TemplateEmail(
+                      array(
+                          'recipients' => $this->options['email_signup_notify_addresses'],
+                          'subject' => $this->options['retrieve_link_notify_subject'],
+                          'body' => $this->options['retrieve_link_notify_body'],
+                          'id' => $record_id,
+                      )
+      );
+      $this->email_message->send();
+    }
+    
+    return 'email sent';
+    
+  }
+  /**
+   * grab the defined identifier field for display in the retrieve private link form
+   * 
+   * @global type $wpdb
+   * @return string
+   */
+  function get_retrieve_field() {
+    
+    global $wpdb;
+    
+    $columns = array( 'name','title','form_element');
+    
+    $sql = 'SELECT v.'. implode( ',v.',$columns ) . ' 
+            FROM '.Participants_Db::$fields_table.' v 
+            WHERE v.name = "'.$this->options['retrieve_link_identifier'].'" 
+            ';
+            
+    return $wpdb->get_results( $sql, OBJECT_K );
+    
   }
 
 }

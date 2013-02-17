@@ -307,7 +307,7 @@ class FormElement {
    * @param array $parameters (same as __construct() )
    * @static
    */
-  public function print_element( $parameters ) {
+  public static function print_element( $parameters ) {
     
     echo self::_HTML( $parameters );
     
@@ -319,7 +319,7 @@ class FormElement {
    * @param array $parameters (same as __construct() )
    * @static
    */
-  public function get_element( $parameters ) {
+  public static function get_element( $parameters ) {
 
     return self::_HTML( $parameters );
 
@@ -330,7 +330,7 @@ class FormElement {
    *
    * @param array $fields name=>value pairs for each hidden input tag
    */
-  public function print_hidden_fields( $fields, $print = true ) {
+  public static function print_hidden_fields( $fields, $print = true ) {
     
     $atts = array( 'type' => 'hidden');
     
@@ -1104,9 +1104,10 @@ if ( 'image' == $type)
    */
   public static function format_date($timestamp) {
 
-    if ( false !== @date('r',$timestamp)) {
+    if ( preg_match('#^[0-9]+$#',$timestamp) && false !== @date('r',$timestamp)) {
+      
       return date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $timestamp ) );
-    } else return '';
+    } else return $timestamp;
     
   }
   

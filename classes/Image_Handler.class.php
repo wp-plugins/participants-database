@@ -67,7 +67,7 @@ abstract class Image_Handler {
    */
   function __construct($config, $subclass_atts) {
 
-    $this->_set_default_wrap();
+    $this->_set_default_wrap($config);
 
     $defaults = array(
         'filename' => '',
@@ -356,7 +356,7 @@ abstract class Image_Handler {
   /**
    * sets up the default wrap tags
    */
-  protected function _set_default_wrap() {
+  protected function _set_default_wrap($config) {
 
     $this->default_wrap = array(
         '<span class="%s">',

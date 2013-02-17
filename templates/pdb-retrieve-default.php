@@ -23,32 +23,27 @@
  
 <!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <div class="wrap <?php echo $this->wrap_class ?>" >
+  
+  <h4><?php _e('Forgot your private link?','participants-database') ?></h4>
 
   <?php // output any validation errors
   $this->print_errors(); ?>
+  
+  <?php if (isset($_POST['action']) && $_POST['action'] == 'success') : ?>
+  
+    <h5><?php _e('Success: your private link has been emailed to you.','participants-database') ?></h5>
+  
+  <?php else : ?>
 
   <?php $this->print_form_head(); // this must be included before any fields are output ?>
+  
+  <?php $this->field = new Field_Item( current($this->get_retrieve_field()) ); ?>
 
     <table class="form-table pdb-signup">
 
       <tbody>
 
-      <?php while ( $this->have_groups() ) : $this->the_group(); ?>
-
-        <?php if ( $this->group->printing_title() ) : // are we printing group titles and descriptions? ?>
-        <tr class="signup-group">
-          <td colspan="2">
-        
-            <?php $this->group->print_title() ?>
-            <?php $this->group->print_description() ?>
-
-          </td>
-        </tr>
-        <?php endif; // end group title/description row ?>
-
-        <?php while ( $this->have_fields() ) : $this->the_field(); ?>
-
-        <tr class="<?php $this->field->print_element_class() ?>">
+        <tr class="<?php echo $this->field->form_element ?>">
 
           <th><?php $this->field->print_label(); // this function adds the required marker ?></th>
 
@@ -56,29 +51,15 @@
 
             <?php $this->field->print_element(); ?>
 
-            <?php if ( $this->field->has_help_text() ) :?>
-            <span class="helptext"><?php $this->field->print_help_text() ?></span>
-            <?php endif ?>
+            <span class="helptext"><?php _e('Type in your email address, your private link will be emailed to you.','participants-database') ?></span>
             
           </td>
 
         </tr>
-  
-        <?php endwhile; // fields
-
-      endwhile; // groups ?>
-      
-        <?php /*if ( $captcha = $this->_add_captcha( $this->captcha_type ) ) : ?>
-        <tr>
-          <td colspan="2" class="pdb-captcha"><?php echo $captcha?></td>
-        </tr>
-        <?php endif */?>
         <tr>
           <td colspan="2" class="submit-buttons">
             
-           <?php $this->print_submit_button('button-primary'); // you can specify a class for the button ?>
-            
-           <span class="pdb-retrieve-link"><?php $this->print_retrieve_link(__('Forget your private link? Click here to have it emailed to you.','participants-database')); ?></span>
+           <?php $this->print_submit_button('button-primary',__('Submit','participants-database')); // you can specify a class for the button ?>
            
           </td>
         </tr>
@@ -88,5 +69,7 @@
     </table>
     
   <?php $this->print_form_close() ?>
+  
+  <?php endif ?>
   
 </div>

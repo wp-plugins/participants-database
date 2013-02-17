@@ -10,8 +10,6 @@ jQuery(document).ready(function($) {
   $(".ui-tabs-panel").each(function(index) {
     var str = $(this).children("a.pdb-anchor").attr('name').replace(/\s/g, "_");
     $(this).attr("id", str.toLowerCase());
-    if (index > 0)
-      $(this).addClass("ui-tabs-hide");
   });
   var wrapclass = $('.participants_db.wrap').attr('class');
   $(".participants_db.wrap").removeClass().addClass( wrapclass+" main" );

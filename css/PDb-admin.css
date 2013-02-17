@@ -283,22 +283,44 @@ a.dragger {
 #fields-tabs {
     visibility:hidden;
 }
-.ui-tabs-nav {
+.participants_db .ui-widget-content {
+  background-image: none;
+  border: none;
+  color: inherit;
+}
+.participants_db .ui-widget {
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.participants_db .ui-tabs-nav {
+	background-image: none;
+	background-color: inherit;
+	border: none;
     border-bottom: 1px solid #ccc;
-    height: 28px;
+    height: 30px;
     margin: 20px 0;
     padding: 0;
 }
-.ui-tabs-nav li {
+.participants_db .ui-tabs-nav li {
+		background-color: transparent;
+    background-image: none;
+		border:none;
     display: block;
     float: left;
     margin: 0;
 }
-.ui-tabs-nav li a {
+.participants_db .ui-tabs-nav .ui-state-default a {
+}
+.participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active a {
+	background-color: #ffffff;
+  padding-bottom: 9px;
+}
+.participants_db .ui-tabs-nav li a {
     padding: 4px 20px 6px;
     font-weight: bold;
 }
-.ui-tabs-nav li a {
+.participants_db .ui-tabs-nav li a {
     border-style: solid;
     border-color: #CCC #CCC #F9F9F9;
     border-width: 1px 1px 0;
@@ -316,26 +338,26 @@ a.dragger {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
-.ui-tabs-nav li.ui-tabs-selected a, 
-.ui-tabs-nav li.ui-state-active a,
-.ui-tabs-nav li a:focus {
+.participants_db .ui-tabs-nav li.ui-tabs-selected a, 
+.participants_db .ui-tabs-nav li.ui-state-active a,
+.participants_db .ui-tabs-nav li a:focus {
     color: #333333;
     background-color:#ffffff;
     outline:none;
 }
-.ui-tabs-panel {
+.participants_db .ui-tabs-panel {
     clear: both;
     position: relative;
     left:0;
 }
-.ui-tabs-panel h3 {
+.participants_db .ui-tabs-panel h3 {
     font: italic normal normal 24px/29px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
     margin: 0;
     padding: 0 0 5px;
     line-height: 35px;
     text-shadow: 0 1px 0 #fff;
 }
-.ui-tabs-panel h4 {
+.participants_db .ui-tabs-panel h4 {
     font-size: 15px;
     font-weight: bold;
     margin: 1em 0;
@@ -359,7 +381,9 @@ a.dragger {
     /* hide it by default */
     display:none;
 }
-.ui-dialog {
+.ui-dialog.ui-widget {
+    font-family: inherit;
+    font-size:1.1em;
     /* css3 drop shadow */
     -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
@@ -409,6 +433,32 @@ a.dragger {
 }
 .ui-dialog a.button:hover{
     background-color:#c33100;
+}
+.ui-dialog .ui-widget-header {
+  display: none;
+}
+.ui-dialog .ui-dialog-buttonpane {
+  border: none;
+  display: block;
+  padding: 0;
+}
+.ui-helper-clearfix:before, .ui-helper-clearfix:after {
+  display: inherit;
+  clear: none;
+}
+.ui-dialog .ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+    font-family: inherit;
+}
+.ui-dialog .ui-state-default {
+    background: #E6E6E6;
+    border: 1px solid #D3D3D3;
+    font-weight: normal;    
+    cursor: pointer;
+    margin: 0.5em 0.4em 0.5em 0;
+    line-height: 1.8;
+}
+.ui-dialog .ui-state-hover {
+    border: 1px solid #b3b3b3;
 }
 #confirmation-dialog p{
 }
