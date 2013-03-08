@@ -393,7 +393,7 @@ class FormElement {
     
     wp_editor(
             htmlspecialchars_decode($value),
-            preg_replace( '#[0-9_-]#', '', Participants_Db::$css_prefix.$this->name ),
+            preg_replace( '#[0-9_-]#', '', Participants_Db::$css_prefix . $this->name ),
             array(
                 'media_buttons' => false,
                 'textarea_name' => $this->name,
@@ -567,10 +567,12 @@ class FormElement {
    */
   private function _select_other( $type = 'radio' ) {
     
-    if ( $type != 'radio' ) {
-		$this->value = (array) $this->value;
-		if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
-	}
+    if ( $type == 'radio' ) {
+      $this->value = is_array($this->value) ? current($this->value) : $this->value;
+    } else {
+      $this->value = (array) $this->value;
+      if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
+    }
     
     // determine the label for the other field
     if ( isset( $this->attributes['other'] ) ) {
@@ -748,8 +750,8 @@ class FormElement {
 if ( 'image' == $type)
         $this->_addline( Participants_Db::prep_field_for_display( $this->value, 'image-upload' ) );
       else {
-        $pattern = Participants_Db::$plugin_options[ 'make_links' ] ? '<a class="file-link-wrap"  href="' . get_bloginfo('url') . Participants_Db::$plugin_options[ 'image_upload_location' ]. '/' . '%1$s" >%1$s</a>' : '<span class="file-link-wrap"  >%1$s</span>';
-        $this->_addline( sprintf($pattern, $this->value ));
+        $pattern = Participants_Db::$plugin_options[ 'make_links' ] ? '<a class="file-link-wrap"  href="%2$s%1$s" >%1$s</a>' : '<span class="file-link-wrap"  >%1$s</span>';
+        $this->_addline( sprintf($pattern, $this->value, Image_Handler::concatenate_directory_path(get_bloginfo('url'), Participants_Db::$plugin_options[ 'image_upload_location' ]) ));
       }
 			
 		}
@@ -1106,7 +1108,7 @@ if ( 'image' == $type)
 
     if ( preg_match('#^[0-9]+$#',$timestamp) && false !== @date('r',$timestamp)) {
       
-      return date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $timestamp ) );
+      return date_i18n( Participants_Db::$date_format, Participants_Db::parse_date( $timestamp ) );
     } else return $timestamp;
     
   }

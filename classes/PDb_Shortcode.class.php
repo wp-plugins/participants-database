@@ -560,18 +560,23 @@ abstract class PDb_Shortcode {
     // get the existing value if any
 		$value = isset( $this->participant_values[ $field->name ] ) ? Participants_Db::unserialize_array( $this->participant_values[ $field->name ] ) : '';
 		
-		// replace it with the new value if provided, escaping the input
-		if ( isset( $_POST[ $field->name ] ) ) {
+		if ( isset( $_POST[ $field->name ] ) ) {                                    // replace it with the new value if provided, escaping the input
 			
 			$value = $this->_esc_submitted_value( $_POST[ $field->name ] );
 			
 		}
 			
 		switch ( $field->form_element ) {
+      
+      case 'text-line':
+
+        // show the default value for empty read-only text-lines
+        if ($field->readonly == 1 and $this->module == 'list' and empty($value)) $value = $field->default;
+        break;
 			
 			case 'image-upload':
 			
-				$value = empty( $value ) ? '' : $value;
+				$value = empty( $value ) ? '' : $value;                                 // why?
 				
 				break;
 				
@@ -590,7 +595,7 @@ abstract class PDb_Shortcode {
 			case 'hidden':
 				
 				/* use the dynamic value if the shortcode is signup, otherwise only use the dynamic 
-         * value in the record module if there is no perviously set value
+         * value in the record module if there is no previously set value
 				 */
 				if ( $this->module == 'signup' or ( empty( $value ) and $this->module == 'record' ) ) $value = $this->get_dynamic_value( $field->default );
         break;

@@ -718,7 +718,7 @@ class PDb_List_Admin
           <input type="hidden" name="CSV type" value="participant list" />
           <input type="hidden" name="query" value="<?php echo rawurlencode( self::$list_query )?>" />
           <?php
-          $date_string = str_replace( array( '/','#','.','\\',', ',',',' '),'-',  date_i18n( get_option( 'date_format' ) ) );
+          $date_string = str_replace( array( '/','#','.','\\',', ',',',' '),'-',  date_i18n( Participants_Db::$date_format ) );
           $suggested_filename = Participants_Db::PLUGIN_NAME.'-'.$date_string.'.csv';
           $namelength = round( strlen( $suggested_filename ) * 0.9 ) ;
           ?>

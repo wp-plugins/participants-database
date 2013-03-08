@@ -382,7 +382,7 @@ abstract class Image_Handler {
    * @param string $path2    second part of the path
    * @param bool   $endslash determines whether to end the path with a slash or not
    */
-  public function concatenate_directory_path( $path1, $path2, $endslash = true ) {
+  public static function concatenate_directory_path( $path1, $path2, $endslash = true ) {
     
     return rtrim( $path1, '/' ) . '/' . ltrim( rtrim( $path2, '/' ), '/' ) . ( $endslash ? '/' : '' );
   }

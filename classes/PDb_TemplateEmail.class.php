@@ -48,8 +48,6 @@ class PDb_TemplateEmail extends TemplateEmail {
       $this->set_tags($params['tags']);
     }
     
-    error_log(__METHOD__.' tags:'.print_r($this->tags,1));
-    
     $this->set_send_to($params['recipients']);
     
     parent::__construct($params);

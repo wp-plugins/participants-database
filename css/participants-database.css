@@ -112,8 +112,10 @@
 
 /* LIST */
 
-.pdb-list th {
-  padding: 4px 7px 2px;;
+.pdb-list .wp-list-table th,
+.pdb-list .wp-list-table td {
+  line-height: 1.1;
+  vertical-align: middle;
 }
 .pdb-list fieldset,
 .pdb-list table caption {

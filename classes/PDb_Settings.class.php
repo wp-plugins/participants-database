@@ -276,21 +276,21 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the date format setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database' ), date(isset(Participants_Db::$date_format) ? Participants_Db::$date_format : get_option('date_format')), (function_exists('date_create') ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
+          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the "Input Date Format" setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database' ), date(isset(Participants_Db::$date_format) ? Participants_Db::$date_format : get_option('date_format')), (class_exists('IntlDateFormatter') ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
         );
 
     $this->plugin_settings[] = array(
-        'name'       =>'date_format',
-        'title'      =>__('Date Format', 'participants-database' ),
+        'name'       =>'input_date_format',
+        'title'      =>__('Input Date Format', 'participants-database' ),
         'group'      =>'pdb-main',
         'options'    => array
           (
           'type'        => 'text-line',
-          'help_text'   => __('date formatting string for all plugin date displays', 'participants-database' ),
-          'value'       => get_option('date_format'),
+          'help_text'   => sprintf(__('date formatting string for all plugin date inputs when "Strict Date Format" is enabled. You should use this for all localized (non-American English) date formats. Uses the %sICU standard formatting.%s', 'participants-database' ), '<a href="http://userguide.icu-project.org/formatparse/datetime" target="_blank">','</a>'),
+          'value'       => Participants_Db::get_ICU_date_format(get_option('date_format')),
           ),
         );
 
@@ -859,6 +859,35 @@ class PDb_Settings extends Plugin_Settings {
     return $columnlist;
 
   }
+
+	private function _get_identifier_columns() {
+
+    $columnlist = array();
+
+    $columns = Participants_Db::get_column_atts( 'frontend' );
+
+    foreach( $columns as $column ) {
+
+      if ( in_array( $column->form_element, array( 'text-line' ) ) ) $columnlist[ $column->title ] = $column->name;
+
+    }
+
+    return $columnlist;
+
+  }
+	
+	/**
+	 * this attempts to find the email column and return it's title=>value
+	 *
+	 * @return array or empty string
+	 */
+	private function _get_email_column() {
+		
+		$field = array_search('email',$this->_get_identifier_columns());
+		if ($field) return array($field => 'email');
+		else return '';
+		
+	}
 
 	private function _get_sort_columns() {
 

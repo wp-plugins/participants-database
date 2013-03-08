@@ -169,8 +169,6 @@ class TemplateEmail {
     // array of recipients
     $to = array();
     
-    error_log(__METHOD__.' send to array:'.print_r($this->send_to,1));
-    
     foreach( $this->send_to as $recipient) {
       $to[] = isset($recipient['name']) ? $recipient['name'] . ' <' . $recipient['email'] . '>' : $recipient['email'];
     }
@@ -185,12 +183,6 @@ class TemplateEmail {
     // if HTML email, add a text body for better deliverability
     if ( $this->setup['mail_func'] == 'wp_mail' && false !== stripos($this->setup['headers'],'html' ) )
             add_action( 'phpmailer_init', array( $this, 'set_alt_body') );
-    
-    
-    error_log(__METHOD__.' calling:'.$this->setup['mail_func'].' to:'.print_r($to,1).' 
-      subject:'.$this->_proc_tags($this->subject).' 
-        body:'.$this->_proc_tags($this->body).' 
-          headers:'.$headers);
     
     call_user_func($this->setup['mail_func'], $to, $this->_proc_tags($this->subject), $this->_proc_tags($this->body), $headers);
     

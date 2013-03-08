@@ -244,8 +244,9 @@ class FormValidation {
     /*
      * set as empty any fields requiring validation
      * second condition is to allow match validation fields to be empty; they'll be tested again
+     * lastly, if the field was not submitted at all, we don't validate it
      */
-		if ( empty( $validation ) || NULL === $validation || 'no' == strtolower( $validation ) ) return;
+		if ( empty( $validation ) || NULL === $validation || 'no' == strtolower( $validation ) || $this->not_submitted($name) ) return;
 
 		elseif ( empty( $value )  && ! isset( $this->post_array[$validation] ) ) {
     
@@ -363,6 +364,17 @@ class FormValidation {
 		return ucwords( str_replace( array( '_','-' ), ' ', $string ) );
 
 	}
+  
+  /**
+   * test a field for presence in the POST array
+   * 
+   * @param string $fieldname the name of the field to test
+   * @return bool
+   */
+  public function not_submitted($fieldname) {
+    
+    return $this->post_array[$fieldname] === false;
+  }
   /**
    * encodes or decodes a string using a simple XOR algorithm
    * 

@@ -17,7 +17,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.4
+ * @version    Release: 1.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 class PDb_List extends PDb_Shortcode {
@@ -76,8 +76,6 @@ class PDb_List extends PDb_Shortcode {
     // set the list limit value; this can be overridden by the shortcode atts later
     $this->page_list_limit = (!isset($_POST['list_limit']) or !is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? Participants_Db::$plugin_options['list_limit'] : $_POST['list_limit'];
 
-    $this->sortables = Participants_Db::get_sortables();
-
     // define the default settings for the shortcode
     $shortcode_defaults = array(
         'sort' => 'false',
@@ -102,6 +100,8 @@ class PDb_List extends PDb_Shortcode {
     $this->registration_page_url = get_bloginfo('url') . '/' . ( isset($this->options['registration_page']) ? $this->options['registration_page'] : '' );
 
     $this->_set_display_columns();
+
+    $this->sortables = Participants_Db::get_sortables($this->display_columns);
 
     $this->_setup_i18n();
     
@@ -252,7 +252,7 @@ class PDb_List extends PDb_Shortcode {
   private function _build_shortcode_query() {
 
     // set up the column select string for the queries
-    $column_select = "`id`,`" . implode("`,`", $this->display_columns) . "`";
+    $column_select = "p.id, p." . implode(", p.", $this->display_columns);
 
     // set up the basic values; sort values come from the shortcode
     $default_values = array(
@@ -273,21 +273,22 @@ class PDb_List extends PDb_Shortcode {
      */
     $this->filter = shortcode_atts($default_values, $_REQUEST);
 
-    /* validate the sorting parameters 
+    /* validate and add the sorting parameters to the query
      */
     $order_statement = array();
-    if (isset($this->filter['sortBy'])) {
+    
+    if ($this->filter['sortBy'] == 'random') {
+      
+      $order_statement[] = 'RAND()';
+    } elseif (isset($this->filter['sortBy']) and ! empty($this->filter['sortBy'])) {
         
         $sort_fields = explode(',',$this->filter['sortBy']);
         $sort_orders = isset($this->filter['ascdesc']) ? explode(',',$this->filter['ascdesc']) : NULL;
         for ($i = 0;$i < count($sort_fields);$i++) {
           
           if (Participants_Db::is_column($sort_fields[$i]))
-            $order_statement[] = '`' . $sort_fields[$i] . '`' . ((isset($sort_orders[$i]) and in_array(strtoupper($sort_orders[$i]), array('ASC', 'DESC')))? ' ' . strtoupper($sort_orders[$i]) : ' ASC' );
+            $order_statement[] = 'p.' . $sort_fields[$i] . ((isset($sort_orders[$i]) and in_array(strtoupper($sort_orders[$i]), array('ASC', 'DESC')))? ' ' . strtoupper($sort_orders[$i]) : ' ASC' );
         }
-    } elseif ($this->filter['sortBy'] == 'random') {
-      
-      $order_statement[] = 'RAND()';
     } else {
       
       $order_statement = false;
@@ -323,12 +324,28 @@ class PDb_List extends PDb_Shortcode {
             in_array($this->filter['search_field'], $this->display_columns)
     ) {
       
-      $this->filter['value'] = $this->to_utf8($this->filter['value']);
+      // grab the attributes of the search field
+      $search_field = Participants_Db::get_field_atts($this->display_columns[array_search($this->filter['search_field'], $this->display_columns)]);
+      
+      if ($search_field->form_element == 'date') {
+        
+        $this->filter['value'] = Participants_Db::parse_date($this->to_utf8($this->filter['value']), $search_field);
+      } else {
+        
+        $this->filter['value'] = $this->to_utf8($this->filter['value']);
+      }
+      
+      $clause_pattern = $this->options['strict_search'] ? 
+              (in_array($search_field->form_element, array('multi-checkbox', 'multi-select-other')) ? 
+                ' p.%s LIKE \'%%"%s"%%\'' :
+                'p.%s = "%s"'
+                ) : 
+              'p.%s LIKE "%%%s%%"';
       
       // we have a valid search, add it to the where clauses
       $clauses[] = sprintf(
-              ($this->options['strict_search'] ? '`%s` = "%s"' : '`%s` LIKE "%%%s%%"'), 
-              $this->display_columns[array_search($this->filter['search_field'], $this->display_columns)], 
+              $clause_pattern, 
+              $search_field->name, 
               mysql_real_escape_string($this->filter['value'])
       );
     } elseif ( $this->filter['submit'] != $this->i18n['sort'] && empty($this->filter['value']))
@@ -339,7 +356,7 @@ class PDb_List extends PDb_Shortcode {
     // assemble there WHERE clause
     $where_clause = empty($clauses) ? '' : ' WHERE ' . implode(' AND ', $clauses);
 
-    $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . $where_clause . $order_clause;
+    $this->list_query = 'SELECT ' . $column_select . ' FROM ' . Participants_Db::$participants_table . ' p' . $where_clause . $order_clause;
 
     if (WP_DEBUG)
       error_log(__METHOD__ . ' list query= ' . $this->list_query);
@@ -348,7 +365,7 @@ class PDb_List extends PDb_Shortcode {
   /**
    * processes the shortcode filter string
    * 
-   * @return array an array of where clauses
+   * @return array of where clauses
    */
   private function _process_shortcode_filter() {
 
@@ -359,68 +376,34 @@ class PDb_List extends PDb_Shortcode {
       $statements = explode('&', html_entity_decode($this->shortcode_atts['filter']));
 
       foreach ($statements as $statement) {
-
-        $operator = preg_match('#^([^\2]+)(\>|\<|=|!|~)(.*)$#', $statement, $matches);
-
-        if ($operator === 0)
-          continue; // no valid operator; skip to the next statement
         
-        // get the parts
-        list( $string, $column, $op_char, $target ) = $matches;
-        
-        /*
-         * if the column is not valid or if the column is being searched in by 
-         * an overriding filter, skip this statement
-         */
-        if (!Participants_Db::is_column($column) or (!empty($this->filter['value']) && $column == $this->filter['search_field'] ))
-          continue;
-
-        $field_atts = Participants_Db::get_field_atts($column);
-
-        $delimiter = array('"', '"');
-
-        /*
-         * if we're dealing with a date element, the target value needs to be 
-         * conditioned to get a correct comparison
-         */
-        if ($field_atts->form_element == 'date' and !empty($target)) {
-
-          $target = Participants_Db::parse_date($target);
-
-          // if we don't get a valid date, skip this statement
-          if (false === $target)
-            continue;
-
-          // if its a MySQL TIMESTAMP we must make the comparison as a string
-          if ($field_atts->group == 'internal') {
-            $target = date('Y-m-d H:i:s', $target);
-          } else {
-            $delimiter = array('CAST(', ' AS SIGNED)');
-          }
-        }
-
-        // get the proper operator
-        switch ($op_char) {
-
-          case '~':
-            $operator = 'LIKE';
-            $delimiter = array('"%', '%"');
-            break;
-
-          case '!':
-
-            if (empty($target)) {
-              $operator = '<>';
-              $delimiter = array("'", "'");
-            } else {
-              $operator = 'NOT LIKE';
-              $delimiter = array('"%', '%"');
+        if ( false !== strpos($statement, '|') ) {                              // check for OR clause
+          
+          $or_statements = explode('|', $statement);
+          
+          $or_clause = array();
+          
+          foreach ( $or_statements as $or_statement ) {
+            
+            $or_clause[] = $this->_make_single_statement($or_statement);
+            
+            if ( end($or_clause) === false ) {                                  // parse failed, abort
+              
+              $clause = false;
+              continue 2;
             }
-            break;
-
-          default:
-            $operator = $op_char;
+            
+          }
+          
+          $clause = '(' . implode( ' OR ', $or_clause ) . ')';
+          
+        } else {
+          
+          $clause = $this->_make_single_statement($statement);
+          
         }
+        
+        if ($clause === false) continue;
 
         /*
          * don't add an 'id = 0' clause if there is a user search. This gives us a 
@@ -431,12 +414,106 @@ class PDb_List extends PDb_Shortcode {
           continue;
 
         // add the clause
-        $clauses[] = sprintf('`%s` %s %s%s%s', $column, $operator, $delimiter[0], $target, $delimiter[1]);
+        $clauses[] = $clause;
+        
       }// each $statement
       
     }// done processing shortcode filter statements
     
     return $clauses;
+  }
+  
+  /**
+   * builds a where clause from a single statement
+   * 
+   * @param string $statement a single statement drawn from the shortcode filter string
+   * @return string a MYSQL statement
+   */
+  private function _make_single_statement($statement) {
+
+    $operator = preg_match('#^([^\2]+)(\>|\<|=|!|~)(.*)$#', $statement, $matches);
+
+    if ($operator === 0)
+      return false; // no valid operator; skip to the next statement
+    
+    // get the parts
+    list( $string, $column, $op_char, $target ) = $matches;
+
+    /*
+     * if the column is not valid or if the column is being searched in by 
+     * an overriding filter, skip this statement
+     */
+    if (!Participants_Db::is_column($column) or (!empty($this->filter['value']) && $column == $this->filter['search_field'] ))
+      return false;
+
+    $field_atts = Participants_Db::get_field_atts($column);
+
+    $delimiter = array('"', '"');
+
+    /*
+     * set up special-case field types
+     */
+    if ($field_atts->form_element == 'date' and !empty($target)) {
+
+      /*
+       * if we're dealing with a date element, the target value needs to be 
+       * conditioned to get a correct comparison
+       */
+      $target = Participants_Db::parse_date($target, $field_atts);
+
+      // if we don't get a valid date, skip this statement
+      if (false === $target)
+        return false;
+
+      // if its a MySQL TIMESTAMP we must make the comparison as a string
+      if ($field_atts->group == 'internal') {
+        $target = date('Y-m-d H:i:s', $target);
+      } else {
+        $delimiter = array('CAST(', ' AS SIGNED)');
+      }
+    }
+
+    // get the proper operator
+    switch ($op_char) {
+
+      case '~':
+
+        $operator = 'LIKE';
+        $delimiter = array('"%', '%"');
+        break;
+
+      case '!':
+
+        if (empty($target)) {
+          $operator = '<>';
+          $delimiter = array("'", "'");
+        } else {
+          $operator = 'NOT LIKE';
+          $delimiter = array('"%', '%"');
+        }
+        break;
+
+      case '=':
+
+        /*
+         * if the field's exact value will be found in an array (actually a 
+         * serialized array), we must prepare a special statement to search 
+         * for the double quotes surrounding the value in the serialization
+         */
+        if (in_array($field_atts->form_element, array('multi-checkbox', 'multi-select-other'))) {
+
+          $delimiter = array('\'%"', '"%\'');
+          $operator = 'LIKE';
+        } else
+          $operator = '=';
+        break;
+
+      default:
+        $operator = $op_char;
+    }
+    
+    return sprintf('p.%s %s %s%s%s', $column, $operator, $delimiter[0], $target, $delimiter[1]);
+    
   }
 
   /**
@@ -708,7 +785,7 @@ class PDb_List extends PDb_Shortcode {
   }
 
   public function output_HTML($output = array()) {
-    return implode("\r", $output);
+    return implode(PHP_EOL, $output);
   }
 
   public function show_link($value, $template = false, $print = false) {

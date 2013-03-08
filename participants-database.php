@@ -232,13 +232,13 @@ class Participants_Db {
     if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
       PDb_Init::on_update();
 
-    // set the email content headers
+    // get the plugin options array
     if (!isset(self::$plugin_options)) {
 
       self::$plugin_options = get_option(self::$participants_db_options);
     }
     
-    self::$date_format = self::$plugin_options['date_format'];
+    self::$date_format = get_option('date_format');
 
     if (0 != self::$plugin_options['html_email']) {
       $type = 'text/html; charset="' . get_option('blog_charset') . '"';
@@ -688,22 +688,30 @@ class Participants_Db {
     return self::get_subset('persistent');
   }
 
-  // get the names of all the sortable fields
-  public function get_sortables() {
+  /**
+   * get the names of all the sortable fields
+   * 
+   * this checks the "sortable" column and collects the list of sortable columns. 
+   * If supplied, the list will be drawn from the array of field names
+   * 
+   * @param array $fields array of field to include in the list of sortables
+   * @param return array
+   */
+  public function get_sortables($fields = false) {
 
     global $wpdb;
 
-    $frontend_fields =  is_admin() ? '' : ' AND f.display_column > 0 ';
+    $field_set =  is_admin() ? '' : ' AND f.display_column > 0 ';
+    if (is_array($fields)) $field_set = $field_set . ' AND f.name IN ("' . implode('","',$fields) . '")';
 
     $sql = "
-			SELECT `name`, REPLACE(`title`,'\\\','') as title
-			FROM " . self::$fields_table . " f
-			WHERE f.sortable > 0" . $frontend_fields . '
-      ORDER BY f.display_column ASC';
+			SELECT f.name, REPLACE(f.title,'\\\','') as title
+			FROM " . self::$fields_table . " f 
+			WHERE f.sortable > 0" . $field_set;
 
     $result = $wpdb->get_results($sql, ARRAY_N);
 
-    // get the 2nd dimension of the array
+    // construct an array of this form: name => title
     $return = array();
     foreach ($result as $item)
       $return[$item[1]] = $item[0];
@@ -955,6 +963,19 @@ class Participants_Db {
           $return = $value;
 
         break;
+        
+      case 'file-upload' :
+
+        if ($html and ! empty($value)) {
+
+          $file_url = Image_Handler::concatenate_directory_path(get_bloginfo('url'), self::$plugin_options['image_upload_location']) . $value;
+          $return = self::make_link($file_url,$value);
+          break;
+        } else {
+
+          $return = $value;
+          break;
+        }
 
       case 'date' :
 
@@ -1911,6 +1932,28 @@ class Participants_Db {
    */
   private function _process_retrieval() {
     
+    /*
+     * we check a transient based on the user's IP; if the user tries more than 3 
+     * times per day to get a private ID, they are blocked for 24 hours
+     */
+    $transient = self::$css_prefix.'retrieve-count-'.str_replace('.', '', $_SERVER['REMOTE_ADDR']);
+    $count = get_transient($transient);
+    if ( $count > 0 and $count <= 3) {
+      
+      // ok, they have a few more tries...
+    } elseif ($count > 3) {
+      
+      // too many tries, come back tomorrow
+      error_log('Participants Database Plugin: IP blocked for too many retrieval attempts in 24-hour period: '. $_SERVER['REMOTE_ADDR']);
+      return;
+    } else {
+      
+      // first time through...
+      $count = 0;
+    }
+    $count++;
+    set_transient($transient,$count,(60 * 60 * 24));
+    
     $column = self::get_column(self::$plugin_options['retrieve_link_identifier']);
     
     if (!isset($_POST[$column->name])) {
@@ -2216,8 +2259,7 @@ class Participants_Db {
       // only obfuscating, not making links
       return vsprintf('%1$s AT %2$s', explode('@', $URI, 2));
     } else {
-      error_log(__METHOD__.' link:'.$link);
-      return esc_html($link); // if it is neither URL nor email address and we're not formatting it as html
+      return esc_html(empty($linktext) ? $link : $linktext); // if it is neither URL nor email address and we're not formatting it as html
     }
 
 
@@ -2282,7 +2324,7 @@ class Participants_Db {
         return false;
     }
 
-    if (!is_uploaded_file($file['tmp_name'])) {
+    if (!is_uploaded_file(realpath($file['tmp_name']))) {
 
       self::_show_validation_error(__('There is something wrong with the file you tried to upload. Try another.', 'participants-database'), $name);
 
@@ -2530,6 +2572,9 @@ class Participants_Db {
 
   /**
    * parses a date string into UNIX timestamp
+   * 
+   * this uses the IntlDateFormatter class in PHP if "strict dates" is selected to obtain a unix timestamp from a textual input. It first creates the international formatter object, to obtain a timestamp, the instantiates a DateTime object for further maniulations of the date. if either of these fails, or if "strict dates" is not selected, it falls back to using "strtotime" which cannot parse most localized time formats 
+   * 
    *
    * @param string $string      the string to parse; if not given, defaults to now
    * @param object $column_atts the column object; used to identify the field for
@@ -2538,17 +2583,31 @@ class Participants_Db {
    */
   public function parse_date($string = false, $column = '') {
 
+    error_log(__METHOD__ . ' input:' . $string . ' format: ' . self::$date_format . ' locale: '.setlocale(LC_ALL, 0));
+
     // return the now() timestamp
     if (false === $string)
       return time();
+    
+    $date = false;
 
     // it's already a timestamp; or something that looks like a timestamp but wouldn't parse anyway
     if (preg_match('#^[0-9-]+$#', $string) > 0)
       return $string;
 
-    if (self::$plugin_options['strict_dates'] and function_exists('date_create_from_format') and ( is_object($column) and $column->group != 'internal' ) ) {
+    if (self::$plugin_options['strict_dates'] == 1 and function_exists('datefmt_create') and ( is_object($column) and $column->group != 'internal' )) {
+      
+      $dateformat = empty(self::$plugin_options['input_date_format']) ? Participants_Db::get_ICU_date_format(get_option('date_format')) : self::$plugin_options['input_date_format'];
+      
+      $fmt = new IntlDateFormatter( WPLANG, IntlDateFormatter::LONG, IntlDateFormatter::NONE, NULL, NULL, $dateformat );
+      
+      error_log(__METHOD__.' format object:'.print_r($fmt,1));
+      $timestamp = $fmt->parse($string);
 
-      $date = date_create_from_format(self::$date_format, $string);
+      $date_obj = new DateTime();
+      $date_obj->setTimestamp($timestamp);
+      
+      error_log(__METHOD__.' date:'.print_r($date_obj,1));
 
       if (is_array(date_get_last_errors()) && !empty($string)) {
 
@@ -2564,12 +2623,30 @@ class Participants_Db {
           }
         }
       }
-
-      // if we have a valid date, convert to timestamp
-      if ($date)
-        $date = date_format($date, 'U');
-    } else {
-
+      if (is_object($date_obj)) {// if we have a valid date, convert to timestamp
+        $date_obj->setTime(0, 0);
+        $date = $date_obj->format($date, 'U');
+      }
+    }
+    
+    /*
+     * if we haven't got a timestamp, attempt to parse the date the regular way
+     */
+    if ( ! preg_match('/^[0-9]+$/', $date ) ){
+      
+      /*
+       * deal with the common special case of non-American-style numeric date with slashes
+       */
+      $dateformat = get_option('date_format');
+      if (false !== strpos($string,'/') ) {
+        $date_parts = explode('/',$dateformat);
+        $day_index = array_search('d',$date_parts) !== false ? array_search('d',$date_parts) : array_search('j',$date_parts);
+        $month_index = array_search('m',$date_parts) !== false ? array_search('m',$date_parts) : array_search('n',$date_parts);
+        if ( $day_index !== false && $month_index !== false && $day_index < $month_index ) {
+          $string = str_replace('/','-',$string);
+        }
+      };
+    
       $date = strtotime($string);
     }
 
@@ -2586,20 +2663,54 @@ class Participants_Db {
 
     return (float) ( $numbers[0] + ( $numbers[1] / 10 ) );
   }
+  /** 
+   * Convert a date format to a strftime format 
+   * 
+   * Timezone conversion is done for unix. Windows users must exchange %z and %Z. 
+   * 
+   * Unsupported date formats : S, n, t, L, B, G, u, e, I, P, Z, c, r 
+   * Unsupported strftime formats : %U, %W, %C, %g, %r, %R, %T, %X, %c, %D, %F, %x 
+   * 
+   * @param string $dateFormat a date format 
+   * @return string 
+   */ 
+  public static function dateFormatToStrftime($dateFormat) { 
+
+      $caracs = array( 
+          // Day - no strf eq : S 
+          'd' => '%d', 'D' => '%a', 'j' => '%e', 'l' => '%A', 'N' => '%u', 'w' => '%w', 'z' => '%j', 
+          // Week - no date eq : %U, %W 
+          'W' => '%V',  
+          // Month - no strf eq : n, t 
+          'F' => '%B', 'm' => '%m', 'M' => '%b', 
+          // Year - no strf eq : L; no date eq : %C, %g 
+          'o' => '%G', 'Y' => '%Y', 'y' => '%y', 
+          // Time - no strf eq : B, G, u; no date eq : %r, %R, %T, %X 
+          'a' => '%P', 'A' => '%p', 'g' => '%l', 'h' => '%I', 'H' => '%H', 'i' => '%M', 's' => '%S', 
+          // Timezone - no strf eq : e, I, P, Z 
+          'O' => '%z', 'T' => '%Z', 
+          // Full Date / Time - no strf eq : c, r; no date eq : %c, %D, %F, %x  
+          'U' => '%s' 
+      ); 
+
+      return strtr((string)$dateFormat, $caracs); 
+  } 
 
   /**
-   * translates the current date format option string to a jQuery UI date format string
+   * translates a PHP date() format string to an ICU format string
+   * 
+   * @param string $PHP_date_format the date format string
    *
    */
-  function get_jqueryUI_date_format($PHP_date_format = '') {
+  function get_ICU_date_format($PHP_date_format = '') {
 
-    $dateString = empty($PHP_date_format) ? self::$date_format : $PHP_date_format;
+    $dateformat = empty($PHP_date_format) ? self::$date_format : $PHP_date_format;
 
     $pattern = array(
         //day
         'd', //day of the month
-        'j', //3 letter name of the day
-        'l', //full name of the day
+        'j', //1 or 2 digit day of month
+        'l', //full name of the day of the week
         'z', //day of the year
         //month
         'F', //Month name full
@@ -2611,14 +2722,16 @@ class Participants_Db {
         'y'  //numeric year: 2 digit
     );
     $replace = array(
-        'dd', 'd', 'DD', 'o',
-        'MM', 'M', 'm', 'mm',
-        'yy', 'y'
+        'dd', 'd', 'EEEE', 'D',
+        'MMMM', 'MMM', 'M', 'MM',
+        'yyyy', 'yy'
     );
-    foreach ($pattern as &$p) {
-      $p = '/' . $p . '/';
+	$i = 1;
+    foreach ($pattern as $p) {
+      $dateformat = str_replace($p,'%'.$i.'$s',$dateformat);
+	  $i++;
     }
-    return preg_replace($pattern, $replace, $dateString);
+    return vsprintf($dateformat, $replace);
   }
   
   /**
