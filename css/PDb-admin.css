@@ -283,23 +283,44 @@ a.dragger {
 #fields-tabs {
     visibility:hidden;
 }
+.participants_db .ui-widget-content {
+  background-image: none;
+  border: none;
+  color: inherit;
+}
+.participants_db .ui-widget {
+  font-size: inherit;
+  font-family: inherit;
+}
 
-.ui-tabs-nav {
+.participants_db .ui-tabs-nav {
+	background-image: none;
+	background-color: inherit;
+	border: none;
     border-bottom: 1px solid #ccc;
-    height: 28px;
+    height: 30px;
     margin: 20px 0;
     padding: 0;
 }
-.ui-tabs-nav li {
+.participants_db .ui-tabs-nav li {
+		background-color: transparent;
+    background-image: none;
+		border:none;
     display: block;
     float: left;
     margin: 0;
 }
-.ui-tabs-nav li a {
+.participants_db .ui-tabs-nav .ui-state-default a {
+}
+.participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active a {
+	background-color: #ffffff;
+  padding-bottom: 9px;
+}
+.participants_db .ui-tabs-nav li a {
     padding: 4px 20px 6px;
     font-weight: bold;
 }
-.ui-tabs-nav li a {
+.participants_db .ui-tabs-nav li a {
     border-style: solid;
     border-color: #CCC #CCC #F9F9F9;
     border-width: 1px 1px 0;
@@ -317,26 +338,26 @@ a.dragger {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
-.ui-tabs-nav li.ui-tabs-selected a, 
-.ui-tabs-nav li.ui-state-active a,
-.ui-tabs-nav li a:focus {
+.participants_db .ui-tabs-nav li.ui-tabs-selected a, 
+.participants_db .ui-tabs-nav li.ui-state-active a,
+.participants_db .ui-tabs-nav li a:focus {
     color: #333333;
     background-color:#ffffff;
     outline:none;
 }
-.ui-tabs-panel {
+.participants_db .ui-tabs-panel {
     clear: both;
     position: relative;
     left:0;
 }
-.ui-tabs-panel h3 {
+.participants_db .ui-tabs-panel h3 {
     font: italic normal normal 24px/29px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
     margin: 0;
     padding: 0 0 5px;
     line-height: 35px;
     text-shadow: 0 1px 0 #fff;
 }
-.ui-tabs-panel h4 {
+.participants_db .ui-tabs-panel h4 {
     font-size: 15px;
     font-weight: bold;
     margin: 1em 0;
