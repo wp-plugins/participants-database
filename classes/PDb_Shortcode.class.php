@@ -90,7 +90,7 @@ abstract class PDb_Shortcode {
     Participants_Db::$shortcode_present = true;
 
     $this->module = $subclass->module;
-    $this->options = get_option(Participants_Db::$participants_db_options);
+    $this->options = Participants_Db::$plugin_options;
     $this->shortcode_class = get_class($subclass);
 
     $this->shortcode_defaults = array(
@@ -235,6 +235,21 @@ abstract class PDb_Shortcode {
     }
 
     //echo $this->error_html;
+  }
+  
+  /**
+   * gets the current errors
+   * 
+   * @return mixed an array of error messages, or bool false if no errors
+   */
+  public function get_errors() {
+
+    if (is_object(Participants_Db::$validation_errors)) {
+
+      $errors = Participants_Db::$validation_errors->get_validation_errors();
+      if ($this->_empty($errors)) return false;
+      else return $errors;
+    }
   }
 
   /*   * **************
@@ -539,6 +554,12 @@ abstract class PDb_Shortcode {
 		}
 			
 		switch ( $field->form_element ) {
+      
+      case 'text-line':
+
+        // show the default value for empty read-only text-lines
+        if ($field->readonly == 1 and $this->module == 'list' and empty($value)) $value = $field->default;
+        break;
 			
 			case 'image-upload':
 			
@@ -561,7 +582,7 @@ abstract class PDb_Shortcode {
 			case 'hidden':
 				
 				/* use the dynamic value if the shortcode is signup, otherwise only use the dynamic 
-         * value in the record module if there is no perviously set value
+         * value in the record module if there is no previously set value
 				 */
 				if ( $this->module == 'signup' or ( empty( $value ) and $this->module == 'record' ) ) $value = $this->get_dynamic_value( $field->default );
         break;

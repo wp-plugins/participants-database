@@ -143,6 +143,13 @@ class PDb_Signup extends PDb_Shortcode {
 				}
 			
 		} elseif ( $this->submitted ) {
+      
+      /*
+       * filter provides access to the freshly-stored record-- actually the whole 
+       * object so things like the email parameters can be altered. The properties 
+       * would need to be public, or we create methods to alter them
+       */
+      apply_filters('pdb_after_submit_signup', $this);
 			
 			// print the thank you note
 			$this->_thanks();

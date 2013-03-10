@@ -41,11 +41,11 @@ class FormValidation {
      * 
      */
     foreach ( array( 'invalid','empty','nonmatching','duplicate' ) as $error_type ) {
-      $this->error_messages[$error_type] = $options[$error_type.'_field_message'];
+      $this->error_messages[$error_type] = Participants_Db::$plugin_options[$error_type.'_field_message'];
     }
-		$this->error_style = $options['field_error_style'];
+		$this->error_style = Participants_Db::$plugin_options['field_error_style'];
 
-    // set the defualt error wrap HTML for the validation error feedback display
+    // set the default error wrap HTML for the validation error feedback display
     $this->error_html_wrap = array( '<div class="%s">%s</div>','<p>%s</p>' );
 
 	}
@@ -153,6 +153,9 @@ class FormValidation {
 
 	/**
 	 * adds an arbitrary error to the object
+	 * 
+	 * @param string $name field name
+	 * @param string $message message handle or liter message string
 	 */
 	public function add_error( $name, $message ) {
 		
@@ -243,8 +246,9 @@ class FormValidation {
     /*
      * set as empty any fields requiring validation
      * second condition is to allow match validation fields to be empty; they'll be tested again
+     * lastly, if the field was not submitted at all, we don't validate it
      */
-		if ( empty( $validation ) || NULL === $validation || 'no' == strtolower( $validation ) ) return;
+		if ( empty( $validation ) || NULL === $validation || 'no' == strtolower( $validation ) || $this->not_submitted($name) ) return;
 
 		elseif ( empty( $value )  && ! isset( $this->post_array[$validation] ) ) {
     
@@ -348,5 +352,33 @@ class FormValidation {
 		return ucwords( str_replace( array( '_','-' ), ' ', $string ) );
 
 	}
+  
+  /**
+   * test a field for presence in the POST array
+   * 
+   * @param string $fieldname the name of the field to test
+   * @return bool
+   */
+  public function not_submitted($fieldname) {
+    
+    return $this->post_array[$fieldname] === false;
+  }
+  /**
+   * encodes or decodes a string using a simple XOR algorithm
+   * 
+   * @param string $string the tring to be encoded/decoded
+   * @param string $key the key to use
+   * @return string
+   */
+  public function xcrypt($string,$key){
+    
+    for( $i = 0; $i < strlen($string); $i++ ) {
+      $pos = $i % strlen($key);
+      $replace = ord($string[$i]) ^ ord($key[$pos]);
+      $string[$i] = chr($replace);
+    }
+    
+    return $string;
+  }
 
 }

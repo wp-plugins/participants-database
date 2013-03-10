@@ -71,7 +71,7 @@ class PDb_List_Admin
 		
 		self::_setup_i18n();
     
-    self::$options = get_option( Participants_Db::$participants_db_options );
+    self::$options = Participants_Db::$plugin_options;
     
     get_currentuserinfo();
 
@@ -645,9 +645,12 @@ class PDb_List_Admin
                     ! empty( self::$options['single_record_page'] )
                   ) {
 								
-								$page_link = get_permalink( self::$options['single_record_page'] );
+								$url = get_permalink( self::$options['single_record_page'] );
+                $template = '<a href="%1$s" >%2$s</a>';
+                $delimiter = false !== strpos($url, '?') ? '&' : '?';
+                $url = $url . $delimiter . 'pdb='.$value['id'];
 
-                $display_value = Participants_Db::make_link( $page_link, $value[ $column ], '<a href="%1$s" >%2$s</a>', array( 'pdb'=>$value['id'] ) );
+                $display_value = sprintf($template, $url, $value[ $column ]);
 					 
               } elseif ( self::$options['make_links'] ) {
 								
@@ -715,7 +718,7 @@ class PDb_List_Admin
           <input type="hidden" name="CSV type" value="participant list" />
           <input type="hidden" name="query" value="<?php echo rawurlencode( self::$list_query )?>" />
           <?php
-          $date_string = str_replace( array( '/','#','.','\\',', ',',',' '),'-',  date_i18n( get_option( 'date_format' ) ) );
+          $date_string = str_replace( array( '/','#','.','\\',', ',',',' '),'-',  date_i18n( Participants_Db::$date_format ) );
           $suggested_filename = Participants_Db::PLUGIN_NAME.'-'.$date_string.'.csv';
           $namelength = round( strlen( $suggested_filename ) * 0.9 ) ;
           ?>

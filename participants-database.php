@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.4.9.1
+  Version: 1.4.9.2
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -96,6 +96,12 @@ class Participants_Db {
   static $CSV_enclosure = '"';
   // list of reserved field names
   public static $reserved_names = array('source', 'subsource', 'id', 'private_id', 'record_link', 'action', 'submit', 'name', 'day', 'month', 'year', 'hour', 'date', 'minute');
+  // true while sending an email
+  public static $sending_email = false;
+  // set of internationalized words
+  public static $i18n = array();
+  // the date format
+  public static $date_format;
 
   public static function initialize() {
 
@@ -236,6 +242,8 @@ class Participants_Db {
 
     self::$plugin_title = __('Participants Database', 'participants-database');
     
+    self::_set_i18n();
+    
     /*
      * checks for the need to update the DB
      * 
@@ -244,22 +252,22 @@ class Participants_Db {
     if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
       PDb_Init::on_update();
 
-    // set the email content headers
+    // get the plugin options array
     if (!isset(self::$plugin_options)) {
 
       self::$plugin_options = get_option(self::$participants_db_options);
     }
+    
+    self::$date_format = get_option('date_format');
 
-    $options = self::$plugin_options;
-
-    if (0 != $options['html_email']) {
+    if (0 != self::$plugin_options['html_email']) {
       $type = 'text/html; charset="' . get_option('blog_charset') . '"';
       //add_filter('wp_mail_content_type', array( __CLASS__, 'set_content_type'));
     } else {
       $type = 'text/plain; charset=us-ascii';
     }
     self::$email_headers = "MIME-Version: 1.0\n" .
-            "From: " . $options['receipt_from_name'] . " <" . $options['receipt_from_address'] . ">\n" .
+            "From: " . self::$plugin_options['receipt_from_name'] . " <" . self::$plugin_options['receipt_from_address'] . ">\n" .
             "Content-Type: " . $type . "\n";
 
     //self::include_scripts();
@@ -275,10 +283,7 @@ class Participants_Db {
 
     // intialize the plugin settings
     // we do this here because we need the object for the plugin menus
-    //self::$plugin_settings = new PDb_Settings();
-
     self::$plugin_settings = new PDb_Settings();
-    self::$plugin_options = get_option(self::$participants_db_options);
 
     // define the plugin admin menu pages
     add_menu_page(
@@ -459,11 +464,14 @@ class Participants_Db {
   /**
    * shows the frontend edit screen called by the [pdb_record] shortcode
    *
-   * requires the 'pid' value in the URI
+   * requires the 'pid' value in the URI or 'id' attribute in the shortcode
+   * 
+   * @param array $atts array of attributes drawn from the shortcode
+   * @return string the HTML of the record edit form
    */
   function record_edit($atts) {
 
-    $atts['id'] = isset($_GET['pid']) ? self::get_participant_id($_GET['pid']) : false;
+    $atts['id'] = isset($_GET['pid']) ? self::get_participant_id($_GET['pid']) : ( isset($atts['id']) ? $atts['id'] : false );
 
     return PDb_Record::print_form($atts);
   }
@@ -700,21 +708,30 @@ class Participants_Db {
     return self::get_subset('persistent');
   }
 
-  // get the names of all the sortable fields
-  public function get_sortables() {
+  /**
+   * get the names of all the sortable fields
+   * 
+   * this checks the "sortable" column and collects the list of sortable columns. 
+   * If supplied, the list will be drawn from the array of field names
+   * 
+   * @param array $fields array of field to include in the list of sortables
+   * @param return array
+   */
+  public function get_sortables($fields = false) {
 
     global $wpdb;
 
-    $frontend_fields =  is_admin() ? '' : ' AND `display_column` > 0 ';
+    $field_set =  is_admin() ? '' : ' AND f.display_column > 0 ';
+    if (is_array($fields)) $field_set = $field_set . ' AND f.name IN ("' . implode('","',$fields) . '")';
 
     $sql = "
-			SELECT `name`, REPLACE(`title`,'\\\','') as title
-			FROM " . self::$fields_table . "
-			WHERE `sortable` > 0" . $frontend_fields;
+			SELECT f.name, REPLACE(f.title,'\\\','') as title
+			FROM " . self::$fields_table . " f 
+			WHERE f.sortable > 0" . $field_set;
 
     $result = $wpdb->get_results($sql, ARRAY_N);
 
-    // get the 2nd dimension of the array
+    // construct an array of this form: name => title
     $return = array();
     foreach ($result as $item)
       $return[$item[1]] = $item[0];
@@ -791,6 +808,24 @@ class Participants_Db {
 
     return $wpdb->get_results($sql, ARRAY_A);
   }
+  
+  /**
+   * gets a single column object
+   * 
+   * @param string $name the column name
+   * @return object
+   */
+  public function get_column($name) {
+    
+    global $wpdb;
+    
+    $sql = 'SELECT * 
+		        FROM ' . self::$fields_table . ' f
+            WHERE f.name = %s
+            LIMIT 1';
+    
+    return $wpdb->get_row($wpdb->prepare($sql, $name));
+  }
 
   /**
    * checks a string against active columns to validate input
@@ -799,19 +834,13 @@ class Participants_Db {
 
     global $wpdb;
 
-    $sql = "SELECT f.name 
-		        FROM " . self::$fields_table . " f";
+    $sql = 'SELECT COUNT(*)
+		        FROM ' . self::$fields_table . ' f
+            WHERE f.name = %s';
 
-    $columns_info = $wpdb->get_results($sql, ARRAY_N);
+    $count = $wpdb->get_var($wpdb->prepare($sql,$string));
 
-    $columns = array();
-
-    foreach ($columns_info as $column_data) {
-
-      $columns[] = $column_data[0];
-    }
-
-    return in_array($string, $columns);
+    return $count > 0;
   }
 
   /**
@@ -939,7 +968,7 @@ class Participants_Db {
 
         $image = new PDb_Image(array('filename' => $value));
 
-        if (self::$plugin_options['make_links'] && $html)
+        if ($html)
           $return = $image->get_image_html();
 
         elseif ($image->file_exists)
@@ -952,7 +981,7 @@ class Participants_Db {
 
       case 'date' :
 
-        $return = empty($value) ? '' : date_i18n(get_option('date_format'), self::parse_date($value));
+        $return = empty($value) ? '' : date_i18n(self::$date_format, self::parse_date($value));
         break;
 
       case 'multi-checkbox' :
@@ -985,7 +1014,7 @@ class Participants_Db {
 
       case 'text-line' :
 
-        if (self::$plugin_options['make_links'] and $html) {
+        if ($html) {
 
           $return = self::make_link($value);
           break;
@@ -1134,19 +1163,17 @@ class Participants_Db {
       }
     }
 
-    $options = get_option(self::$participants_db_options);
-
     /*
      * checks for a record with a matching field so we can exercise the
      * duplicate record preference
      */
-    if ($action == 'insert' and $options['unique_email'] !== 0) {
+    if ($action == 'insert' and self::$plugin_options['unique_email'] !== 0) {
 
-      $match_field = $options['unique_field'];
+      $match_field = self::$plugin_options['unique_field'];
 
       if (isset($post[$match_field]) && !empty($post[$match_field]) && self::field_value_exists($post[$match_field], $match_field)) {
 
-        switch ($options['unique_email']) {
+        switch (self::$plugin_options['unique_email']) {
 
           case 1:
 
@@ -1172,7 +1199,7 @@ class Participants_Db {
             // go on validating the rest of the form
             break;
         }
-      } elseif ( $options['unique_email'] == 1 and 'id' == strtolower($match_field) and isset($post[$match_field]) ) {
+      } elseif ( self::$plugin_options['unique_email'] == 1 and 'id' == strtolower($match_field) and isset($post[$match_field]) ) {
         /*
          * if the "OVERWRITE" option is set to "id" and the record contains an id, use it to create the record
          */
@@ -1427,7 +1454,7 @@ class Participants_Db {
     global $current_user;
 
     if ( is_object( $current_user ) ) $default_record['by'] = $current_user->display_name;
-    $default_record['when'] = date_i18n(get_option('date_format'));
+    $default_record['when'] = date_i18n(self::$date_format);
     $default_record['private_id'] = self::generate_pid();
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
     $default_record['date_updated'] = date('Y-m-d H:i:s');
@@ -1486,10 +1513,11 @@ class Participants_Db {
    *
    * @param string $term the column to match
    * @param string $value the value to search for
+   * @param bool   $single if true, return only one ID
    *
    * @return unknown returns integer if one match, array of integers if multiple matches, false if no match
    */
-  private function _get_participant_id_by_term($term, $value) {
+  private function _get_participant_id_by_term($term, $value, $single = false) {
 
     global $wpdb;
 
@@ -1505,7 +1533,7 @@ class Participants_Db {
       $output[] = $row['id'];
     }
 
-    return count($output) > 1 ? $output : current($output);
+    return count($output) > 1 && ! $single ? $output : current($output);
   }
 
   /**
@@ -1705,8 +1733,6 @@ class Participants_Db {
   // processes any POST requests for the submitted edit page
   public static function process_page_request() {
 
-    $options = get_option(self::$participants_db_options);
-
     // only process POST arrays from this plugin's pages
     if (!isset($_POST['subsource']) or $_POST['subsource'] != self::PLUGIN_NAME or !isset($_POST['action']))
       return NULL;
@@ -1741,14 +1767,14 @@ class Participants_Db {
         // if we are submitting from the frontend, we're done
         if (!is_admin()) {
 
-          if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error('', $options['record_updated_message']);
+          if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error('', self::$plugin_options['record_updated_message']);
 
-          if ($options['send_record_update_notify_email']) {
+          if (self::$plugin_options['send_record_update_notify_email']) {
 
             $sent = wp_mail(
-                    $options['email_signup_notify_addresses'],
-                    self::proc_tags($options['record_update_email_subject'], $participant_id, 'all'),
-                    self::proc_tags($options['record_update_email_body'], $participant_id, 'all'),
+                    self::$plugin_options['email_signup_notify_addresses'],
+                    self::proc_tags(self::$plugin_options['record_update_email_subject'], $participant_id, 'all'),
+                    self::proc_tags(self::$plugin_options['record_update_email_body'], $participant_id, 'all'),
                     self::$email_headers
             );
           }
@@ -1759,15 +1785,15 @@ class Participants_Db {
         // redirect according to which submit button was used
         switch ($_POST['submit']) {
 
-          case 'Apply' :
+          case self::$i18n['apply'] :
             wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant&id=' . $participant_id);
             exit;
 
-          case 'Next' :
+          case self::$i18n['next'] :
             wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant');
             exit;
 
-          case 'Submit' :
+          case self::$i18n['submit'] :
           default :
             wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id);
             exit;
@@ -2042,7 +2068,7 @@ class Participants_Db {
 
           if (!empty($value) && is_numeric($value)) {
 
-            $value = date(get_option('date_format'), $value);
+            $value = date(self::$date_format, $value);
           }
           break;
 
@@ -2102,7 +2128,7 @@ class Participants_Db {
     // clean up the provided link string
     $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($link))));
 
-    if (filter_var($URI, FILTER_VALIDATE_URL)) {
+    if (filter_var($URI, FILTER_VALIDATE_URL) && self::$plugin_options['make_links']) {
 
       // convert the get array to a get string and add it to the URI
       if (is_array($get)) {
@@ -2111,13 +2137,13 @@ class Participants_Db {
 
         $URI .= http_build_query($get);
       }
-    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL)) {
+    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && self::$plugin_options['make_links']) {
 
       // in admin, emails are plaintext
       if (is_admin())
         return esc_html($link);
 
-      if (self::$plugin_options['email_protect']) {
+      if (self::$plugin_options['email_protect'] && ! self::$sending_email) {
 
         // the email gets displayed in plaintext if javascript is disabled; a clickable link if enabled
         list( $URI, $linktext ) = explode('@', $URI, 2);
@@ -2127,12 +2153,17 @@ class Participants_Db {
         $linktext = empty($linktext) ? $link : $linktext;
         $URI = 'mailto:' . $URI;
       }
-    } else
-      return esc_html($link); // if it is neither URL nor email address
+    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && ! self::$plugin_options['make_links'] && self::$plugin_options['email_protect'] && ! self::$sending_email) {
+      
+      // only obfuscating, not making links
+      return vsprintf('%1$s AT %2$s', explode('@', $URI, 2));
+    } else {
+      return esc_html(empty($linktext) ? $link : $linktext); // if it is neither URL nor email address and we're not formatting it as html
+    }
 
 
       
-// default template for links
+    // default template for links
     $linktemplate = $template === false ? '<a href="%1$s" >%2$s</a>' : $template;
 
     $linktext = empty($linktext) ? str_replace(array('http://', 'https://'), '', $URI) : $linktext;
@@ -2140,6 +2171,36 @@ class Participants_Db {
     //construct the link
     return sprintf($linktemplate, $URI, esc_html($linktext));
   }
+  
+  /**
+   * prepares an email address for display
+   * 
+   * this assumes the supplied string is a valid email address
+   * 
+   * @var string $email
+   * @return string HTML to display
+   */
+  private function _prep_email_for_display($email) {
+
+      // in admin, emails are plaintext
+      if (is_admin())
+        return esc_html($email);
+
+      if (self::$plugin_options['email_protect']) {
+
+        // the email gets displayed in plaintext if javascript is disabled; a clickable link if enabled
+        list( $URI, $linktext ) = explode('@', $URI, 2);
+        $template = '<a class="obfuscate" rel=\'{"name":"%1$s","domain":"%2$s"}\'>%1$s AT %2$s</a>';
+      } else {
+
+        $linktext = $email;
+        $URI = 'mailto:' . $email;
+        $template = '<a href="%1$s" >%2$s</a>' ;
+      }
+      
+      return sprintf($template, $URI, $linktext);
+    
+  } 
 
   /**
    * handles file uploads
@@ -2150,15 +2211,13 @@ class Participants_Db {
    */
   private function _handle_file_upload($name, $file) {
 
-    $options = get_option(self::$participants_db_options);
+    if ( !is_dir( Image_Handler::concatenate_directory_path( ABSPATH, self::$plugin_options['image_upload_location'] ) ) ) {
 
-    if ( !is_dir( Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) ) ) {
-
-      if (false === self::_make_uploads_dir($options['image_upload_location']))
+      if (false === self::_make_uploads_dir(self::$plugin_options['image_upload_location']))
         return false;
     }
 
-    if (!is_uploaded_file($file['tmp_name'])) {
+    if (!is_uploaded_file(realpath($file['tmp_name']))) {
 
       self::_show_validation_error(__('There is something wrong with the file you tried to upload. Try another.', 'participants-database'), $name);
 
@@ -2180,20 +2239,20 @@ class Participants_Db {
      */
     $new_filename = preg_replace(array("/\s+/", "/[^-\.\w]+/"), array("_", ""), trim($file['name']));
     $index = 1;
-    while ( file_exists(Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename) ) {
+    while ( file_exists(Image_Handler::concatenate_directory_path( ABSPATH, self::$plugin_options['image_upload_location'] ) . $new_filename) ) {
       $filename_parts = pathinfo($new_filename);
       $new_filename = preg_replace('#_[0-9]+$#','',$filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
       $index++;
     }
 
-    if ($file['size'] > $options['image_upload_limit'] * 1024) {
+    if ($file['size'] > self::$plugin_options['image_upload_limit'] * 1024) {
 
-      self::_show_validation_error(sprintf(__('The image you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), $options['image_upload_limit']),$name);
+      self::_show_validation_error(sprintf(__('The image you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), self::$plugin_options['image_upload_limit']),$name);
 
       return false;
     }
 
-    if (false === move_uploaded_file($file['tmp_name'], Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename)) {
+    if (false === move_uploaded_file($file['tmp_name'], Image_Handler::concatenate_directory_path( ABSPATH, self::$plugin_options['image_upload_location'] ) . $new_filename)) {
 
       self::_show_validation_error(__('The file could not be saved.', 'participants-database'));
 
@@ -2206,7 +2265,7 @@ class Participants_Db {
      */
 
     else
-      return /* get_bloginfo('wpurl').DIRECTORY_SEPARATOR.$options['image_upload_location']. */$new_filename;
+      return $new_filename;
   }
 
   /**
@@ -2241,21 +2300,19 @@ class Participants_Db {
    */
   public function get_record_link($PID) {
 
-    $options = get_option(self::$participants_db_options);
-
     // if the setting is not yet set, don't try to build a link
-    if (!isset($options['registration_page']) || empty($options['registration_page']))
+    if (!isset(self::$plugin_options['registration_page']) || empty(self::$plugin_options['registration_page']))
       return '';
 
     // if the setting was made in previous versions and is a slug, convert it to a post ID
-    if (!is_numeric($options['registration_page'])) {
+    if (!is_numeric(self::$plugin_options['registration_page'])) {
 
-      $options['registration_page'] = self::get_id_by_slug($options['registration_page']);
+      self::$plugin_options['registration_page'] = self::get_id_by_slug(self::$plugin_options['registration_page']);
 
-      update_option(self::$participants_db_options, $options);
+      update_option(self::$participants_db_options, self::$plugin_options);
     }
 
-    $page_link = get_permalink($options['registration_page']);
+    $page_link = get_permalink(self::$plugin_options['registration_page']);
 
     $delimiter = false !== strpos($page_link, '?') ? '&' : '?';
 
@@ -2317,15 +2374,13 @@ class Participants_Db {
       $values[] = self::prep_field_for_display($participant[$column->name], $column->form_element);
     }
 
-    $options = get_option(self::$participants_db_options);
-
     // add the "record_link" tag
     $tags[] = '[record_link]';
-    $values[] = $options['registration_page'];
+    $values[] = self::$plugin_options['registration_page'];
 
     // add the date tag
     $tags[] = '[date]';
-    $values[] = date_i18n(get_option('date_format'), self::parse_date());
+    $values[] = date_i18n(self::$date_format, self::parse_date());
     
     // add the admin record link tag
     $tags[] = '[admin_record_link]';
@@ -2422,8 +2477,26 @@ class Participants_Db {
       // if we have a valid date, convert to timestamp
       if ($date)
         $date = date_format($date, 'U');
-    } else {
-
+    }
+    
+    /*
+     * if we haven't got a timestamp, attempt to parse the date the regular way
+     */
+    if ( ! preg_match('/^[0-9]+$/', $date ) ){
+      
+      /*
+       * deal with the common special case of non-American-style numeric date with slashes
+       */
+      $dateformat = get_option('date_format');
+      if (false !== strpos($string,'/') ) {
+        $date_parts = explode('/',$dateformat);
+        $day_index = array_search('d',$date_parts) !== false ? array_search('d',$date_parts) : array_search('j',$date_parts);
+        $month_index = array_search('m',$date_parts) !== false ? array_search('m',$date_parts) : array_search('n',$date_parts);
+        if ( $day_index !== false && $month_index !== false && $day_index < $month_index ) {
+          $string = str_replace('/','-',$string);
+        }
+      };
+    
       $date = strtotime($string);
     }
 
@@ -2507,6 +2580,18 @@ class Participants_Db {
   private function _show_validation_error( $error, $name = '' ) {
     if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error($name, $error );
     else self::set_admin_message($error);
+  }
+  
+  /**
+   * sets up a few internationalization words
+   */
+  private function _set_i18n() {
+    
+    self::$i18n = array(
+        'submit' => __('Submit','participants-database'),
+        'apply' => __('Apply','participants-database'),
+        'next' => __('Next','participants-database'),
+    );
   }
 
   /**

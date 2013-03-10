@@ -362,7 +362,7 @@ class FormElement {
     
     wp_editor(
             htmlspecialchars_decode($value),
-            preg_replace( '#[0-9_-]#', '', Participants_Db::$css_prefix.$this->name ),
+            preg_replace( '#[0-9_-]#', '', Participants_Db::$css_prefix . $this->name ),
             array(
                 'media_buttons' => false,
                 'textarea_name' => $this->name,
@@ -454,7 +454,7 @@ class FormElement {
     $this->_add_option_series();
     
     // add the "other" option
-    if ( $other ) $this->_addline( '<option ' . ( ! empty( $this->value ) ? $this->_set_selected( $this->options, $this->value, 'selected', false ) : '' ) . ' value="other" >'.$otherlabel.'</option>' );
+    if ( $other ) $this->_addline( '<option ' . ( ! empty( $this->value ) ? $this->_set_selected( $this->options['other'], $this->value, 'selected', false ) : '' ) . ' value="other" >'.$otherlabel.'</option>' );
     
     $this->_addline( '</select>', -1 );
     
@@ -536,10 +536,12 @@ class FormElement {
    */
   private function _select_other( $type = 'radio' ) {
     
-    if ( $type != 'radio' ) {
-		$this->value = (array) $this->value;
-		if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
-	}
+    if ( $type == 'radio' ) {
+      $this->value = is_array($this->value) ? current($this->value) : $this->value;
+    } else {
+      $this->value = (array) $this->value;
+      if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
+    }
     
     // determine the label for the other field
     if ( isset( $this->attributes['other'] ) ) {
@@ -564,7 +566,7 @@ class FormElement {
 		
 		//error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
     $this->_addline( '<label for="'.$this->name.'">' );
-    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( $options, ( $type == 'checkbox' ? $this->value['other'] : $this->value ), 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
+    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( end($options), ( $type == 'checkbox' ? $this->value['other'] : $this->value ), 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
     $this->_addline( $otherlabel.':' );
     $this->_addline( '</label>', -1 );
     
@@ -907,23 +909,24 @@ class FormElement {
    *
    * @return string selection state string for HTML element
    */
-  private function _set_selected( $element_value, $new_value, $attribute = 'selected', $state = true ) {
+  private function _set_selected($element_value, $new_value, $attribute = 'selected', $state = true)
+  {
 
-		
-		if ( is_array( $new_value ) ) return $this->_set_multi_selected( $element_value, $new_value, $attribute, $state );
-		
-    // error_log( __METHOD__.' checking value:'.$this->_prep_comp_string($new_value).' against:'.$this->_prep_comp_string($element_value) );
+    if (is_array($new_value)) { 
+      return $this->_set_multi_selected($element_value, $new_value, $attribute, $state);
+    }
+
+    $new_value = $this->_prep_comp_string($new_value);
 
     if (
-        ( is_array( $element_value ) && ( $state === in_array( $this->_prep_comp_string( $new_value ), $this->_prep_comp_array( $element_value ) ) ) )
-          ||
-          $this->_prep_comp_string( $element_value ) == $this->_prep_comp_string( $new_value )
-         ) {
-      
-      return sprintf( ' %1$s="%1$s" ', $attribute );
-      
-    } else return '';
-    
+            ( is_array($element_value) && !empty($new_value) && ( $state === in_array($new_value, $this->_prep_comp_array($element_value)) ) )
+            ||
+            ( !empty($new_value) && $this->_prep_comp_string($element_value) == $new_value )
+    ) {
+
+      return sprintf(' %1$s="%1$s" ', $attribute);
+    } else
+      return '';
   }
 
   /**
@@ -939,6 +942,9 @@ class FormElement {
 
   /**
    * prepares an array for string comparison
+   * 
+   * @param array $array the array to prepare for comparison
+   * @return array an indexed array of prepared strings
    */
   private function _prep_comp_array( $array ) {
 
@@ -971,7 +977,7 @@ class FormElement {
 		
     //if (WP_DEBUG) error_log( __METHOD__.' checking value:'.$prepped_string.'('.$element_value.')'.' against:'.print_r($prepped_new_value_array,true).' state:'.( in_array( $prepped_string, $prepped_new_value_array)?'true':'false').' setting: '.$attribute );
 			
-		if ( $state === in_array( $prepped_string, $prepped_new_value_array ) ) return  sprintf( ' %1$s="%1$s" ', $attribute );
+		if ( ! empty($prepped_string) && $state === in_array( $prepped_string, $prepped_new_value_array ) ) return  sprintf( ' %1$s="%1$s" ', $attribute );
 		
 		else return '';
 		
@@ -1019,9 +1025,10 @@ class FormElement {
    */
   public static function format_date($timestamp) {
 
-    if ( false !== @date('r',$timestamp)) {
-      return date_i18n( get_option( 'date_format' ), Participants_Db::parse_date( $timestamp ) );
-    } else return '';
+    if ( preg_match('#^[0-9-]+$#',$timestamp) && false !== @date('r',$timestamp)) {
+      
+      return date_i18n( Participants_Db::$date_format, Participants_Db::parse_date( $timestamp ) );
+    } else return $timestamp;
     
   }
   
