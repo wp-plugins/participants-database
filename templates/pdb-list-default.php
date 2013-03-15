@@ -23,7 +23,7 @@
    * the search/sort form is only presented when enabled in the shortcode.
    *
    */
-  $this->show_search_sort_form()
+  $this->show_search_sort_form();
 
   /* LIST DISPLAY */
 ?>

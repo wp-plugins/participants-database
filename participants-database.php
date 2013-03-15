@@ -416,7 +416,7 @@ class Participants_Db {
       wp_enqueue_style('pdb-frontend');
     }
 
-    wp_register_script('pdb-shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
+    wp_register_script(self::$css_prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
     wp_register_script(self::$css_prefix.'list-filter', plugin_dir_url(__FILE__) . 'js/list-filter.js', array('jquery'));
     wp_register_script(self::$css_prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
 
@@ -432,9 +432,9 @@ class Participants_Db {
   public function add_scripts() {
 
     if (false !== self::$shortcode_present) {
-
-      wp_enqueue_script('pdb-shortcode');
-      wp_enqueue_script('jq-placeholder');
+      wp_enqueue_script('jquery');
+      wp_enqueue_script(self::$css_prefix.'shortcode');
+      wp_enqueue_script(self::$css_prefix.'jq-placeholder');
     }
   }
 
@@ -653,8 +653,8 @@ class Participants_Db {
   /**
    * get an array of groups
    *
-   * @param string $column comma-separated list of columns to get, defualts to all (*)
-   * @param mixed $exclude singe group to exclude or array of groups to exclude
+   * @param string $column comma-separated list of columns to get, defaults to all (*)
+   * @param mixed $exclude single group to exclude or array of groups to exclude
    * @return indexed array
    */
   public function get_groups($column = '*', $exclude = false) {
@@ -709,25 +709,55 @@ class Participants_Db {
   }
 
   /**
-   * get the names of all the sortable fields
+   * gets a list of field names/titles
    * 
-   * this checks the "sortable" column and collects the list of sortable columns. 
-   * If supplied, the list will be drawn from the array of field names
-   * 
-   * @param array $fields array of field to include in the list of sortables
+   * assembles a list of columns from those columns set to display. Optionally, a list of fields can be supplied with an array. This allows fields that are not displayed to be included.
+   *
+   * @param string $type   if 'sortable' will only select fields flagged as sortable  
+   * @param array  $fields array of fields to include in the list of sortables
+   * @param string $sort   sorting method to use, can be 'order' which uses the
+   *                       defined group/field order, 'column' which uses the
+   *                       current display column order or 'alpha' which sorts the
+   *                       list alphabetially; defaults to 'column'
    * @param return array
    */
-  public function get_sortables($fields = false) {
+  public function get_field_list($type = false, $fields = false, $sort = 'column') {
 
     global $wpdb;
-
-    $field_set =  is_admin() ? '' : ' AND f.display_column > 0 ';
-    if (is_array($fields)) $field_set = $field_set . ' AND f.name IN ("' . implode('","',$fields) . '")';
-
-    $sql = "
-			SELECT f.name, REPLACE(f.title,'\\\','') as title
-			FROM " . self::$fields_table . " f 
-			WHERE f.sortable > 0" . $field_set;
+    
+    $where_clauses = array();
+    if ($type == 'sortable') {
+      $where_clauses[] = 'f.sortable > 0';
+    }
+    if (is_array($fields)) {
+      $where_clauses[] = 'f.name IN ("' . implode('","',$fields) . '")';
+    } elseif (! is_admin()) {
+      $where_clauses[] = 'f.display_column > 0 ';
+    }
+    
+    switch ($sort) {
+      case 'alpha':
+        $sql = "
+          SELECT f.name, REPLACE(f.title,'\\\','') as title
+          FROM " . self::$fields_table . " f
+          WHERE " . implode(' AND ', $where_clauses) . "
+          ORDER BY f.name";
+        break;
+      case 'order':
+        $sql = "
+          SELECT f.name, REPLACE(f.title,'\\\',''), g.order as title
+          FROM " . self::$fields_table . " f
+          INNER JOIN " . self::$groups_table . " g ON f.group = g.name
+          WHERE " . implode(' AND ', $where_clauses) . "
+          ORDER BY g.order, f.order";
+        break;
+      default:
+        $sql = "
+          SELECT f.name, REPLACE(f.title,'\\\','') as title
+          FROM " . self::$fields_table . " f
+          WHERE " . implode(' AND ', $where_clauses) . "
+          ORDER BY f." . (is_admin() ? 'admin_column' : 'display_column');
+    }
 
     $result = $wpdb->get_results($sql, ARRAY_N);
 
@@ -739,7 +769,35 @@ class Participants_Db {
     return $return;
   }
 
-  // get a subset of field names; this function only works for boolean qualifiers
+  /**
+   * get the names of all the sortable fields
+   * 
+   * this checks the "sortable" column and collects the list of sortable columns
+   * from those columns set to display. Optionally, a list of fields to include
+   * can be supplied with an array. This allows fields that are not displayed to
+   * be included.
+   * 
+   * @param array  $fields array of fields to include in the list of sortables
+   * @param string $sort   sorting method to use, can be 'order' which uses the
+   *                       defined group/field order, 'column' which uses the
+   *                       current display column order or 'alpha' which sorts the
+   *                       list alphabetially; defaults to 'column'
+   * @param return array
+   */
+  public function get_sortables($fields = false, $sort = 'column') {
+
+    return self::get_field_list('sortable', $fields, $sort);
+  }
+
+  /**
+   * gets a subset of field names
+   *
+   * this function only works for boolean qualifiers or "column order" columns where
+   * any number greater than 0 indicates the field is to be displayed in a column
+   *
+   * @param string the name of the qualifier to use to select a set of field names
+   * @return array an indexed array of field names
+   */
   private function get_subset($subset) {
 
     global $wpdb;
@@ -1132,7 +1190,7 @@ class Participants_Db {
    * can either add new record or edit existing record
    * new record begins with the default values
    *
-   * @param array  $post           the array of new values
+   * @param array  $post           the array of new values (typically the $_POST array)
    * @param string $action         the db action to be performed: insert or update
    * @param mixed  $participant_id the id of the record to update. If it is false, it creates
    *                               a new record, if true, it creates or updates the default record.
@@ -2006,6 +2064,7 @@ class Participants_Db {
             'options' => array(
                 __('Not Required', 'participants-database') => 'no',
                 __('Required', 'participants-database') => 'yes',
+                __('Email','participants-database') => 'email',
             ),
             'attributes' => array('other' => 'regex/match'),
         );
@@ -2440,6 +2499,12 @@ class Participants_Db {
   /**
    * parses a date string into UNIX timestamp
    *
+   * if "strict dates" is set, this function uses the DateTime class to parse the
+   * string according to a specific format. If it is not, we use the conventional
+   * strtotime() function, with the enhancement that if the non-American style
+   * format is used with slashes "d/m/Y" the string is prepared so strtotime can
+   * parse it correctly  
+   *
    * @param string $string      the string to parse; if not given, defaults to now
    * @param object $column_atts the column object; used to identify the field for
    *                            user feedback
@@ -2451,21 +2516,23 @@ class Participants_Db {
     if (false === $string)
       return time();
 
-    // it's already a timestamp; or something that looks like a timestamp but wouldn't parse anyway
-    if (preg_match('#^[0-9-]+$#', $string) > 0)
+    // it's already a timestamp
+    if (self::is_valid_timestamp($string)) {
+      error_log(__METHOD__.' tried to parse timestamp from '. $column->name);
       return $string;
+    }
 
     if (self::$plugin_options['strict_dates'] and function_exists('date_create_from_format') and ( is_object($column) and $column->group != 'internal' ) ) {
 
-      $date = date_create_from_format(get_option('date_format'), $string);
+      $date_obj = DateTime::createFromFormat(get_option('date_format'), $string);
+      
+      $errors = DateTime::getLastErrors();
 
-      if (is_array(date_get_last_errors()) && !empty($string)) {
-
-        $errors = date_get_last_errors();
+      if (is_array($errors) && !empty($string)) {
 
         if ($errors['warning_count'] > 0 || $errors['error_count'] > 0) {
 
-          $date = false;
+          $date_obj = false;
 
           if (is_object(self::$validation_errors) and is_object($column)) {
 
@@ -2474,15 +2541,22 @@ class Participants_Db {
         }
       }
 
-      // if we have a valid date, convert to timestamp
-      if ($date)
-        $date = date_format($date, 'U');
+      /*
+       * if we have a valid date, convert to timestamp
+       */
+      if ($date_obj) {
+        /*
+         * zero the time so date equality comparisons can be made
+         */
+        $date_obj->setTime(0,0);
+        $date = $date_obj->format('U');
+      }
     }
     
     /*
-     * if we haven't got a timestamp, attempt to parse the date the regular way
+     * if we haven't got a timestamp, parse the date the regular way
      */
-    if ( ! preg_match('/^[0-9]+$/', $date ) ){
+    if ( ! isset($date) or ! self::is_valid_timestamp($date) ){
       
       /*
        * deal with the common special case of non-American-style numeric date with slashes
@@ -2501,6 +2575,16 @@ class Participants_Db {
     }
 
     return $date;
+  }
+  
+  /**
+   * validates a time stamp
+   *
+   * @param mixed $timestamp the string to test
+   * @return bool true if valid timestamp
+   */
+  public static function is_valid_timestamp($timestamp) {
+    return is_int($timestamp) or ((string) (int) $timestamp === $timestamp);
   }
 
   /**

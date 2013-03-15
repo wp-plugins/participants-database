@@ -112,12 +112,28 @@ body[class*='participants-database'] .text-block p,
 body[class*='participants-database'] .text-block li {
     line-height: 1.2;
 }
+.participants_db input[type="submit"] {
+    border: 1px solid #AAAAAA;
+    border-radius: 3px 3px 3px 3px;
+    box-shadow: 0 0 13px rgba(0, 0, 0, 0.3) inset;
+    padding: 3px 8px;
+    transition: 0.2s;
+}
+.participants_db input:hover[type="submit"] {
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.1) inset;
+}
 #delete_button.unarmed {
     opacity:0.5;
 }
 #delete_button.armed {
     border: 1px solid rgba(204, 0, 0, 0.5);
     box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
+}
+#delete_button.armed:hover {
+    box-shadow: 0 0 2px rgba(204, 0, 0, 0.1) inset;
+}
+.pdb-searchform input[type="checkbox"], .pdb-searchform input[type="radio"] {
+    margin-right: 5px;
 }
 .participants_db.settings-class .pdb_anchor {
     position:relative;

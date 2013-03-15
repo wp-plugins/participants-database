@@ -87,10 +87,10 @@ class FormElement {
   public $group;
   
   // linebreak character
-  const BR = PHP_EOL;
+  const BR = '';// PHP_EOL
   
   // tab character
-  const TAB = "\t";
+  const TAB = ''; //"\t"
   
   // holds current indent level
   private $indent;
@@ -335,8 +335,9 @@ class FormElement {
     
     $this->add_class( 'date_field' );
     
-    if (!empty($this->value))
+    if (!empty($this->value)) {
       $this->value = $this->format_date( $this->value );
+    }
     
     $this->_addline( $this->_input_tag() );
     
@@ -454,7 +455,7 @@ class FormElement {
     $this->_add_option_series();
     
     // add the "other" option
-    if ( $other ) $this->_addline( '<option ' . ( ! empty( $this->value ) ? $this->_set_selected( $this->options['other'], $this->value, 'selected', false ) : '' ) . ' value="other" >'.$otherlabel.'</option>' );
+    if ( $other ) $this->_addline( '<option ' . ( ! empty( $this->value ) ? $this->_set_selected( $this->options, $this->value, 'selected', false ) : '' ) . ' value="other" >'.$otherlabel.'</option>' );
     
     $this->_addline( '</select>', -1 );
     
@@ -566,7 +567,7 @@ class FormElement {
 		
 		//error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
     $this->_addline( '<label for="'.$this->name.'">' );
-    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( end($options), ( $type == 'checkbox' ? $this->value['other'] : $this->value ), 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
+    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( $options, ( $type == 'checkbox' ? $this->value['other'] : $this->value ), 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
     $this->_addline( $otherlabel.':' );
     $this->_addline( '</label>', -1 );
     
@@ -1021,14 +1022,19 @@ class FormElement {
    * returns an internationalized date string from a UNIX timestamp
    * 
    * @param int $timestamp a UNIX timestamp
-   * @return string a formatted date or empty string if invalid
+   * @return string a formatted date or input string if invalid
    */
   public static function format_date($timestamp) {
 
-    if ( preg_match('#^[0-9-]+$#',$timestamp) && false !== @date('r',$timestamp)) {
+    if (Participants_Db::is_valid_timestamp($timestamp)) {
       
-      return date_i18n( Participants_Db::$date_format, Participants_Db::parse_date( $timestamp ) );
-    } else return $timestamp;
+      return date_i18n( Participants_Db::$date_format, $timestamp );
+    
+    } else {
+      // not a timestamp: return unchanged
+      error_log(__METHOD__ . ': timestamp couldn\'t be formatted: ' . $timestamp);
+      return $timestamp;
+    }
     
   }
   

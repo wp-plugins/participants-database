@@ -48,8 +48,22 @@ this is a more detailed template showing how the parts of the display can be cus
       <legend><?php _e('Search', 'participants-database' )?>:</legend>
 
       <?php
-        // you can replace "false" with your own text for the "all columns" value
-        $this->column_selector( false );
+        /*
+         * there are 4 options for this function which defines which fields will be 
+         * available in the search dropdown selector:
+         *    1. "all fields" text: set the text of the default "all fields" item: 
+         *       leave it "false" to use the internationalized defualt
+         *    2. print it or return the element as a value: only use this if you 
+         *       need to alter the HTML directly. You will need to print the item for 
+         *       it to be seen. If 'true', the function prints the selector dropdown.
+         *    3. columns: supply an array of column names if you want to define the 
+         *       list of fields that can be used for searching: 'false' uses all displayed 
+         *       fields
+         *    4. sorting: you can choose to sort the list by 'column' (the order they 
+         *       appear in the table), 'alpha' (alphabetical order), or 'order' which 
+         *       uses the defined group/field order
+         */
+        $this->column_selector( false, true, false, 'column' );
       ?>
 
       <?php $this->search_form() ?>
@@ -60,6 +74,18 @@ this is a more detailed template showing how the parts of the display can be cus
     
     <fieldset class="widefat">
       <legend><?php _e('Sort by', 'participants-database' )?>:</legend>
+      
+      <?php
+      /*
+       * this function sets the fields in the sorting dropdown. It has two options:
+       *    1. columns: an array of field names to show in the sorting dropdown. If 
+       *       'false' shows default list of sortable fields as defined
+       *    2. sorting: you can choose to sort the list by 'column' (the order they 
+       *       appear in the table), 'alpha' (alphabetical order), or 'order' which 
+       *       uses the defined group/field order
+       */
+      $this->set_sortables(false, 'column');
+      ?>
 
       <?php $this->sort_form() ?>
 

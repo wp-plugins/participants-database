@@ -386,7 +386,7 @@ class PDb_List_Admin
     
   </script>
   <a id="pdb-list-admin" name="pdb-list-admin"></a>
-  <div class="wrap pdb-list">
+  <div class="wrap pdb-list participants_db">
     <h2><?php echo Participants_Db::$plugin_title?></h2>
     <h3><?php printf( _n( 'List Participants: %s record found, sorted by:', 'List Participants: %s records found, sorted by:', self::$num_records ), self::$num_records )?> 
 		<?php echo Participants_Db::column_title( self::$filter['sortBy'] ) ?>.</h3>
