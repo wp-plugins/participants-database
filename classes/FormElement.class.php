@@ -918,16 +918,19 @@ class FormElement {
     }
 
     $new_value = $this->_prep_comp_string($new_value);
-
-    if (
-            ( is_array($element_value) && !empty($new_value) && ( $state === in_array($new_value, $this->_prep_comp_array($element_value)) ) )
-            ||
-            ( !empty($new_value) && $this->_prep_comp_string($element_value) == $new_value )
-    ) {
-
-      return sprintf(' %1$s="%1$s" ', $attribute);
-    } else
-      return '';
+    $add_attribute = false;
+    // we break up the logic here so it's easier to read
+    if (!empty($new_value)) {
+      if (is_array($element_value)) {
+        if ($state === in_array($new_value, $this->_prep_comp_array($element_value))) {
+          $add_attribute = true;
+        } 
+      } elseif ($this->_prep_comp_string($element_value) == $new_value) {
+          $add_attribute = true;
+      }
+    }
+    
+    return $add_attribute ? sprintf(' %1$s="%1$s" ', $attribute) : '';
   }
 
   /**

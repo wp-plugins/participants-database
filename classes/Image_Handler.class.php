@@ -245,9 +245,12 @@ abstract class Image_Handler {
    * this is needed because on some systems file_exists() gives a false negative
    *
    * @param string $filepath a full system filepath to an image file or just a file name
+   * @return bool true if the file exists
    *
    */
   protected function _file_exists($filepath) {
+    
+    if (empty($filepath)) return false;
 
     // first use the standard function
     if (is_file($filepath)){

@@ -80,7 +80,9 @@ class PDb_Signup extends PDb_Shortcode {
 	public function __construct( $params ) {
     
 		// define shortcode-specific attributes to use
-		$add_atts = array( 'type' => 'signup' );
+		$add_atts = array(
+                      'type'   => 'signup',
+                      );
     
 		/*
      * if we're coming back from a successful form submission, the id of the new
@@ -101,6 +103,8 @@ class PDb_Signup extends PDb_Shortcode {
 		
     // run the parent class initialization to set up the parent methods 
     parent::__construct( $this, $params, $add_atts );
+    
+    $this->module = $this->shortcode_atts['type'];
     
     $this->registration_page = Participants_Db::get_record_link( $this->participant_values['private_id'] );
     
@@ -134,7 +138,7 @@ class PDb_Signup extends PDb_Shortcode {
 						 ( isset( $_GET['pid'] ) && false === Participants_Db::get_participant_id( $_GET['pid'] ) ) 
 						)
 						&&
-						$this->shortcode_atts['type'] != 'thanks'
+						$this->module == 'signup'
 					 )
 				{
 					// no submission; output the form
@@ -365,9 +369,8 @@ class PDb_Signup extends PDb_Shortcode {
   /**
    * strips the HTML out of an HTML email message body to provide the text body
    * 
-   * this is a fairly crude conversion here. I should include some kind of 
-   * library to do this properly. 
-   * 
+   * this is a fairly crude conversion here. I should include some kind of library
+   * to do this properly.
    * 
    * @param string $HTML the HTML body of the email
    * @return string

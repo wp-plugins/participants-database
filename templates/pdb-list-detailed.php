@@ -141,10 +141,10 @@ this is a more detailed template showing how the parts of the display can be cus
           <?php $value = $this->field->value; // we do this just to make the variable name shorter ?>
           <td>
           	<?php 
-						/* wrap the item in a link if it's enabled for this field: this uses
-						 * the global setting. If you want to customize the field on which to
-						 * place the link to the record detail page, change the "test" to
-						 * something like this:
+						/* wrap the item in a single record link if it's enabled for this field:
+						 * this uses the global setting. If you want to customize the field on
+						 * which to place the link to the record detail page, change the "test"
+						 * to something like this:
 						 * if ( $this->field->name == 'field_name' ) {
 						 *
 						 * if you do this, check out the case below where we make a clickable
@@ -161,35 +161,15 @@ this is a more detailed template showing how the parts of the display can be cus
                * single record by defining a read-only field with a default value
                */
               $value = empty($value) ? $this->field->default : $value;
-              
-              // create the link
-              echo Participants_Db::make_link(
-								
-								/* URL of the single record page: replace this to specify a single
-								 * record page for this template. It doesn't have to be the whole
-								 * URL, you can use just the slug or relative part of the page URL
-								 * like this: '/single-record', Be sure to quote literal values and
-								 * include the comma at the end.
-                 * 
-                 * it's also possible to define the link in the shortcode like this 
-                 * [pdb_list single_record_link=single-page] if your [pdb_single] 
-                 * shortcode is on a page named 'single-page'.
-								 */
-                $single_record_link,
-								
-								// field value
-                $value,
-								
-								/* template for building the link: this would be the place to include
-								 * anything special you want to add to the link
-								 */
-                '<a href="%1$s" title="%2$s" >',
-								
-								/* record ID to get the record. You can add other variables to the link
-								 * if you want by adding more name/value pairs to the array
-								 */
-                array( 'pdb'=>$this->field->record_id )
-              );
+							
+							// add the record ID to the single record link
+							$single_record_uri = Participants_Db::add_uri_conjunction($single_record_link) . 'pdb=' . $this->record->record_id;
+							
+							/*
+							 * print the opening tag of the single record link
+							 */
+							echo '<a class="single-record-link" href="' . $single_record_uri . '" >';
+							
             } ?>
 
             <?php /*

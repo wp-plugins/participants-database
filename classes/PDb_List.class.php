@@ -44,8 +44,6 @@ class PDb_List extends PDb_Shortcode {
   var $registration_page_url;
   // holds the url to the single record page
   var $single_record_url = false;
-  // holds the columns to display in the list
-  var $display_columns;
   // holds the list of sortable columns
   var $sortables;
   // holds the parameters for a shortcode-called display of the list
@@ -98,8 +96,6 @@ class PDb_List extends PDb_Shortcode {
     //error_log( __METHOD__.' '.print_r( $this,1 ));
 
     $this->registration_page_url = get_bloginfo('url') . '/' . ( isset($this->options['registration_page']) ? $this->options['registration_page'] : '' );
-
-    $this->_set_display_columns();
 
     $this->sortables = Participants_Db::get_sortables($this->display_columns);
 
@@ -193,13 +189,19 @@ class PDb_List extends PDb_Shortcode {
     // instantiate the pagination object
     $this->pagination = new PDb_Pagination($pagination_defaults);
 
+    // allow the query to be altered before the records are retrieved
+    $list_query = $this->list_query . ' ' . $this->pagination->getLimitSql();
+    apply_filters('pdb_list_query',$list_query);
     /*
      * get the records for this page, adding the pagination limit clause
      *
      * this gives us an array of objects, each one a set of field->value pairs
      */
-    $records = $wpdb->get_results($this->list_query . ' ' . $this->pagination->getLimitSql(), OBJECT);
+    $records = $wpdb->get_results($list_query, OBJECT);
 
+    /*
+     * build an array of record objects, indexed by ID
+     */
     foreach ($records as $record) {
 
       $id = $record->id;
@@ -743,7 +745,7 @@ class PDb_List extends PDb_Shortcode {
    * @return NULL just sets the sortables property
    */
   public function set_sortables($columns = false, $sort = 'column') {
-    if ($columns !== false or $sort != 'column') {
+    if($columns !== false or $sort != 'column') {
     	$this->sortables = Participants_Db::get_sortables($columns,$sort);
     }
   }
@@ -789,32 +791,32 @@ class PDb_List extends PDb_Shortcode {
    * sets the columns to display in the list
    *
    */
-  private function _set_display_columns() {
-
-    // allow for an arbitrary fields definition list in the shortcode
-    if (!empty($this->shortcode_atts['fields'])) {
-
-      $raw_list = explode(',', str_replace(array("'", '"', ' ', "\r"), '', $this->shortcode_atts['fields']));
-
-      if (is_array($raw_list)) :
-
-        //clear the array
-        $this->display_columns = array();
-
-        foreach ($raw_list as $column) {
-
-          if (Participants_Db::is_column($column)) {
-
-            $this->display_columns[] = $column;
-          }
-        }
-
-      endif;
-    } else {
-
-      $this->display_columns = Participants_Db::get_list_display_columns('display_column');
-    }
-  }
+//  private function _set_display_columns() {
+//
+//    // allow for an arbitrary fields definition list in the shortcode
+//    if (!empty($this->shortcode_atts['fields'])) {
+//
+//      $raw_list = explode(',', str_replace(array("'", '"', ' ', "\r"), '', $this->shortcode_atts['fields']));
+//
+//      if (is_array($raw_list)) :
+//
+//        //clear the array
+//        $this->display_columns = array();
+//
+//        foreach ($raw_list as $column) {
+//
+//          if (Participants_Db::is_column($column)) {
+//
+//            $this->display_columns[] = $column;
+//          }
+//        }
+//
+//      endif;
+//    } else {
+//
+//      $this->display_columns = Participants_Db::get_list_display_columns('display_column');
+//    }
+//  }
 
   /**
    * get the column form element type

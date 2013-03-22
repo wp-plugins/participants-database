@@ -1331,10 +1331,10 @@ class Participants_Db {
 
         default :
 
-          // replace null value with the default if defined
-          if (NULL === @$post[$column_atts->name]) {
+          // replace unsubmitted fields with the default if defined
+          if (NULL === @$post[$column_atts->name] and ! empty($column_atts->default)) {
 
-            $new_value = empty($column_atts->default) ? false : $column_atts->default;
+            $new_value = $column_atts->default;
             $post[$column_atts->name] = $new_value;
           }
 
@@ -1387,7 +1387,8 @@ class Participants_Db {
             $new_value = wp_kses(stripslashes($post[$column_atts->name]), $allowedposttags);
           } elseif ('date' == $column_atts->form_element) {
 
-            $date = self::parse_date($post[$column_atts->name], $column_atts);
+            $date = false;
+            if (isset($post[$column_atts->name])) $date = self::parse_date($post[$column_atts->name], $column_atts);
 
             $new_value = $date ? $date : NULL;
           } elseif ('password' == $column_atts->form_element) {
@@ -1811,16 +1812,30 @@ class Participants_Db {
 
       case 'update':
       case 'insert':
+    
+        /*
+         * set the raw post array filters. We use a copy of the POST array so that
+         * certain values will remain untouched
+         */
+        $post_data = $_POST;
+        $wp_filter = 'pdb_before_submit_' . ($_POST['action'] == 'insert' ? 'signup' : 'update');
+        apply_filters($wp_filter,$post_data);
 
         $id = isset($_POST['id']) ? $_POST['id'] : ( isset($_GET['id']) ? $_GET['id'] : false );
 
-        $participant_id = self::process_form($_POST, $_POST['action'], $id);
+        $participant_id = self::process_form($post_data, $_POST['action'], $id);
 
         if (false === $participant_id) {
 
           // we have errors; go back to form and show errors
           return;
         }
+        
+        /*
+         * set the stored record hook.
+         */
+        $wp_hook = 'pdb_after_submit_' . ($_POST['action'] == 'insert' ? 'signup' : 'update');
+        do_action($wp_hook,self::get_participant($partcipant_id));
 
         // if we are submitting from the frontend, we're done
         if (!is_admin()) {
@@ -1929,13 +1944,6 @@ class Participants_Db {
         return $data;
 
       case 'signup' :
-
-        /* if someone signs up with an email that already exists, we update that
-         * record rather than let them create a new record. This gives us a method
-         * for dealing with people who have lost their access link, they just sign
-         * up again with the same email, and their access link will be emailed to
-         * them. This is handled by the Participants_Db::process_form method.
-         */
 
         $_POST['private_id'] = self::generate_pid();
 
@@ -2173,7 +2181,11 @@ class Participants_Db {
   }
 
   /**
-   * outputs a link in specified format
+   * outputs a link (HTML anchor tag) in specified format if enabled by "make_links"
+   * option
+   *
+   * this func validates the link as being either an email addres or URI, then
+   * (if enabled) builds the HTML and returns it
    * 
    * @param string $link the URI
    * @param string $linktext the clickable text (optional)
@@ -2229,6 +2241,19 @@ class Participants_Db {
 
     //construct the link
     return sprintf($linktemplate, $URI, esc_html($linktext));
+  }
+  
+  /**
+   * adds the URL conjunction to a GET string
+   *
+   * @param string $URI the URI to which an get string is to be added
+   *
+   * @return string the URL with the conjunction character appended
+   */
+  public function add_uri_conjunction($URI) {
+    
+    return $URI . ( false !== strpos($URI, '?') ? '&' : '?');
+  
   }
   
   /**
@@ -2373,9 +2398,7 @@ class Participants_Db {
 
     $page_link = get_permalink(self::$plugin_options['registration_page']);
 
-    $delimiter = false !== strpos($page_link, '?') ? '&' : '?';
-
-    return $page_link . $delimiter . 'pid=' . $PID;
+    return self::add_uri_conjunction($page_link) . 'pid=' . $PID;
   }
   
   /**
