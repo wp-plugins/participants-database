@@ -211,6 +211,7 @@ You can no doubt come up with many variations on this.
 * more control over search/sort dropdowns in the list display (see template)
 * list shortcode filters now correctly filter multi-select fields
 * lists may now be sorted by more than one field in the shortcode
+* list shortcode filter statements may now include "or" operators
 * read-only text fields show the default value when empty
 * adds several API hooks and filters
 * mbstring functions are now tested present before use: multi-byte strings are really only needed for non-western language sites
@@ -563,7 +564,7 @@ If you want to get tricky with the CSS, each header column has a class name that
 
 **Searching and Sorting The List**
 
-You can activate list searching and/or sorting for your users with tese attributes: `[pdb_list search="true"]` or `[pdb_list sort="true"]` These attributes will enable a search form and/or sort form displayed above the list. The user can select which field they want to search through a dropdown and type in a search term. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
+You can activate list searching and/or sorting for your users with these attributes: `[pdb_list search="true"]` or `[pdb_list sort="true"]` These attributes will enable a search form and/or sort form displayed above the list. The user can select which field they want to search through a dropdown and type in a search term. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
 
 There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
 
@@ -583,7 +584,9 @@ The operators can be '=', '!', '<', '>' and '~' only. '!' means "NOT", so if you
 
 You can use more than one filter by stringing them together like this: `[pdb_list filter='last_name>c&last_name<h' ]` (note ampersand between filter statements) This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
 
-To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date values should be a regular date string like this: `[pdb_list filter='date>jan3,2012']` It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers. If you really want to use numbers for the date, just try it to see what the correct order for your web server is.
+It's now also possible to use an "or" operator to link statements, indicated by the "|" character. For instance if you wanted to show all records with a city of Boston or Providence, you would use `[pdb_list filter="city=boston|city=providence"]` and they can be combined: `[pdb_list filter="last_name=smith&city=boston|city=providence"]`
+
+To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date values should be a regular date string like this: `[pdb_list filter='date>jan3,2012']` It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers.
 
 The "Strict Date Format" setting affects how the shortcode filters are interpreted, so if this is checked, the date format in your filter argument must match the date format set in your WP General Settings.
 
@@ -626,6 +629,8 @@ If you want to customize your template, copy the template file you want to use a
 Template files use the naming convention: pdb-{shortcode name}-{template name}.php. So, for instance, the default template for the `[pdb_signup]` shortcode is "pdb-signup-default.php" If you want to create your own template file, you would rename it something like: "pdb-signup-mytemplate.php" then, call it in the shortcode like this: `[pdb_signup template="mytemplate"]`.
 
 The default template files include comments to help you develop your own templates easily.
+
+I have created a help page for custom templates which includes a tutorial: http://xnau.com/pdb-templates/
 
 = Single Record Templates =
 

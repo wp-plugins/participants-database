@@ -255,14 +255,18 @@ class FormValidation {
      * 
      * if a custom validation is implemented, the $field->error_type must be set 
      * to a validation method key string so the built-in validation won't be 
-     * applied. This key string will be used to select the error message from 
-     * the $error_messages array
-     * 
-     * the $error_messages array is also supplied so a custom error message can 
-     * be added
+     * applied. This key string is an arbitrary unique key, so if can be anything 
+     * except a string that is already defined.
      * 
      */
-    apply_filters('pdb_before_validate_field', $field, $this->error_messages );
+    apply_filters('pdb_before_validate_field', $field );
+    /*
+     * this filter provides an opportunity to add or modify validation error messages
+     * 
+     * for example, if there is a custom validation that generates an error type of 
+     * "custom" an error message with a key of "custom" will be shown if it fails.
+     */
+    apply_filters('pdb_validation_error_messages', $this->error_messages);
 		
 		/*
 		 * set the validation to FALSE if it is not defined or == 'no'
