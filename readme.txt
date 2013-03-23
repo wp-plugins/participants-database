@@ -84,6 +84,8 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * Italian: Mario Conte
 
+* French: Dominique Chapelle
+
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
 == Installation ==
@@ -202,6 +204,16 @@ You can no doubt come up with many variations on this.
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.4.9.2 =
+* improved date formatting for numeric non-American style dates (dd/mm/yyyy)
+* fields omitted from the signup form are no longer validated, making it easier to construct different signup forms
+* more control over search/sort dropdowns in the list display (see template)
+* list shortcode filters now correctly filter multi-select fields
+* lists may now be sorted by more than one field in the shortcode
+* read-only text fields show the default value when empty
+* adds several API hooks and filters
+* mbstring functions are now tested present before use: multi-byte strings are really only needed for non-western language sites
 
 = 1.4.9.1 =
 Taking defensive precautions against other plugins in the admin:

@@ -1,4 +1,11 @@
 <div class="text-block">
+<?php
+$langfile = ABSPATH . 'wp-content/plugins/' . Participants_Db::PLUGIN_NAME . '/languages/setup_guide-' . WPLANG . '.html';
+if (file_exists($langfile)) {
+  $text = file_get_contents($langfile);
+  echo wpautop($text);
+} else {
+?>
 <h1>Participants Database<br />Quick Setup Guide</h1>
 <h2>Initial Setup</h2>
 <p>There are several settings that must be set for many of the plugin's functions to work. On this page, I will walk you through getting the plugin set up and running on your site. The first thing you will want to do is have a general idea of how you want the plugin to work, what information you need to gather and store and how your users will see and interact with that information. </p>
@@ -23,4 +30,5 @@
 <li>Next, set the &#8220;Single Record Page&#8221; setting to point to the page where you put the &#8220;&#91;pdb_single]&#8221; shortcode.</li>
 </ol>
 <p>Now, go to the &#8220;Add Participant&#8221; page in the admin and enter a test record. You can now test the plugin functions to see how it all works.</p>
+<?php } ?>
 </div>

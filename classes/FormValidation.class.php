@@ -246,90 +246,107 @@ class FormValidation {
 	private function _validate_field( $value, $name, $validation = NULL, $form_element = false ) {
 
     $error_type = false;
+    
+    $field = (object) compact('value','name','validation','form_element','error_type');
+    
+    /*
+     * this filter sends the $field object through a filter to allow a custom 
+     * validation to be inserted
+     * 
+     * if a custom validation is implemented, the $field->error_type must be set 
+     * to a validation method key string so the built-in validation won't be 
+     * applied. This key string will be used to select the error message from 
+     * the $error_messages array
+     * 
+     * the $error_messages array is also supplied so a custom error message can 
+     * be added
+     * 
+     */
+    apply_filters('pdb_before_validate_field', $field, $this->error_messages );
 		
 		/*
 		 * set the validation to FALSE if it is not defined or == 'no'
 		 */
-		if (empty($validation) || $validation === NULL || $validation == 'no') $validation = FALSE;
+		if (empty($field->validation) || $field->validation === NULL || $field->validation == 'no') $field->validation = FALSE;
     
     if (WP_DEBUG) { error_log(__METHOD__.'
 		field: '.$name.'
-		value: '.(is_array($value)? print_r($value,1):$value).'
-		validation: '.(is_bool($validation)? ($validation ? 'true' : 'false') : $validation).'
+		value: '.(is_array($field->value)? print_r($field->value,1):$field->value).'
+		validation: '.(is_bool($field->validation)? ($field->validation ? 'true' : 'false') : $field->validation).'
 		submitted? '.($this->not_submitted($name)?'no' : 'yes').'
-		empty? '.($this->is_empty($value)?'yes':'no')); }
+		empty? '.($this->is_empty($field->value)?'yes':'no')); }
 
     /*
      * first we check if the field needs to be validated at all. Fields not present
      * in the form are excluded as well as any field with no validation method
      * defined, or a validation method of 'no'.
      */
-		if ( $validation === FALSE || $this->not_submitted($name) ) return;
+		if ( $field->validation === FALSE || $this->not_submitted($name) ) return;
 		/*
 		 * if the validation method is 'yes' we test the submitted field for empty using a defined method that
 		 * allows 0, but no whitespace characters.
 		 */
-		elseif ( $validation == 'yes' ) {
+		elseif ( $field->validation == 'yes' ) {
 			
-			if ( $form_element === false and $this->is_empty($value)	) {
+			if ( $field->form_element === false and $this->is_empty($field->value)	) {
 				
-				$error_type = 'empty';
+				$field->error_type = 'empty';
 				
 			} else {
 				// we can validate each form element differently here
-				switch ($form_element) {
+				switch ($field->form_element) {
 					case 'link':
-						if ($this->is_empty($value[0])) {
-							$error_type = 'empty';
+						if ($this->is_empty($field->value[0])) {
+							$field->error_type = 'empty';
 						}
 						break;
 					default:
-						if ($this->is_empty($value)) {
-							$error_type = 'empty';
+						if ($this->is_empty($field->value)) {
+							$field->error_type = 'empty';
 						}
 				}
 			}
     
     /*
-		 * here we process the specific validation method set for the field
+		 * here we process the remaining validation methods set for the field
 		 */
-    } else {
+    } elseif ($field->error_type === false) {
 
       $regex = false;
       $test_value = false;
       switch (true) {
   
-        case ( $validation == 'email' ) :
+        case ( $field->validation == 'email' ) :
   
           $regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
           break;
   
-        case ( $this->_is_regex( $validation ) ) :
+        case ( $this->_is_regex( $field->validation ) ) :
   
-          $regex = $validation;
+          $regex = $field->validation;
           break;
         
         /*
          * if it's not a regex, test to see if it's a valid field name for a match test
          */
-        case ( isset( $this->post_array[$validation] ) ) :
+        case ( isset( $this->post_array[$field->validation] ) ) :
           
-          $test_value = $this->post_array[$validation];
+          $test_value = $this->post_array[$field->validation];
           break;
         
         default:
   
       }
   
-      if ( false !== $test_value && $value !== $test_value ) {
-        $error_type = 'nonmatching';
-      } elseif ( false !== $regex && preg_match( $regex, $value ) == 0 ) {
-        $error_type = 'invalid';
+      if ( false !== $test_value && $field->value !== $test_value ) {
+        $field->error_type = 'nonmatching';
+      } elseif ( false !== $regex && preg_match( $regex, $field->value ) == 0 ) {
+        $field->error_type = 'invalid';
       } 
       
     }
     
-    if ( $error_type ) $this->_add_error( $name, $error_type );
+    if ( $field->error_type ) $this->_add_error( $name, $field->error_type );
 
 	}
 
