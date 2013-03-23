@@ -73,9 +73,9 @@ input[type="checkbox"],
   float: left;
   margin-right: 10px;
 }
-.inline-controls input[type='text'],
-.inline-controls input[type='checkbox'],
-.inline-controls select {
+.participants_db .inline-controls input[type='text'],
+.participants_db .inline-controls input[type='checkbox'],
+.participants_db .inline-controls select {
   float: none;
   display: inline;
   margin-right:0;

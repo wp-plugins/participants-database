@@ -1,0 +1,1684 @@
+# Copyright (C) 2013 Participants Database
+# This file is distributed under the same license as the Participants Database package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Participants Database 1.4.9.2\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/participants-database\n"
+"POT-Creation-Date: 2013-03-22 22:04:46+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2013-02-04 21:00+0100\n"
+"Last-Translator: Dominique Chapelle <dominique.chapelle@gmail.com>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: classes/CSV_Import.class.php:58
+msgid "The file %s has been uploaded."
+msgstr "Le fichier %s a bien été chargé"
+
+#: classes/CSV_Import.class.php:64
+msgid "%s record added"
+msgid_plural "%s records added"
+msgstr[0] "%s entrée ajoutée"
+msgstr[1] "%s entrées ajoutées"
+
+#: classes/CSV_Import.class.php:68
+msgid "%s matching record updated"
+msgid_plural "%s matching records updated"
+msgstr[0] "%s entrée correspondante mise à jour"
+msgstr[1] "%s entrées correspondantes mises à jour"
+
+#: classes/CSV_Import.class.php:73
+msgid "%s duplicate record skipped"
+msgid_plural "%s duplicate records skipped"
+msgstr[0] "%s entrée redondante omise"
+msgstr[1] "%s entrées redondantes omises"
+
+#: classes/CSV_Import.class.php:77
+msgid "Zero records imported"
+msgstr "Aucune entrée importée"
+
+#: classes/CSV_Import.class.php:82
+msgid ""
+"There was an error uploading the file. This could be a problem with "
+"permissions on the uploads directory."
+msgstr "Echec du chargement de fichier. Cela peut venir d'un problème de droits sur le répertoire d'upload."
+
+#: classes/CSV_Import.class.php:82 classes/CSV_Import.class.php:88
+msgid "Destination"
+msgstr "Destination"
+
+#: classes/CSV_Import.class.php:88
+msgid ""
+"Target directory does not exist and could not be created. Try creating it "
+"manually."
+msgstr ""
+"Le répertoire cible n'existe pas et n'a pas pu être créé. "
+"Tentez de le créer manuellement."
+
+#. translators: the %s will be the name of the file
+#: classes/CSV_Import.class.php:142
+msgid "Error occured while trying to add the data to the database"
+msgstr "Erreur en essayant d'ajouter les données dans la base"
+
+#: classes/CSV_Import.class.php:142
+msgid ""
+"Input file does not exist or path is incorrect.<br />Attempted to load: %s"
+msgstr ""
+"Le fichier à importer n'a pas pu être trouvé à l'endroit indiqué: %s"
+
+#: classes/CSV_Import.class.php:188
+msgid ""
+"The number of items in line %s is incorrect.<br />There are %s and there "
+"should be %s."
+msgstr ""
+"Le nombre d'éléments dans la ligne %s est incorrect.<br />Il y "
+"en a %s au lieu de %s attendu."
+
+#: classes/CSV_Import.class.php:197
+msgid "Number of values does not match number of columns"
+msgstr "Le nombre de valeurs et de colonnes ne correspondent pas"
+
+#: classes/CSV_Import.class.php:286
+msgid "New columns imported from the CSV file."
+msgstr "Nouvelles colonnes importées depuis le fichier CSV"
+
+#: classes/FormElement.class.php:150
+msgctxt "indicates a write-in choice"
+msgid "other"
+msgstr "autre"
+
+#: classes/FormElement.class.php:151
+msgctxt "indicates the text to be clicked to go to another web page"
+msgid "Link Text"
+msgstr "Texte du lien"
+
+#: classes/FormElement.class.php:734 manage_fields.php:386
+msgid "delete"
+msgstr "détruire"
+
+#: classes/PDb_List.class.php:598 templates/pdb-list-bootstrap.php:34
+#: templates/pdb-list-detailed.php:32
+msgid "Please select a column to search in."
+msgstr "Choisissez une colonne pour la recherche SVP."
+
+#: classes/PDb_List.class.php:599 templates/pdb-list-bootstrap.php:35
+#: templates/pdb-list-detailed.php:33
+msgid "Please type in something to search for."
+msgstr "Entrez ce que vous recherchez SVP."
+
+#: classes/PDb_List.class.php:607 templates/pdb-list-bootstrap.php:45
+#: templates/pdb-list-detailed.php:48
+msgid "Search"
+msgstr "Rechercher"
+
+#: classes/PDb_List.class.php:622 classes/PDb_List_Admin.class.php:455
+#: templates/pdb-list-bootstrap.php:62 templates/pdb-list-detailed.php:76
+msgid "Sort by"
+msgstr "Trier par"
+
+#: classes/PDb_List.class.php:674 classes/PDb_List_Admin.class.php:415
+msgid "show all"
+msgstr "tout afficher"
+
+#: classes/PDb_List.class.php:723 classes/PDb_List_Admin.class.php:471
+#: classes/PDb_Settings.class.php:297
+msgid "Ascending"
+msgstr "Croissant"
+
+#: classes/PDb_List.class.php:724 classes/PDb_List_Admin.class.php:472
+#: classes/PDb_Settings.class.php:297
+msgid "Descending"
+msgstr "Décroissant"
+
+#. translators: the following 5 strings are used in logic matching, please test
+#. after translating in case special characters cause problems
+#: classes/PDb_List.class.php:1105 classes/PDb_List_Admin.class.php:785
+msgctxt "submit button label"
+msgid "Delete Checked"
+msgstr "Détruire selection"
+
+#: classes/PDb_List.class.php:1106 classes/PDb_List_Admin.class.php:786
+msgctxt "submit button label"
+msgid "Change"
+msgstr "Modifier"
+
+#: classes/PDb_List.class.php:1107 classes/PDb_List_Admin.class.php:787
+msgctxt "submit button label"
+msgid "Sort"
+msgstr "Trier"
+
+#: classes/PDb_List.class.php:1108 classes/PDb_List_Admin.class.php:788
+msgctxt "submit button label"
+msgid "Filter"
+msgstr "Filtrer"
+
+#: classes/PDb_List.class.php:1109 classes/PDb_List_Admin.class.php:789
+msgctxt "submit button label"
+msgid "Clear"
+msgstr "Effacer"
+
+#: classes/PDb_List.class.php:1110 classes/PDb_List_Admin.class.php:790
+msgctxt "search button label"
+msgid "Search"
+msgstr "Rechercher"
+
+#: classes/PDb_List_Admin.class.php:119
+msgctxt "noun; page number indicator"
+msgid "Page"
+msgstr "Page"
+
+#: classes/PDb_List_Admin.class.php:329
+msgid "Do you really want to delete the selected record?"
+msgstr "Voulez-vous vraiment détruire l'entrée sélectionnée?"
+
+#: classes/PDb_List_Admin.class.php:330
+msgid "Do you really want to delete the selected records?"
+msgstr "Voulez-vous vraiment détruire les entrées sélectionnées?"
+
+#: classes/PDb_List_Admin.class.php:391
+msgid "List Participants: %s record found, sorted by:"
+msgid_plural "List Participants: %s records found, sorted by:"
+msgstr[0] "Liste des participants: % entrée trouvée, triée par:"
+msgstr[1] "Liste des participants: % entrées trouvées, triées par:"
+
+#: classes/PDb_List_Admin.class.php:412
+msgid "Show only records with"
+msgstr "Afficher seulement les entrées contenant"
+
+#: classes/PDb_List_Admin.class.php:439
+msgid "is"
+msgstr "est"
+
+#: classes/PDb_List_Admin.class.php:440
+msgid "is not"
+msgstr "n'est pas"
+
+#: classes/PDb_List_Admin.class.php:441
+msgid "contains"
+msgstr "contient"
+
+#: classes/PDb_List_Admin.class.php:442
+msgid "doesn&#39;t contain"
+msgstr "ne contient pas"
+
+#: classes/PDb_List_Admin.class.php:443
+msgid "is greater than"
+msgstr "supérieur à"
+
+#: classes/PDb_List_Admin.class.php:444
+msgid "is less than"
+msgstr "inférieur à"
+
+#: classes/PDb_List_Admin.class.php:505
+msgid "Show %s items per page."
+msgstr "Afficher %s éléments par page."
+
+#: classes/PDb_List_Admin.class.php:561
+msgid "Edit"
+msgstr "Editer"
+
+#: classes/PDb_List_Admin.class.php:696 templates/pdb-list-detailed.php:291
+msgid "No records found"
+msgstr "Aucune entrée trouvée"
+
+#: classes/PDb_List_Admin.class.php:714
+msgid "Export CSV"
+msgstr "Exporter en CSV"
+
+#: classes/PDb_List_Admin.class.php:726
+msgid "File Name"
+msgstr "Nom du fichier"
+
+#: classes/PDb_List_Admin.class.php:728
+msgid "Download CSV for this list"
+msgstr "Télécharger CSV pour cette liste"
+
+#: classes/PDb_List_Admin.class.php:731
+msgid ""
+"This will download the whole list of participants that match your search "
+"terms, and in the order specified by the sort. The export will include "
+"records on all list pages. The fields included in the export are defined in "
+"the \"CSV\" column on the Manage Database Fields page."
+msgstr ""
+"Ceci téléchargera la liste des participants correspondant à votre recherche, "
+"et dans l'ordre spécifié par le tri. L'export comprendra des entrées pour "
+"toutes les pages de la liste. Les champs inclus sont définis dans la "
+"colonne \"CSV\" de la page Gestion des champs de la base."
+
+#. translators: uses the check symbol in a phrase that means "check all"
+#: classes/PDb_List_Admin.class.php:746
+msgid "all"
+msgstr "tout"
+
+#: classes/PDb_Pagination.class.php:350
+msgid "First"
+msgstr "Premier"
+
+#: classes/PDb_Pagination.class.php:359
+msgid "Previous"
+msgstr "Précédent"
+
+#: classes/PDb_Pagination.class.php:376 participants-database.php:2700
+msgid "Next"
+msgstr "Suivant"
+
+#: classes/PDb_Pagination.class.php:385
+msgid "Last"
+msgstr "Dernier"
+
+#: classes/PDb_Settings.class.php:17
+msgid "General Settings"
+msgstr "Réglages généraux"
+
+#: classes/PDb_Settings.class.php:18
+msgid "Signup Form Settings"
+msgstr "Réglages page d'inscription"
+
+#: classes/PDb_Settings.class.php:19
+msgid "Record Form Settings"
+msgstr "Réglages formulaire détaillé"
+
+#: classes/PDb_Settings.class.php:20
+msgid "List Display Settings"
+msgstr "Réglages d'affichage de liste"
+
+#: classes/PDb_Settings.class.php:24
+msgid ""
+"Settings for the [pdb_record] shortcode, which is used to show a user-"
+"editable form on the website."
+msgstr ""
+"Réglages pour le shortcode [pdb_record], utilisé pour afficher "
+"le formulaire éditable en ligne par l'utilisateur."
+
+#: classes/PDb_Settings.class.php:25
+msgid ""
+"Settings for the [pdb_list] shortcode, which is used to show a list of "
+"records from the database."
+msgstr ""
+"Réglages pour le shortcode [pdb_list], utilisé pour afficher une liste "
+"d'entrées provenant de la base."
+
+#: classes/PDb_Settings.class.php:26
+msgid ""
+"Settings for the [pdb_signup] shortcode, which is used to show a signup or "
+"registration form on the website."
+msgstr ""
+"Réglages pour le shortcode [pdb_signup], utilisé pour afficher un "
+"formulaire d'inscription en ligne."
+
+#: classes/PDb_Settings.class.php:33
+msgid "Save Plugin Settings"
+msgstr "Enregistrer les réglages du plugin"
+
+#: classes/PDb_Settings.class.php:59
+msgid "File Upload Location"
+msgstr "Emplacement des fichiers (upload)"
+
+#: classes/PDb_Settings.class.php:63
+msgid ""
+"This defines where the uploaded files will go, relative to the WordPress "
+"root. The default location is '/wp-content/uploads/participants-"
+"database'<br />Don't put it in the plugin folder, the images and files could "
+"get deleted when the plugin is updated."
+msgstr ""
+"Ceci définit la destination des fichiers en upload, par rapport à la racine "
+"de WordPress. L'emplacement par défaut est '/wp-content/uploads/participants-"
+"database'<br />Ne pas utiliser le répertoire du plugin, car les images et "
+"fichiers risqueraient alors d'être détruits dans les mises à jour."
+
+#: classes/PDb_Settings.class.php:70
+msgid "File Upload Limit"
+msgstr "Limite pour fichiers en upload"
+
+#: classes/PDb_Settings.class.php:74
+msgid "the maximum allowed file size for an uploaded image"
+msgstr "la taille maximum autorisée pour les fichiers ou images en upload"
+
+#: classes/PDb_Settings.class.php:82
+msgid "Default Image"
+msgstr "Image par défaut"
+
+#: classes/PDb_Settings.class.php:86
+msgid ""
+"Path (relative to WP root) of an image file to show if no image has been "
+"defined for an image field. Leave blank for no default image."
+msgstr ""
+"Chemin (relatif à la racine WP) d'un fichier image à utiliser quand aucune "
+"image n'est fournie pour un champ image. Laisser blanc si pas d'image par défaut."
+
+#: classes/PDb_Settings.class.php:93
+msgid "Link Image to Fullsize"
+msgstr "Lien vers image en pleine taille"
+
+#: classes/PDb_Settings.class.php:98
+msgid ""
+"place a link to the full-size image on images. This link will work with most "
+"\"lightbox\" plugins."
+msgstr ""
+"placer un lien sur l'image vers l'image en pleine taille. Ce lien devrait "
+"fonctionner avec la plupart des plugins \"lightbox\"."
+
+#: classes/PDb_Settings.class.php:106
+msgid "Use the Plugin CSS"
+msgstr "Utiliser le CSS du plugin"
+
+#: classes/PDb_Settings.class.php:111
+msgid "use the plugin's CSS to style the output of shortcodes"
+msgstr "utiliser le CSS du plugin pour formater le résultat des shortcodes"
+
+#: classes/PDb_Settings.class.php:119
+msgid "Make Links Clickable"
+msgstr "Rendre les liens cliquables"
+
+#: classes/PDb_Settings.class.php:124
+msgid ""
+"if a \"text-line\" field looks like a link (begins with \"http\" or is an "
+"email address) make it clickable"
+msgstr ""
+"si un champ \"texte\" ressemble à un lien (commence par \"http\" "
+"ou adresse email), le rendre cliquable. "
+
+#: classes/PDb_Settings.class.php:132
+msgid "Protect Email Addresses"
+msgstr "Protéger les adresses email"
+
+#: classes/PDb_Settings.class.php:137
+msgid "protect email addresses in text-line fields with Javascript"
+msgstr "protéger les adresses email dans les champs texte par du Javascript"
+
+#: classes/PDb_Settings.class.php:145
+msgid "Missing Field Error Message"
+msgstr "Message d'erreur pour champ manquant"
+
+#: classes/PDb_Settings.class.php:149
+msgid ""
+"the message shown when a field is required, but left empty (the %s is "
+"replaced by the name of the field)"
+msgstr ""
+"message affiché quand est champ est requis, mais laissé vide (le %s "
+"est remplacé par le nom du champ)"
+
+#: classes/PDb_Settings.class.php:150
+msgid "The %s field is required."
+msgstr "The champ %s est obligatoire."
+
+#: classes/PDb_Settings.class.php:156
+msgid "Invalid Field Error Message"
+msgstr "Message d'erreur pour champ incorrect"
+
+#: classes/PDb_Settings.class.php:160
+msgid ""
+"the message shown when a field's value does not pass the validation test"
+msgstr ""
+"message affiché quand la valeur d'un champ de satisfait pas le test de validation"
+
+#: classes/PDb_Settings.class.php:161
+msgid "The %s field appears to be incorrect."
+msgstr "Le champ %s semble incorrect."
+
+#: classes/PDb_Settings.class.php:167
+msgid "Non-Matching Field Error Message"
+msgstr "Message d'erreur pour champ non-correspondant"
+
+#: classes/PDb_Settings.class.php:171
+msgid ""
+"the message shown when a field's value does match the value of another field"
+msgstr ""
+"message affiché quand la valeur d'un champ ne correspond pas à celle d'un autre"
+
+#: classes/PDb_Settings.class.php:172
+msgid "The %s field must match."
+msgstr "Le champ %s doit correspondre."
+
+#: classes/PDb_Settings.class.php:178
+msgid "Field Error Style"
+msgstr "Style pour erreur de champ"
+
+#: classes/PDb_Settings.class.php:182
+msgid ""
+"the CSS style applied to an input or text field that is missing or has not "
+"passed validation. This must be a valid CSS rule"
+msgstr ""
+"style CSS appliqué au paramètre ou champ texte qui manque ou ne satisfait "
+"pas la validation. Ceci doit être une règle CSS valide"
+
+#: classes/PDb_Settings.class.php:183
+msgid "border: 1px solid red"
+msgstr "frontière: 1px rouge pleine"
+
+#: classes/PDb_Settings.class.php:189
+msgid "Mark Required Fields"
+msgstr "Marquer les champs obligatoires"
+
+#: classes/PDb_Settings.class.php:194
+msgid "mark the title of required fields?"
+msgstr "marquer les titres des champs obligatoires?"
+
+#: classes/PDb_Settings.class.php:202
+msgid "Required Field Marker"
+msgstr "Marqueur de champ obligatoire"
+
+#: classes/PDb_Settings.class.php:206
+msgid ""
+"html added to field title for required fields if selected above (the %s is "
+"replaced by the title of the field)"
+msgstr ""
+"html ajouté au titre du champ pour les champs obligatoires quand sélectionné "
+"ci-dessus (the champ %s est remplacé par le titre du champ)"
+
+#: classes/PDb_Settings.class.php:213
+msgid "Use Rich Text Editor"
+msgstr "Utiliser l'éditeur \"Rich Text\""
+
+#: classes/PDb_Settings.class.php:218
+msgid ""
+"enable the rich text editor on \"rich-text\" fields for front-end users. If "
+"deselected, \"rich-text\" fields will appear as text-area fields. This does "
+"not affect admin users, who always have the use of the rich-text editor."
+msgstr ""
+"active l'éditeur \"Rich Text\" sur les champs de ce type pour les utilisateurs "
+"de l'interface. Quand désactivé, les champs \"rich-text\" apparaissent comme des champs textes. "
+"Ceci n'affecte pas les administrateurs, qui ont toujours accès à l'éditeur \"Rich Text\"."
+
+#: classes/PDb_Settings.class.php:226
+msgid "Use WordPress Auto Formatting"
+msgstr "Utiliser le formatage automatique de WordPress"
+
+#: classes/PDb_Settings.class.php:231
+msgid "Use WordPress&#39; auto formatting on rich text fields."
+msgstr "Utiliser le formatage automatique de WordPress sur les champs \"rich-text\"."
+
+#: classes/PDb_Settings.class.php:239
+msgid "Send HTML Email"
+msgstr "Envoyer email en HTML"
+
+#: classes/PDb_Settings.class.php:244
+msgid ""
+"use rich text in plugin emails? If you turn this off, be sure to remove all "
+"HTML tags from the email body settings for the plugin."
+msgstr ""
+"utiliser le \"rich-text\" dans les emails du plugin? Dans le cas contraire, assurez-vous "
+"de retirer les tags HTML des messages dans la configuration des emails du plugin."
+
+#: classes/PDb_Settings.class.php:252
+msgid "Strict Date Format"
+msgstr "Format de date strict"
+
+#: classes/PDb_Settings.class.php:257
+msgid ""
+"This forces date inputs to be interpreted strictly according to the date "
+"format setting of the site. You should tell your users what format you are "
+"expecting them to use. This also applies to date values used in [pdb_list] "
+"shortcode filters. The date with your current setting looks like this: "
+"<strong>%s</strong> %s"
+msgstr ""
+"Ceci impose l'interprétation des dates au sens strict selon le format de dates "
+"du site. Vous devez indiquer aux utilisateurs le format à utiliser. Ceci s'applique "
+"aussi aux dates utilisées dans les filtres du shortcode [pdb_list]. Dans votre "
+"configuration actuelle voici à quoi ressemblent les dates: "
+"<strong>%s</strong> %s"
+
+#: classes/PDb_Settings.class.php:265
+msgid "Record Edit Access Level"
+msgstr "Enregistrer le niveau d'accès en édition"
+
+#: classes/PDb_Settings.class.php:269
+msgid ""
+"sets the user access level for adding, editing and listing records. (fields "
+"management and plugin settings always require admin level access)"
+msgstr ""
+"fixe le niveau d'accès requis pour ajouter, éditer, et lister des entrées. (la "
+"gestion des champs et la configuration du plugin nécessitent toujours un admin)"
+
+#: classes/PDb_Settings.class.php:271
+msgid "Author"
+msgstr "Auteur"
+
+#: classes/PDb_Settings.class.php:271
+msgid "Editor"
+msgstr "Editeur"
+
+#: classes/PDb_Settings.class.php:271
+msgid "Admin"
+msgstr "Admin"
+
+#: classes/PDb_Settings.class.php:278
+msgid "Admin List Default Sort"
+msgstr "Tri par défaut dans la liste d'admin "
+
+#: classes/PDb_Settings.class.php:284
+msgid ""
+"The record list shown in the admin section will be sorted by this field by "
+"default. (Field must be checked \"sortable.\")"
+msgstr ""
+"La liste affichée dans la console d'admin sera triée par défaut par ce champ. "
+"(Le champ doit être coché \"triable\")"
+
+#: classes/PDb_Settings.class.php:291
+msgid "Admin List Default Sort Order"
+msgstr "Ordre par défaut de la liste d'admin"
+
+#: classes/PDb_Settings.class.php:295
+msgid "Sets the default order of the record list in the admin."
+msgstr "Fixe l'ordre par défaut pour les entrées affichées dans la liste d'admin."
+
+#: classes/PDb_Settings.class.php:310
+msgid "Records per Page"
+msgstr "Entrées par page"
+
+#: classes/PDb_Settings.class.php:314
+msgid "the number of records to show on each page"
+msgstr "nombre d'entrées à afficher par page"
+
+#: classes/PDb_Settings.class.php:322
+msgid "Single Record Link Field"
+msgstr "Champ du lien vers les fiches individuelles"
+
+#: classes/PDb_Settings.class.php:327
+msgid ""
+"select the field on which to put a link to the [pdb_single] shortcode. Leave "
+"blank or set to \"none\" for no link."
+msgstr ""
+"sélectionne le champ dans lequel doit figurer le lien vers le shortcode "
+"[pdb_single]. Laisser vide ou mettre à \"aucun\" pour ne pas avoir de lien."
+
+#: classes/PDb_Settings.class.php:334
+msgid "Single Record Page"
+msgstr "Page fiche individuelle"
+
+#: classes/PDb_Settings.class.php:340
+msgid ""
+"this is the page where the [pdb_single] shortcode is located. If you want to "
+"assign a post or custom post type, select \"Post ID\" and enter the post ID "
+"in the \"other\" box."
+msgstr ""
+"page où le shortcode [pdb_single] est employé. Si vous voulez donner directement "
+"le \"Post ID\" (par ex. pour un \"custom post type\"), sélectionner ce choix dans "
+"le menu, puis entrez l'ID dans la boîte qui apparaît."
+
+#: classes/PDb_Settings.class.php:347
+msgid "Strict User Searching"
+msgstr "Recherche stricte d'utilisateur"
+
+#: classes/PDb_Settings.class.php:352
+msgid ""
+"When checked, the frontend list search must match the whole field exactly. "
+"If unchecked, the search will match if the search term is found in part of "
+"the field. Searches are not case-sensitive either way."
+msgstr ""
+"Quand coché, la recherche dans la liste se fait sur le champ exact et entier. "
+"Sinon, la recherche correspond quand le terme entré se retrouve dans une partie "
+"du champ. Dans tous les cas, ne tient pas compte de la casse."
+
+#: classes/PDb_Settings.class.php:359
+msgid "Enable AJAX Search Functionality"
+msgstr "Activer la fonction de recherche AJAX"
+
+#: classes/PDb_Settings.class.php:364
+msgid ""
+"This enables list search results that are updated without reloading the "
+"page. It requires Javascript, but search will still work if Javascript is "
+"disabled in the user's browser."
+msgstr ""
+"Ceci active la mise à jour automatique des résultats de la recherche (sans recharger "
+"la page). Nécessite Javascript, mais la recherche fonctionnera même quand "
+"le Javascript est désactivé dans le navigateur de l'utilisateur."
+
+#: classes/PDb_Settings.class.php:378
+msgid "Signup Button Text"
+msgstr "Texte du bouton d'inscription"
+
+#: classes/PDb_Settings.class.php:382
+msgid "text shown on the button to sign up"
+msgstr "texte affiché sur le bouton d'inscription"
+
+#: classes/PDb_Settings.class.php:383
+msgctxt "the text on a button to submit a signup form"
+msgid "Sign Up"
+msgstr "S'inscrire"
+
+#: classes/PDb_Settings.class.php:389
+msgid "Signup Thanks Page"
+msgstr "Page de post-incription"
+
+#: classes/PDb_Settings.class.php:394
+msgid ""
+"after they singup, send them to this page for a thank you message. This page "
+"is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have "
+"to do that if you have them go back to the same page. You can also use a "
+"Post ID for posts and custom post types."
+msgstr ""
+"après l'inscription, renvoyer à cette page pour un message de remerciement. "
+"C'est la page où placer le shortcode [pdb_signup_thanks], mais ce n'est pas "
+"nécessaire pour renvoyer à la même page. Vous pouvez aussi employer le "
+"\"Post ID\" (par ex. pour un \"custom post type\")."
+
+#: classes/PDb_Settings.class.php:402
+msgid "Send Signup Response Email"
+msgstr "Envoyer email de confirmation d'inscription"
+
+#: classes/PDb_Settings.class.php:407
+msgid "Send a receipt email to people who sign up"
+msgstr "Envoyer un email de confirmation après l'inscription"
+
+#: classes/PDb_Settings.class.php:415
+msgid "Signup Email From Address"
+msgstr "Adresse d'expéditeur de l'email d'inscription"
+
+#: classes/PDb_Settings.class.php:419
+msgid ""
+"the \"From\" address on signup receipt emails. If the recipient hits \"reply"
+"\", their reply will go to this address. It is a good idea to use an email "
+"address from the same domain as this website."
+msgstr ""
+"l'adresse qui apparaît dans le champ \"From\" des emails de confirmation d'inscription. "
+"Utilisée quand le destinataire répond à cet email. Il est conseillé d'employer "
+"une adresse avec le même nom de domaine que ce site."
+
+#: classes/PDb_Settings.class.php:426
+msgid "Signup Email From Name"
+msgstr "Nom d'expéditeur de l'email d'inscription"
+
+#: classes/PDb_Settings.class.php:430
+msgid "the \"From\" name on signup receipt emails."
+msgstr "le nom qui apparaît dans le champ \"From\" des emails de confirmation d'inscription."
+
+#: classes/PDb_Settings.class.php:437
+msgid "Signup Response Email Subject"
+msgstr " Sujet de l'email d'inscription"
+
+#: classes/PDb_Settings.class.php:441
+msgid ""
+"subject line for the signup response email; placeholder tags can be used "
+"(see below)"
+msgstr ""
+"Champ sujet de l'email de confirmation d'inscription; des noms de variables "
+"peuvent être utilisées (voir ci-dessous)"
+
+#: classes/PDb_Settings.class.php:442
+msgid "You've just signed up on %s"
+msgstr "Vous venez de vous inscrire à %s"
+
+#: classes/PDb_Settings.class.php:448
+msgid "Signup Response Email"
+msgstr "Email de confirmation d'inscription"
+
+#: classes/PDb_Settings.class.php:452
+msgid ""
+"Body of the email a visitor gets when they sign up. It includes a link "
+"([record_link]) back to their record so they can fill it out. Can include "
+"HTML, placeholders:[first_name],[last_name],[email],[record_link]. You can "
+"only use placeholders for fields that are present in the signup form, "
+"including hidden fields."
+msgstr ""
+"Corps du message qu'un utilisateur reçoit après son inscription. Il comprend un lien "
+"([record_link]) vers la fiche individuelle pour que celle-ci puisse être complétée. "
+"Peut contenir: du HTML, les variables: [first_name],[last_name],[email],[record_link]. "
+"Vous pouvez uniquement utiliser les variables présentes dans le formulaire "
+"d'inscription, y compris les champs cachés."
+
+#. translators: the %s will be the name of the website
+#: classes/PDb_Settings.class.php:454
+msgid ""
+"<p>Thank you, [first_name], for signing up with %s.</p><p>You may complete "
+"your registration with additional information or update your information by "
+"visiting this private link at any time: <a href=\"[record_link]\">"
+"[record_link]</a>.</p>"
+msgstr ""
+"<p>Merci, [first_name], pour votre inscription à %s.</p><p>Vous pouvez compléter "
+"ou mettre à jour les informations vous concernant à tout moment en utilisant "
+"le lien privé suivant: <a href=\"[record_link]\">[record_link]</a>.</p>"
+
+#: classes/PDb_Settings.class.php:460
+msgid "Signup Thanks Message"
+msgstr "Message de post-inscription"
+
+#: classes/PDb_Settings.class.php:464
+msgid ""
+"Note to display on the web page after someone has submitted a signup form. "
+"Can include HTML and placeholders (see above)"
+msgstr ""
+"Message à afficher sur la page web une fois que quelqu'un a effectué "
+"son inscription. Peut contenir du HTML et des variables (voir ci-dessus)"
+
+#: classes/PDb_Settings.class.php:465
+msgid ""
+"<p>Thank you, [first_name] for signing up!</p><p>You will receive an email "
+"acknowledgement shortly. You may complete your registration with additional "
+"information or update your information by visiting the link provided in the "
+"email.</p>"
+msgstr ""
+"<p>Merci, [first_name] pour cette inscription!</p><p>Vous ne tarderez pas à "
+"recevoir un email de confirmation. Vous pourrez compléter ou mettre à jour "
+"vos informations en utilisant le lien privé figurant dans cet email.</p>"
+
+#: classes/PDb_Settings.class.php:471
+msgid "Send Signup Notification Email"
+msgstr "Envoyer un email de notification d'inscription"
+
+#: classes/PDb_Settings.class.php:476
+msgid "Send an email notification that a signup has occurred."
+msgstr "Envoyer un email notifiant qu'une inscription a eu lieu."
+
+#: classes/PDb_Settings.class.php:485
+msgid "Signup Notification Recipients"
+msgstr "Destinataires de la notification d'inscription"
+
+#: classes/PDb_Settings.class.php:489
+msgid "comma-separated list of email addresses to send signup notifications to"
+msgstr ""
+"liste d'adresses email (séparées par des virgules) auxquelles envoyer les "
+"notifications d'inscription"
+
+#: classes/PDb_Settings.class.php:496
+msgid "Signup Notification Email Subject"
+msgstr "Sujet de l'email de notification d'inscription"
+
+#: classes/PDb_Settings.class.php:500
+msgid ""
+"subject of the notification email; placeholder tags can be used (see above)"
+msgstr ""
+"sujet de l'email de notification; peut contenir des noms de variables (voir ci-dessus)"
+
+#. translators: the %s will be the name of the website
+#: classes/PDb_Settings.class.php:502
+msgid "New signup on %s"
+msgstr "Nouvelle inscription à %s"
+
+#: classes/PDb_Settings.class.php:508
+msgid "Signup Notification Email"
+msgstr "Email de notification d'inscription"
+
+#: classes/PDb_Settings.class.php:512
+msgid ""
+"notification email body. The [admin_record_link] tag will supply the URL for "
+"editing the record in the admin."
+msgstr ""
+"corps du message de notification. La variable [admin_record_link] fournira l'URL "
+"permettant d'éditer l'entrée comme admin."
+
+#: classes/PDb_Settings.class.php:513
+msgid ""
+"<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]"
+"</li><li>Email: [email]</li></ul><p>Edit this new record here: <a href="
+"\"[admin_record_link]\">[admin_record_link]</a></p>"
+msgstr ""
+"<p>Une nouvelle inscription a été demandée</p><ul><li>Nom: [first_name] [last_name]"
+"</li><li>Email: [email]</li></ul><p>Editer cette entrée ici: <a href="
+"\"[admin_record_link]\">[admin_record_link]</a></p>"
+
+#: classes/PDb_Settings.class.php:519
+msgid "Duplicate Record Check Field"
+msgstr "Champ de test de doublon"
+
+#: classes/PDb_Settings.class.php:524
+msgid ""
+"when a signup is submitted or CSV record is imported, this field is checked "
+"for a duplicate"
+msgstr ""
+"quand une inscription est demandée ou un fichier CSV importé, on testera la présence "
+"d'un doublon avec ce champ"
+
+#: classes/PDb_Settings.class.php:531
+msgid "Duplicate Record Preference"
+msgstr "Préférence en cas de doublon"
+
+#: classes/PDb_Settings.class.php:536
+msgid ""
+"when the submission matches the Duplicate Record Check Field of an existing "
+"record. This also applies to importing records from a CSV file."
+msgstr ""
+"quand une inscription révèle un doublon via le champ de test choisi. "
+"Ceci s'applique également aux entrées importées depuis un fichier CSV."
+
+#: classes/PDb_Settings.class.php:539
+msgid "Create a new record with the submission"
+msgstr "Créer une nouvelle entrée avec l'import"
+
+#: classes/PDb_Settings.class.php:540
+msgid "Overwrite matching record with new data"
+msgstr "Remplacer l'entrée en doublon par la nouvelle"
+
+#: classes/PDb_Settings.class.php:541
+msgid "Show a validation error message"
+msgstr "Afficher un message d'erreur"
+
+#: classes/PDb_Settings.class.php:548
+msgid "Duplicate Record Error Message"
+msgstr "Message d'erreur de doublon"
+
+#: classes/PDb_Settings.class.php:552
+msgid ""
+"If \"Show a validation error message\" is selected above, this message will "
+"be shown if a signup is made with a \"check field\" that matches an existing "
+"record."
+msgstr ""
+"Si l'option \"Afficher un message d'erreur\" est choisie ci-dessus, "
+"ce message sera affiché si une inscription est demandée avec un champ de test "
+"qui correspond à celui d'une entrée existante."
+
+#: classes/PDb_Settings.class.php:553
+msgid "A record with that %s already exists. Please choose another."
+msgstr "Une fiche avec ce %s existe déjà. Merci de faire un autre choix."
+
+#: classes/PDb_Settings.class.php:559
+msgid "Show Field Groups"
+msgstr "Afficher les groupes de champs"
+
+#: classes/PDb_Settings.class.php:564
+msgid "Show groups and group descriptions in the signup form."
+msgstr "Afficher les groupes et leurs descriptions dans le formulaire d'inscription."
+
+#: classes/PDb_Settings.class.php:578
+msgid "Participant Record Page"
+msgstr "Page de formulaire détaillé"
+
+#: classes/PDb_Settings.class.php:583
+msgid ""
+"The page where your participant record ([pdb_record] shortcode) is "
+"displayed. You can use a Post ID for posts and custom post types."
+msgstr ""
+"La page qui affiche le formulaire détaillé (shortcode [pdb_record]). "
+"Vous pouvez aussi employer le \"Post ID\" (par ex. pour un \"custom post type\")."
+
+#: classes/PDb_Settings.class.php:591
+msgid "Save Changes Label"
+msgstr "Texte enregistrement des modifications"
+
+#: classes/PDb_Settings.class.php:596
+msgid "label for the save changes button on the record form"
+msgstr "texte du bouton d'enregistrement des modifications"
+
+#: classes/PDb_Settings.class.php:597
+msgid "Save Your Changes"
+msgstr "Enregistrer vos modifications"
+
+#: classes/PDb_Settings.class.php:603
+msgid "Save Button Text"
+msgstr "Texte du bouton enregistrer"
+
+#: classes/PDb_Settings.class.php:608
+msgid "text on the \"save\" button"
+msgstr "Texte sur le bouton \"enregistrer\""
+
+#: classes/PDb_Settings.class.php:609
+msgctxt "a label for a button to save a form"
+msgid "Save"
+msgstr "Enregistrer"
+
+#: classes/PDb_Settings.class.php:615
+msgid "Show Group Descriptions"
+msgstr "Afficher les descriptions des groupes"
+
+#: classes/PDb_Settings.class.php:620
+msgid "Show the group description under each group title in the record form."
+msgstr "Afficher la description de chaque groupe sous son titre dans le formulaire détaillé."
+
+#: classes/PDb_Settings.class.php:628
+msgid "Record Updated Message"
+msgstr "Message de confirmation de mise-à-jour"
+
+#: classes/PDb_Settings.class.php:632
+msgid "the message shown when a record form has been successfully submitted"
+msgstr "le message affiché quand un formulaire détaillé a été soumis avec succès."
+
+#: classes/PDb_Settings.class.php:633
+msgid "Your information has been updated:"
+msgstr "Votre information a été mise à jour:"
+
+#: classes/PDb_Settings.class.php:639
+msgid "Send Record Form Update Notification Email"
+msgstr "Envoyer email de notification de mise-à-jour"
+
+#: classes/PDb_Settings.class.php:644
+msgid ""
+"Send an email notification that a record has been updated. These will be "
+"sent to the email addresses listed in the \"Signup Notification Recipients\" "
+"setting."
+msgstr ""
+"Envoyer un email de notification quand une fiche est mise à jour. Celui-ci "
+"sera envoyé aux adresses précisées dans la configuration des \"Destinataires de "
+"notification d'inscription\"."
+
+#: classes/PDb_Settings.class.php:652
+msgid "Record Update Email Subject"
+msgstr "Sujet du message de mise-à-jour de fiche"
+
+#: classes/PDb_Settings.class.php:656
+msgid ""
+"subject line for the record update notification email; placeholders can be "
+"used."
+msgstr ""
+"Sujet de l'email de notification de mise-à-jour; on peut utiliser des "
+"variables."
+
+#: classes/PDb_Settings.class.php:657
+msgid "A record has just been updated on %s"
+msgstr "Une entrée a été mise à jour sur %s"
+
+#: classes/PDb_Settings.class.php:663
+msgid "Record Update Notification Email"
+msgstr "Email de notification de mise-à-jour de fiche"
+
+#: classes/PDb_Settings.class.php:667
+msgid ""
+"Body of the the email sent when a user updates their record. Any field from "
+"the form can be included by using a replacement code of the form: "
+"[field_name]. For instance: [last_name],[address],[email] etc. (The field "
+"name is under the \"name\" column on the \"Manage Database Fields\" page.)  "
+"Also available is [date] which will show the date and time of the update and "
+"[admin_record_link] tag for a link to edit the record in the admin."
+msgstr ""
+"Corps du message envoyé quand un utilisateur met à jour sa fiche. Tous les champs "
+"de la fiche peuvent être inclus en utilisant un code de la forme [nom_du_champ]. "
+"Par exemple: [last_name],[address],[email] etc. (Le nom du champ figure dans la "
+"colonne \"Nom\" dans la page \"Gestion des champs de la base\".) On peut aussi "
+"utiliser [date] qui affichera la date et l'heure de la mise-à-jour, et "
+"[admin_record_link] pour un lien d'édition admin de la fiche."
+
+#: classes/PDb_Settings.class.php:668
+msgid ""
+"<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] "
+"[last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</"
+"li><li>Phone: [phone]</li><li>Email: [email]</li></ul><p>Edit this record <a "
+"href=\"[admin_record_link]\">here.</a></p>"
+msgstr ""
+"<p>La fiche suivante a été mis-à-jour le [date]:</p><ul><li>Nom: [first_name] "
+"[last_name]</li><li>Adresse: [address], [city]</"
+"li><li>Téléphone: [phone]</li><li>Email: [email]</li></ul><p>Editer cette fiche <a "
+"href=\"[admin_record_link]\">ici.</a></p>"
+
+#: classes/PDb_Settings.class.php:674
+msgid "Record Not Found Error Message"
+msgstr "Message d'erreur fiche introuvable"
+
+#: classes/PDb_Settings.class.php:678
+msgid ""
+"message to show if the record page was accessed without a valid identifier. "
+"Leave this empty if you want nothing at all to show."
+msgstr ""
+"message à afficher quand la page individuelle est invoquée sans identifiant "
+"valide. Laisser vide si vous ne voulez rien afficher."
+
+#: classes/PDb_Settings.class.php:679
+msgid "No record was found."
+msgstr "Aucune entrée trouvée."
+
+#: classes/PDb_Settings.class.php:689
+msgid "Same Page"
+msgstr "Même page"
+
+#: classes/PDb_Settings.class.php:719
+msgid "None"
+msgstr "Aucun/e"
+
+#: classes/PDb_Settings.class.php:759 participants-database.php:334
+#: participants-database.php:335
+msgid "Settings"
+msgstr "Configuration"
+
+#: classes/PDb_Shortcode.class.php:126
+msgctxt "message to show if the plugin cannot find the template"
+msgid ""
+"<%1$s>The template %2$s was not found.</%1$s> Please make sure the name is "
+"correct and the template file is in the correct location."
+msgstr ""
+"<%1$s>Le template %2$s est introuvable.</%1$s> Merci de vérifier son nom "
+"et son emplacement."
+
+#: edit_participant.php:19
+msgid "Add New Participant Record"
+msgstr "Ajouter une nouvelle fiche"
+
+#: edit_participant.php:24
+msgid "Edit Existing Participant Record"
+msgstr "Editer une fiche existante"
+
+#: edit_participant.php:83
+msgctxt "abbreviation for \"identification\""
+msgid "ID"
+msgstr "ID"
+
+#: edit_participant.php:83
+msgctxt "indicates a new record is being entered"
+msgid "(new record)"
+msgstr "(nouvelle fiche)"
+
+#: edit_participant.php:207
+msgid "Save the Record"
+msgstr "Enregistrer la fiche"
+
+#: edit_participant.php:214
+msgid ""
+"<strong>Submit:</strong> save record and return to list<br><strong>Apply:</"
+"strong> save record and continue with same record<br><strong>Next:</strong> "
+"save record and then start a new one"
+msgstr ""
+"<strong>Sauver:</strong> enregistrer la fiche et revenir à la liste<br><strong>Appliquer:</"
+"strong> enregistrer et poursuivre avec la même fiche<br><strong>Suivant:</strong> "
+"enregistrer la fiche et créer une nouvelle"
+
+#. translators: these strings are used in logic matching, please test after
+#. translating in case special characters cause problems
+#: manage_fields.php:9
+msgid "Update Fields"
+msgstr "Mettre à jour les champs"
+
+#: manage_fields.php:10
+msgid "Update Groups"
+msgstr "Mettre à jour les groupes"
+
+#: manage_fields.php:11
+msgid "Add Field"
+msgstr "Ajouter un champ"
+
+#: manage_fields.php:12
+msgid "Add Group"
+msgstr "Ajouter un groupe"
+
+#: manage_fields.php:13
+msgid "new field name"
+msgstr "nom du nouveau champ"
+
+#: manage_fields.php:14
+msgid "new group name"
+msgstr "nom du nouveau groupe"
+
+#: manage_fields.php:120
+msgid "Cannot add a field with that name"
+msgstr "Impossible d'ajouter un champ de ce nom"
+
+#: manage_fields.php:121
+msgid "This name is reserved; please choose another. Reserved names are"
+msgstr "Ce nom est réservé; merci d'en choisir un autre. Les noms réservés sont"
+
+#: manage_fields.php:207 participants-database.php:316
+#: participants-database.php:317
+msgid "Manage Database Fields"
+msgstr "Gérer les champs de la base"
+
+#: manage_fields.php:216 manage_fields.php:223
+msgid "Field Groups"
+msgstr "Groupes de champs"
+
+#: manage_fields.php:224
+msgid "Help"
+msgstr "Aide"
+
+#: manage_fields.php:232
+msgid "Fields"
+msgstr "Champs"
+
+#: manage_fields.php:276
+msgid "No fields in this group"
+msgstr "Aucun champ dans ce groupe"
+
+#: manage_fields.php:370
+msgid "Edit / Add / Remove Field Groups"
+msgstr "Editer / ajouter / détruire des groupes de champs"
+
+#: manage_fields.php:385
+msgid "fields"
+msgstr "champs"
+
+#: manage_fields.php:579
+msgid "The %1$s was not added. Your new %1$s must have a unique name."
+msgstr "Le %1$s n'a pas été ajouté. Votre nouveau %1$s doit avoir un nom unique."
+
+#: manage_fields_help.php:4
+msgid "Manage Fields Help"
+msgstr "Aide sur la gestion des champs"
+
+#: manage_fields_help.php:5
+msgid "Defining Database Fields"
+msgstr "Définition des champs de la base"
+
+#: manage_fields_help.php:6
+msgid ""
+"The database stores information about people. On this page, you can "
+"determine what pieces of information are stored and how they are presented "
+"and interacted with. Take a look at the \"Add Participant\" page to see how "
+"the form is presented. You will be able to see your changes to how the "
+"fields are set up by checking this page."
+msgstr ""
+"La base contient des informations individuelles. Sur cette page, vous "
+"pouvez préciser la nature de l'information stockée, et comment elle est "
+"présentée et utilisée. Consultez la page \"Ajouter un participant\" pour voir "
+"comment le formulaire est présenté. Vous pourrez aussi y voir vos changements "
+"sur le réglage des champs."
+
+#: manage_fields_help.php:7
+msgid ""
+"<strong>Important:</strong> Some of the changes you can make here will "
+"affect existing records in the database. It is best to set up your database "
+"before you begin adding records, but it is possible to add fields to the "
+"database at any time. Any records that were entered before the new field was "
+"added will have no value for the field. This can be filled in by then "
+"editing the record."
+msgstr ""
+"<strong>Important:</strong> Certains changements effectués ici pourraient "
+"affecter des entrées déjà existantes. L'idéal est de configurer la base avant "
+"de commencer à ajouter des entrées, mais il est toujours possible d'ajouter des "
+"champs. Toute entrée présente avant l'ajout d'un nouveau champ n'aura rien dans "
+"ce champ, mais on peut bien sûr les remplir ensuite en éditant la fiche."
+
+#: manage_fields_help.php:8
+msgid "Delete"
+msgstr "Détruire"
+
+#: manage_fields_help.php:9
+msgid ""
+"Click on the red \"X\" to delete a field. If there are existing records with "
+"this data field, that information will not be deleted from the database, but "
+"you will no longer be able to display or edit it."
+msgstr ""
+"Cliquer sur le \"X\" rouge pour détruire un champ. Si certaines entrées utilisent "
+"ce champ, le contenu n'en sera pas détruit, mais vous ne pourrez plus y accéder "
+"ni le modifier."
+
+#: manage_fields_help.php:10
+msgid "Order"
+msgstr "Ordre"
+
+#: manage_fields_help.php:11
+msgid ""
+"Click and drag to reorder the fields. You do not need to click on \"Update\" "
+"for the change to take effect."
+msgstr ""
+"Cliquer et déplacer pour changer l'ordre des champs. Inutile de cliquer sur "
+"\"Mettre à jour\" pour valider ces changements."
+
+
+#: manage_fields_help.php:12
+msgid "Title"
+msgstr "Titre"
+
+#: manage_fields_help.php:13
+msgid ""
+"This is the display title for your field. You can change it at any time, it "
+"won&#39;t affect the field in any way other than to change how it is labeled "
+"in forms.<p>"
+msgstr ""
+"Ceci constitue l'intitulé visible de votre champ. Vous pouvez le changer plus "
+"tard sans que cela n'affecte le champ d'aucune autre façon que sa dénomination "
+"dans les formulaires."
+
+#: manage_fields_help.php:14
+msgid "Default"
+msgstr "Défaut"
+
+#: manage_fields_help.php:15
+msgid "If you wish to pre-load a field with a value, you can put it here."
+msgstr "Si vous voulez pré-définir une valeur du champ, la donner ici"
+
+#: manage_fields_help.php:16
+msgid "Group"
+msgstr "Groupe"
+
+#: manage_fields_help.php:17
+msgid ""
+"The database fields are organized into groups, and you can select which "
+"group the database field belongs to here. You can edit the groups under the "
+"\"Field Groups\" tab."
+msgstr ""
+"Les champs de la base sont répartis en groupes, et vous pouvez choisir ici à "
+"quel groupe les champs appartiennent. Vous pouvez éditer les groupes dans l'onglet "
+"\"Groupes de champs\"."
+
+#: manage_fields_help.php:18
+msgid "Help Text"
+msgstr "Texte d'aide"
+
+#: manage_fields_help.php:19
+msgid ""
+"When a form is displayed, sometimes it is a good idea to explain something "
+"about the information you want in a field. Any text you put in here will be "
+"displayed next to the field. HTML is allowed, but be careful with that, you "
+"can break things!"
+msgstr ""
+"Quand un formulaire est affiché, il peut être avisé de préciser ce que vous "
+"voulez comme information dans un champ. Le texte entré ici sera affiché à "
+"côté du champ. L'HTML est autorisé, mais peut perturber les choses."
+
+#: manage_fields_help.php:20
+msgid "Form Element"
+msgstr "Elément de formulaire"
+
+#: manage_fields_help.php:21
+msgid ""
+"If your piece of information is a simple line of text (like a name), it "
+"should be presented in the form as a text field. If a longer piece of text "
+"is called for, a text-field would be a better choice, and so forth. This is "
+"where you can determine what kind of form element this particular piece of "
+"information will be preseted with."
+msgstr ""
+"Si l'information est une simple chaîne de caractère (comme un nom), elle "
+"peut être présentée dans le formulaire comme un champ-texte. Si elle prend plus "
+"de place, une zone de texte est mieux adaptée, etc. Ceci sert à déterminer avec "
+"quel type d'élément de formulaire l'information sera fournie."
+
+#: manage_fields_help.php:22
+msgid ""
+"Under the multiple-choice dropdown are the form elements you can choose "
+"from. It is really best to avoid changing this once you have begun adding "
+"records to the database using this field&hellip;unpredictable things can "
+"happen, and although you won&#39;t lose any data, it can make a mess! That "
+"said, it <em>is</em> possible to change between similar elements, like text/"
+"text-field or select/dropdown or select-other/dropdown-other. Be warned, "
+"it&#39;s safest to set this up before you start getting data for the field."
+msgstr ""
+"Dans ce menu déroulant figurent les éléments de formulaires parmi lesquels "
+"vous pouvez choisir. Il vaut mieux éviter de changer cela après avoir commencé "
+"à ajouter des entrées dans la base, car cela risque d'avoir des résultats assez "
+"imprévisibles, même si aucune info ne peut être perdue. Néanmoins il est "
+"<em>possible</em> de changer entre éléments semblables, comme text/"
+"text-field ou select/dropdown ou select-other/dropdown-other. Mais le plus "
+"sûr est de régler cela avant de commencer à recueillir des données pour ce champ."
+
+#: manage_fields_help.php:23
+msgid "Values"
+msgstr "Valeurs"
+
+#: manage_fields_help.php:24
+msgid ""
+"For form elements that have multiple choices, you need to define those "
+"choices here. Type in a comma-separated list of the options you want to "
+"present."
+msgstr ""
+"Pour les éléments de formulaire qui comportent des choix multiples, c'est "
+"ici que vous devez définir ces choix, sous la forme d'une liste d'options "
+"séparées par des virgules."
+
+#: manage_fields_help.php:25
+msgid ""
+"Don&#39;t try to have a comma in one of your options, though! It&#39;s "
+"posiible to break things by trying to include other (mostly non-text and "
+"punctuation) characters, so test things, and if you get erratic behavior in "
+"the form, you may have characters here that are messing things up. Most "
+"international language characters should be fine, just type them in. Don&#39;"
+"t try to use HTML entities or codes, it just won&#39;t work."
+msgstr ""
+"Attention à ne pas inclure une virgule dans une option, néanmoins! Vous "
+"pouvez causer des problèmes en utilisant certains caractères non alphanumériques "
+"(ponctuation en particulier), donc testez soigneusement l'effet dans les "
+"formulaires. Les caractères accentués ne devraient pas poser problème. En "
+"revanche, pas d'HTML ici SVP."
+
+#: manage_fields_help.php:26
+msgid "Validation"
+msgstr "Validation"
+
+#: manage_fields_help.php:27
+msgid ""
+"If you wish certain fields to be required or have a specific kind of "
+"content, you can set that here. \"Not Required\" means you don&#39;t care if "
+"the field is filled in or not. \"Required\" simply means the field must have "
+"something in it. \"match/regex\" gives you some advanced options for "
+"validating a field. To match the field to the value of another field, put "
+"the name of that field in the box. You can also use a regex to validate the "
+"field, but it is for advanced users, so if you don&#39;t know what a regex "
+"is, get some help before trying to use this feature."
+msgstr ""
+"Si vous souhaitez que certains champs soient obligatoires, ou aient un "
+"certain type de contenu, vous pouvez le définir ici. \"Not Required\" "
+"signifie que vous n'imposez pas de le remplir. \"Required\" impose simplement "
+"que le champ contienne quelque chose. \"match/regex\" vous donne un réglage fin "
+"pour valider un champ. Avec match mettez simplement le nom d'un autre champ dans "
+"la case pour imposer à celui-ci de lui correspondre. L'usage des expressions "
+"régulières (regex) est plus compliqué, donc si vous ne connaissez pas le concept "
+"documentez-vous avant d'essayer."
+
+#: manage_fields_help.php:28
+msgid "Admin Column"
+msgstr "Colonne admin"
+
+#: manage_fields_help.php:29
+msgid ""
+"This only affects the \"List Participants\" page of the plugin. On that "
+"page, the database records are listed. Since it would be impractical to "
+"include every field as a column in this list, you can select which fields "
+"are shown here. \"0\" means don&#39;t display it, a number sets the order in "
+"which the column will appear. You have to make sure the numbers make sense, "
+"if you have multiple items with the same number (other than 0), only the "
+"last one with the number will appear."
+msgstr ""
+"Ceci concerne seulement la page \"Liste des participants\" du plugin. Sur "
+"cette page apparaît la liste des entrées de la base. Comme il n'est pas "
+"souhaitable d'inclure tous les champs dans cette liste, vous pouvez choisir "
+"ici lesquels montrer: \"0\" pour ne pas l'afficher, ou un autre nombre pour "
+"le numéro de la colonne dans laquelle l'afficher. Vous devez vous assurer de "
+"la cohérence de ces nombres: si vous avez plusieurs champs avec le même (autre "
+"que 0), seul le dernier d'entre eux apparaîtra."
+
+#: manage_fields_help.php:30
+msgid "Display Column"
+msgstr "Colonne affichage"
+
+#: manage_fields_help.php:31
+msgid ""
+"When using the [pdb_list] shortcode to display the list of records, this "
+"column determines whether the column will be shown and in what order."
+msgstr ""
+"Cette colonne détermine quels champs apparaissent, et leur ordre quand on "
+"utilise le shortcode [pdb-list] pour générer une liste."
+
+#: manage_fields_help.php:32
+msgid "Switches"
+msgstr "Options"
+
+#: manage_fields_help.php:33
+msgid ""
+"<strong>Sortable</strong> means the list presented on the \"List Participants"
+"\" page can be sorted by this field. Of course, it must have a non-zero "
+"value in \"Column\" to be seen at all."
+msgstr ""
+"<strong>Triable</strong> signifie que la liste affichée sur la page \"Liste "
+"des participants\" peut être triée à l'aide de ce champ. Bien sûr, il doit "
+"avoir une valeur autre que 0 dans la colonne admin pour être vu."
+
+#: manage_fields_help.php:34
+msgid ""
+"<strong>CSV</strong> means the field is one that can be imported or exported "
+"with a CSV file. If you are using CSV files to bring in records, you should "
+"set these switches based on which fields you are planning to import. When "
+"exporting a CSV, this switch determines whether the field will be exported."
+"<p>"
+msgstr ""
+"<strong>CSV</strong> signifie que ce champ pourra être importé ou exporté via "
+"un fichier CSV. Si vous utilisez des fichiers CSV pour ajouter des champs, vous "
+pouvez choisir ces options en fonction des champs à importer. A l'export, ceci "
+"définit les champs à exporter."
+
+#: manage_fields_help.php:35
+msgid ""
+"<strong>Persistent</strong> is a convenience feature helpful when you are "
+"manually entering a series of records in the admin. If set, it means the "
+"field will carry over to the next blank entry. For instance, if a group of "
+"records from the same city are being entered, set the \"city\" field to be "
+"persistent, then once a city value has been entered in the first record of "
+"the series, the next blank record will have this city pre-filled."
+msgstr ""
+"<strong>Persistant</strong> est une option utile pour ajouter manuellement "
+"une série d'entrées dans la base. Elle implique que la valeur du champ sera "
+"réutilisée par défaut dans l'entrée suivante. Par exemple, quand on ajoute "
+"une série de participants d'une même ville, l'option est pertinente pour le "
+"champ \"city\" pour pré-remplir cette case à partir de la valeur donnée dans "
+"la première entrée."
+
+#: manage_fields_help.php:36
+msgid ""
+"<strong>Signup</strong> selects this field for use in the brief signup form "
+"that is presented with the [pdb_signup] shortcode."
+msgstr ""
+"<strong>Inscription</strong> veut dire que ce champ apparaîtra dans le petit "
+"formulaire d'inscription généré par le shortcode [pdb_signup]."
+
+#: manage_fields_help.php:37
+msgid ""
+"<strong>Readonly</strong> means that plugin users can see the value of the "
+"field, but cannot edit it. The field will be editable in the admin."
+msgstr ""
+"<strong>Lecture seule</strong> signifie que les utilisateurs peuvent voir la"
+"valeur du champ, mais pas la modifier. Le champ est éditable en admin seulement."
+
+#. #-#-#-#-#  plugin.pot (Participants Database 1.4.9.2)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: participants-database.php:243
+msgid "Participants Database"
+msgstr "Base de participants"
+
+#: participants-database.php:298 participants-database.php:299
+msgid "List Participants"
+msgstr "Lister les participants"
+
+#: participants-database.php:307 participants-database.php:308
+msgid "Add Participant"
+msgstr "Ajouter un participant"
+
+#: participants-database.php:325 participants-database.php:326
+#: upload_csv.php:9
+msgid "Import CSV File"
+msgstr "Importer un fichier CSV"
+
+#: participants-database.php:343 participants-database.php:344
+msgid "Setup Guide"
+msgstr "Guide de configuration"
+
+#: participants-database.php:352 participants-database.php:353
+msgid "Edit Record"
+msgstr "Editer une entrée"
+
+#. translators: don't translate the words in brackets {}
+#: participants-database.php:529
+msgctxt "message to show if the plugin cannot find the template"
+msgid "Missing Template"
+msgstr "Template manquant"
+
+#: participants-database.php:543
+msgid "No record found for %s."
+msgstr "Pas d'entrée trouvée pour %s."
+
+#: participants-database.php:2073
+msgid "Not Required"
+msgstr "Non-obligatoire"
+
+#: participants-database.php:2074
+msgid "Required"
+msgstr "Obligatoire"
+
+#: participants-database.php:2075
+msgid "Email"
+msgstr "Email"
+
+#: participants-database.php:2306
+msgid ""
+"There is something wrong with the file you tried to upload. Try another."
+msgstr ""
+"Il y a un problème avec le fichier que vous avez voulu charger. Essayez "
+"avec un autre."
+
+#: participants-database.php:2316
+msgid "You may only upload image files like JPEGs, GIFs or PNGs."
+msgstr ""
+"Vous pouvez seulement utiliser des fichiers images tels que JPEGs, "
+"GIFs ou PNGs."
+
+#: participants-database.php:2334
+msgid ""
+"The image you tried to upload is too large. The file must be smaller than "
+"%sK."
+msgstr ""
+"L'image que vous avez voulu charger est trop volumineuse. Le fichier ne doit "
+"pas faire plus de %sK."
+
+#: participants-database.php:2341
+msgid "The file could not be saved."
+msgstr "Ce fichier n'a pas pu être enregistré."
+
+#: participants-database.php:2224
+msgid "The uploads directory (%s) could not be created."
+msgstr ""
+
+#: participants-database.php:2562
+msgid ""
+"The date for \"%s\" was invalid. Please input the date with the exact format "
+"shown"
+msgstr ""
+"La date pour \"%s\" n'est pas correcte. Entrez la date exactement au format "
+"indiqué."
+
+#: participants-database.php:2698
+msgid "Submit"
+msgstr "Sauver"
+
+#: participants-database.php:2699
+msgid "Apply"
+msgstr "Appliquer"
+
+#: participants-database.php:2713
+msgid "WordPress Plugin"
+msgstr "Extension WordPress"
+
+#: participants-database.php:2714
+msgid ""
+"Helping organizations manage their volunteers, members and participants."
+msgstr ""
+"Aider les organisations à gérer leurs volontaires, membres et participants."
+
+#: participants-database.php:2717
+msgid "Developed by"
+msgstr "Développé par"
+
+#: participants-database.php:2718
+msgid ""
+"Suggestions or crticisms of this plugin? I&#39;d love to hear them: email "
+msgstr ""
+"Suggestions ou commentaires sur cette extension? N'hésitez pas par email "
+
+#: participants-database.php:2721
+msgid ""
+"Please consider contributing to the continued support and development of "
+"this software by visiting %1$sthis plugin&#39;s page,%3$s giving the plugin "
+"a %2$srating%3$s or review, or dropping something in the %1$stip jar.%3$s "
+"Thanks!"
+msgstr ""
+"N'hésitez pas à contribuer au bon support et développement de ce logiciel "
+"en vous rendant sur la %1$spage de l'extension%3$s, en donnant une note ou "
+"une évaluation, et je n'ai rien contre un %1$spourboire%3$s. Merci!"
+
+#: upload_csv.php:29
+msgid "1. Prepare a spreadsheet file with the correct format:"
+msgstr "1. Préparez un fichier tableur au bon format:"
+
+#: upload_csv.php:31
+msgid ""
+"To properly import your membership data, the columns in your spreadsheet "
+"must match exactly the columns in the database. Currently, the CSV import "
+"columns are as follows:"
+msgstr ""
+"Pour importer correctement vos données, les colonnes de votre table doivent "
+"correspondre exactement aux champs de votre base. Pour l'instant les colonnes "
+"du fichier CSV sont les suivantes:"
+
+#: upload_csv.php:46
+msgid ""
+"This means your spreadsheet needs to have %s columns, and the heading in "
+"each of those columns needs to match exactly the names above. If there is no "
+"data for a particular column, you can include it and leave it blank, or "
+"leave it out entirely. The order of the columns doesn&#39;t matter."
+msgstr ""
+"Ceci signifie que votre table doit avoir %s colonnes, et que leurs titres "
+"doivent correspondre exactement aux noms ci-dessus. S'il n'y a pas de données "
+"pour certaines colonnes vous pouvez inclure ces colonnes en les laissant vides, ou bien "
+"ne pas les inclure. L'ordre des colonnes est sans importance."
+
+#: upload_csv.php:47
+msgid ""
+"If the imported CSV file has a different column set, that column set will be "
+"imported and used. If a column name does not match a defined column in the "
+"database, the data from that column will be discarded"
+msgstr ""
+"Si le fichier CSV comporte des colonnes dont le nom ne correspond pas à un "
+"champ de la base, ces colonnes ne seront pas utilisées."
+
+#: upload_csv.php:48
+msgid "Get Blank CSV File"
+msgstr "Télécharger un fichier CSV à remplir"
+
+#: upload_csv.php:48
+msgid ""
+"You can download this file, then open it in Open Office, Excel or Google "
+"Docs."
+msgstr ""
+"Vous pouvez télécharger ce fichier, puis l'éditer avec Open Office, Excel ou Google "
+"Docs."
+
+#: upload_csv.php:54
+msgid "2. Upload the .csv file"
+msgstr "2. Charger le fichier .csv"
+
+#: upload_csv.php:56
+msgid ""
+"When you have your spreadsheet properly set up and filled with data, export "
+"it as any of the following: \"comma-delimited csv\", or just \"csv\". Save "
+"it to your computer then upload it here."
+msgstr ""
+"Une fois que votre table est correctement préparée et remplie, exportez-la "
+"au format \"comma-delimited csv\", ou simplement \"csv\". Sauvez-la, puis "
+"importez-la ici."
+
+#: upload_csv.php:57
+msgid ""
+"Exported CSV files should be comma-delimited and enclosed with double-quotes "
+"(\"). Encoding should be \"UTF-8.\""
+msgstr ""
+"Les fichiers CSV exportés doivent avoir les champs séparés par des virgules "
+"et inclus dans des doubles-guillemets (\"). L'encodage doit être en \"UTF-8.\""
+
+#: upload_csv.php:58
+msgid ""
+"<strong>Note:</strong> Depending on the \"Duplicate Record Preference\" "
+"setting, imported records are checked against existing records by the field "
+"set in the \"Duplicate Record Check Field\" setting. If a record matching an "
+"existing record is imported, one of three things can happen, based on the "
+"\"Duplicate Record Preference\" setting:"
+msgstr ""
+"<strong>Note:</strong> En fonction de la \"Préférence en cas de doublon\" "
+"les entrées importées sont comparées aux existantes sur le champ défini dans "
+"le réglage \"Champ de test de doublon\". En cas de doublon détecté, trois "
+"solutions possibles, en fonction de la \"Préférence en cas de doublon\":"
+
+#: upload_csv.php:59
+msgid "Current Setting"
+msgstr "Réglage actuel"
+
+#: upload_csv.php:62
+msgid ""
+"%sOverwrite%s an existing record with a matching %s will be updated with the "
+"data from the imported record. Blank or missing fields will not overwrite "
+"existing data."
+msgstr ""
+"%sRemplacer%s l'entrée existante avec un doublon sur %s sera mise à jour avec "
+"le contenu de l'entrée importée. Les champs vides ou manquant n'effaceront pas "
+"les valeurs existantes."
+
+#: upload_csv.php:65
+msgid ""
+"%sCreate New%s adds all imported records as new records without checking for "
+"a match."
+msgstr ""
+"%sAjouter%s ajoute toutes les entrées importées sans tester les doublons."
+
+#: upload_csv.php:68
+msgid ""
+"%sDon&#39;t Import%s does not import the new record if it matches the %s of "
+"an existing one."
+msgstr ""
+"%sSauter%s ne pas importer la nouvelle entrée en cas de doublon sur %s avec "
+"une existante."
+
+#: upload_csv.php:77
+msgid "Choose .csv file to import:"
+msgstr "Choisir un fichier .csv à importer:"
+
+#: upload_csv.php:78
+msgid "Upload File"
+msgstr "Charger le fichier"
+
+#. Plugin URI of the plugin/theme
+msgid "http://xnau.com/wordpress-plugins/participants-database"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Plugin for managing a database of participants, members or volunteers"
+msgstr "Extension pour gérer une base de participants, membres ou volontaires"
+
+#. Author of the plugin/theme
+msgid "Roland Barker"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://xnau.com"
+msgstr ""

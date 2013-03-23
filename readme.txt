@@ -502,8 +502,8 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.4.9.1 =
-* resolves many issues with other plugins conflicting in the admin
+= 1.4.9.2 =
+* major enhancements and bugfix release
 
 == Using the Plugin ==
 
@@ -584,7 +584,7 @@ The operators can be '=', '!', '<', '>' and '~' only. '!' means "NOT", so if you
 
 You can use more than one filter by stringing them together like this: `[pdb_list filter='last_name>c&last_name<h' ]` (note ampersand between filter statements) This gives you all records with last names that start with d through g. Upper case or lower case doesn't matter. These comparisons can be made with dates and numbers too, of course.
 
-It's now also possible to use an "or" operator to link statements, indicated by the "|" character. For instance if you wanted to show all records with a city of Boston or Providence, you would use `[pdb_list filter="city=boston|city=providence"]` and they can be combined: `[pdb_list filter="last_name=smith&city=boston|city=providence"]`
+It's now also possible to use an "or" operator to link statements, for instance if you wanted to show all records with a city of Boston or Providence, you would use `[pdb_list filter="city=boston|city=providence"]` and they can be combined: `[pdb_list filter="last_name=smith&city=boston|city=providence"]`
 
 To correctly compare dates, the field *must* be defined as a date field form element on the manage database fields page. Date values should be a regular date string like this: `[pdb_list filter='date>jan3,2012']` It's best not to use a number for the month (and maybe you have to use English month names) because the date/month/year order is different on different servers.
 
