@@ -9,9 +9,6 @@
 	// a string identifier for the class
   var $module = 'single';
   
-  // class for the wrapper
-  var $wrap_class = 'pdb-single';
-  
   // methods
   
   /**

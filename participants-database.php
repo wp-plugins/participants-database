@@ -58,6 +58,8 @@ class Participants_Db {
   public static $plugin_options;
   // holds the plugin settings object
   public static $plugin_settings;
+  // holds hard-coded configuration values
+  public static $config;
   // locations
   public static $plugin_page;
   public static $plugin_path;
@@ -72,9 +74,8 @@ class Participants_Db {
   public static $personal_fields;
   public static $source_fields;
   public static $field_groups;
-  // a list of all the form element types available
-  public static $element_types;
-  // this is can be prefixed on CSS classes or id to keep a namespace
+  
+  // this is a general-use prefix to set a namespace
   public static $css_prefix = 'pdb-';
   // holds the form validation errors
   public static $validation_errors;
@@ -108,6 +109,8 @@ class Participants_Db {
     // register the class autoloading
     spl_autoload_extensions('.php');
     spl_autoload_register('PDb_class_loader');
+    
+    self::_include_config();
 
     // set the table names
     global $wpdb;
@@ -130,25 +133,6 @@ class Participants_Db {
     //self::$plugin_options = get_option( self::$participants_db_options );
     // hard-code some image file extensions
     self::$allowed_extensions = array('jpg', 'jpeg', 'gif', 'png');
-
-    // define an array of all available form element types
-    self::$element_types = array(
-        'Text-line' => 'text-line',
-        'Text Area' => 'text-area',
-        'Rich Text' => 'rich-text',
-        'Checkbox' => 'checkbox',
-        'Radio Buttons' => 'radio',
-        'Dropdown List' => 'dropdown',
-        'Date Field' => 'date',
-        'Dropdown/Other' => 'dropdown-other',
-        'Multiselect Checkbox' => 'multi-checkbox',
-        'Radio Buttons/Other' => 'select-other',
-        'Multiselect/Other' => 'multi-select-other',
-        'Link Field' => 'link',
-        'Image Upload Field' => 'image-upload',
-        'Hidden Field' => 'hidden',
-        'Password Field' => 'password',
-    );
 
 
     // install/deactivate and uninstall methods are handled by the PDB_Init class
@@ -1019,83 +1003,90 @@ class Participants_Db {
    * @return string
    */
   public function prep_field_for_display($value, $form_element, $html = true) {
+    
+    $return = '';
+    
+    $return = apply_filters(self::$css_prefix . 'before_display_field', $return, $value, $form_element);
+    
+    if (empty($return)) {
 
-    switch ($form_element) :
+      switch ($form_element) :
 
-      case 'image-upload' :
+        case 'image-upload' :
 
-        $image = new PDb_Image(array('filename' => $value));
+          $image = new PDb_Image(array('filename' => $value));
 
-        if ($html)
-          $return = $image->get_image_html();
+          if ($html)
+            $return = $image->get_image_html();
 
-        elseif ($image->file_exists)
-          $return = $image->get_image_file();
+          elseif ($image->file_exists)
+            $return = $image->get_image_file();
 
-        else
+          else
+            $return = $value;
+
+          break;
+
+        case 'date' :
+
+          $return = empty($value) ? '' : date_i18n(self::$date_format, self::parse_date($value));
+          break;
+
+        case 'multi-checkbox' :
+        case 'multi-select-other' :
+
+          $multivalues = self::unserialize_array($value);
+          if ( is_array($multivalues) and empty( $multivalues['other'] ) ) unset($multivalues['other']);
+
+          $return = implode(', ', (array) $multivalues);
+          break;
+
+        case 'link' :
+
+          $linkdata = self::unserialize_array($value);
+
+          if (!is_array($linkdata)) {
+
+            $return = '';
+            break;
+          }
+
+          if (empty($linkdata[1]))
+            $linkdata[1] = str_replace('http://', '', $linkdata[0]);
+
+          if ($html)
+            $return = vsprintf(( empty($linkdata[0]) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>'), $linkdata);
+          else
+            $return = $linkdata[0];
+          break;
+
+        case 'text-line' :
+
+          if ($html) {
+
+            $return = self::make_link($value);
+            break;
+          } else {
+
+            $return = $value;
+            break;
+          }
+
+        case 'text-area':
+        case 'textarea':
+
+          $return = sprintf('<span class="textarea">%s</span>',$value );
+          break;
+        case 'rich-text':
+
+          $return = sprintf('<span class="textarea richtext">%s</span>',(self::$plugin_options['enable_wpautop'] ? wpautop($value) : $value ) );
+          break;
+        default :
+
           $return = $value;
 
-        break;
-
-      case 'date' :
-
-        $return = empty($value) ? '' : date_i18n(self::$date_format, self::parse_date($value));
-        break;
-
-      case 'multi-checkbox' :
-      case 'multi-select-other' :
-        
-        $multivalues = self::unserialize_array($value);
-        if ( is_array($multivalues) and empty( $multivalues['other'] ) ) unset($multivalues['other']);
-
-        $return = implode(', ', (array) $multivalues);
-        break;
-
-      case 'link' :
-
-        $linkdata = self::unserialize_array($value);
-
-        if (!is_array($linkdata)) {
-
-          $return = '';
-          break;
-        }
-
-        if (empty($linkdata[1]))
-          $linkdata[1] = str_replace('http://', '', $linkdata[0]);
-
-        if ($html)
-          $return = vsprintf(( empty($linkdata[0]) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>'), $linkdata);
-        else
-          $return = $linkdata[0];
-        break;
-
-      case 'text-line' :
-
-        if ($html) {
-
-          $return = self::make_link($value);
-          break;
-        } else {
-
-          $return = $value;
-          break;
-        }
-        
-      case 'text-area':
-      case 'textarea':
-        
-        $return = sprintf('<span class="textarea">%s</span>',$value );
-        break;
-      case 'rich-text':
-        
-        $return = sprintf('<span class="textarea richtext">%s</span>',(self::$plugin_options['enable_wpautop'] ? wpautop($value) : $value ) );
-        break;
-      default :
-
-        $return = $value;
-
-    endswitch;
+      endswitch;
+    }
 
     return $return;
   }
@@ -1336,6 +1327,8 @@ class Participants_Db {
 
             $new_value = $column_atts->default;
             $post[$column_atts->name] = $new_value;
+          } elseif (!isset($post[$column_atts->name])) {
+            continue;
           }
 
           if (in_array($column_atts->form_element, array('multi-checkbox', 'multi-select-other'))) {
@@ -1818,8 +1811,10 @@ class Participants_Db {
          * certain values will remain untouched
          */
         $post_data = $_POST;
-        $wp_filter = 'pdb_before_submit_' . ($_POST['action'] == 'insert' ? 'signup' : 'update');
-        apply_filters($wp_filter,$post_data);
+        $wp_filter = self::$css_prefix . 'before_submit_' . ($_POST['action'] == 'insert' ? 'signup' : 'update');
+        if (has_filter($wp_filter)) {
+          $post_data = apply_filters($wp_filter,$post_data);
+        }
 
         $id = isset($_POST['id']) ? $_POST['id'] : ( isset($_GET['id']) ? $_GET['id'] : false );
 
@@ -1834,8 +1829,8 @@ class Participants_Db {
         /*
          * set the stored record hook.
          */
-        $wp_hook = 'pdb_after_submit_' . ($_POST['action'] == 'insert' ? 'signup' : 'update');
-        do_action($wp_hook,self::get_participant($partcipant_id));
+        $wp_hook = self::$css_prefix . 'after_submit_' . ($_POST['action'] == 'insert' ? 'signup' : 'update');
+        do_action($wp_hook,self::get_participant($participant_id));
 
         // if we are submitting from the frontend, we're done
         if (!is_admin()) {
@@ -2064,7 +2059,7 @@ class Participants_Db {
       // drop-down fields
       case 'form_element':
         // populate the dropdown with the available field types from the FormElement class
-        return array('type' => 'dropdown', 'options' => self::$element_types);
+        return array('type' => 'dropdown', 'options' => array_flip(FormElement::get_types()));
 
       case 'validation':
         return array(
@@ -2687,6 +2682,54 @@ class Participants_Db {
   private function _show_validation_error( $error, $name = '' ) {
     if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error($name, $error );
     else self::set_admin_message($error);
+  }
+  
+  /**
+   * includes the hard-coded configuration file
+   *
+   * this loads the default configuration file, then if it exists, a custom config
+   * file whcih will override the default values when the two are merged into one
+   * configuration value 
+   */
+  private static function _include_config() {
+    
+    $overrides = array();
+    $config_file = ABSPATH . 'wp-content/'. Participants_Db::$css_prefix . 'config.php';
+    if (is_file($config_file)) {
+      require $config_file;
+      $overrides = $config;
+    }
+    require Participants_Db::$css_prefix . 'config.php';
+    
+    self::$config = self::array_merge2($config, $overrides);
+    
+    //error_log(__METHOD__.' config:'.print_r(self::$config,1));
+    
+  }
+  
+  /**
+   * recursively merges two arrays, overwriting matching keys
+   *
+   * if any of the array elements are an array, they will be merged with an array
+   * with the same key in the base array
+   *
+   * @param array $array    the base array
+   * @param array $override the array to merge
+   * @return array
+   */
+  public function array_merge2 ($array, $override) {
+    $x = array();
+    foreach ($array as $k => $v) {
+      if (isset($override[$k])) {
+        if (is_array($v)) {
+          $v = self::array_merge2($v,(array)$override[$k]);
+        } else $v = $override[$k];
+        unset($override[$k]);
+      }
+      $x[$k] = $v;
+    }
+    // add in the remaining unmatched elements
+    return $x += $override;
   }
   
   /**

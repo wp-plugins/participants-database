@@ -10,7 +10,7 @@ class FormValidation {
 	private $errors;
 
   // holds the error messages
-	private $error_messages;
+	public $error_messages = array();
   
   // holds the CSS for an error indication as defined in the options
 	private $error_style;
@@ -42,6 +42,16 @@ class FormValidation {
     foreach ( array( 'invalid','empty','nonmatching','duplicate' ) as $error_type ) {
       $this->error_messages[$error_type] = Participants_Db::$plugin_options[$error_type.'_field_message'];
     }
+    /*
+     * this filter provides an opportunity to add or modify validation error messages
+     * 
+     * for example, if there is a custom validation that generates an error type of 
+     * "custom" an error message with a key of "custom" will be shown if it fails.
+     */
+		if (has_filter(Participants_Db::$css_prefix . 'validation_error_messages')) {
+			$this->error_messages = apply_filters(Participants_Db::$css_prefix . 'validation_error_messages', $this->error_messages);
+		}
+    
 		$this->error_style = Participants_Db::$plugin_options['field_error_style'];
 
     // set the default error wrap HTML for the validation error feedback display
@@ -142,10 +152,10 @@ class FormValidation {
 
 			if ( isset( $this->error_messages[$error] ) ) {
         $error_messages[] = sprintf( $this->error_messages[$error], $field_atts->title );
-				$this->error_class = 'pdb-error';
+				$this->error_class = Participants_Db::$css_prefix . 'error';
       } else {
       	$error_messages[] = $error;
-				$this->error_class = empty( $field ) ? 'pdb-message' :'pdb-error' ;
+				$this->error_class = empty( $field ) ? Participants_Db::$css_prefix . 'message' :Participants_Db::$css_prefix . 'error' ;
 			}
 
 		endforeach;// $this->errors 
@@ -236,11 +246,12 @@ class FormValidation {
 	 * receives a validation pair and processes it, adding any error to the
 	 * validation status array
 	 *
-	 * @param string $value       the submitted value of the field
-	 * @param string $name        the name of the field
-	 * @param string $validation  validation method to use: can be NULL (or absent),
-	 *                            'no', 'yes', 'email', 'other' (for regex or match
-	 *                            another field value)
+	 * @param string $value        the submitted value of the field
+	 * @param string $name         the name of the field
+	 * @param string $validation   validation method to use: can be NULL (or absent),
+	 *                             'no', 'yes', 'email', 'other' (for regex or match
+	 *                             another field value)
+	 * @param string $form_element the form element type of the field
 	 * @return NULL
 	 */
 	private function _validate_field( $value, $name, $validation = NULL, $form_element = false ) {
@@ -256,17 +267,14 @@ class FormValidation {
      * if a custom validation is implemented, the $field->error_type must be set 
      * to a validation method key string so the built-in validation won't be 
      * applied. This key string is an arbitrary unique key, so if can be anything 
-     * except a string that is already defined.
+     * except a string that is already defined. If the field passes validation,
+     * $field->validation can be set to false to avoid further validation of the
+     * field.
      * 
      */
-    apply_filters('pdb_before_validate_field', $field );
-    /*
-     * this filter provides an opportunity to add or modify validation error messages
-     * 
-     * for example, if there is a custom validation that generates an error type of 
-     * "custom" an error message with a key of "custom" will be shown if it fails.
-     */
-    apply_filters('pdb_validation_error_messages', $this->error_messages);
+    if (has_filter(Participants_Db::$css_prefix . 'before_validate_field')) {
+			apply_filters(Participants_Db::$css_prefix . 'before_validate_field', $field );
+		}
 		
 		/*
 		 * set the validation to FALSE if it is not defined or == 'no'
@@ -274,11 +282,13 @@ class FormValidation {
 		if (empty($field->validation) || $field->validation === NULL || $field->validation == 'no') $field->validation = FALSE;
     
     if (WP_DEBUG) { error_log(__METHOD__.'
-		field: '.$name.'
-		value: '.(is_array($field->value)? print_r($field->value,1):$field->value).'
-		validation: '.(is_bool($field->validation)? ($field->validation ? 'true' : 'false') : $field->validation).'
-		submitted? '.($this->not_submitted($name)?'no' : 'yes').'
-		empty? '.($this->is_empty($field->value)?'yes':'no')); }
+  field: '.$name.'
+  element: '.$field->form_element . '
+  value: '.(is_array($field->value)? print_r($field->value,1):$field->value).'
+  validation: '.(is_bool($field->validation)? ($field->validation ? 'true' : 'false') : $field->validation).'
+  submitted? '.($this->not_submitted($name)?'no' : 'yes').'
+  empty? '.($this->is_empty($field->value)?'yes':'no') . '
+  error type: ' . $field->error_type); }
 
     /*
      * first we check if the field needs to be validated at all. Fields not present
@@ -287,10 +297,11 @@ class FormValidation {
      */
 		if ( $field->validation === FALSE || $this->not_submitted($name) ) return;
 		/*
-		 * if the validation method is 'yes' we test the submitted field for empty using a defined method that
-		 * allows 0, but no whitespace characters.
+		 * if the validation method is 'yes' and the field has not already been
+		 * validated (error_type false) we test the submitted field for empty using
+		 * a defined method that allows 0, but no whitespace characters.
 		 */
-		elseif ( $field->validation == 'yes' ) {
+		elseif ( $field->validation == 'yes' and $field->error_type === false ) {
 			
 			if ( $field->form_element === false and $this->is_empty($field->value)	) {
 				
@@ -312,7 +323,8 @@ class FormValidation {
 			}
     
     /*
-		 * here we process the remaining validation methods set for the field
+		 * here we process the remaining validation methods set for the field if we
+		 * have not validated the field yet
 		 */
     } elseif ($field->error_type === false) {
 
@@ -408,9 +420,9 @@ class FormValidation {
 	private function _is_empty_array($array)
 	{
 		foreach ($array as $element) {
-			if (self::is_empty($element)) return true;
+			if (!self::is_empty($element)) return false;
 		}
-		return false;
+		return true;
 	}
 
 	// tests a string for a regex pattern by looking for a delimiter

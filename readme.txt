@@ -209,6 +209,7 @@ You can no doubt come up with many variations on this.
 * improved date formatting for numeric non-American style dates (dd/mm/yyyy)
 * fields omitted from the signup form are no longer validated, making it easier to construct different signup forms
 * more control over search/sort dropdowns in the list display (see template)
+* signup, record and single shortcodes now have the "fields" attribute
 * list shortcode filters now correctly filter multi-select fields
 * lists may now be sorted by more than one field in the shortcode
 * list shortcode filter statements may now include "or" operators

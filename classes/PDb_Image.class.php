@@ -25,7 +25,7 @@ class PDb_Image extends Image_Handler {
   function __construct( $config ) {
     
     $subclass_atts = array(
-                      'classname' => 'pdb-image image-field-wrap',
+                      'classname' => Participants_Db::$css_prefix . 'image image-field-wrap',
                       );
     
     parent::__construct( $config, $subclass_atts );

@@ -17,9 +17,6 @@ class PDb_Signup extends PDb_Shortcode {
   
 	// a string identifier for the class
   var $module = 'signup';
-  
-  // class for the wrapper
-  var $wrap_class = 'pdb-signup';
 	
 	// holds the target page for the submission
 	private $submission_page;
@@ -153,7 +150,7 @@ class PDb_Signup extends PDb_Shortcode {
        * object so things like the email parameters can be altered. The properties 
        * would need to be public, or we create methods to alter them
        */
-      apply_filters('pdb_after_submit_signup', $this);
+      apply_filters(Participants_Db::$css_prefix . 'after_submit_signup', $this);
 			
 			// print the thank you note
 			$this->_thanks();
