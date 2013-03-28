@@ -189,7 +189,9 @@ class PDb_List extends PDb_Shortcode {
 
     // allow the query to be altered before the records are retrieved
     $list_query = $this->list_query . ' ' . $this->pagination->getLimitSql();
-    apply_filters(Participants_Db::$css_prefix . 'list_query',$list_query);
+    if (has_filter(Participants_Db::$css_prefix . 'list_query')) {
+      $list_query = apply_filters(Participants_Db::$css_prefix . 'list_query',$list_query);
+    }
     /*
      * get the records for this page, adding the pagination limit clause
      *
