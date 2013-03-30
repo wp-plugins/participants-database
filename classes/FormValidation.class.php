@@ -29,6 +29,8 @@ class FormValidation {
 	 *
 	 */
 	public function __construct() {
+    
+    $this->post_array = $_POST;
 
 		// clear the array
 		$this->errors = array();
@@ -59,13 +61,14 @@ class FormValidation {
 	 * @param string $value       the submitted value of the field
 	 * @param object $column_atts the column atributes object
 	 *                            validation key can be NULL, 'yes', 'email', regex
-	 * @param array  $post        the post array with all submitted values
+	 * @param array  $post        the post array with all submitted values, defaults 
+   *                            to $this->post_array as instantiated
 	 */
-	public function validate( $value, $column_atts, $post = NULL ) {
+	public function validate( $value, $column_atts, $post = false ) {
 
-		$this->_validate_field( $value, $column_atts->name, $column_atts->validation, $column_atts->title );
+		$this->_validate_field( $value, $column_atts->name, $column_atts->validation, $column_atts->form_element );
 
-    if ( is_array( $post ) ) $this->post_array = $post;
+    if ( $post ) $this->post_array = $post;
 
 	}
 
@@ -118,8 +121,11 @@ class FormValidation {
 					$element = 'textarea';
 					break;
 
+        case 'link':
+          $field_atts->name .= '[]';
 				case 'text':
 				case 'text-line':
+        case 'date':
         case 'captcha':
 					$element = 'input';
 					break;
@@ -233,43 +239,89 @@ class FormValidation {
 	 *
 	 * @param string $value       the submitted value of the field
 	 * @param string $name        the name of the field
-	 * @param string $validation  key can be NULL (or absent), 'yes', 'email', regex, 'captcha'
+	 * @param string $validation  validation method to use: can be NULL (or absent),
+	 *                            'no', 'yes', 'email', 'other' (for regex or match
+	 *                            another field value)
+	 * @return NULL
 	 */
-	private function _validate_field( $value, $name, $validation = NULL ) {
-
-		//error_log( __METHOD__.' validating field '.$name.' of value '.(is_array($value)?print_r($value,1):$value).' with '.$validation );
+	private function _validate_field( $value, $name, $validation = NULL, $form_element = false ) {
 
     $error_type = false;
 
+    $field = (object) compact('value','name','validation','form_element','error_type');
+    
     /*
-     * set as empty any fields requiring validation
-     * second condition is to allow match validation fields to be empty; they'll be tested again
-     * lastly, if the field was not submitted at all, we don't validate it
+     * this filter sends the $field object through a filter to allow a custom 
+     * validation to be inserted
+     * 
+     * if a custom validation is implemented, the $field->error_type must be set 
+     * to a validation method key string so the built-in validation won't be 
+     * applied. This key string is an arbitrary unique key, so if can be anything 
+     * except a string that is already defined.
+     * 
      */
-		if ( empty( $validation ) || NULL === $validation || 'no' == strtolower( $validation ) || $this->not_submitted($name) ) return;
+    apply_filters('pdb_before_validate_field', $field );
+    /*
+     * this filter provides an opportunity to add or modify validation error messages
+     * 
+     * for example, if there is a custom validation that generates an error type of 
+     * "custom" an error message with a key of "custom" will be shown if it fails.
+     */
+    apply_filters('pdb_validation_error_messages', $this->error_messages);
 
-		elseif ( empty( $value )  && ! isset( $this->post_array[$validation] ) ) {
+		/*
+		 * set the validation to FALSE if it is not defined or == 'no'
+		 */
+		if (empty($field->validation) || $field->validation === NULL || $field->validation == 'no') $field->validation = FALSE;
     
-    //error_log( __METHOD__.' test empty' );
+    if (WP_DEBUG) { error_log(__METHOD__.'
+		field: '.$name.'
+		value: '.(is_array($field->value)? print_r($field->value,1):$field->value).'
+		validation: '.(is_bool($field->validation)? ($field->validation ? 'true' : 'false') : $field->validation).'
+		submitted? '.($this->not_submitted($name)?'no' : 'yes').'
+		empty? '.($this->is_empty($field->value)?'yes':'no')); }
     
-      $error_type = 'empty';
+    /*
+     * first we check if the field needs to be validated at all. Fields not present
+     * in the form are excluded as well as any field with no validation method
+     * defined, or a validation method of 'no'.
+     */
+		if ( $field->validation === FALSE || $this->not_submitted($name) ) return;
+		/*
+		 * if the validation method is 'yes' we test the submitted field for empty using a defined method that
+		 * allows 0, but no whitespace characters.
+		 */
+		elseif ( $field->validation == 'yes' ) {
     
+			if ( $field->form_element === false and $this->is_empty($field->value)	) {
+				
+				$field->error_type = 'empty';
+				
     } else {
+				// we can validate each form element differently here
+				switch ($field->form_element) {
+					case 'link':
+						if ($this->is_empty($field->value[0])) {
+							$field->error_type = 'empty';
+						}
+						break;
+					default:
+						if ($this->is_empty($field->value)) {
+							$field->error_type = 'empty';
+						}
+				}
+			}
     
-    //error_log( __METHOD__.' '.$name.' not empty; other validation:'.$validation.' '.print_r( $this->post_array,1 ) );
-
       /*
-       * perform the specific type of validation with our field
+		 * here we process the remaining validation methods set for the field
        */
+    } elseif ($field->error_type === false) {
+
       $regex = false;
       $test_value = false;
       switch (true) {
         
-        /*
-         * we now process sever different types of validation
-         */
-  
-        case ( 'email'  == strtolower( $validation ) ) :
+        case ( $field->validation == 'email' ) :
   
           $regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
           break;
@@ -287,29 +339,32 @@ class FormValidation {
           
           break;
         
-        case ( isset( $this->post_array[$validation] ) ) :
-          
-          $test_value = $this->post_array[$validation];
+        case ( $this->_is_regex( $field->validation ) ) :
+  
+          $regex = $field->validation;
           break;
-  
-        case ( self::_is_regex( $validation ) ) :
-  
-          $regex = $validation;
+        
+        /*
+         * if it's not a regex, test to see if it's a valid field name for a match test
+         */
+        case ( isset( $this->post_array[$field->validation] ) ) :
+          
+          $test_value = $this->post_array[$field->validation];
           break;
         
         default:
-  
+        
       }
   
-      if ( false !== $regex && preg_match( $regex, $value ) == 0 ) {
-        $error_type = $validation == 'captcha' ? 'captcha': 'invalid';
-      } elseif ( false !== $test_value && $value !== $test_value ) {
-        $error_type = 'nonmatching';
+      if ( false !== $test_value && $field->value !== $test_value ) {
+        $field->error_type = 'nonmatching';
+      } elseif ( false !== $regex && preg_match( $regex, $field->value ) == 0 ) {
+        $field->error_type = $validation == 'captcha' ? 'captcha': 'invalid';
       }
       
     }
     
-    if ( $error_type ) $this->_add_error( $name, $error_type );
+    if ( $field->error_type ) $this->_add_error( $name, $field->error_type );
 
 	}
 
@@ -340,6 +395,37 @@ class FormValidation {
 	/*************************
 	 * UTILITIES             *
 	 *************************/
+
+	/**
+	 * test a submitted field as empty
+	 *
+	 * we test for a submission that has only invalid characters or nothing. If we
+	 * come here with an array, we test each element and return true if one of them
+	 * tests true
+	 *
+	 * @param mixed $input the value of the submitted field
+	 * 
+	 * @return bool true if empty
+	 */
+	public static function is_empty($string)
+	{
+		if (is_array($string)) return self::_is_empty_array($string);
+		return $string == '' or 0 !== preg_match('/^(\W+|\s+)$/', $string);
+	}
+	
+	/**
+	 * tests each element of an array for empty
+	 *
+	 * @param array $array the array to test
+	 * @return bool true if any element tests true
+	 */
+	private function _is_empty_array($array)
+	{
+		foreach ($array as $element) {
+			if (self::is_empty($element)) return true;
+		}
+		return false;
+	}
 
 	// tests a string for a regex pattern by looking for a delimiter
 	// not the most robust solution, but will do for most situations
@@ -373,7 +459,7 @@ class FormValidation {
    */
   public function not_submitted($fieldname) {
     
-    return $this->post_array[$fieldname] === false;
+    return @$_POST[$fieldname] === NULL;
   }
   /**
    * encodes or decodes a string using a simple XOR algorithm

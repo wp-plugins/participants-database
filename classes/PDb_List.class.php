@@ -193,13 +193,19 @@ class PDb_List extends PDb_Shortcode {
     // instantiate the pagination object
     $this->pagination = new PDb_Pagination($pagination_defaults);
 
+    // allow the query to be altered before the records are retrieved
+    $list_query = $this->list_query . ' ' . $this->pagination->getLimitSql();
+    apply_filters('pdb_list_query',$list_query);
     /*
      * get the records for this page, adding the pagination limit clause
      *
      * this gives us an array of objects, each one a set of field->value pairs
      */
-    $records = $wpdb->get_results($this->list_query . ' ' . $this->pagination->getLimitSql(), OBJECT);
+    $records = $wpdb->get_results($list_query, OBJECT);
 
+    /*
+     * build an array of record objects, indexed by ID
+     */
     foreach ($records as $record) {
 
       $id = $record->id;
@@ -257,11 +263,13 @@ class PDb_List extends PDb_Shortcode {
     // set up the basic values; sort values come from the shortcode
     $default_values = array(
         'search_field' => 'none',
-        'value' => '',
-        'operator' => 'LIKE',
-        'sortBy' => $this->shortcode_atts['orderby'],
-        'ascdesc' => $this->shortcode_atts['order'],
-        'submit' => '',
+        'value'        => '',
+        'operator'     => 'LIKE',
+        'sortBy'       => $this->shortcode_atts['orderby'],
+        'ascdesc'      => $this->shortcode_atts['order'],
+        'submit'       => '',
+        'sortstring'   => $this->shortcode_atts['orderby'],
+        'orderstring'  => $this->_get_orderstring(),
     );
 
     /* filtering parameters can come from three sources: the shortcode, $_POST (AJAX) 
@@ -273,30 +281,11 @@ class PDb_List extends PDb_Shortcode {
      */
     $this->filter = shortcode_atts($default_values, $_REQUEST);
 
-    /* validate and add the sorting parameters to the query
-     */
-    $order_statement = array();
+    //error_log(__METHOD__.' this->filter:'.print_r($this->filter,1));
     
-    if ($this->filter['sortBy'] == 'random') {
+    // get the ORDER BY clause
+    $order_clause = $this->_build_order_clause();
       
-      $order_statement[] = 'RAND()';
-    } elseif (isset($this->filter['sortBy']) and ! empty($this->filter['sortBy'])) {
-        
-        $sort_fields = explode(',',$this->filter['sortBy']);
-        $sort_orders = isset($this->filter['ascdesc']) ? explode(',',$this->filter['ascdesc']) : NULL;
-        for ($i = 0;$i < count($sort_fields);$i++) {
-          
-          if (Participants_Db::is_column($sort_fields[$i]))
-            $order_statement[] = 'p.' . $sort_fields[$i] . ((isset($sort_orders[$i]) and in_array(strtoupper($sort_orders[$i]), array('ASC', 'DESC')))? ' ' . strtoupper($sort_orders[$i]) : ' ASC' );
-        }
-    } else {
-      
-      $order_statement = false;
-    }
-
-    // assemble the ORDER BY clause
-    $order_clause = is_array($order_statement) ? ' ORDER BY ' . implode( ', ', $order_statement) : '';
-
     /* at this point, we have our base query, now we need to add any WHERE clauses
      */
 
@@ -363,6 +352,86 @@ class PDb_List extends PDb_Shortcode {
   }
   
   /**
+   * processes the ordering attributes to build an order clause for the query
+   * 
+   * this starts with the two order attributes of the shortcode, both of which can have multiple fields, and then add in the user sort to yield a combined order clause
+   * 
+   * @return string an order clause for a database query
+   */
+  private function _build_order_clause() {
+    
+    $order_statement = array();
+
+    if ($this->filter['sortBy'] == 'random') {
+
+      $order_statement[] = 'RAND()';
+    } elseif (isset($this->filter['sortBy']) and !empty($this->filter['sortBy'])) {
+      
+      /*
+       * the idea here is we take the two strings, sortstring and orderstring (which 
+       * correspond to the shortcode-supplied sorting parameters) and convert them 
+       * into arrays. We then build an array of sorting paramters, starting with the 
+       * user sort. Then we add the shortcode sort, discarding any that match sort 
+       * fields already in the sorting array. Finally, we use the sorting array to 
+       * construct our MySQL clause;
+       */
+      $sort_arrays = array();
+      $sort_fields = explode(',',$this->filter['sortstring']);
+      $sort_orders = explode(',',$this->filter['orderstring']);
+      $sort_by = explode(',',$this->filter['sortBy']);
+      $sort_by_order = explode(',',$this->filter['ascdesc']);
+      for ($i = 0; $i < count($sort_by); $i++) {
+        if(Participants_Db::is_column($sort_by[$i])) {
+          $sort_arrays[] = array(
+              'field' => $sort_by[$i],
+              'order' => (empty($sort_by_order[$i]) ? 'asc' : $sort_by_order[$i]),
+          );
+        }
+      }
+      for ($i = 0; $i < count($sort_fields); $i++) {
+        if(Participants_Db::is_column($sort_fields[$i])) {
+          foreach ($sort_arrays as $sort_array) {
+            if ($sort_fields[$i] == $sort_array['field']) continue 2;
+          }
+          $sort_arrays[] = array(
+              'field' => $sort_fields[$i],
+              'order' => $sort_orders[$i],
+          );
+        }
+      }
+      
+      foreach ($sort_arrays as $sort_array) {
+        $order_statement[] = 'p.' . $sort_array['field'] . ' ' . strtoupper($sort_array['order']);
+      }
+    } else {
+
+      $order_statement = false;
+    }
+
+    // assemble the ORDER BY clause
+    return is_array($order_statement) ? ' ORDER BY ' . implode( ', ', $order_statement) : '';
+    
+  }
+  
+  /**
+   * builds an order definition string and adds it to the shortcode atts array
+   * 
+   * this create a string of ASC/DESC statements to pair with the sort fields defined in a shortcode
+   * 
+   * @return string the orderstring
+   */
+  private function _get_orderstring() {
+    
+    $sort_fields = explode(',', $this->shortcode_atts['orderby']);
+    $sort_orders = explode(',', $this->shortcode_atts['order']);
+    if ( count($sort_fields) > count($sort_orders)) {
+      $sort_orders = $sort_orders + array_fill(count($sort_orders),count($sort_fields)-count($sort_orders),'asc');
+    }
+    
+    return implode(',',$sort_orders);
+  }
+  
+  /**
    * processes the shortcode filter string
    * 
    * @return array of where clauses
@@ -405,14 +474,6 @@ class PDb_List extends PDb_Shortcode {
         
         if ($clause === false) continue;
 
-        /*
-         * don't add an 'id = 0' clause if there is a user search. This gives us a 
-         * way to create a "search results only" list if the shortcode contains 
-         * a filter for 'id=0'
-         */
-        if (isset($this->filter['value']) and !empty($this->filter['value']) and $column == 'id' and $target == '0')
-          continue;
-
         // add the clause
         $clauses[] = $clause;
         
@@ -438,6 +499,15 @@ class PDb_List extends PDb_Shortcode {
     
     // get the parts
     list( $string, $column, $op_char, $target ) = $matches;
+
+    /*
+     * don't add an 'id = 0' clause if there is a user search. This gives us a 
+     * way to create a "search results only" list if the shortcode contains 
+     * a filter for 'id=0'
+     */
+    if ($column == 'id' and $target == '0' and isset($this->filter['value']) and !empty($this->filter['value'])) {
+      return false;
+    }
 
     /*
      * if the column is not valid or if the column is being searched in by 
@@ -585,6 +655,8 @@ class PDb_List extends PDb_Shortcode {
     $output[] = '<form method="post" id="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
     $output[] = '<input type="hidden" name="action" value="pdb_list_filter">';
     $output[] = '<input type="hidden" name="pagelink" value="' . $this->prepare_page_link($_SERVER['REQUEST_URI']) . '">';
+    $output[] = '<input type="hidden" name="sortstring" value="' . $this->filter['sortstring'] . '">';
+    $output[] = '<input type="hidden" name="orderstring" value="' . $this->filter['orderstring'] . '">';
 
     if ($print)
       echo $this->output_HTML($output);
@@ -592,18 +664,21 @@ class PDb_List extends PDb_Shortcode {
       return $this->output_HTML($output);
   }
 
-  //build the list of columns available for filtering
-  public function column_selector($all = false, $print = true) {
+  /**
+   * builds a dropdown element with a list of columns available for filtering
+   *
+   * @param string $all   sets the "all fields" or no search string, defaults to "show all"
+   * @param bool   $print if true prints the dropdown element
+   * @param array  $columns array of columns to show in the dropdown, defaults to displayed columns
+   *
+   * @return NULL or HTML string if $print == false
+   */
+  public function column_selector($all = false, $print = true, $columns = false, $sort = 'column') {
 
     $all_string = false === $all ? '(' . __('show all', 'participants-database') . ')' : $all;
 
-    $filter_columns = array($all_string => 'none');
+    $filter_columns = array($all_string => 'none') + Participants_Db::get_field_list('search', $columns, $sort);
     
-    foreach($this->display_columns as $column ) {
-      
-      $filter_columns[Participants_Db::column_title($column)] = $column;
-    }
-
     $element = array(
         'type' => 'dropdown',
         'name' => 'search_field',
@@ -638,7 +713,7 @@ class PDb_List extends PDb_Shortcode {
         'type' => 'dropdown',
         'name' => 'sortBy',
         'value' => $this->filter['sortBy'],
-        'options' => array(''=>''  ) + $this->sortables,
+        'options' => array(''=>'') + $this->sortables,
         'class' => 'search-item',
     );
     $output[] = FormElement::get_element($element);
@@ -655,12 +730,28 @@ class PDb_List extends PDb_Shortcode {
     );
     $output[] = FormElement::get_element($element);
 
-    $output[] = '<input name="submit" type="submit" value="' . $this->i18n['sort'] . '"';
+    $output[] = '<input name="submit" type="submit" value="' . $this->i18n['sort'] . '" />';
 
     if ($print)
       echo $this->output_HTML($output);
     else
       return $this->output_HTML($output);
+  }
+
+  /**
+   * sets the sortables list
+   * 
+   * @param array  $columns supplies a list of columns to use, defualts to sortable 
+   *                        displayed columns
+   * @param string $sort    'column' sorts by the display column order, 'order' uses 
+   *                        the defined group/fields order, 'alpha' sorts the list 
+   *                        alphabetically
+   * @return NULL just sets the sortables property
+   */
+  public function set_sortables($columns = false, $sort = 'column') {
+    if($columns !== false or $sort != 'column') {
+    	$this->sortables = Participants_Db::get_sortables($columns,$sort);
+    }
   }
 
   /**
@@ -704,32 +795,32 @@ class PDb_List extends PDb_Shortcode {
    * sets the columns to display in the list
    *
    */
-  private function _set_display_columns() {
-
-    // allow for an arbitrary fields definition list in the shortcode
-    if (!empty($this->shortcode_atts['fields'])) {
-
-      $raw_list = explode(',', str_replace(array("'", '"', ' ', "\r"), '', $this->shortcode_atts['fields']));
-
-      if (is_array($raw_list)) :
-
-        //clear the array
-        $this->display_columns = array();
-
-        foreach ($raw_list as $column) {
-
-          if (Participants_Db::is_column($column)) {
-
-            $this->display_columns[] = $column;
-          }
-        }
-
-      endif;
-    } else {
-
-      $this->display_columns = Participants_Db::get_list_display_columns('display_column');
-    }
-  }
+//  private function _set_display_columns() {
+//
+//    // allow for an arbitrary fields definition list in the shortcode
+//    if (!empty($this->shortcode_atts['fields'])) {
+//
+//      $raw_list = explode(',', str_replace(array("'", '"', ' ', "\r"), '', $this->shortcode_atts['fields']));
+//
+//      if (is_array($raw_list)) :
+//
+//        //clear the array
+//        $this->display_columns = array();
+//
+//        foreach ($raw_list as $column) {
+//
+//          if (Participants_Db::is_column($column)) {
+//
+//            $this->display_columns[] = $column;
+//          }
+//        }
+//
+//      endif;
+//    } else {
+//
+//      $this->display_columns = Participants_Db::get_list_display_columns('display_column');
+//    }
+//  }
 
   /**
    * get the column form element type
@@ -785,7 +876,7 @@ class PDb_List extends PDb_Shortcode {
   }
 
   public function output_HTML($output = array()) {
-    return implode(PHP_EOL, $output);
+    return implode('', $output);
   }
 
   public function show_link($value, $template = false, $print = false) {
@@ -976,6 +1067,22 @@ class PDb_List extends PDb_Shortcode {
   }
   
   /**
+   * merges two indexed arrays such that each element is unique in the resulting indexed array
+   * 
+   * @param array $array1 this array will take priority, it's elements will precede 
+   *                      elements from the second array
+   * @param array $array2
+   * @return array an indexed array of unique values
+   */
+  public static function array_merge_unique($array1,$array2)
+  {
+    $array1 = array_combine( array_values( $array1 ), $array1 );
+    $array2 = array_combine( array_values( $array2 ), $array2 );
+
+    return array_values(array_merge($array1, $array2));
+  }
+  
+  /**
    * converts a URL-encoded character to the correct utf-8 form
    *
    * @param string $string the string to convert to UTF-8
@@ -984,6 +1091,10 @@ class PDb_List extends PDb_Shortcode {
   function to_utf8( $string ) {
     
     $value = urldecode($string);
+    if (!function_exists('mb_detect_encoding')) {
+      error_log( __METHOD__ . ': unable to process multibyte strings because "mbstring" module is not present');
+      return $value;
+    }
     $encoding = mb_detect_encoding($value.'a',array('utf-8', 'windows-1251','windows-1252','ISO-8859-1'));
     return mb_convert_encoding($value,'utf-8',$encoding); 
   }
@@ -996,11 +1107,11 @@ class PDb_List extends PDb_Shortcode {
     /* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
     $this->i18n = array(
         'delete_checked' => _x('Delete Checked', 'submit button label', 'participants-database'),
-        'change' => _x('Change', 'submit button label', 'participants-database'),
-        'sort' => _x('Sort', 'submit button label', 'participants-database'),
-        'filter' => _x('Filter', 'submit button label', 'participants-database'),
-        'clear' => _x('Clear', 'submit button label', 'participants-database'),
-        'search' => _x('Search', 'search button label', 'participants-database'),
+        'change'         => _x('Change', 'submit button label', 'participants-database'),
+        'sort'           => _x('Sort', 'submit button label', 'participants-database'),
+        'filter'         => _x('Filter', 'submit button label', 'participants-database'),
+        'clear'          => _x('Clear', 'submit button label', 'participants-database'),
+        'search'         => _x('Search', 'search button label', 'participants-database'),
     );
   }
 

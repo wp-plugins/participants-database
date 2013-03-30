@@ -27,6 +27,9 @@ class PDb_Signup extends PDb_Shortcode {
   // holds the submission status: false if the form has not been submitted
   private $submitted = false;
 
+	// holds the recipient values after a form submission
+	private $recipient;
+
 	// holds the current email object
 	public $email_message;
 	
@@ -61,7 +64,9 @@ class PDb_Signup extends PDb_Shortcode {
 	public function __construct( $params ) {
     
 		// define shortcode-specific attributes to use
-		$add_atts = array( 'type' => 'signup' );
+		$add_atts = array(
+                      'type'   => 'signup',
+                      );
     
 		/*
      * if we're coming back from a successful form submission, the id of the new
@@ -84,6 +89,10 @@ class PDb_Signup extends PDb_Shortcode {
 		
     // run the parent class initialization to set up the parent methods 
     parent::__construct( $this, $params, $add_atts );
+		
+    $this->module = $this->shortcode_atts['type'];
+    
+    $this->registration_page = Participants_Db::get_record_link( $this->participant_values['private_id'] );
 		
     // set the action URI for the form
 		$this->_set_submission_page();
@@ -112,7 +121,7 @@ class PDb_Signup extends PDb_Shortcode {
 						 ( isset( $_GET['pid'] ) && false === Participants_Db::get_participant_id( $_GET['pid'] ) ) 
 						)
 						&&
-						$this->shortcode_atts['type'] != 'thanks'
+						$this->module == 'signup'
 					 )
 				{
 					// no submission; output the form
@@ -203,17 +212,17 @@ class PDb_Signup extends PDb_Shortcode {
         FormElement::print_hidden_fields( array(
                                                 'action'         => $this->module,
                                                 'subsource'      => Participants_Db::PLUGIN_NAME,
-                                                'shortcode_page' => $_SERVER['REQUEST_URI'],
+                                                'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ),
                                                 'thanks_page'    => $this->submission_page
                                                 ) );
 
   }
 	
-	public function print_submit_button( $class = 'button-primary', $text = false ) {
+	public function print_submit_button( $class = 'button-primary' ) {
 		
 		FormElement::print_element( array(
                                       'type'       => 'submit',
-                                      'value'      => ($text === false ? $this->options['signup_button_text'] : $text),
+                                      'value'      => $this->options['signup_button_text'],
                                       'name'       => 'submit',
                                       'class'      => $class.' pdb-submit',
                                       ) );

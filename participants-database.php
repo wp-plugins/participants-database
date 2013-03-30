@@ -58,6 +58,8 @@ class Participants_Db {
   public static $plugin_options;
   // holds the plugin settings object
   public static $plugin_settings;
+  // holds hard-coded configuration values
+  public static $config;
   // locations
   public static $plugin_page;
   public static $plugin_path;
@@ -107,6 +109,8 @@ class Participants_Db {
     // register the class autoloading
     spl_autoload_extensions('.php');
     spl_autoload_register('PDb_class_loader');
+    
+    self::_include_config();
 
     // set the table names
     global $wpdb;
@@ -396,7 +400,7 @@ class Participants_Db {
       wp_enqueue_style('pdb-frontend');
     }
 
-    wp_register_script('pdb-shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
+    wp_register_script(self::$css_prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
     wp_register_script(self::$css_prefix.'list-filter', plugin_dir_url(__FILE__) . 'js/list-filter.js', array('jquery'));
     wp_register_script(self::$css_prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
 
@@ -412,9 +416,9 @@ class Participants_Db {
   public function add_scripts() {
 
     if (false !== self::$shortcode_present) {
-
-      wp_enqueue_script('pdb-shortcode');
-      wp_enqueue_script('jq-placeholder');
+      wp_enqueue_script('jquery');
+      wp_enqueue_script(self::$css_prefix.'shortcode');
+      wp_enqueue_script(self::$css_prefix.'jq-placeholder');
     }
   }
 
@@ -633,8 +637,8 @@ class Participants_Db {
   /**
    * get an array of groups
    *
-   * @param string $column comma-separated list of columns to get, defualts to all (*)
-   * @param mixed $exclude singe group to exclude or array of groups to exclude
+   * @param string $column comma-separated list of columns to get, defaults to all (*)
+   * @param mixed $exclude single group to exclude or array of groups to exclude
    * @return indexed array
    */
   public function get_groups($column = '*', $exclude = false) {
@@ -689,25 +693,55 @@ class Participants_Db {
   }
 
   /**
-   * get the names of all the sortable fields
+   * gets a list of field names/titles
    * 
-   * this checks the "sortable" column and collects the list of sortable columns. 
-   * If supplied, the list will be drawn from the array of field names
+   * assembles a list of columns from those columns set to display. Optionally, a list of fields can be supplied with an array. This allows fields that are not displayed to be included.
    * 
-   * @param array $fields array of field to include in the list of sortables
+   * @param string $type   if 'sortable' will only select fields flagged as sortable  
+   * @param array  $fields array of fields to include in the list of sortables
+   * @param string $sort   sorting method to use, can be 'order' which uses the
+   *                       defined group/field order, 'column' which uses the
+   *                       current display column order or 'alpha' which sorts the
+   *                       list alphabetially; defaults to 'column'
    * @param return array
    */
-  public function get_sortables($fields = false) {
+  public function get_field_list($type = false, $fields = false, $sort = 'column') {
 
     global $wpdb;
 
-    $field_set =  is_admin() ? '' : ' AND f.display_column > 0 ';
-    if (is_array($fields)) $field_set = $field_set . ' AND f.name IN ("' . implode('","',$fields) . '")';
+    $where_clauses = array();
+    if ($type == 'sortable') {
+      $where_clauses[] = 'f.sortable > 0';
+    }
+    if (is_array($fields)) {
+      $where_clauses[] = 'f.name IN ("' . implode('","',$fields) . '")';
+    } elseif (! is_admin()) {
+      $where_clauses[] = 'f.display_column > 0 ';
+    }
 
+    switch ($sort) {
+      case 'alpha':
     $sql = "
 			SELECT f.name, REPLACE(f.title,'\\\','') as title
 			FROM " . self::$fields_table . " f 
-			WHERE f.sortable > 0" . $field_set;
+          WHERE " . implode(' AND ', $where_clauses) . "
+          ORDER BY f.name";
+        break;
+      case 'order':
+        $sql = "
+          SELECT f.name, REPLACE(f.title,'\\\',''), g.order as title
+          FROM " . self::$fields_table . " f
+          INNER JOIN " . self::$groups_table . " g ON f.group = g.name
+          WHERE " . implode(' AND ', $where_clauses) . "
+          ORDER BY g.order, f.order";
+        break;
+      default:
+        $sql = "
+          SELECT f.name, REPLACE(f.title,'\\\','') as title
+          FROM " . self::$fields_table . " f
+          WHERE " . implode(' AND ', $where_clauses) . "
+          ORDER BY f." . (is_admin() ? 'admin_column' : 'display_column');
+    }
 
     $result = $wpdb->get_results($sql, ARRAY_N);
 
@@ -719,7 +753,35 @@ class Participants_Db {
     return $return;
   }
 
-  // get a subset of field names; this function only works for boolean qualifiers
+  /**
+   * get the names of all the sortable fields
+   * 
+   * this checks the "sortable" column and collects the list of sortable columns
+   * from those columns set to display. Optionally, a list of fields to include
+   * can be supplied with an array. This allows fields that are not displayed to
+   * be included.
+   * 
+   * @param array  $fields array of fields to include in the list of sortables
+   * @param string $sort   sorting method to use, can be 'order' which uses the
+   *                       defined group/field order, 'column' which uses the
+   *                       current display column order or 'alpha' which sorts the
+   *                       list alphabetially; defaults to 'column'
+   * @param return array
+   */
+  public function get_sortables($fields = false, $sort = 'column') {
+
+    return self::get_field_list('sortable', $fields, $sort);
+  }
+
+  /**
+   * gets a subset of field names
+   *
+   * this function only works for boolean qualifiers or "column order" columns where
+   * any number greater than 0 indicates the field is to be displayed in a column
+   *
+   * @param string the name of the qualifier to use to select a set of field names
+   * @return array an indexed array of field names
+   */
   private function get_subset($subset) {
 
     global $wpdb;
@@ -1130,7 +1192,7 @@ class Participants_Db {
    * can either add new record or edit existing record
    * new record begins with the default values
    *
-   * @param array  $post           the array of new values
+   * @param array  $post           the array of new values (typically the $_POST array)
    * @param string $action         the db action to be performed: insert or update
    * @param mixed  $participant_id the id of the record to update. If it is false, it creates
    *                               a new record, if true, it creates or updates the default record.
@@ -1234,13 +1296,6 @@ class Participants_Db {
     $columns = array();
 
     // determine the set of columns to process
-//    if ( isset($_POST['action']) && $_POST['action'] == 'signup') {
-//      
-//      $column_set = 'signup';
-//    } else {
-//      
-//      $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
-//    }
     
     switch ($action) {
       
@@ -1295,10 +1350,10 @@ class Participants_Db {
 
         default :
 
-          // replace null value with the default if defined
-          if (NULL === @$post[$column_atts->name]) {
+          // replace unsubmitted fields with the default if defined
+          if (NULL === @$post[$column_atts->name] and ! empty($column_atts->default)) {
 
-            $new_value = empty($column_atts->default) ? false : $column_atts->default;
+            $new_value = $column_atts->default;
             $post[$column_atts->name] = $new_value;
           }
 
@@ -1351,7 +1406,8 @@ class Participants_Db {
             $new_value = wp_kses(stripslashes($post[$column_atts->name]), $allowedposttags);
           } elseif ('date' == $column_atts->form_element) {
 
-            $date = self::parse_date($post[$column_atts->name], $column_atts);
+            $date = false;
+            if (isset($post[$column_atts->name])) $date = self::parse_date($post[$column_atts->name], $column_atts);
 
             $new_value = $date ? $date : NULL;
           } elseif ('captcha' == $column_atts->form_element) {
@@ -1779,15 +1835,29 @@ class Participants_Db {
       case 'update':
       case 'insert':
 
+        /*
+         * set the raw post array filters. We use a copy of the POST array so that
+         * certain values will remain untouched
+         */
+        $post_data = $_POST;
+        $wp_filter = 'pdb_before_submit_' . ($_POST['action'] == 'insert' ? 'signup' : 'update');
+        apply_filters($wp_filter,$post_data);
+
         $id = isset($_POST['id']) ? $_POST['id'] : ( isset($_GET['id']) ? $_GET['id'] : false );
 
-        $participant_id = self::process_form($_POST, $_POST['action'], $id);
+        $participant_id = self::process_form($post_data, $_POST['action'], $id);
 
         if (false === $participant_id) {
 
           // we have errors; go back to form and show errors
           return;
         }
+
+        /*
+         * set the stored record hook.
+         */
+        $wp_hook = 'pdb_after_submit_' . ($_POST['action'] == 'insert' ? 'signup' : 'update');
+        do_action($wp_hook,self::get_participant($partcipant_id));
 
         // if we are submitting from the frontend, we're done
         if (!is_admin()) {
@@ -2098,7 +2168,7 @@ class Participants_Db {
       // drop-down fields
       case 'form_element':
         // populate the dropdown with the available field types from the FormElement class
-        return array('type' => 'dropdown', 'options' => FormElement::$element_types);
+        return array('type' => 'dropdown', 'options' => array_flip(FormElement::get_types()));
 
       case 'validation':
         return array(
@@ -2106,6 +2176,7 @@ class Participants_Db {
             'options' => array(
                 __('Not Required', 'participants-database') => 'no',
                 __('Required', 'participants-database') => 'yes',
+                __('Email','participants-database') => 'email',
                 'CAPTCHA' => 'captcha',
             ),
             'attributes' => array('other' => 'regex/match'),
@@ -2215,7 +2286,11 @@ class Participants_Db {
   }
 
   /**
-   * outputs a link in specified format
+   * outputs a link (HTML anchor tag) in specified format if enabled by "make_links"
+   * option
+   * 
+   * this func validates the link as being either an email addres or URI, then
+   * (if enabled) builds the HTML and returns it
    * 
    * @param string $link the URI
    * @param string $linktext the clickable text (optional)
@@ -2271,6 +2346,19 @@ class Participants_Db {
 
     //construct the link
     return sprintf($linktemplate, $URI, esc_html($linktext));
+  }
+  
+  /**
+   * adds the URL conjunction to a GET string
+   *
+   * @param string $URI the URI to which an get string is to be added
+   *
+   * @return string the URL with the conjunction character appended
+   */
+  public function add_uri_conjunction($URI) {
+    
+    return $URI . ( false !== strpos($URI, '?') ? '&' : '?');
+  
   }
   
   /**
@@ -2447,9 +2535,7 @@ class Participants_Db {
 
     $page_link = get_permalink(self::$plugin_options['registration_page']);
 
-    $delimiter = false !== strpos($page_link, '?') ? '&' : '?';
-
-    return $page_link . $delimiter . 'pid=' . $PID;
+    return self::add_uri_conjunction($page_link) . 'pid=' . $PID;
   }
   
   /**
@@ -2572,9 +2658,12 @@ class Participants_Db {
 
   /**
    * parses a date string into UNIX timestamp
-   * 
-   * this uses the IntlDateFormatter class in PHP if "strict dates" is selected to obtain a unix timestamp from a textual input. It first creates the international formatter object, to obtain a timestamp, the instantiates a DateTime object for further maniulations of the date. if either of these fails, or if "strict dates" is not selected, it falls back to using "strtotime" which cannot parse most localized time formats 
-   * 
+   *
+   * if "strict dates" is set, this function uses the DateTime class to parse the
+   * string according to a specific format. If it is not, we use the conventional
+   * strtotime() function, with the enhancement that if the non-American style
+   * format is used with slashes "d/m/Y" the string is prepared so strtotime can
+   * parse it correctly  
    *
    * @param string $string      the string to parse; if not given, defaults to now
    * @param object $column_atts the column object; used to identify the field for
@@ -2583,31 +2672,47 @@ class Participants_Db {
    */
   public function parse_date($string = false, $column = '') {
 
-    error_log(__METHOD__ . ' input:' . $string . ' format: ' . self::$date_format . ' locale: '.setlocale(LC_ALL, 0));
-
     // return the now() timestamp
     if (false === $string)
       return time();
-    
-    $date = false;
 
-    // it's already a timestamp; or something that looks like a timestamp but wouldn't parse anyway
-    if (preg_match('#^[0-9-]+$#', $string) > 0)
+    // it's already a timestamp
+    if (self::is_valid_timestamp($string)) {
+      error_log(__METHOD__.' tried to parse timestamp from '. $column->name);
       return $string;
+    }
 
-    if (self::$plugin_options['strict_dates'] == 1 and function_exists('datefmt_create') and ( is_object($column) and $column->group != 'internal' )) {
+    /*
+     * we have two options to parse a date string into a timestamp: the 
+     * IntlDateFormatter class or the DateTime class. The IntlDateFormatter 
+     * class can parse localized text dates, but it seems commonly unavailable, 
+     * at least on English-speaking servers. The DateTime class is widely 
+     * available, but can't parse non-English text dates. It can parse numeric 
+     * date representations, so if the intl module is not available, we try to 
+     * use DateTime.
+     */
+    if (self::$plugin_options['strict_dates'] and ( is_object($column) and $column->group != 'internal' ) ) {
       
-      $dateformat = empty(self::$plugin_options['input_date_format']) ? Participants_Db::get_ICU_date_format(get_option('date_format')) : self::$plugin_options['input_date_format'];
+      if (function_exists('datefmt_create')) {
       
-      $fmt = new IntlDateFormatter( WPLANG, IntlDateFormatter::LONG, IntlDateFormatter::NONE, NULL, NULL, $dateformat );
-      
-      error_log(__METHOD__.' format object:'.print_r($fmt,1));
-      $timestamp = $fmt->parse($string);
+        $dateformat = empty(self::$plugin_options['input_date_format']) ? get_option('date_format') : self::$plugin_options['input_date_format'];
 
-      $date_obj = new DateTime();
-      $date_obj->setTimestamp($timestamp);
+        $fmt = new IntlDateFormatter( WPLANG, IntlDateFormatter::LONG, IntlDateFormatter::NONE, NULL, NULL, Participants_Db::get_ICU_date_format($dateformat) );
+
+        //error_log(__METHOD__.' format object:'.print_r($fmt,1));
+        $timestamp = $fmt->parse($string);
+
+        $date_obj = new DateTime();
+        $date_obj->setTimestamp($timestamp);
+        
+      } else if (function_exists('date_create_from_format')) {
+
+        $date_obj = DateTime::createFromFormat(self::$plugin_options['input_date_format'], $string);
+        
+      }
       
-      error_log(__METHOD__.' date:'.print_r($date_obj,1));
+
+      //error_log(__METHOD__.' date:'.print_r($date_obj,1));
 
       if (is_array(date_get_last_errors()) && !empty($string)) {
 
@@ -2615,7 +2720,7 @@ class Participants_Db {
 
         if ($errors['warning_count'] > 0 || $errors['error_count'] > 0) {
 
-          $date = false;
+          $date_obj = false;
 
           if (is_object(self::$validation_errors) and is_object($column)) {
 
@@ -2623,16 +2728,24 @@ class Participants_Db {
           }
         }
       }
-      if (is_object($date_obj)) {// if we have a valid date, convert to timestamp
-        $date_obj->setTime(0, 0);
-        $date = $date_obj->format($date, 'U');
+
+      /*
+       * if we have a valid date, convert to timestamp
+       */
+      if ($date_obj) {
+        /*
+         * zero the time so date equality comparisons can be made
+         */
+        $date_obj->setTime(0,0);
+        $date = $date_obj->format('U');
       }
+      
     }
     
     /*
-     * if we haven't got a timestamp, attempt to parse the date the regular way
+     * if we haven't got a timestamp, parse the date the regular way
      */
-    if ( ! preg_match('/^[0-9]+$/', $date ) ){
+    if ( ! isset($date) or ! self::is_valid_timestamp($date) ){
       
       /*
        * deal with the common special case of non-American-style numeric date with slashes
@@ -2651,6 +2764,16 @@ class Participants_Db {
     }
 
     return $date;
+  }
+  
+  /**
+   * validates a time stamp
+   *
+   * @param mixed $timestamp the string to test
+   * @return bool true if valid timestamp
+   */
+  public static function is_valid_timestamp($timestamp) {
+    return is_int($timestamp) or ((string) (int) $timestamp === $timestamp);
   }
 
   /**
@@ -2766,6 +2889,20 @@ class Participants_Db {
   private function _show_validation_error( $error, $name = '' ) {
     if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error($name, $error );
     else self::set_admin_message($error);
+  }
+  
+  /**
+   * includes the hard-coded configuration file
+   */
+  private static function _include_config() {
+    
+    $config_file = ABSPATH . 'wp-content/pdb-config.php';
+    if (is_file($config_file)) {
+      require $config_file;
+    } else {
+      require 'pdb-config.php';
+    }
+    
   }
   
   /**

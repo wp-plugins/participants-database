@@ -276,7 +276,7 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'checkbox',
-          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the "Input Date Format" setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database' ), date(isset(Participants_Db::$date_format) ? Participants_Db::$date_format : get_option('date_format')), (class_exists('IntlDateFormatter') ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
+          'help_text'   => sprintf( __('This forces date inputs to be interpreted strictly according to the "Input Date Format" setting of the site. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database' ), date(isset(Participants_Db::$date_format) ? Participants_Db::$date_format : get_option('date_format')), (function_exists('date_create') ? '' : '<strong>(Your current version of PHP does not support this setting.)</strong>' ) ),
           'value'       => 0,
           'options'     => array( 1, 0 ),
           ),
@@ -289,8 +289,8 @@ class PDb_Settings extends Plugin_Settings {
         'options'    => array
           (
           'type'        => 'text-line',
-          'help_text'   => sprintf(__('date formatting string for all plugin date inputs when "Strict Date Format" is enabled. You should use this for all localized (non-American English) date formats. Uses the %sICU standard formatting.%s', 'participants-database' ), '<a href="http://userguide.icu-project.org/formatparse/datetime" target="_blank">','</a>'),
-          'value'       => Participants_Db::get_ICU_date_format(get_option('date_format')),
+          'help_text'   => __('date formatting string for all plugin date inputs when "Strict Date Format" is enabled. You should use this for all localized (non-American English) date formats.', 'participants-database' ),
+          'value'       => get_option('date_format'),
           ),
         );
 

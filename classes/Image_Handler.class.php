@@ -67,6 +67,8 @@ abstract class Image_Handler {
    */
   function __construct($config, $subclass_atts) {
 
+    $this->set_image_directory();
+
     $this->_set_default_wrap($config);
 
     $defaults = array(
@@ -76,8 +78,6 @@ abstract class Image_Handler {
     );
 
     $this->setup = shortcode_atts(array_merge($defaults, $subclass_atts), $config);
-
-    $this->set_image_directory();
 
     $this->_set_props();
 
@@ -244,10 +244,13 @@ abstract class Image_Handler {
    *
    * this is needed because on some systems file_exists() gives a false negative
    *
-   * @param string $filepath a full system filepath to an image file
+   * @param string $filepath a full system filepath to an image file or just a file name
+   * @return bool true if the file exists
    *
    */
   protected function _file_exists($filepath) {
+
+    if (empty($filepath)) return false;
 
     // first use the standard function
     if (is_file($filepath)){
@@ -255,7 +258,7 @@ abstract class Image_Handler {
     }
 
     /*
-     * if we're testing an absolute pate
+     * if we're testing an absolute path
      */
     if (function_exists('curl_exec')) {
 

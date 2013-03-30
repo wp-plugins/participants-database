@@ -73,7 +73,7 @@ class PDb_Image extends Image_Handler {
    */
   protected function _set_default_wrap($config) {
     
-    if ( Participants_Db::$plugin_options['image_link'] == 1 and ! empty($config['filename']) ) {
+    if ( Participants_Db::$plugin_options['image_link'] == 1 and $this->_file_exists($config['filename']) ) {
       
       $this->default_wrap = array(
                         '<span class="%s"><a href="%s" rel="lightbox" title="%s" >',

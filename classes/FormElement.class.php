@@ -56,26 +56,26 @@
 class FormElement {
   
   // defines the type of form element for the object
-  private $type;
+  var $type;
   
   // holds the current value of the element
-  private $value;
+  var $value;
   
   // the name attribute of the form data field
-  private $name;
+  var $name;
   
   // for elements that have set options such as checkboxes and dropdowns, this 
   // array holds the name=>value pairs
-  private $options;
+  var $options;
   
   // this array holds all other html element attributes
-  private $attributes;
+  var $attributes;
   
   // space-separated string of class names for the form element
-  private $classes;
+  var $classes;
 
   // array holding the text lines of an element to be output
-  private $output = array();
+  var $output = array();
   
   // the size attribute of the input tag
   public $size;
@@ -102,25 +102,7 @@ class FormElement {
   private $i18n;
   
   // define an array of all available form element types
-  public static $element_types = array(
-        'Text-line'            => 'text-line',
-        'Text Area'            => 'text-area',
-        'Rich Text'            => 'rich-text',
-        'Checkbox'             => 'checkbox',
-        'Radio Buttons'        => 'radio',
-        'Dropdown List'        => 'dropdown',
-        'Date Field'           => 'date',
-        'Dropdown/Other'       => 'dropdown-other',
-        'Multiselect Checkbox' => 'multi-checkbox',
-        'Radio Buttons/Other'  => 'select-other',
-        'Multiselect/Other'    => 'multi-select-other',
-        'Link Field'           => 'link',
-        'Image Upload Field'   => 'image-upload',
-        'File Upload Field'    => 'file-upload',
-        'Hidden Field'         => 'hidden',
-        'Password Field'       => 'password',
-        'CAPTCHA'              => 'captcha',
-    );
+  public static $element_types;
   
   /**
    * instantiates a FormElement object
@@ -143,6 +125,8 @@ class FormElement {
    * @return NULL
    */
   public function __construct( $parameters ) {
+    
+    $this->_set_types();
     
     $defaults = array(
                       'options'      => NULL,
@@ -190,97 +174,106 @@ class FormElement {
 
     // clear the output array
     $this->output = array();
+    
+    /*
+     * if the type is unknown, we pass the object to an external function with 
+     * a filter handle that includes the name of the custom form element
+     */
+    apply_filters('pdb-form_element-build-' . $this->type, $this);
 
-    // build the element by calling the type's method
-    switch ( $this->type ) :
-
-      case 'date':
-        $this->_date_field();
-        break;
-
-      case 'text-area':
-      case 'textarea':
-        $this->_text_field();
-        break;
+    if (empty($this->output)) {
       
-      case 'rich-text':
-        if ( Participants_Db::$plugin_options['rich_text_editor'] ) $this->_rich_text_field();
-        else $this->_text_field();
-        break;
+      // build the element by calling the type's method if it has been built by the filter callback
+      switch ( $this->type ) :
 
-      case 'checkbox':
-        $this->_checkbox();
-        break;
+        case 'date':
+          $this->_date_field();
+          break;
 
-      case 'radio':
-        $this->_radio();
-        break;
+        case 'text-area':
+        case 'textarea':
+          $this->_text_field();
+          break;
 
-      case 'dropdown':
-        $this->_dropdown();
-        break;
+        case 'rich-text':
+          if ( Participants_Db::$plugin_options['rich_text_editor'] ) $this->_rich_text_field();
+          else $this->_text_field();
+          break;
 
-      case 'dropdown-other':
-        $this->_dropdown_other();
-        break;
+        case 'checkbox':
+          $this->_checkbox();
+          break;
 
-      case 'multi-checkbox':
-       $this->_multi_checkbox();
-       break;
+        case 'radio':
+          $this->_radio();
+          break;
 
-      case 'text':
-      case 'text-line':
-        $this->_text_line();
-        break;
-        
-      case 'password':
-        $this->_password();
-        break;
-        
-      case 'select-other':
-        $this->_select_other();
-        break;
-        
-      case 'multi-select-other':
-        $this->_select_other_multi();
-        break;
-				
-			case 'link':
-				$this->_link_field();
-				break;
+        case 'dropdown':
+          $this->_dropdown();
+          break;
 
-      case 'drag-sort':
-        $this->_drag_sort();
-        break;
-        
-      case 'submit':
-        $this->_submit_button();
-        break;
-        
-      case 'selectbox':
-        $this->_selectbox();
-        break;
-        
-      case 'hidden':
-        $this->_hidden();
-        break;
-        
-      case 'image-upload':
-        $this->_upload('image');
-        break;
-      
-			case 'file':
-			case 'file-upload':
-        $this->_upload('file');
-        break;
-      
-      case 'captcha':
-        $this->_captcha();
-        break;
+        case 'dropdown-other':
+          $this->_dropdown_other();
+          break;
 
-      default:
+        case 'multi-checkbox':
+         $this->_multi_checkbox();
+         break;
 
-    endswitch;
+        case 'text':
+        case 'text-line':
+          $this->_text_line();
+          break;
+
+        case 'password':
+          $this->_password();
+          break;
+
+        case 'select-other':
+          $this->_select_other();
+          break;
+
+        case 'multi-select-other':
+          $this->_select_other_multi();
+          break;
+
+        case 'link':
+          $this->_link_field();
+          break;
+
+        case 'drag-sort':
+          $this->_drag_sort();
+          break;
+
+        case 'submit':
+          $this->_submit_button();
+          break;
+
+        case 'selectbox':
+          $this->_selectbox();
+          break;
+
+        case 'hidden':
+          $this->_hidden();
+          break;
+
+        case 'image-upload':
+          $this->_upload('image');
+          break;
+
+        case 'file':
+        case 'file-upload':
+          $this->_upload('file');
+          break;
+
+        case 'captcha':
+          $this->_captcha();
+          break;
+
+        default:
+
+      endswitch;
+    }
     
   }
   
@@ -298,7 +291,7 @@ class FormElement {
   }
   
   /**********************
-	 * PUBLIC FUNCTIONS
+	 * PUBLIC METHODS
 	 */
   
   /** 
@@ -366,8 +359,9 @@ class FormElement {
     
     $this->add_class( 'date_field' );
     
-    if (!empty($this->value))
+    if (!empty($this->value)) {
       $this->value = $this->format_date( $this->value );
+    }
     
     $this->_addline( $this->_input_tag() );
     
@@ -994,23 +988,27 @@ if ( 'image' == $type)
    *
    * @return string selection state string for HTML element
    */
-  private function _set_selected( $element_value, $new_value, $attribute = 'selected', $state = true ) {
+  private function _set_selected($element_value, $new_value, $attribute = 'selected', $state = true)
+  {
 
+    if (is_array($new_value)) { 
+      return $this->_set_multi_selected($element_value, $new_value, $attribute, $state);
+    }
 		
-		if ( is_array( $new_value ) ) return $this->_set_multi_selected( $element_value, $new_value, $attribute, $state );
+    $new_value = $this->_prep_comp_string($new_value);
+    $add_attribute = false;
+    // we break up the logic here so it's easier to read
+    if (!empty($new_value)) {
+      if (is_array($element_value)) {
+        if ($state === in_array($new_value, $this->_prep_comp_array($element_value))) {
+          $add_attribute = true;
+        } 
+      } elseif ($this->_prep_comp_string($element_value) == $new_value) {
+          $add_attribute = true;
+      }
+    }
 		
-    // error_log( __METHOD__.' checking value:'.$this->_prep_comp_string($new_value).' against:'.$this->_prep_comp_string($element_value) );
-
-    if (
-        ( is_array( $element_value ) && ( $state === in_array( $this->_prep_comp_string( $new_value ), $this->_prep_comp_array( $element_value ) ) ) )
-          ||
-          $this->_prep_comp_string( $element_value ) == $this->_prep_comp_string( $new_value )
-         ) {
-      
-      return sprintf( ' %1$s="%1$s" ', $attribute );
-      
-    } else return '';
-    
+    return $add_attribute ? sprintf(' %1$s="%1$s" ', $attribute) : '';
   }
 
   /**
@@ -1026,6 +1024,9 @@ if ( 'image' == $type)
 
   /**
    * prepares an array for string comparison
+   * 
+   * @param array $array the array to prepare for comparison
+   * @return array an indexed array of prepared strings
    */
   private function _prep_comp_array( $array ) {
 
@@ -1058,7 +1059,7 @@ if ( 'image' == $type)
 		
     //if (WP_DEBUG) error_log( __METHOD__.' checking value:'.$prepped_string.'('.$element_value.')'.' against:'.print_r($prepped_new_value_array,true).' state:'.( in_array( $prepped_string, $prepped_new_value_array)?'true':'false').' setting: '.$attribute );
 			
-		if ( $state === in_array( $prepped_string, $prepped_new_value_array ) ) return  sprintf( ' %1$s="%1$s" ', $attribute );
+		if ( ! empty($prepped_string) && $state === in_array( $prepped_string, $prepped_new_value_array ) ) return  sprintf( ' %1$s="%1$s" ', $attribute );
 		
 		else return '';
 		
@@ -1102,15 +1103,59 @@ if ( 'image' == $type)
    * returns an internationalized date string from a UNIX timestamp
    * 
    * @param int $timestamp a UNIX timestamp
-   * @return string a formatted date or empty string if invalid
+   * @return string a formatted date or input string if invalid
    */
   public static function format_date($timestamp) {
 
-    if ( preg_match('#^[0-9]+$#',$timestamp) && false !== @date('r',$timestamp)) {
+    if (Participants_Db::is_valid_timestamp($timestamp)) {
       
-      return date_i18n( Participants_Db::$date_format, Participants_Db::parse_date( $timestamp ) );
-    } else return $timestamp;
+      return date_i18n( Participants_Db::$date_format, $timestamp );
     
+    } else {
+      // not a timestamp: return unchanged
+      error_log(__METHOD__ . ': timestamp couldn\'t be formatted: ' . $timestamp);
+      return $timestamp;
+    }
+  
+  }
+  
+  /**
+   * sets the array of available form element types
+   * 
+   * merges in an array in the config file, this allowing new types to be registered, 
+   * also a transation of type titles is possible by overwriting an existing entry
+   */
+  private function _set_types() {
+     $this->element_types = $this->get_types();
+  }
+  /*
+   * static function for assembling the types array
+   */
+  public static function get_types() {
+     $types = array ( 
+         'text-line'          => 'Text-line', 
+         'text-area'          => 'Text Area', 
+         'rich-text'          => 'Rich Text', 
+         'checkbox'           => 'Checkbox', 
+         'radio'              => 'Radio Buttons', 
+         'dropdown'           => 'Dropdown List', 
+         'date'               => 'Date Field', 
+         'dropdown-other'     => 'Dropdown/Other', 
+         'multi-checkbox'     => 'Multiselect Checkbox', 
+         'select-other'       => 'Radio Buttons/Other', 
+         'multi-select-other' => 'Multiselect/Other', 
+         'link'               => 'Link Field', 
+         'image-upload'       => 'Image Upload Field', 
+         'file-upload'        => 'File Upload Field', 
+         'hidden'             => 'Hidden Field', 
+         'password'           => 'Password Field', 
+         'captcha'            => 'CAPTCHA',
+         );
+    if (is_array(Participants_Db::$config['form_element_types'])) {
+      return array_merge($types, Participants_Db::$config['form_element_types']);
+    } else {
+      return $types;
+    }
   }
   
 } //class

@@ -130,15 +130,15 @@ if ($participant_values) :
                 $value = false;
 
               switch ($column->form_element) {
-                // format the date if it's a date field
+
                 case 'date':
 
-                  if (!empty($value)) {
-
+                  /*
+									 * if it's not a timestamp, format it for display; if it is a
+									 * timestamp, it will be formatted by the FormElement class
+									 */
+									if (!empty($value) and ! Participants_Db::is_valid_timestamp($value)) {
                     $value = Participants_Db::prep_field_for_display($value,$column->form_element);
-                  } else {
-                    // I like this idea, but...
-                    //$attributes['placeholder'] = date(Participants_Db::$date_format);
                   }
 
                   break;

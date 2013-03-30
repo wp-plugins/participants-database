@@ -73,9 +73,9 @@ input[type="checkbox"],
     float: left;
     margin-right: 10px;
 }
-.inline-controls input[type='text'],
-.inline-controls input[type='checkbox'],
-.inline-controls select {
+.participants_db .inline-controls input[type='text'],
+.participants_db .inline-controls input[type='checkbox'],
+.participants_db .inline-controls select {
   float: none;
   display: inline;
   margin-right:0;
@@ -112,12 +112,33 @@ body[class*='participants-database'] .text-block p,
 body[class*='participants-database'] .text-block li {
     line-height: 1.2;
 }
+.participants_db input[type="submit"] {
+  background-color:#ffffff;
+  border: 1px solid #AAAAAA;
+  border-radius: 3px 3px 3px 3px;
+  box-shadow: 0 0 13px rgba(0, 0, 0, 0.3) inset;
+  padding: 3px 8px;
+  transition: 0.2s;
+  -webkit-transition: 0.2s;
+}
+.participants_db input:hover[type="submit"] {
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1) inset;
+}
+.participants_db input.button-primary {
+  padding:0 10px 1px;
+}
 #delete_button.unarmed {
     opacity:0.5;
 }
 #delete_button.armed {
     border: 1px solid rgba(204, 0, 0, 0.5);
     box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
+}
+#delete_button.armed:hover {
+  box-shadow: 0 0 2px rgba(204, 0, 0, 0.1) inset;
+}
+.pdb-searchform input[type="checkbox"], .pdb-searchform input[type="radio"] {
+  margin-right: 5px;
 }
 .participants_db.settings-class .pdb_anchor {
     position:relative;
@@ -314,7 +335,7 @@ a.dragger {
 }
 .participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active a {
 	background-color: #ffffff;
-  padding-bottom: 9px;
+  padding-bottom: 10px;
 }
 .participants_db .ui-tabs-nav li a {
     padding: 4px 20px 6px;

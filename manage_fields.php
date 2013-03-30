@@ -10,8 +10,8 @@ $PDb_i18n = array(
 	'update groups'   => __( 'Update Groups',   'participants-database' ),
 	'add field'       => __( 'Add Field',       'participants-database' ),
 	'add group'       => __( 'Add Group',       'participants-database' ),
-	'new field title' => __( 'new field name', 'participants-database' ),
-	'new group title' => __( 'new group name', 'participants-database' ),
+	'new field title' => __( 'new field title', 'participants-database' ),
+	'new group title' => __( 'new group title', 'participants-database' ),
   );
 // process form submission
 $error_msgs = array();

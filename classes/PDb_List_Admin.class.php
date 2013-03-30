@@ -239,7 +239,7 @@ class PDb_List_Admin
 			case self::$i18n['filter']:
       case self::$i18n['search']:
 			
-				self::$list_query = 'SELECT * FROM '.Participants_Db::$participants_table;
+				self::$list_query = 'SELECT * FROM ' . Participants_Db::$participants_table . ' p ';
 				
 				$delimiter = array("'","'");
 
@@ -274,28 +274,47 @@ class PDb_List_Admin
 					
 					$value = self::$filter['value']; 
 					
-					if ( $field_atts->form_element == 'date') {
+					if ( in_array( self::$filter['search_field'], array( 'date_recorded','date_updated','last_accessed' ) ) ) {
 					
-						$value = strtotime( self::$filter['value'] ); 
-						if ( empty( $value ) ) {
+            /*
+             * these values are stored as MySQL timestamps, so they will be a special case
+             */
+						$value = Participants_Db::parse_date( self::$filter['value'] );
+            if ($operator == '=') {
+              /*
+               * exact equalities are actually a search within a 24-hour window because 
+               * timestamps include a time-of-day and we're just interested in the day 
+               * of the timestamp.
+               */
+              $range = (12*60*60);
+              $value_min = $value - $range;
+              $value_max = $value + $range;
+              $value = '';
+              $operator = 'BETWEEN';
+              $delimiter = array(
+                  'FROM_UNIXTIME(' . $value_min . ') AND FROM_UNIXTIME(',
+                  $value_max . ') + INTERVAL 1 DAY'
+                  );
+            } else {
+              $delimiter = array( 'FROM_UNIXTIME(',')' );
+            }
+						
+					} elseif ( $field_atts->form_element == 'date') {
+					
+						$value = Participants_Db::parse_date( self::$filter['value'] );
+						if ( ! $value ) {
 							$value = time();
 						}
 						$delimiter = array( 'CAST(',' AS SIGNED)' );
 						
 					}
 					
-					if ( in_array( self::$filter['search_field'], array( 'date_recorded','date_updated' ) ) ) {
+					self::$list_query .= ' WHERE p.'.mysql_real_escape_string(self::$filter['search_field']).' '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
 					
-						$delimiter = array( 'FROM_UNIXTIME(',')' );
-						
 					}
 					
-					self::$list_query .= ' WHERE `'.mysql_real_escape_string(self::$filter['search_field']).'` '.mysql_real_escape_string($operator)." ".$delimiter[0].mysql_real_escape_string($value).$delimiter[1]." ";
-						
-				}
-				
 				// add the sorting
-				self::$list_query .= ' ORDER BY `'.mysql_real_escape_string(self::$filter['sortBy']).'` '.mysql_real_escape_string(self::$filter['ascdesc']);
+				self::$list_query .= ' ORDER BY p.'.mysql_real_escape_string(self::$filter['sortBy']).' '.mysql_real_escape_string(self::$filter['ascdesc']);
 		
 				// go back to the first page to display the newly sorted/filtered list
 				if ( isset( $_POST['submit'] ) ) $_GET[ self::$list_page ] = 1;
@@ -386,7 +405,7 @@ class PDb_List_Admin
     
   </script>
   <a id="pdb-list-admin" name="pdb-list-admin"></a>
-  <div class="wrap pdb-list">
+  <div class="wrap pdb-list participants_db">
     <h2><?php echo Participants_Db::$plugin_title?></h2>
     <h3><?php printf( _n( 'List Participants: %s record found, sorted by:', 'List Participants: %s records found, sorted by:', self::$num_records ), self::$num_records )?> 
 		<?php echo Participants_Db::column_title( self::$filter['sortBy'] ) ?>.</h3>

@@ -39,6 +39,8 @@ abstract class PDb_Shortcode {
   protected $shortcode_defaults;
   // holds the current shorcode attributes
   protected $shortcode_atts;
+  // a selected array of fields to display
+  var $display_columns = false;
   // holds the field groups array which will contain all the groups info and their fields
   // this will be the main object the template iterates through
   var $record;
@@ -98,10 +100,13 @@ abstract class PDb_Shortcode {
         'captcha' => 'none',
         'class' => Participants_Db::$css_prefix . $this->module,
         'template' => 'default',
+        'fields' => '',
     );
 
     // set up the shortcode_atts property
     $this->_set_attributes($params, $add_atts);
+
+    $this->_set_display_columns();
 
     $this->wrap_class = trim($this->wrap_class) . ' ' . trim($this->shortcode_atts['class']);
 
@@ -477,6 +482,10 @@ abstract class PDb_Shortcode {
             
     }
     
+    if (is_array($this->display_columns)) {
+      $sql .= ' AND v.name IN ("' . implode('","',$this->display_columns) . '")';
+    }
+    
     // this orders the hidden fields at the top of the list
     $sql .= ' ORDER BY v.form_element = "hidden" DESC, v.order';
             
@@ -560,7 +569,8 @@ abstract class PDb_Shortcode {
     // get the existing value if any
 		$value = isset( $this->participant_values[ $field->name ] ) ? Participants_Db::unserialize_array( $this->participant_values[ $field->name ] ) : '';
 		
-		if ( isset( $_POST[ $field->name ] ) ) {                                    // replace it with the new value if provided, escaping the input
+		// replace it with the new value if provided, escaping the input
+		if ( isset( $_POST[ $field->name ] ) ) {
 			
 			$value = $this->_esc_submitted_value( $_POST[ $field->name ] );
 			
@@ -605,6 +615,37 @@ abstract class PDb_Shortcode {
     // set the value property of the field object
     $field->value = $value;
     
+  }
+  
+  /**
+   * builds a validated array of selected fields
+   * 
+   * this looks for the 'field' attribute in the shortcode and if it finds it, goes 
+   * through the list of selected fields and sets up an array of valid fields that 
+   * can be used in a database query 
+   */
+  protected function _set_display_columns() {
+    
+    if (isset($this->shortcode_atts['fields'])) {
+
+      $raw_list = explode(',', str_replace(array("'", '"', ' ', "\r"), '', $this->shortcode_atts['fields']));
+
+      if (is_array($raw_list)) :
+      
+        foreach ($raw_list as $column) {
+
+          if (Participants_Db::is_column($column)) {
+
+            $this->display_columns[] = $column;
+          }
+        }
+
+      endif;
+    }
+    
+    if ($this->module == 'list' and ! is_array($this->display_columns)) {
+      $this->display_columns = Participants_Db::get_list_display_columns('display_column');
+    }
   }
   
   /**
@@ -740,7 +781,7 @@ abstract class PDb_Shortcode {
 	 * tests a value for emptiness
 	 *
 	 * needed primarliy because we can have arrays of empty elements which will
-	 * not test empty using PHP's empty() function
+	 * not test empty using PHP's empty() function. Also, a zero is non-empty.
 	 *
 	 * @param mixed $value the value to test
 	 * @return bool
@@ -750,7 +791,7 @@ abstract class PDb_Shortcode {
 		// if it is an array, collapse it
 		if ( is_array( $value ) ) $value = implode( '', $value );
 		
-		return empty( $value );
+		return empty( $value ) or $value !== 0;
 		
 	}
   

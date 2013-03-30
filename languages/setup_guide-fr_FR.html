@@ -1,0 +1,32 @@
+<h1>Base de participants</h1>
+<h2>Guide de configuration rapide</h2>
+
+<h3>Configuration initiale</h3>
+
+Il y a plusieurs éléments à configurer pour utiliser les différentes fonctionnalités de cette extension. Cette page est un tutoriel pour installer et faire tourner l'extension sur votre site. La première chose est d'avoir une idée générale de la façon dont vous voulez utiliser l'extension, quelle information vous souhaitez collecter et stocker, et comment les utilisateurs pourront interagir avec la base.
+
+<h3>Voici un exemple de configuration de l'extension.</h3>
+
+Supposons que vous voulez avoir un formulaire d'inscription qui recueille le nom et l'adresse mail des utilisateurs. Quand ceux-ci remplissent et soumettent le formulaire, ils sont redirigés vers une autre page qui les remercie. Un email leur est également envoyé pour confirmer leur inscription, et leur indiquer comment compléter les informations en ligne. Pour cela un lien privé leur est fourni dans l'email.
+
+Par ailleurs, l'administrateur du site reçoit un email de notification de l'inscription, avec un lien direct vers la nouvelle entrée dans la base.
+
+<h3>Voici comment configurer:</h3>
+
+1. Placer le shortcode "[pdb_signup]" dans la page où vous voulez que le formulaire d'inscription apparaisse.
+2. Dans la configuration de l'extension, sélectionner l'onglet "Réglages page d'inscription".
+3. Indiquer la page de post-inscription vers laquelle l'utilisateur est redirigé, et placer le shortcode "[pdb_signup_thanks]" sur cette page.
+4. Quand l'utilisateur inscrit clique sur le lien fourni dans son email de confirmation, il/elle accède à une page permettant de compléter les informations le/la concernant via un formulaire détaillé.
+5. Sélectionner l'onglet "Réglages formulaire détaillé", et précisez la page sur laquelle ce formulaire figurera. Placez le shortcode "[pdb_record]" sur cette page. Ce shortcode ne produira aucun résultat si l'accès à la page se fait sans le lien privé contenu dans l'email de confirmation d'inscription.
+
+<h3>Configuration de l'affichage de liste, et des fiches individuelles</h3>
+
+Vous pouvez afficher sur votre site une liste des gens qui se sont inscrits. Chaque élément de la liste peut comporter un lien permettant d'afficher l'information à vocation publique de la fiche individuelle. Voici comment configurer cela:
+1. Placer le shortcode "[pdb_list]" dans la page où vous voulez générer la liste de participants.
+2. Dans "Gérer les champs de la base" (menu de l'extension) choisir les champs qui apparaissent dans la liste et leur ordre, via la colonne affichage ("display"). Mettre zéro dans cette colonne sert à ne pas afficher le champ.
+3. Dans la page où vous voulez faire apparaître la fiche détaillée, placer le shortcode "[pdb_single]". Celui-ci n'affichera la fiche que si l'accès à la page se fait avec l'ID de l'entrée en question, comme par exemple dans:
+/participants/detail?pid=27
+4. Dans l'onglet "Réglages d'affichage de liste" de la configuration de l'extension, préciser (menu déroulant) le champ qui portera le lien vers les fiches individuelles.
+5. Ensuite, indiquer la page affichant la fiche individuelle, c'est à dire celle contenant le shortcode "[pdb_single]".
+
+Vous pouvez maintenant choisir "Ajouter un participant" dans le menu de l'extension, ajouter une entrée pour tester, et vous en servir pour passer en revue l'ensemble des fonctionnalités.

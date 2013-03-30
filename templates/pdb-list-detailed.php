@@ -48,8 +48,22 @@ this is a more detailed template showing how the parts of the display can be cus
       <legend><?php _e('Search', 'participants-database' )?>:</legend>
 
       <?php
-        // you can replace "false" with your own text for the "all columns" value
-        $this->column_selector( false );
+        /*
+         * there are 4 options for this function which defines which fields will be 
+         * available in the search dropdown selector:
+         *    1. "all fields" text: set the text of the default "all fields" item: 
+         *       leave it "false" to use the internationalized defualt
+         *    2. print it or return the element as a value: only use this if you 
+         *       need to alter the HTML directly. You will need to print the item for 
+         *       it to be seen. If 'true', the function prints the selector dropdown.
+         *    3. columns: supply an array of column names if you want to define the 
+         *       list of fields that can be used for searching: 'false' uses all displayed 
+         *       fields
+         *    4. sorting: you can choose to sort the list by 'column' (the order they 
+         *       appear in the table), 'alpha' (alphabetical order), or 'order' which 
+         *       uses the defined group/field order
+         */
+        $this->column_selector( false, true, false, 'column' );
       ?>
 
       <?php $this->search_form() ?>
@@ -60,6 +74,18 @@ this is a more detailed template showing how the parts of the display can be cus
     
     <fieldset class="widefat">
       <legend><?php _e('Sort by', 'participants-database' )?>:</legend>
+
+      <?php
+      /*
+       * this function sets the fields in the sorting dropdown. It has two options:
+       *    1. columns: an array of field names to show in the sorting dropdown. If 
+       *       'false' shows default list of sortable fields as defined
+       *    2. sorting: you can choose to sort the list by 'column' (the order they 
+       *       appear in the table), 'alpha' (alphabetical order), or 'order' which 
+       *       uses the defined group/field order
+       */
+      $this->set_sortables(false, 'column');
+      ?>
 
       <?php $this->sort_form() ?>
 
@@ -115,10 +141,10 @@ this is a more detailed template showing how the parts of the display can be cus
           <?php $value = $this->field->value; // we do this just to make the variable name shorter ?>
           <td>
           	<?php 
-						/* wrap the item in a link if it's enabled for this field: this uses
-						 * the global setting. If you want to customize the field on which to
-						 * place the link to the record detail page, change the "test" to
-						 * something like this:
+						/* wrap the item in a single record link if it's enabled for this field:
+						 * this uses the global setting. If you want to customize the field on
+						 * which to place the link to the record detail page, change the "test"
+						 * to something like this:
 						 * if ( $this->field->name == 'field_name' ) {
 						 *
 						 * if you do this, check out the case below where we make a clickable
@@ -136,34 +162,14 @@ this is a more detailed template showing how the parts of the display can be cus
                */
               $value = empty($value) ? $this->field->default : $value;
               
-              // create the link
-              echo Participants_Db::make_link(
+							// add the record ID to the single record link
+							$single_record_uri = Participants_Db::add_uri_conjunction($single_record_link) . 'pdb=' . $this->record->record_id;
 								
-								/* URL of the single record page: replace this to specify a single
-								 * record page for this template. It doesn't have to be the whole
-								 * URL, you can use just the slug or relative part of the page URL
-								 * like this: '/single-record', Be sure to quote literal values and
-								 * include the comma at the end.
-                 * 
-                 * it's also possible to define the link in the shortcode like this 
-                 * [pdb_list single_record_link=single-page] if your [pdb_single] 
-                 * shortcode is on a page named 'single-page'.
+							/*
+							 * print the opening tag of the single record link
 								 */
-                $single_record_link,
+							echo '<a class="single-record-link" href="' . $single_record_uri . '" >';
 								
-								// field value
-                $value,
-								
-								/* template for building the link: this would be the place to include
-								 * anything special you want to add to the link
-								 */
-                '<a href="%1$s" title="%2$s" >',
-								
-								/* record ID to get the record. You can add other variables to the link
-								 * if you want by adding more name/value pairs to the array
-								 */
-                array( 'pdb'=>$this->field->record_id )
-              );
             } ?>
 
             <?php /*
