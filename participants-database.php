@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.4.9.2
+  Version: 1.4.9.3
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -107,9 +107,8 @@ class Participants_Db {
   public static function initialize() {
 
     // register the class autoloading
-    spl_autoload_extensions('.php');
-    spl_autoload_register('PDb_class_loader');
-    
+    self::set_autoloader();
+    // include the configuration fiel
     self::_include_config();
 
     // set the table names
@@ -1006,7 +1005,9 @@ class Participants_Db {
     
     $return = '';
     
-    $return = apply_filters(self::$css_prefix . 'before_display_field', $return, $value, $form_element);
+    if (has_filter(self::$css_prefix . 'before_display_field') ) {
+      $return = apply_filters(self::$css_prefix . 'before_display_field', $return, $value, $form_element);
+    }
     
     if (empty($return)) {
 
@@ -2815,6 +2816,17 @@ class Participants_Db {
     }
     return $links;
   }
+  /**
+   * sets up the class autoloader for the plugin
+   */
+  public function set_autoloader() {
+    
+    // register the class autoloading
+    $registered_extensions = explode(',', spl_autoload_extensions());
+    if (!in_array('.class.php', $registered_extensions))
+            spl_autoload_extensions('.class.php');
+    spl_autoload_register('PDb_class_loader');
+  }
 
 }
 
@@ -2822,14 +2834,21 @@ class Participants_Db {
 
 /**
  * performs the class autoload
+ * 
+ * 1.4.9.3 now checking to see if the incoming class is a plugin class by seeing 
+ * if the file requested exists in the plugin classes directory
  *
  * @param string $class the name of the class to be loaded
  */
 function PDb_class_loader($class) {
+  
+  $PDb_class_files = scandir(plugin_dir_path(__FILE__) . 'classes/');
+  
+  //error_log(__FUNCTION__.' scandir:'.print_r($PDb_class_files,1));
 
   $class_file = plugin_dir_path(__FILE__) . 'classes/' . $class . '.class.php';
 
-  if (is_file($class_file)) {
+  if (in_array(basename($class_file), $PDb_class_files) and is_file($class_file)) {
 
     //error_log( __FUNCTION__. ' class loaded: '.$class_file );
 

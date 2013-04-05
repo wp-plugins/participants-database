@@ -395,9 +395,12 @@ class PDb_List extends PDb_Shortcode {
           );
         }
       }
-      
-      foreach ($sort_arrays as $sort_array) {
-        $order_statement[] = 'p.' . $sort_array['field'] . ' ' . strtoupper($sort_array['order']);
+      if (empty($sort_arrays)) {
+        $order_statement = false;
+      } else {
+        foreach ($sort_arrays as $sort_array) {
+          $order_statement[] = 'p.' . $sort_array['field'] . ' ' . strtoupper($sort_array['order']);
+        }
       }
     } else {
 
