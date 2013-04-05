@@ -513,17 +513,17 @@ Taking defensive precautions against other plugins in the admin:
 
 == Using the Plugin ==
 
-* [General Description](#general)
-* [Quick Start Instructions](#quickstart)
-* [List of Plugin Shortcodes](#shortcodes)
-* [The List Shortcode](#list)
-* [Shortcode Templates](#templates)
-* [The Thank You Page](#thankyou)
-* [Hidden Signup Fields](#hidden)
-* [Uploading Images](#images)
-* [Importing Records](#csv)
+* General Description
+* Quick Start Instructions
+* List of Plugin Shortcodes
+* The List Shortcode
+* Shortcode Templates
+* The Thank You Page
+* Hidden Signup Fields
+* Uploading Images
+* Importing Records
 
-{#general}This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
+This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
 
 *Please read the documentation fully, as this is a complex plugin that can be used in a lot of different ways.*
 
