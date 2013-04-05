@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.4.9.2
+Stable tag: 1.4.9.3
 License: GPLv2
 
 Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
@@ -622,14 +622,6 @@ Normally, a user search can only override the fields they search on. For instanc
 
 One application for the list filtering option allows you to control whether a record gets displayed, giving you an approval process for new records. Create an administrative field (one that is not displayed or edited on the frontend) called "approved" that is a checkbox. Put this (without the quotes) in the values for the field: 'yes,no' with a default value of 'no'. Then put this in the shortcode: `[pdb_list filter='approved=yes']` Now, only records that have been approved will be included in the list display. You may need to do something like this if you get a problem with spam, for instance.
 
-= Determining Which Fields are Shown by Each Shortcode =
-
-Each of the 4 main shortcodes (signup, record, list and single) can show any or all of the fields you have defined, depending on the settings on the "manage database fields" page. For the signup, record and single shortcodes, only fields in groups marked "display" will be shown. The signup shortcode also only shows fields that have "signup" checked. The list shortcode only shows fields that have a non-zero "display" value.
-
-Each of these 4 shortcodes can also determine which fields to show in the shortcode itself by using the "fields" attribute. This attribute is a comma-separated list of field names to show in the shortcode. This makes it easy to have different sets of fields appear on different pages, or to create different signup forms for different pages. For example: `[pdb_signup fields="first_name,last_name,address,city,country,email,newsletter"]`
-
-By using custom templates, you can have even more control over how things are displayed by the shortcode. These templates are very similar to the templates that a WordPress theme uses.
-
 = Shortcode Templates =
 
 The list, record, single and signup shortcodes use templates to determine how they are presented. Plugin default templates are found in the "templates" directory in the plugin directory. These templates are commented to help you understand how they work, and are intended to serve as starting points to creating your own custom templates. Like WordPress theme templates, some knowledge of PHP, CSS and HTML is required to create and edit them.
@@ -663,6 +655,14 @@ You can put a link to the single record in the participant list by defining the 
 If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW". You must use the "detailed" list template for this to work.
 
 If you are good with CSS, you can easily make the link look like a button.
+
+= Determining Which Fields are Shown by Each Shortcode =
+
+Each of the 4 main shortcodes (signup, record, list and single) can show any or all of the fields you have defined, depending on the settings on the "manage database fields" page. For the signup, record and single shortcodes, only fields in groups marked "display" will be shown. The signup shortcode also only shows fields that have "signup" checked. The list shortcode only shows fields that have a non-zero "display" value.
+
+Each of these 4 shortcodes can also determine which fields to show in the shortcode itself by using the "fields" attribute. This attribute is a comma-separated list of field names to show in the shortcode. This makes it easy to have different sets of fields appear on different pages, or to create different signup forms for different pages. For example: `[pdb_signup fields="first_name,last_name,address,city,country,email,newsletter"]`
+
+By using custom templates, you can have even more control over how things are displayed by the shortcode. These templates are very similar to the templates that a WordPress theme uses. <a id="thankyou"></a>
 
 = Setting Up the Signup Form "Thank You" Page =
 
