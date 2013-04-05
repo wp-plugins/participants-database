@@ -147,6 +147,8 @@ The idea is to use the database as a roster of volunteers, supporters, etc. for 
 
 = People are signing up, but emails are not getting sent =
 
+Use my [Email Troubleshooting Flowchart](http://xnau.com/participants-database-email-troubleshooting/) to help you diagnose the problem.
+
 Of course make sure your settings are set to send emails.
 
 The most common reason emails are not being sent is because the WP application cannot send email. If you are having this problem, I suggest you install an SMTP plugin (like WP-Mail-SMTP) and use that plugin to test your email sending. Sometimes it is necessary to set up and use SMTP (which is not the default on most systems) to successfully send email.
@@ -511,15 +513,27 @@ Taking defensive precautions against other plugins in the admin:
 
 == Using the Plugin ==
 
-This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
+* [General Description](#general)
+* [Quick Start Instructions](#quickstart)
+* [List of Plugin Shortcodes](#shortcodes)
+* [The List Shortcode](#list)
+* [Shortcode Templates](#templates)
+* [The Thank You Page](#thankyou)
+* [Hidden Signup Fields](#hidden)
+* [Uploading Images](#images)
+* [Importing Records](#csv)
+
+{#general}This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
 
 *Please read the documentation fully, as this is a complex plugin that can be used in a lot of different ways.*
 
-To collect signups on your website use this shortcode: `[pdb_signup]`. The shortcode will generate a short form to give people a way to add their name to your list. You can customize which fields they need to fill in. `[pdb_record]` displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want. The `[pdb_record]` form is only available when accessed using a private link because it allows a user to edit their own record. This link can be provided in an email and is also visible in the admin listing of records.
+To collect signups on your website use this shortcode: `[pdb_signup]`. The shortcode will generate a short form to give people a way to add their name to your list. You can customize which fields they need to fill in. 
+
+When they sign up, they can be provided with a private link to their record, which the can add to or edit.  Place the `[pdb_record]` shortcode on they page you want them to go to to edit their record. This page should also be selected in the settings as the "Participant Record Page."
 
 The idea is your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
 
-When your site visitors fill out and submit the signup form, they will be sent an email with a private link to their full record. This page is where the `[pdb_record]` shortcode goes.
+When your site visitors fill out and submit the signup form, they will be sent an email with a private link to their full record. This page is where the `[pdb_record]` shortcode goes. <a id="quickstart"></a>
 
 = Quick Start Instructions: =
 
@@ -530,7 +544,7 @@ When your site visitors fill out and submit the signup form, they will be sent a
 5. When someone signs up, an email is sent to them with a private link to their record so they can fill out all the fields you want them to. This is why you need to tell the plugin where your `[pdb_record]` shortcode is. You can define which fields they will see there on the "manage fields" page.
 6. Go to the plugin settings page to set up the emails. There are both user and admin emails sent on a signup, and you can determine the content of the emails and also whether to send them and to whom.
 
-Of course, records can be entered in the backend by a user with "edit posts" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file.
+Of course, records can be entered in the backend by a user with "edit posts" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file. <a id="shortcodes"></a>
 
 = Shortcodes this Plugin Uses =
 
@@ -540,7 +554,7 @@ This plugin uses a number of different shortcodes to place it's functionality in
 2. `[pdb_record]` - This shortcode only displays when accessed with a URL including the record "private id" number. It allows the user to edit and add to their own record, while others won't have access to it. A private link to this record can be included in the "thankyou" email they will receive on submission.
 3. `[pdb_list]` - This shortcode prints out a list of records from the database. Which records get displayed and how can all be determined by the admin. It is also possible to allow the site visitor to filter (search) the list and also sort it.
 4. `[pdb_single]` - This shows a single record as determined by the record ID present in the URL used to access the page. It is possible to set a link to the single record in the record list, allowing for a detail display of a single record.
-5. `[pdb_signup_thanks]` - If you want to send the people who use the signup form to another page after they submit, you can use this shortcode to display the thankyou message. This is not needed if you have them just go back to the signup page, the signup shortcode will take care if it.
+5. `[pdb_signup_thanks]` - If you want to send the people who use the signup form to another page after they submit, you can use this shortcode to display the thankyou message. This is not needed if you have them just go back to the signup page, the signup shortcode will take care if it. <a id="list"></a>
 
 = Showing a List of Records on Your Website =
 
@@ -566,7 +580,7 @@ Which columns are shown by the shortcode is set up on the fields management page
 
 If you want to get tricky with the CSS, each header column has a class name that corresponds to the name of the field, you can use CSS to lay out the listing exactly as you want.
 
-**Searching and Sorting The List**
+= Searching and Sorting The List =
 
 You can activate list searching and/or sorting for your users with these attributes: `[pdb_list search=true]` or `[pdb_list sort=true]` These attributes will enable a search form and/or sort form displayed above the list. The user can select which field they want to search through a dropdown and type in a search term. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
 
@@ -612,15 +626,7 @@ Normally, a user search can only override the fields they search on. For instanc
 
 = Approving Records for Public Display =
 
-One application for the list filtering option allows you to control whether a record gets displayed, giving you an approval process for new records. Create an administrative field (one that is not displayed or edited on the frontend) called "approved" that is a checkbox. Put this (without the quotes) in the values for the field: 'yes,no' with a default value of 'no'. Then put this in the shortcode: `[pdb_list filter='approved=yes']` Now, only records that have been approved will be included in the list display. You may need to do something like this if you get a problem with spam, for instance.
-
-= Determining Which Fields are Shown by Each Shortcode =
-
-Each of the 4 main shortcodes (signup, record, list and single) can show any or all of the fields you have defined, depending on the settings on the "manage database fields" page. For the signup, record and single shortcodes, only fields in groups marked "display" will be shown. The signup shortcode also only shows fields that have "signup" checked. The list shortcode only shows fields that have a non-zero "display" value.
-
-Each of these 4 shortcodes can also determine which fields to show in the shortcode itself by using the "fields" attribute. This attribute is a comma-separated list of field names to show in the shortcode. This makes it easy to have different sets of fields appear on different pages, or to create different signup forms for different pages. For example: `[pdb_signup fields="first_name,last_name,address,city,country,email,newsletter"]`
-
-By using custom templates, you can have even more control over how things are displayed by the shortcode. These templates are very similar to the templates that a WordPress theme uses.
+One application for the list filtering option allows you to control whether a record gets displayed, giving you an approval process for new records. Create an administrative field (one that is not displayed or edited on the frontend) called "approved" that is a checkbox. Put this (without the quotes) in the values for the field: 'yes,no' with a default value of 'no'. Then put this in the shortcode: `[pdb_list filter='approved=yes']` Now, only records that have been approved will be included in the list display. You may need to do something like this if you get a problem with spam, for instance.<a id="templates"></a>
 
 = Shortcode Templates =
 
@@ -654,11 +660,19 @@ If you want to make a field that is just for linking to the record, create a fie
 
 If you are good with CSS, you can easily make the link look like a button.
 
+= Determining Which Fields are Shown by Each Shortcode =
+
+Each of the 4 main shortcodes (signup, record, list and single) can show any or all of the fields you have defined, depending on the settings on the "manage database fields" page. For the signup, record and single shortcodes, only fields in groups marked "display" will be shown. The signup shortcode also only shows fields that have "signup" checked. The list shortcode only shows fields that have a non-zero "display" value.
+
+Each of these 4 shortcodes can also determine which fields to show in the shortcode itself by using the "fields" attribute. This attribute is a comma-separated list of field names to show in the shortcode. This makes it easy to have different sets of fields appear on different pages, or to create different signup forms for different pages. For example: `[pdb_signup fields="first_name,last_name,address,city,country,email,newsletter"]`
+
+By using custom templates, you can have even more control over how things are displayed by the shortcode. These templates are very similar to the templates that a WordPress theme uses. <a id="thankyou"></a>
+
 = Setting Up the Signup Form "Thank You" Page =
 
 To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the `[pdb_signup_thanks]` shortcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
 
-It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.
+It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.<a id="hidden"></a>
 
 = Hidden Signup Fields =
 
@@ -682,7 +696,7 @@ If you just want to put in a fixed value, the hidden field will include any stri
 
 You can also access some PHP "Superglobals." For instance, to get the IP of the user, put this into the default: "SERVER:REMOTE_ADDR" You can access these superglobals: POST, GET, REQUEST, COOKIE, SERVER. This means you can get the value of a cookie and put it into the form, saving it when the form is submitted. You don't need the '$_' that is used in PHP. A good reference for what is possible can be found here: <http://php.net/manual/en/language.variables.superglobals.php>
 
-For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden fields are also present in the form presented by the `[pdb_record]` shortcode. These fields are visible and editable in the admin edit page.
+For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden fields are also present in the form presented by the `[pdb_record]` shortcode. These fields are visible and editable in the admin edit page.<a id="images"></a>
 
 = Image Uploads =
 
@@ -690,7 +704,7 @@ Images can now be stored anywhere in the WP install directory, and can be moved 
 
 The plugin has a "default image" that will be shown if no image is present. You can create your own, but you shouldn't keep it in the plugin folder. Keep it in the uploads directory or in your theme directory. Change the "Default Image" setting to point to your image. If you don't want anything to show if no image is present, make the "Default Image" setting blank.
 
-IMPORTANT: Don't store images in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
+IMPORTANT: Don't store images in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.<a id="csv"></a>
 
 = Importing CSV Files =
 
