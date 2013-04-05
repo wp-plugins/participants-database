@@ -56,26 +56,26 @@
 class FormElement {
   
   // defines the type of form element for the object
-  private $type;
+  var $type;
   
   // holds the current value of the element
-  private $value;
+  var $value;
   
   // the name attribute of the form data field
-  private $name;
+  var $name;
   
   // for elements that have set options such as checkboxes and dropdowns, this 
   // array holds the name=>value pairs
-  private $options;
+  var $options;
   
   // this array holds all other html element attributes
-  private $attributes;
+  var $attributes;
   
   // space-separated string of class names for the form element
-  private $classes;
+  var $classes;
 
   // array holding the text lines of an element to be output
-  private $output = array();
+  var $output = array();
   
   // the size attribute of the input tag
   public $size;
@@ -98,6 +98,9 @@ class FormElement {
   // holds the internationaliztion strings
   private $i18n;
   
+  // define an array of all available form element types
+  public static $element_types;
+  
   /**
    * instantiates a FormElement object
 	 * 
@@ -119,6 +122,8 @@ class FormElement {
    * @return NULL
    */
   public function __construct( $parameters ) {
+    
+    $this->_set_types();
     
     $defaults = array(
                       'options'      => NULL,
@@ -166,91 +171,100 @@ class FormElement {
 
     // clear the output array
     $this->output = array();
-
-    // build the element by calling the type's method
-    switch ( $this->type ) :
-
-      case 'date':
-        $this->_date_field();
-        break;
-
-      case 'text-area':
-      case 'textarea':
-        $this->_text_field();
-        break;
-      
-      case 'rich-text':
-        if ( Participants_Db::$plugin_options['rich_text_editor'] ) $this->_rich_text_field();
-        else $this->_text_field();
-        break;
-
-      case 'checkbox':
-        $this->_checkbox();
-        break;
-
-      case 'radio':
-        $this->_radio();
-        break;
-
-      case 'dropdown':
-        $this->_dropdown();
-        break;
-
-      case 'dropdown-other':
-        $this->_dropdown_other();
-        break;
-
-      case 'multi-checkbox':
-       $this->_multi_checkbox();
-       break;
-
-      case 'text':
-      case 'text-line':
-        $this->_text_line();
-        break;
-        
-      case 'password':
-        $this->_password();
-        break;
-        
-      case 'select-other':
-        $this->_select_other();
-        break;
-        
-      case 'multi-select-other':
-        $this->_select_other_multi();
-        break;
-				
-			case 'link':
-				$this->_link_field();
-				break;
-
-      case 'drag-sort':
-        $this->_drag_sort();
-        break;
-        
-      case 'submit':
-        $this->_submit_button();
-        break;
-        
-      case 'selectbox':
-        $this->_selectbox();
-        break;
-        
-      case 'hidden':
-        $this->_hidden();
-        break;
-        
-      case 'image-upload':
-			case 'file':
-			case 'file-upload':
-        $this->_upload();
-        break;
-
-      default:
-
-    endswitch;
     
+    /*
+     * open up a filter to allow custom elements or methods
+     */
+    apply_filters(Participants_Db::$css_prefix . 'form_element_build_' . $this->type, $this);
+
+    if (empty($this->output)) {
+
+      // build the element by calling the type's method
+      switch ($this->type) :
+
+        case 'date':
+          $this->_date_field();
+          break;
+
+        case 'text-area':
+        case 'textarea':
+          $this->_text_field();
+          break;
+
+        case 'rich-text':
+          if (Participants_Db::$plugin_options['rich_text_editor'])
+            $this->_rich_text_field();
+          else
+            $this->_text_field();
+          break;
+
+        case 'checkbox':
+          $this->_checkbox();
+          break;
+
+        case 'radio':
+          $this->_radio();
+          break;
+
+        case 'dropdown':
+          $this->_dropdown();
+          break;
+
+        case 'dropdown-other':
+          $this->_dropdown_other();
+          break;
+
+        case 'multi-checkbox':
+          $this->_multi_checkbox();
+          break;
+
+        case 'text':
+        case 'text-line':
+          $this->_text_line();
+          break;
+
+        case 'password':
+          $this->_password();
+          break;
+
+        case 'select-other':
+          $this->_select_other();
+          break;
+
+        case 'multi-select-other':
+          $this->_select_other_multi();
+          break;
+
+        case 'link':
+          $this->_link_field();
+          break;
+
+        case 'drag-sort':
+          $this->_drag_sort();
+          break;
+
+        case 'submit':
+          $this->_submit_button();
+          break;
+
+        case 'selectbox':
+          $this->_selectbox();
+          break;
+
+        case 'hidden':
+          $this->_hidden();
+          break;
+
+        case 'image-upload':
+        case 'file':
+        case 'file-upload':
+          $this->_upload();
+          break;
+
+        default:
+
+      endswitch;
+    }
   }
   
   /**
@@ -267,7 +281,7 @@ class FormElement {
   }
   
   /**********************
-	 * PUBLIC FUNCTIONS
+	 * PUBLIC METHODS
 	 */
   
   /** 
@@ -1038,7 +1052,49 @@ class FormElement {
       error_log(__METHOD__ . ': timestamp couldn\'t be formatted: ' . $timestamp);
       return $timestamp;
     }
-    
+  
+  }
+  
+  /**
+   * sets the array of available form element types
+   * 
+   * merges in an array in the config file, this allowing new types to be registered, 
+   * also a language translation of type titles is possible by overwriting an existing 
+   * entry
+   */
+  private function _set_types() {
+     $this->element_types = $this->get_types();
+  }
+  /*
+   * static function for assembling the types array
+   */
+  public static function get_types() {
+     $types = array ( 
+         'text-line'          => 'Text-line', 
+         'text-area'          => 'Text Area', 
+         'rich-text'          => 'Rich Text', 
+         'checkbox'           => 'Checkbox', 
+         'radio'              => 'Radio Buttons', 
+         'dropdown'           => 'Dropdown List', 
+         'date'               => 'Date Field', 
+         'dropdown-other'     => 'Dropdown/Other', 
+         'multi-checkbox'     => 'Multiselect Checkbox', 
+         'select-other'       => 'Radio Buttons/Other', 
+         'multi-select-other' => 'Multiselect/Other', 
+         'link'               => 'Link Field', 
+         'image-upload'       => 'Image Upload Field', 
+         'hidden'             => 'Hidden Field', 
+         'password'           => 'Password Field', 
+         'captcha'            => 'CAPTCHA',
+         );
+    if (is_array(Participants_Db::$config['form_element_types'])) {
+      $types = array_merge($types, Participants_Db::$config['form_element_types']);
+    }
+    /*
+     * this gives access to the list of form element types for alteration before
+     * it is set
+     */
+    return apply_filters(Participants_Db::$css_prefix . 'set_form_element_types', $types);
   }
   
 } //class

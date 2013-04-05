@@ -17,43 +17,40 @@ class PDb_Signup extends PDb_Shortcode {
   
 	// a string identifier for the class
   var $module = 'signup';
-  
-  // class for the wrapper
-  var $wrap_class = 'pdb-signup';
 	
 	// holds the target page for the submission
-	private $submission_page;
+	var $submission_page;
   
   // holds the submission status: false if the form has not been submitted
-  private $submitted = false;
+  var $submitted = false;
 
 	// holds the recipient values after a form submission
-	private $recipient;
+	var $recipient;
 	
 	// boolean to send the reciept email
-	private $send_reciept;
+	var $send_reciept;
 
 	// the receipt subject line
-	private $receipt_subject;
+	var $receipt_subject;
 	
 	// holds the body of the signup receipt email
-	private $receipt_body;
+	var $receipt_body;
 	
 	// boolean to send the notification email
-	private $send_notification;
+	var $send_notification;
 
 	// holds the notify recipient emails
 	public $notify_recipients;
 
 	// the notification subject line
-	private $notify_subject;
+	var $notify_subject;
 
 	// holds the body of the notification email
-	private $notify_body;
+	var $notify_body;
   // holds the current email body
   var $current_body;
 	
-	private $thanks_message;
+	var $thanks_message;
 
 	// header added to receipts and notifications
 	private $email_header;
@@ -149,11 +146,18 @@ class PDb_Signup extends PDb_Shortcode {
 		} elseif ( $this->submitted ) {
       
       /*
-       * filter provides access to the freshly-stored record-- actually the whole 
-       * object so things like the email parameters can be altered. The properties 
-       * would need to be public, or we create methods to alter them
+       * filter provides access to the freshly-stored record and the email and thanks message properties so user feedback can be altered.
        */
-      apply_filters('pdb_after_submit_signup', $this);
+      if (has_filter(Participants_Db::$css_prefix . 'before_signup_thanks')) {
+        
+        $signup_feedback_props = array('recipient', 'receipt_subject', 'receipt_body', 'notify_recipients', 'notify_subject', 'notify_body', 'thanks_message', 'participant_values');
+        $signup_feedback = new stdClass();
+        foreach ($signup_feedback_props as $prop) {
+          $signup_feedback->$prop = &$this->$prop;
+        }
+
+        apply_filters(Participants_Db::$css_prefix . 'before_signup_thanks', $signup_feedback);
+      }
 			
 			// print the thank you note
 			$this->_thanks();
