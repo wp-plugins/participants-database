@@ -790,6 +790,8 @@ class FormElement {
 			$this->classes = '';
 			}
     
+    $this->_addline($this->_input_tag( 'hidden', '', '', false ), 1 );
+    
     foreach ( $this->_make_assoc( $this->options ) as $key => $value ) {
        
       $this->_addline( '<label '.$class.' for="'.$this->name.'">' );

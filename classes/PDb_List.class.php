@@ -17,7 +17,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.4.9.2
+ * @version    Release: 1.4.9.3
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 class PDb_List extends PDb_Shortcode {
@@ -133,7 +133,7 @@ class PDb_List extends PDb_Shortcode {
    * @return string form HTML
    */
   public static function print_record($params) {
-
+    
     self::$instance = new PDb_List($params);
 
     return self::$instance->output;
@@ -168,6 +168,11 @@ class PDb_List extends PDb_Shortcode {
     // process any search/filter/sort terms and build the main query
     $this->_build_shortcode_query();
 
+    // allow the query to be altered before the records are retrieved
+    if (has_filter(Participants_Db::$css_prefix . 'list_query')) {
+      $this->list_query = apply_filters(Participants_Db::$css_prefix . 'list_query',$this->list_query);
+    }
+
     // get the $wpdb object
     global $wpdb;
 
@@ -186,18 +191,12 @@ class PDb_List extends PDb_Shortcode {
 
     // instantiate the pagination object
     $this->pagination = new PDb_Pagination($pagination_defaults);
-
-    // allow the query to be altered before the records are retrieved
-    $list_query = $this->list_query . ' ' . $this->pagination->getLimitSql();
-    if (has_filter(Participants_Db::$css_prefix . 'list_query')) {
-      $list_query = apply_filters(Participants_Db::$css_prefix . 'list_query',$list_query);
-    }
     /*
      * get the records for this page, adding the pagination limit clause
      *
      * this gives us an array of objects, each one a set of field->value pairs
      */
-    $records = $wpdb->get_results($list_query, OBJECT);
+    $records = $wpdb->get_results($this->list_query . ' ' . $this->pagination->getLimitSql(), OBJECT);
 
     /*
      * build an array of record objects, indexed by ID
@@ -395,9 +394,12 @@ class PDb_List extends PDb_Shortcode {
           );
         }
       }
-      
-      foreach ($sort_arrays as $sort_array) {
-        $order_statement[] = 'p.' . $sort_array['field'] . ' ' . strtoupper($sort_array['order']);
+      if (empty($sort_arrays)) {
+        $order_statement = false;
+      } else {
+        foreach ($sort_arrays as $sort_array) {
+          $order_statement[] = 'p.' . $sort_array['field'] . ' ' . strtoupper($sort_array['order']);
+        }
       }
     } else {
 

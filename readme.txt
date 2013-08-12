@@ -508,8 +508,8 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.4.9.2 =
-* major enhancements and bugfix release
+= 1.4.9.3 =
+* several bugs fixed
 
 == Using the Plugin ==
 
