@@ -26,7 +26,7 @@ class Template_Item {
 	var $record_id;
 	
 	// the plugin options
-	var $options;
+	//var $options;
 	
 	// the instantiating module
 	var $module;
@@ -40,7 +40,7 @@ class Template_Item {
    */
   public function __construct( $properties ) {
 		
-		$this->options = Participants_Db::$plugin_options;
+		//$this->options = Participants_Db::$plugin_options;
     
   }
   

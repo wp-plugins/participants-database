@@ -24,11 +24,8 @@ class PDb_Image extends Image_Handler {
    */
   function __construct( $config ) {
     
-    $subclass_atts = array(
-                      'classname' => Participants_Db::$css_prefix . 'image image-field-wrap',
-                      );
-    
-    parent::__construct( $config, $subclass_atts );
+    parent::__construct($config);
+    $this->classname = Participants_Db::$css_prefix . 'image image-field-wrap';
     
   }
   
@@ -69,23 +66,41 @@ class PDb_Image extends Image_Handler {
   }
   
   /**
-   * sets up the default wrap tags
+   * sets up the image wrap html
+   * 
+   * this gives us a chance to structure the wrap based on the image file
+   * 
+   * @return null
    */
-  protected function _set_default_wrap($config) {
+  protected function _set_image_wrap() {
     
-    if ( Participants_Db::$plugin_options['image_link'] == 1 and $this->_file_exists($config['filename']) ) {
+    if( $this->link === false) {
       
-      $this->default_wrap = array(
-                        '<span class="%s"><a href="%s" rel="lightbox" title="%s" >',
+      $this->image_wrap = array(
+          '<span class="%1$s">',
+          '</span>'
+      );
+    } elseif ( Participants_Db::$plugin_options['image_link'] == 1 and $this->file_exists and $this->image_uri !== $this->default_image ) {
+      
+      $this->image_wrap = array(
+                        '<span class="%1$s"><a href="%2$s" rel="lightbox" title="%3$s" >',
                         '</a></span>'
                         );
 
-    } else {
+    } elseif (!empty($this->link) and $this->link !== false) {
       
-      $this->default_wrap = array(
-                        '<span class="%s">',
-                        '</span>'
+      $this->image_wrap = array(
+                        '<span class="%1$s single-record-link"><a href="%2$s" title="%3$s" >',
+                        '</a></span>'
                         );
+      
+    } else {
+
+      $this->image_wrap = array(
+          '<span class="%1$s">',
+          '</span>'
+      );
+      
     }
     
   }

@@ -91,7 +91,7 @@ this is a more detailed template showing how the parts of the display can be cus
 
     </fieldset>
     <?php endif ?>
-
+  </form>
   </div>
   <?php endif ?>
 
@@ -99,9 +99,14 @@ this is a more detailed template showing how the parts of the display can be cus
   /* END SEARCH/SORT FORM */
 
   /* LIST DISPLAY */
+  /* 
+   * NOTE: the container for the list itself (excluding search and pagination 
+   * controls) must have a class of "list-container" for AJAX search/sort to 
+   * function
+   */
 ?>
 
-  <table class="wp-list-table widefat fixed pages" id="pdb-list" cellspacing="0" >
+  <table class="wp-list-table widefat fixed pages list-container" cellspacing="0" >
   
     <?php // print the count if enabled in the shortcode
 		if ( $display_count ) : ?>

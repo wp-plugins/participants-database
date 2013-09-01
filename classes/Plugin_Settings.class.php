@@ -43,6 +43,11 @@ class Plugin_Settings {
   protected $submit_button;
 
   /**
+   * @var string type to use for text area settings; rich or plain text
+   */
+  var $textarea_type = 'text-area';
+
+  /**
    * constructor
    *
    * @param string $class    the classname of the extending subclass (required)
@@ -79,20 +84,20 @@ class Plugin_Settings {
         $this->WP_setting,
         array( $this->plugin_class, 'validate'));
 
-		// register the sections
-    $this->_register_sections();
-
   }
 	
 	/**
 	 * registers the individual plugin options
 	 */
-	protected function initialize() {
+  public function initialize() {
 		
 		// register the individual settings
+    if (function_exists('add_settings_field')) {
 		$this->_register_options();
-		
+      // register the sections
+      $this->_register_sections();
 	}
+  }
 		
 
   /*************************
@@ -224,6 +229,35 @@ class Plugin_Settings {
 
     }
 
+  }
+
+  /**
+   * gets a setting default value
+   * 
+   * @param string $name name of the setting default to get
+   * @return unknown the default value
+   */
+  public function get_default_value($name) {
+    foreach($this->plugin_settings as $setting) {
+      if ($setting['name'] == $name and isset($setting['options']['value'])) {
+        return $setting['options']['value'];
+      }
+    }
+  }
+  
+  /**
+   * gets all options names
+   * 
+   * @return array of all defined option names
+   */
+  public function get_option_names() {
+    
+    $names = array();
+    foreach($this->plugin_settings as $setting) {
+      $names[] = $setting['name'];
+    }
+    return $names;
+    
   }
 
   /********************

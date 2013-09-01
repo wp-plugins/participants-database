@@ -26,12 +26,13 @@
   $this->show_search_sort_form();
 
   /* LIST DISPLAY */
+  /* 
+   * NOTE: the container for the list itself (excluding search and pagination 
+   * controls) must have a class of "list-container" for AJAX search/sort to 
+   * function
+   */
 ?>
-  <?php /*
-   * IMPORTANT: the list container must have an id="pdb-list" in order for the
-	 * AJAX-enabled search to work.
-   */ ?>
-  <table class="wp-list-table widefat fixed pages" id="pdb-list" cellspacing="0" >
+  <table class="wp-list-table widefat fixed pages list-container" cellspacing="0" >
 
     <?php // print the count if enabled in the shortcode
 		if ( $display_count ) : ?>

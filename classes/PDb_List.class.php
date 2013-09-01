@@ -17,7 +17,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.4.9.3
+ * @version    Release: 1.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 class PDb_List extends PDb_Shortcode {
@@ -95,7 +95,7 @@ class PDb_List extends PDb_Shortcode {
 
     $this->registration_page_url = get_bloginfo('url') . '/' . ( isset($this->options['registration_page']) ? $this->options['registration_page'] : '' );
 
-    $this->sortables = Participants_Db::get_sortables($this->display_columns);
+    $this->sortables = Participants_Db::get_sortables(Participants_Db::get_sortables() + $this->display_columns);
 
     $this->_setup_i18n();
     
@@ -110,6 +110,8 @@ class PDb_List extends PDb_Shortcode {
           'ajaxurl' => admin_url('admin-ajax.php'),
           'filterNonce' => wp_create_nonce('pdb-list-filter-nonce'),
           'postID' => ( isset($wp_query->post) ? $wp_query->post->ID : '' ),
+          'prefix' => Participants_Db::$css_prefix,
+          'loading_indicator' => Participants_Db::get_loading_spinner(),
           'i18n' => $this->i18n
       );
       wp_localize_script(Participants_Db::$css_prefix.'list-filter', 'PDb_ajax', $ajax_params);
@@ -132,8 +134,8 @@ class PDb_List extends PDb_Shortcode {
    * @param array $params parameters passed by the shortcode
    * @return string form HTML
    */
-  public static function print_record($params) {
-    
+  public static function get_list($params) {
+
     self::$instance = new PDb_List($params);
 
     return self::$instance->output;
@@ -211,22 +213,26 @@ class PDb_List extends PDb_Shortcode {
 
     if (!empty($this->records)) {
 
-      foreach ($this->records as &$record) {
+      foreach ($this->records as $id => &$record) {
 
         $this->participant_values = (array) $record;
+        $this->participant_values['id'] = $id;
 
         //error_log( __METHOD__.' participant_values:'.print_r( $this->participant_values ,1));
 
         foreach ($record as $field => $value) {
 
           $field_object = $this->_get_record_field($field);
+          
+          
 
           // set the current value of the field
           $this->_set_field_value($field_object);
 
-          //error_log( __METHOD__.' record field:'.print_r( $field_object ,1));
+          $this->_set_field_link($field_object);
+
           // add the field to the list of fields
-          $this->columns[] = $field;
+          $this->columns[$field_object->name] = $field_object;
 
           // add the field to the record object
           $record->{$field_object->name} = $field_object;
@@ -250,10 +256,15 @@ class PDb_List extends PDb_Shortcode {
    * processes shortcode filters and sorts to build the listing query
    *
    */
-  private function _build_shortcode_query() {
+  private function  _build_shortcode_query() {
 
-    // set up the column select string for the queries
-    $column_select = "p.id, p." . implode(", p.", $this->display_columns);
+    if (!empty($this->display_columns)) {
+      // set up the column select string for the queries
+      $column_select = "p.id, p." . implode(", p.", $this->display_columns);
+    } else {
+      // we end up here if no columns have been selected to show
+      $column_select = "p.id";
+    }
 
     // set up the basic values; sort values come from the shortcode
     $default_values = array(
@@ -266,6 +277,13 @@ class PDb_List extends PDb_Shortcode {
         'sortstring'   => $this->shortcode_atts['orderby'],
         'orderstring'  => $this->_get_orderstring(),
     );
+    
+    /*
+     * this is necessary for backward compatibility; all that really matters is that 
+     * we don't need to have the form submit button named "submit" so it is named 
+     * "submit_button" in that context
+     */
+    if (isset($_REQUEST['submit_button'])) $_REQUEST['submit'] == $_REQUEST['submit_button'];
 
     /* filtering parameters can come from three sources: the shortcode, $_POST (AJAX) 
      * and $_GET (pagination and non-AJAX search form submissions) We merge the $_POST 
@@ -274,7 +292,7 @@ class PDb_List extends PDb_Shortcode {
      * were brought in from the $_POST or $_GET. The processed values are kept in the 
      * filter property
      */
-    $this->filter = shortcode_atts($default_values, $_REQUEST);
+    $this->filter = array_merge($default_values, $_POST, $_GET);
     
     //error_log(__METHOD__.' this->filter:'.print_r($this->filter,1));
 
@@ -309,22 +327,43 @@ class PDb_List extends PDb_Shortcode {
     ) {
       
       // grab the attributes of the search field
-      $search_field = Participants_Db::get_field_atts($this->display_columns[array_search($this->filter['search_field'], $this->display_columns)]);
+      $search_field = Participants_Db::get_field_atts($this->filter['search_field']);
       
-      if ($search_field->form_element == 'date') {
+      if(empty($search_field->form_element)) {
+        break; // not a valid field
+      } elseif ($search_field->form_element == 'date') {
         
         $this->filter['value'] = Participants_Db::parse_date($this->to_utf8($this->filter['value']), $search_field);
+        
       } else {
         
         $this->filter['value'] = $this->to_utf8($this->filter['value']);
       }
       
-      $clause_pattern = $this->options['strict_search'] ? 
-              (in_array($search_field->form_element, array('multi-checkbox', 'multi-select-other')) ? 
-                ' p.%s LIKE \'%%"%s"%%\'' :
-                'p.%s = "%s"'
-                ) : 
-              'p.%s LIKE "%%%s%%"';
+      /*
+       * if the search term contains a '*' wildcard, use it, otherwise, we assume the 
+       * search string can be anywhere in the target string (except in strict mode)
+       */
+      $wildcard = '%%';
+      $operator =  'LIKE';
+      if (strpos($this->filter['value'], '*') !== false) {
+        $wildcard =  '';
+        $this->filter['value'] = str_replace('*', '%', $this->filter['value']);
+        $this->filter['operator'] = 'LIKE';
+      } elseif ($this->filter['operator'] === 'EQ') {
+        $operator = '=';
+        $wildcard = '';
+      }
+      
+      if ($this->options['strict_search']) {
+        if (in_array($search_field->form_element, array('multi-checkbox', 'multi-select-other'))) {
+          $clause_pattern = ' p.%s LIKE \'' . $wildcard . '"%s"' . $wildcard . '\'';
+        } else {
+          $clause_pattern = 'p.%s = "%s"';
+        }
+      } else {
+        $clause_pattern = 'p.%s ' . $operator . ' "' . $wildcard . '%s' . $wildcard . '"';
+      }
       
       // we have a valid search, add it to the where clauses
       $clauses[] = sprintf(
@@ -597,8 +636,8 @@ class PDb_List extends PDb_Shortcode {
       $output[] = $this->search_error_style;
       $output[] = '<div class="pdb-searchform">';
       $output[] = '<div class="pdb-error pdb-search-error" style="display:none">';
-      $output[] = sprintf('<p id="search_field_error">%s</p>', __('Please select a column to search in.', 'participants-database'));
-      $output[] = sprintf('<p id="value_error">%s</p>', __('Please type in something to search for.', 'participants-database'));
+      $output[] = sprintf('<p class="search_field_error">%s</p>', __('Please select a column to search in.', 'participants-database'));
+      $output[] = sprintf('<p class="value_error">%s</p>', __('Please type in something to search for.', 'participants-database'));
       $output[] = '</div>';
       $output[] = $this->search_sort_form_top(false, false, false);
 
@@ -628,7 +667,7 @@ class PDb_List extends PDb_Shortcode {
         $output[] = '</fieldset>';
       }
 
-      $output[] = '</div>';
+      $output[] = '</form></div>';
     }
 
     echo $this->output_HTML($output);
@@ -650,7 +689,7 @@ class PDb_List extends PDb_Shortcode {
     $action = $target ? $target : get_permalink($post->ID) . '#' . $this->list_anchor;
     $ref = $target ? 'remote' : 'update';
     $class_att = $class ? 'class="' . $class . '"' : '';
-    $output[] = '<form method="post" id="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
+    $output[] = '<form method="post" class="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
     $output[] = '<input type="hidden" name="action" value="pdb_list_filter">';
     $output[] = '<input type="hidden" name="pagelink" value="' . $this->prepare_page_link($_SERVER['REQUEST_URI']) . '">';
     $output[] = '<input type="hidden" name="sortstring" value="' . $this->filter['sortstring'] . '">';
@@ -675,7 +714,11 @@ class PDb_List extends PDb_Shortcode {
 
     $all_string = false === $all ? '(' . __('show all', 'participants-database') . ')' : $all;
     
-    $filter_columns = array($all_string => 'none') + Participants_Db::get_field_list('search', $columns, $sort);
+    if ($columns === false) {
+      $columns = Participants_Db::get_field_list() + $this->display_columns;
+    }
+    
+    $filter_columns = array($all_string => 'none', 'null_select' => false) + Participants_Db::get_field_list('search', $columns, $sort);
 
     $element = array(
         'type' => 'dropdown',
@@ -696,8 +739,8 @@ class PDb_List extends PDb_Shortcode {
 
     $output[] = '<input name="operator" type="hidden" class="search-item" value="LIKE" />';
     $output[] = '<input id="participant_search_term" type="text" name="value" class="search-item" value="' . $this->filter['value'] . '">';
-    $output[] = '<input name="submit" type="submit" value="' . $this->i18n['search'] . '">';
-    $output[] = '<input name="submit" type="submit" value="' . $this->i18n['clear'] . '">';
+    $output[] = '<input name="submit_button" type="submit" value="' . $this->i18n['search'] . '">';
+    $output[] = '<input name="submit_button" type="submit" value="' . $this->i18n['clear'] . '">';
 
     if ($print)
       echo $this->output_HTML($output);
@@ -711,7 +754,7 @@ class PDb_List extends PDb_Shortcode {
         'type' => 'dropdown',
         'name' => 'sortBy',
         'value' => $this->filter['sortBy'],
-        'options' => array(''=>'') + $this->sortables,
+        'options' => array('null_select' => true,) + $this->sortables,
         'class' => 'search-item',
     );
     $output[] = FormElement::get_element($element);
@@ -728,7 +771,7 @@ class PDb_List extends PDb_Shortcode {
     );
     $output[] = FormElement::get_element($element);
 
-    $output[] = '<input name="submit" type="submit" value="' . $this->i18n['sort'] . '" />';
+    $output[] = '<input name="submit_button" type="submit" value="' . $this->i18n['sort'] . '" />';
 
     if ($print)
       echo $this->output_HTML($output);
@@ -762,14 +805,9 @@ class PDb_List extends PDb_Shortcode {
 
     // set the wrapper HTML parameters
     $this->pagination->set_wrappers($this->pagination_wrap);
-    
-    /*
-     * add a split point if this is an AJAX call
-     */
-    $split_point = $this->shortcode_atts['filtering'] ? '%%%' : '';
 
     // print the control
-    echo $split_point.$this->pagination->create_links();
+    echo $this->pagination->create_links();
   }
 
   /**
@@ -853,7 +891,7 @@ class PDb_List extends PDb_Shortcode {
    */
   public function show_date($value, $format = false, $print = true) {
 
-    $time = preg_match('#^[0-9-]+$#', $value) > 0 ? (int) $value : Participants_Db::parse_date($value);
+    $time = Participants_Db::is_valid_timestamp($time) ? $value : Participants_Db::parse_date($value);
 
     $dateformat = $format ? $format : get_option('date_format', 'r');
 
@@ -1088,13 +1126,13 @@ class PDb_List extends PDb_Shortcode {
    */
   function to_utf8( $string ) {
     
-    $value = urldecode($string);
+    $value = preg_match('/%[0-9A-F]{2}/i',$string) ? rawurldecode($string) : $string;
     if (!function_exists('mb_detect_encoding')) {
       error_log( __METHOD__ . ': Participants Database Plugin unable to process multibyte strings because "mbstring" module is not present');
       return $value;
     }
     $encoding = mb_detect_encoding($value.'a',array('utf-8', 'windows-1251','windows-1252','ISO-8859-1'));
-    return mb_convert_encoding($value,'utf-8',$encoding); 
+    return ($encoding == 'UTF-8' ? $value : mb_convert_encoding($value,'utf-8',$encoding));
   }
 
   /**
