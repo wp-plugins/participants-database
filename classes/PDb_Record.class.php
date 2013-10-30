@@ -7,26 +7,25 @@
 
 class PDb_Record extends PDb_Shortcode {
 
-  // a string identifier for the class
-  var $module = 'record';
   // class for the wrapper
-  var $wrap_class = 'edit-participant';
+  var $wrap_class = 'participant-record';
 
   // methods
 
   /**
    * initializes the record edit object
    */
-  public function __construct($params) {
+  public function __construct($shortcode_atts) {
 
     // define shortcode-specific attributes to use
     $add_atts = array(
+        'module' => 'record',
         'id' => false,
-        'class' => 'edit-participant'
+        'class' => 'edit-participant ' . $this->wrap_class,
     );
 
     // run the parent class initialization to set up the parent methods 
-    parent::__construct($this, $params, $add_atts);
+    parent::__construct($shortcode_atts, $add_atts);
 
     // set the action URI for the form
     $this->_set_submission_page();
@@ -89,7 +88,7 @@ class PDb_Record extends PDb_Shortcode {
     $hidden = array(
         'action' => 'update',
         'id' => $this->participant_id,
-        'private_id' => $this->participant_values['private_id'],
+        'pid' => $this->participant_values['private_id'],
     );
 
     $this->_print_form_head($hidden);

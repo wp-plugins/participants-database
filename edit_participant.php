@@ -51,7 +51,7 @@ if ($participant_values) :
 
   $section = '';
   ?>
-  <div class="wrap edit-participant">
+  <div class="wrap admin-edit-participant">
     <h2><?php echo $page_title ?></h2>
     <?php
     if (is_object(Participants_Db::$validation_errors)) {
@@ -63,7 +63,7 @@ if ($participant_values) :
     ?>
     <form method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>" enctype="multipart/form-data" autocomplete="off" >
       <?php
-      FormElement::print_hidden_fields($hidden);
+      PDb_FormElement::print_hidden_fields($hidden);
 
       // get the columns and output form
       $readonly_columns = Participants_Db::get_readonly();
@@ -85,7 +85,7 @@ if ($participant_values) :
           $section = $column->group
           ?>
           <h3><?php echo $groups[$section]['title'] ?></h3>
-          <?php if ($options['show_group_descriptions']) echo '<p class="' . Participants_Db::$css_prefix . 'group-description">' . $groups[$section]['description'] . '</p>' ?>
+          <?php if ($options['show_group_descriptions']) echo '<p class="' . Participants_Db::$prefix . 'group-description">' . $groups[$section]['description'] . '</p>' ?>
           <table class="form-table">
             <?php
           }
@@ -94,7 +94,7 @@ if ($participant_values) :
 
           <tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) ?>">
             <?php
-            $column_title = htmlspecialchars(stripslashes($column->title), ENT_QUOTES, "UTF-8", false);
+            $column_title = str_replace(array('"',"'"), array('&quot;','&#39;'), stripslashes($column->title));
             if ($options['mark_required_fields'] && $column->validation != 'no') {
               $column_title = sprintf($options['required_field_marker'], $column_title);
             }
@@ -103,13 +103,13 @@ if ($participant_values) :
             $add_title = '';
             if ($column->form_element == 'hidden') {
               $add_title = sprintf(' (%s)', __('hidden', 'participants-database'));
-            } elseif (in_array($column->name, $readonly_columns)) {
+            } elseif (in_array($column->name, $readonly_columns) or $column->form_element == 'timestamp') {
               $attributes['readonly'] = 'readonly';
               $add_title = sprintf(' (%s)', __('read only', 'participants-database'));
             }
             ?>
             <th><?php echo $column_title . $add_title ?></th>
-            <td id="<?php echo Participants_Db::$css_prefix . $column->name ?>" >
+            <td id="<?php echo Participants_Db::$prefix . $column->name ?>" >
               <?php
               // get the existing value if any
               $column->value = isset($participant_values[$column->name]) ? Participants_Db::unserialize_array($participant_values[$column->name]) : '';
@@ -132,11 +132,12 @@ if ($participant_values) :
 
                 //error_log(basename(__FILE__) . ' ' . $column->name . ':' . $column->value);
 
-                if ($column->name == 'last_accessed' && (!isset($column->value) or '0000-00-00 00:00:00' == $column->value ))
-                  $column->value = false;
+//                if ($column->name == 'last_accessed' && (!isset($column->value) or '0000-00-00 00:00:00' == $column->value ))
+//                  $column->value = false;
 
                 switch ($column->form_element) {
-
+                  
+                  case 'timestamp':
                   case 'date':
 
                     /*
@@ -144,7 +145,8 @@ if ($participant_values) :
                      * timestamp, it will be formatted by the FormElement class
                      */
                     if (!empty($column->value) and !Participants_Db::is_valid_timestamp($column->value)) {
-                      $column->value = FormElement::get_field_value_display($column);
+                      //$column->value = FormElement::get_field_value_display($column);
+                      $column->value = Participants_Db::parse_date($column->value);
                     }
 
                     break;
@@ -177,7 +179,7 @@ if ($participant_values) :
               if ('rich-text' == $column->form_element) {
 
                 wp_editor(
-                        $column->value, preg_replace('#[0-9_-]#', '', Participants_Db::$css_prefix . $column->name), array(
+                        $column->value, preg_replace('#[0-9_-]#', '', Participants_Db::$prefix . $column->name), array(
                     'media_buttons' => false,
                     'textarea_name' => $column->name,
                     'editor_class' => $field_class,
@@ -185,7 +187,7 @@ if ($participant_values) :
                 );
               } else {
 
-                FormElement::print_element(
+                PDb_FormElement::print_element(
                         array(
                             'type' => $column->form_element,
                             'value' => $column->value,
@@ -193,7 +195,7 @@ if ($participant_values) :
                             'options' => $column->values,
                             'class' => $field_class,
                             'attributes' => $attributes,
-                            'module' => 'record',
+                            'module' => 'admin',
                         )
                 );
               }
@@ -212,13 +214,19 @@ if ($participant_values) :
   <?php if (is_admin()) : ?>
           <tr>
             <th><h3><?php _e('Save the Record', 'participants-database') ?></h3></th>
-          <td class="submit-buttons"><input class="button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit_button">
+          <td class="submit-buttons">
+            <?php if (isset($_GET['id'])) : ?><input class="button-secondary button-leftarrow" type="submit" value="<?php echo self::$i18n['previous'] ?>" name="submit_button"><?php endif ?>
+            <input class="button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit_button">
             <input class="button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit_button">
-            <input class="button-primary" type="submit" value="<?php echo self::$i18n['next'] ?>" name="submit_button">
+            <input class="button-secondary button-rightarrow" type="submit" value="<?php echo self::$i18n['next'] ?>" name="submit_button">
           </td>
           </tr>
           <tr>
-            <td colspan="2"><?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', 'participants-database') ?> </td>
+            <td colspan="2">
+              <?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', 'participants-database') ?>
+              <br />
+              <?php if (isset($_GET['id'])) {_e('<strong>Previous:</strong> save and move to previous record', 'participants-database'); } ?>
+            </td>
           </tr>
   <?php else : ?>
           <tr>

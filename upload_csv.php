@@ -1,7 +1,7 @@
 <?php
 $CSV_import = new PDb_CSV_Import('csv_file_upload');
 ?>
-<div class="wrap <?php echo Participants_Db::$css_prefix ?>csv-upload">
+<div class="wrap <?php echo Participants_Db::$prefix ?>csv-upload">
   <?php Participants_Db::admin_page_heading() ?>
   <div id="poststuff">
     <div id="post-body">

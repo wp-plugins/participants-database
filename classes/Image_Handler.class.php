@@ -201,7 +201,7 @@ abstract class Image_Handler {
   abstract function set_image_directory();
 
   /**
-   * sets the default image path
+   * sets the default image source path
    *
    * @param string $image absolute path to the default image file
    */

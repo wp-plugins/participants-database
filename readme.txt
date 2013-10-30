@@ -3,8 +3,8 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.0
-Tested up to: 3.5
-Stable tag: 1.4.9.2
+Tested up to: 3.6
+Stable tag: 1.4.9.3
 License: GPLv2
 
 Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
@@ -17,6 +17,8 @@ This plugin was developed for an organization with the mission of educating and 
 
 This database could be of use to any organization that needs to build and maintain lists of constituents, supporters, members, volunteers, etc. for any purpose. It is designed to be easy to use and serve multiple purposes, with several very powerful features to customize it's functionality to the needs of your organization, club, sports team, or any other large group of people.
 
+The plugin can be easily adapted to work as a database for other applications such as indexes, directories, catalogs, or anything, really. The plugin uses a system of customizable templates for all it's displays, and an API for the customization and extension of it's capabilities. The plugin is fully internationalized with a growing set of translations.
+
 = Some of the features of the Participants Database Plugin: =
 
 * fully configurable database for holding any kind of information about people (or anything, really!)
@@ -26,6 +28,7 @@ This database could be of use to any organization that needs to build and mainta
 * completing the sign-up form can direct visitors to another page for a thank you message or reward
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
 * shortcode for displaying the list on the site, including the ability to select and order columns to display, sorting and filtering rules to determine which records are shown and in what order
+* shortcode for showing a search form that takes the user to the search results page
 * email notification and confirmation with secure individual access link
 * email notification when a user edits a record
 * searchable, sortable record listings in the WordPress admin
@@ -46,11 +49,11 @@ The plugin provides a shortcode for a sign-up form that presents a customizable 
 
 Signup forms are produced by a template, making it easy to add extra functionality and match the presentation of the form to your theme.
 
-= Frontend Form =
+= Frontend Record Edit Form =
 
 This is where people who have signed up can fill in any additional information about themselves you wish to collect. It can be additional demographic info, survey questions, what they would be willing to offer in support. This form is accessible to the signups via an individual link containing an ID number, which is emailed to them when they sign up. They don't need to register as a user or enter a password, they just need the link.
 
-= Backend Form =
+= Backend Record Editing =
 
 For your backend users, the ability to edit and enter new records is provided. This backend form can also contain administrative fields that won't be visible to the front-end (not logged-in) user, so organization staff can keep internal records of volunteer activities, availability, contributions, personal notes, etc.
 
@@ -60,7 +63,7 @@ For textarea fields, a rich-text editor will be used if enabled in the settings.
 
 = List Display =
 
-Display the list on your website with the `[pdb_list]` shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order. Optionally, search and sorting controls can be displayed.
+Display the list on your website with the `[pdb_list]` shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order. Optionally, search and sorting controls can be displayed. Each record listing can be linked to the full record showing all the details of the record.
 
 = Record Display =
 
@@ -74,17 +77,21 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 
 = Internationalization and Translations =
 
-This plugin is fully compliant with WordPress Internationalization standards and includes partial translations in Italian and Polish, and a complete translation in Slovak. All of the front-end text is user-customizable, so even if a translation isn't available for your language, your users will be able to use the plugin in their language.
+This plugin is fully compliant with WordPress Internationalization standards and includes several translations, some of which are incomplete at the moment. All of the front-end text is user-customizable, so even if a translation isn't available for your language, your users will be able to use the plugin in their language.
 
 *Translation Credits*
 
-* Slovak: Branco Radenovich [WebHostingGeeks.com](http://webhostinggeeks.com/blog/)
-
-* Polish: Piotr Kubala
+* French: Dominique Chapelle
 
 * Italian: Mario Conte
 
-* French: Dominique Chapelle
+* Dutch: Bas van Erp
+
+* Polish: Piotr Kubala
+
+* Russian: Konstantin Bashevoy [Полиатлон России](http://polyathlon-russia.com/base)
+
+* Slovak: Branco Radenovich [WebHostingGeeks.com](http://webhostinggeeks.com/blog/)
 
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
@@ -171,9 +178,13 @@ If someone does not have the private link to edit their record, they can sign up
 
 It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the `[pdb_record]` shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
 
-= Can they upload files too? =
+= Is it possible for users to upload files? =
 
-No, only image files are supported for now, primarily for security reasons.
+File uploads use the "file upload" field type. You should define a set of allowed file extensions in the settings: "allowed file types" under the "general settings" tab.
+
+= My site is not in English and searches using non-English characters are not working properly. =
+
+If you have a non-English site, you should convert your database to the correct "collation" for your language. 
 
 = I'm seeing strange characters in my CSV export. What's going on? =
 
@@ -210,6 +221,11 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.4.9.3 =
+* reworked class autoloading to avoid conflicts
+* 'list_query' filter now happens before the length of the list is calculated so if it is altered, the length will be correct
+* 'list_query' filter no longer includes the pagination limit statement
 
 = 1.4.9.2 =
 * improved date formatting for numeric non-American style dates (dd/mm/yyyy)
@@ -582,7 +598,9 @@ If you want to get tricky with the CSS, each header column has a class name that
 
 = Searching and Sorting The List =
 
-You can activate list searching and/or sorting for your users with these attributes: `[pdb_list search=true]` or `[pdb_list sort=true]` These attributes will enable a search form and/or sort form displayed above the list. The user can select which field they want to search through a dropdown and type in a search term. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
+You can activate user list searching and/or sorting for your users with these attributes: `[pdb_list search=true]` or `[pdb_list sort=true]` These attributes will enable a search form and/or sort form displayed above the list. The user can select which field they want to search through a dropdown and type in a search term. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
+
+User list searches now allow for the use of the '*' wildcard, so for instance, to search for records beginning with the letter 'B' the search would be 'B*'.
 
 There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
 
@@ -694,17 +712,23 @@ At the moment, two WordPress objects are available: $post and $current_user. You
 
 If you just want to put in a fixed value, the hidden field will include any string you put into the "default" for the field.
 
-You can also access some PHP "Superglobals." For instance, to get the IP of the user, put this into the default: "SERVER:REMOTE_ADDR" You can access these superglobals: POST, GET, REQUEST, COOKIE, SERVER. This means you can get the value of a cookie and put it into the form, saving it when the form is submitted. You don't need the '$_' that is used in PHP. A good reference for what is possible can be found here: <http://php.net/manual/en/language.variables.superglobals.php>
+You can also access some PHP "Superglobals." For instance, to get the IP of the user, put this into the default: "SERVER:REMOTE_ADDR" You can access these superglobals: POST, GET, REQUEST, COOKIE, SERVER, SESSION. This means you can get the value of a cookie and put it into the form, saving it when the form is submitted. You don't need the '$_' that is used in PHP. A good reference for what is possible can be found here: <http://php.net/manual/en/language.variables.superglobals.php>
 
 For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden fields are also present in the form presented by the `[pdb_record]` shortcode. These fields are visible and editable in the admin edit page.<a id="images"></a>
 
-= Image Uploads =
+= Image & File Uploads =
 
-Images can now be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'Image Upload Location' setting will always determine the location for the images. The images are stored in the database as filenames without any path information.
+Files can be uploaded and managed using the "File Upload" field type. The allowed filetypes (determined by extension) are defined in the "Allowed File Types" setting. This is a global setting for all uploads. Image files are uploaded and managed using the "Image Upload" field type.
+
+Images can be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'File Upload Location' setting will always determine the location for files uploaded using the plugin forms. The files are stored in the database as filenames without any path information.
 
 The plugin has a "default image" that will be shown if no image is present. You can create your own, but you shouldn't keep it in the plugin folder. Keep it in the uploads directory or in your theme directory. Change the "Default Image" setting to point to your image. If you don't want anything to show if no image is present, make the "Default Image" setting blank.
 
-IMPORTANT: Don't store images in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.<a id="csv"></a>
+IMPORTANT: Don't store your files in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have files in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
+
+File uploads can present a security risk to a website, so some precautions should be taken. The plugin secures uploads by replacing the filename of the uploaded file with a sanitized filename. We are depending on the hosting server to prevent the possibility of executing an uploaded file based on the filename extension.
+
+<a id="csv" name="csv"></a>
 
 = Importing CSV Files =
 

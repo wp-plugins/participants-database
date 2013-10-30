@@ -124,7 +124,7 @@ class Field_Item extends Template_Item {
    */
   public function get_value() {
     
-    return FormElement::get_field_value_display($this);
+    return PDb_FormElement::get_field_value_display($this);
     
   }
   
@@ -180,7 +180,7 @@ class Field_Item extends Template_Item {
     
     $label = $this->prepare_display_value( $this->title );
     
-    if ( Participants_Db::$plugin_options['mark_required_fields'] && $this->validation != 'no' && $this->module != 'single' ) {
+    if ( Participants_Db::$plugin_options['mark_required_fields'] && $this->validation != 'no' && in_array($this->module,array('signup','record'))) {
       
       $label = sprintf( Participants_Db::$plugin_options['required_field_marker'], $label );
       
@@ -219,7 +219,7 @@ class Field_Item extends Template_Item {
     if ($this->readonly) {
 
       if ($this->form_element == 'date')
-        $this->value = FormElement::format_date($this->value);
+        $this->value = PDb_FormElement::get_field_value_display($this);
 
       echo '<span class="pdb-readonly ' . $this->field_class . '" >' . $this->value . '</span>';
     } else {
@@ -233,7 +233,7 @@ class Field_Item extends Template_Item {
    */
   public function _print() {
     
-    FormElement::print_element( array(
+    PDb_FormElement::print_element( array(
                                         'type'       => $this->form_element,
                                         'value'      => $this->value,
                                         'name'       => $this->name,

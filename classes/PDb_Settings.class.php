@@ -19,6 +19,8 @@ class PDb_Settings extends Plugin_Settings {
         'pdb-signup' => __('Signup Form Settings', 'participants-database'),
         'pdb-record' => __('Record Form Settings', 'participants-database'),
         'pdb-list' => __('List Display Settings', 'participants-database'),
+        'pdb-resend' => __('Resend Link Settings', 'participants-database'),
+        'pdb-advanced' => __('Advanced Settings', 'participants-database'),
         'pdb-css'  => __('Custom CSS', 'participants-database'),
     );
 
@@ -26,10 +28,12 @@ class PDb_Settings extends Plugin_Settings {
         'pdb-record' => __('Settings for the [pdb_record] shortcode, which is used to show a user-editable form on the website.', 'participants-database'),
         'pdb-list' => __('Settings for the [pdb_list] shortcode, which is used to show a list of records from the database.', 'participants-database'),
         'pdb-signup' => __('Settings for the [pdb_signup] shortcode, which is used to show a signup or registration form on the website.', 'participants-database'),
+        'pdb-resend' => __('Settings for the lost private link resend function.', 'participants-database'),
+        'pdb-advanced' => __('Settings for special configurations.', 'participants-database'),
         'pdb-css' => __('User CSS rules for styling plugin displays.</h4><p>If you\'re new to CSS, try this tutorial to help you get started: <a href="http://www.ostraining.com/blog/wordpress/firebug-wordpress-css/">Use Firebug for Editing WordPress Themes.</a></p>' , 'participants-database'),
     );
     // determine the type of text-area elements to use for email body settings
-    $this->textarea_type = Participants_Db::$plugin_options['html_email'] == 1 ? 'rich-text' : 'text-area';
+    $this->textarea_type = Participants_Db::$plugin_options['html_email'] == '1' ? 'rich-text' : 'text-area';
 
 
     // run the parent class initialization to finish setting up the class 
@@ -86,7 +90,7 @@ class PDb_Settings extends Plugin_Settings {
         'group' => 'pdb-main',
         'options' => array(
             'type' => 'text',
-            'help_text' => __('list of allowed file types by file extension. Please be aware that there are security risks inherent in allowing file uploads.', 'participants-database'),
+            'help_text' => __('list of allowed file types by file extension. Please be aware that there are security risks in allowing file uploads.', 'participants-database'),
             'value' => 'txt,pdf,mp3,mp4a,ogg,doc,docx,odt,rtf,zip,jpg,jpeg,gif,png',
         )
     );
@@ -122,21 +126,8 @@ class PDb_Settings extends Plugin_Settings {
         'options' => array
             (
             'type' => 'checkbox',
-            'help_text' => __('if checked, allows uploaded files and images to be deleted from storage when deleted from a record', 'participants-database'),
+            'help_text' => __('if checked, allows uploaded files and images to be deleted from storage when deleted from a record by a user', 'participants-database'),
             'value' => 0,
-            'options' => array(1, 0),
-        ),
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'use_plugin_css',
-        'title' => __('Use the Plugin CSS', 'participants-database'),
-        'group' => 'pdb-main',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __('use the plugin\'s CSS to style the output of shortcodes', 'participants-database'),
-            'value' => 1,
             'options' => array(1, 0),
         ),
     );
@@ -195,8 +186,8 @@ class PDb_Settings extends Plugin_Settings {
         'group' => 'pdb-main',
         'options' => array(
             'type' => 'text',
-            'help_text' => __("the message shown when a field's value does match the value of another field", 'participants-database'),
-            'value' => __('The %s field must match.', 'participants-database'),
+            'help_text' => __("the message shown when a field's value does match the value of another field. The first %s will show the name of the field, the second will show the name of the filed it must match.", 'participants-database'),
+            'value' => __('The %s field must match the %s field.', 'participants-database'),
         )
     );
 
@@ -219,7 +210,7 @@ class PDb_Settings extends Plugin_Settings {
         'options' => array(
             'type' => 'text',
             'help_text' => __('the CSS style applied to an input or text field that is missing or has not passed validation. This must be a valid CSS rule', 'participants-database'),
-            'value' => __('border: 1px solid red', 'participants-database'),
+            'value' => 'border: 1px solid red',
         )
     );
 
@@ -247,99 +238,23 @@ class PDb_Settings extends Plugin_Settings {
         )
     );
 
-    $this->plugin_settings[] = array(
-        'name' => 'rich_text_editor',
-        'title' => __('Use Rich Text Editor', 'participants-database'),
-        'group' => 'pdb-main',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __('enable the rich text editor on "rich-text" fields for front-end users. If deselected, "rich-text" fields will appear as text-area fields. This does not affect admin users, who always have the use of the rich-text editor.', 'participants-database'),
-            'value' => 1,
-            'options' => array(1, 0),
-        ),
-    );
+//    $this->plugin_settings[] = array(
+//        'name' => 'search_collation',
+//        'title' => __('Search Collation', 'participants-database'),
+//        'group' => 'pdb-main',
+//        'options' => array(
+//            'type' => 'dropdown',
+//            'help_text' => sprintf(__('sets the database collation map <a href="%s">(more info)</a> to use for list searches. Set this to your language if your non-English searches are not working correctly. You may have to experiment with different settings. The default is "UTF-8 Unicode."', 'participants-database'), 'http://dev.mysql.com/doc/refman/5.0/en/charset-general.html'),
+//            'value' => $this->get_collation(),
+//            'options' => $this->get_collation_list(),
+//        )
+//    );
 
-    $this->plugin_settings[] = array(
-        'name' => 'enable_wpautop',
-        'title' => __('Use WordPress Auto Formatting', 'participants-database'),
-        'group' => 'pdb-main',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __('Use WordPress&#39; auto formatting on rich text fields.', 'participants-database'),
-            'value' => 1,
-            'options' => array(1, 0),
-        ),
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'html_email',
-        'title' => __('Send HTML Email', 'participants-database'),
-        'group' => 'pdb-main',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __('use rich text in plugin emails? If you turn this off, be sure to remove all HTML tags from the email body settings for the plugin.', 'participants-database'),
-            'value' => 1,
-            'options' => array(1, 0),
-        ),
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'strict_dates',
-        'title' => __('Strict Date Format', 'participants-database'),
-        'group' => 'pdb-main',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => sprintf(__('This forces date inputs to be interpreted strictly according to the "Input Date Format" setting. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database'), date(isset(Participants_Db::$plugin_options['input_date_format']) ? Participants_Db::$plugin_options['input_date_format'] : get_option('date_format')), (function_exists('date_create') ? '' : '<strong>(' . __('Your current PHP installation does not support this setting.', 'participants-database') . ' )</strong>')),
-            'value' => 0,
-            'options' => array(1, 0),
-        ),
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'input_date_format',
-        'title' => __('Input Date Format', 'participants-database'),
-        'group' => 'pdb-main',
-        'options' => array
-            (
-            'type' => 'text-line',
-            'help_text' => __('date formatting string for all plugin date inputs when "Strict Date Format" is enabled. You should use this for all localized (non-American English) date formats.', 'participants-database'),
-            'value' => get_option('date_format'),
-        ),
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'record_edit_capability',
-        'title' => __('Record Edit Access Level', 'participants-database'),
-        'group' => 'pdb-main',
-        'options' => array(
-            'type' => 'dropdown',
-            'help_text' => __('sets the user access level for adding, editing and listing records.', 'participants-database'),
-            'value' => 'edit_others_posts',
-            'options' => $this->get_role_select(),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'plugin_admin_capability',
-        'title' => __('Plugin Admin Access Level', 'participants-database'),
-        'group' => 'pdb-main',
-        'options' => array(
-            'type' => 'dropdown',
-            'help_text' => __('sets the user access level for fields management, plugin settings, and CSV operations.', 'participants-database'),
-            'value' => 'manage_options',
-            'options' => $this->get_role_select(),
-        )
-    );
-
-    /*     * ****************************************************
+    /******************************************************
      *
      *   signup form settings
      *
-     * **************************************************** */
+     ******************************************************/
 
     $this->plugin_settings[] = array(
         'name' => 'signup_button_text',
@@ -358,10 +273,64 @@ class PDb_Settings extends Plugin_Settings {
         'group' => 'pdb-signup',
         'options' => array(
             'type' => 'dropdown-other',
-            'help_text' => __('after they singup, send them to this page for a thank you message. This page is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have to do that if you have them go back to the same page. You can also use a Post ID for posts and custom post types.', 'participants-database'),
-            'options' => $this->_get_pagelist(true),
+            'help_text' => __('after they register, send them to this page for a thank you message. This page is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have to do that if you have them go back to the same page. You can also use a Post ID for posts and custom post types.', 'participants-database'),
+            'options' => $this->_get_pagelist(false),
             'attributes' => array('other' => 'Post ID'),
             'value' => 'none',
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'signup_show_group_descriptions',
+        'title' => __('Show Field Groups', 'participants-database'),
+        'group' => 'pdb-signup',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('Show groups and group descriptions in the signup form.', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        )
+    );
+    
+     $this->plugin_settings[] = array(
+        'name' => 'unique_field',
+        'title' => __('Duplicate Record Check Field', 'participants-database'),
+        'group' => 'pdb-signup',
+        'options' => array
+            (
+            'type' => 'dropdown',
+            'help_text' => __('when a signup is submitted or CSV record is imported, this field is checked for a duplicate', 'participants-database'),
+            'options' => array_merge($this->_get_display_columns(), array('Record ID' => 'id')),
+            'value' => $this->_get_email_column(),
+        )
+    );
+    $this->plugin_settings[] = array(
+        'name' => 'unique_email',
+        'title' => __('Duplicate Record Preference', 'participants-database'),
+        'group' => 'pdb-signup',
+        'options' => array
+            (
+            'type' => 'dropdown',
+            'help_text' => __('when the submission matches the Duplicate Record Check Field of an existing record. This also applies to importing records from a CSV file.', 'participants-database'),
+            'value' => 1,
+            'options' => array(
+                __('Create a new record with the submission', 'participants-database') => 0,
+                __('Overwrite matching record with new data', 'participants-database') => 1,
+                __('Show a validation error message', 'participants-database') => 2,
+                'null_select' => false,
+            ),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'duplicate_field_message',
+        'title' => __('Duplicate Record Error Message', 'participants-database'),
+        'group' => 'pdb-signup',
+        'options' => array(
+            'type' => 'text-area',
+            'help_text' => __('If "Show a validation error message" is selected above, this message will be shown if a signup is made with a "check field" that matches an existing record.', 'participants-database'),
+            'value' => __('A record with that %s already exists. Please choose another.', 'participants-database'),
         )
     );
 
@@ -480,58 +449,118 @@ class PDb_Settings extends Plugin_Settings {
             'value' => __('<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul><p>Edit this new record here: <a href="[admin_record_link]">[admin_record_link]</a></p>', 'participants-database'),
         )
     );
-
-
-    $this->plugin_settings[] = array(
-        'name' => 'unique_field',
-        'title' => __('Duplicate Record Check Field', 'participants-database'),
-        'group' => 'pdb-signup',
-        'options' => array
-            (
-            'type' => 'dropdown',
-            'help_text' => __('when a signup is submitted or CSV record is imported, this field is checked for a duplicate', 'participants-database'),
-            'options' => array_merge($this->_get_display_columns(), array('Record ID' => 'id')),
-            'value' => $this->_get_email_column(),
-        )
-    );
-    $this->plugin_settings[] = array(
-        'name' => 'unique_email',
-        'title' => __('Duplicate Record Preference', 'participants-database'),
-        'group' => 'pdb-signup',
-        'options' => array
-            (
-            'type' => 'dropdown',
-            'help_text' => __('when the submission matches the Duplicate Record Check Field of an existing record. This also applies to importing records from a CSV file.', 'participants-database'),
-            'value' => 1,
-            'options' => array(
-                __('Create a new record with the submission', 'participants-database') => 0,
-                __('Overwrite matching record with new data', 'participants-database') => 1,
-                __('Show a validation error message', 'participants-database') => 2,
-            ),
-        ),
-    );
+    
+    /*******************************************************
+     * 
+     * link retrieval settings
+     * 
+     *******************************************************/
 
     $this->plugin_settings[] = array(
-        'name' => 'duplicate_field_message',
-        'title' => __('Duplicate Record Error Message', 'participants-database'),
-        'group' => 'pdb-signup',
-        'options' => array(
-            'type' => 'text-area',
-            'help_text' => __('If "Show a validation error message" is selected above, this message will be shown if a signup is made with a "check field" that matches an existing record.', 'participants-database'),
-            'value' => __('A record with that %s already exists. Please choose another.', 'participants-database'),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'signup_show_group_descriptions',
-        'title' => __('Show Field Groups', 'participants-database'),
-        'group' => 'pdb-signup',
+        'name' => 'show_retrieve_link',
+        'title' => __('Enable Lost Private Link', 'participants-database'),
+        'group' => 'pdb-resend',
         'options' => array
             (
             'type' => 'checkbox',
-            'help_text' => __('Show groups and group descriptions in the signup form.', 'participants-database'),
+            'help_text' => __('Show a link on the signup form allowing users to have their private link emailed to them.', 'participants-database'),
             'value' => 0,
             'options' => array(1, 0),
+        )
+    );
+    $this->plugin_settings[] = array(
+        'name' => 'link_retrieval_page',
+        'title' => __('Lost Private Link Page', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array
+            (
+            'type' => 'dropdown-other',
+            'help_text' => __('send people to this page to request their private link.', 'participants-database'),
+            'options' => $this->_get_pagelist(true),
+            'attributes' => array('other' => 'Post ID'),
+            'value' => 'none',
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_identifier',
+        'title' => __('Lost Private Link ID Field', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'dropdown',
+            'help_text' => __('The field used to identify the user&#39;s account. This must be a unique identifier for the record', 'participants-database'),
+            'options' => $this->_get_identifier_columns(),
+            'value' => $this->_get_email_column(),
+        )
+    );
+   
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_email_subject',
+        'title' => __('Lost Private Link Email Subject', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('subject line for the lost private link email', 'participants-database'),
+            'value' => sprintf(__("Here is your private link on %s", 'participants-database'), get_bloginfo('name')),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_email_body',
+        'title' => __('Lost Private Link Email', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => $this->textarea_type,
+            'help_text' => __('Body of the email sent when a lost private link is requested.', 'participants-database'),
+            /* translators: the %s will be the name of the website */
+            'value' => '<p>' . sprintf(__('Here is the private link you requested from %s:', 'participants-database'), get_bloginfo('name')) . '</p><p><a href="[record_link]">[record_link]</a>.</p>',
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'send_retrieve_link_notify_email',
+        'title' => __('Send Lost Private Link Notification Email', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('Send an email notification that a lost private link has been requested. This email will go to the "Signup Notification Recipients."', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_notify_subject',
+        'title' => __('Lost Private Link Notification Email Subject', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('subject of the notification email; placeholder tags can be used (see above)', 'participants-database'),
+            /* translators: the %s will be the name of the website */
+            'value' => sprintf(__('A Lost Private Link has been requested on %s', 'participants-database'), get_bloginfo('name')),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_notify_body',
+        'title' => __('Lost Private Link Notification Email', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => $this->textarea_type,
+            'help_text' => __('notification email body', 'participants-database'),
+            'value' => __('<p>A lost private link has been requested by:</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>', 'participants-database'),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'identifier_field_message',
+        'title' => __('Retrieve Private Link Error Message', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text-area',
+            'help_text' => __('Message shown when a record matching the retrieve link idenifier cannot be found', 'participants-database'),
+            'value' => __('A record matching that %s cannot be found.', 'participants-database'),
         )
     );
 
@@ -549,8 +578,21 @@ class PDb_Settings extends Plugin_Settings {
             (
             'type' => 'dropdown-other',
             'help_text' => __('The page where your participant record ([pdb_record] shortcode) is displayed. You can use a Post ID for posts and custom post types.', 'participants-database'),
-            'options' => $this->_get_pagelist(),
+            'options' => $this->_get_pagelist(false,true),  
             'attributes' => array('other' => 'Post ID'),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'show_group_descriptions',
+        'title' => __('Show Group Descriptions', 'participants-database'),
+        'group' => 'pdb-record',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('Show the group description under each group title in the record form.', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
         )
     );
 
@@ -579,26 +621,24 @@ class PDb_Settings extends Plugin_Settings {
     );
 
     $this->plugin_settings[] = array(
-        'name' => 'show_group_descriptions',
-        'title' => __('Show Group Descriptions', 'participants-database'),
-        'group' => 'pdb-record',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __('Show the group description under each group title in the record form.', 'participants-database'),
-            'value' => 0,
-            'options' => array(1, 0),
-        )
-    );
-
-    $this->plugin_settings[] = array(
         'name' => 'record_updated_message',
         'title' => __('Record Updated Message', 'participants-database'),
         'group' => 'pdb-record',
         'options' => array(
             'type' => 'text',
             'help_text' => __("the message shown when a record form has been successfully submitted", 'participants-database'),
-            'value' => __('Your information has been updated:', 'participants-database'),
+            'value' => __('Your information has been updated', 'participants-database'),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'no_record_error_message',
+        'title' => __('Record Not Found Error Message', 'participants-database'),
+        'group' => 'pdb-record',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('message to show if the record page was accessed without a valid identifier. Leave this empty if you want nothing at all to show.', 'participants-database'),
+            'value' => sprintf(__("No record was found.", 'participants-database'), get_bloginfo('name')),
         )
     );
 
@@ -632,19 +672,9 @@ class PDb_Settings extends Plugin_Settings {
         'group' => 'pdb-record',
         'options' => array(
             'type' => $this->textarea_type,
+            /* translators: [date] and [admin_record_link] must not be translated, they must be used literally. The rest of the words enclosed in brackets can be defined by the user, they are used here only as examples. */
             'help_text' => __('Body of the the email sent when a user updates their record. Any field from the form can be included by using a replacement code of the form: [field_name]. For instance: [last_name],[address],[email] etc. (The field name is under the "name" column on the "Manage Database Fields" page.)  Also available is [date] which will show the date and time of the update and [admin_record_link] tag for a link to edit the record in the admin.', 'participants-database'),
             'value' => __('<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] [last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</li><li>Phone: [phone]</li><li>Email: [email]</li></ul><p>Edit this record <a href="[admin_record_link]">here.</a></p>', 'participants-database'),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'no_record_error_message',
-        'title' => __('Record Not Found Error Message', 'participants-database'),
-        'group' => 'pdb-record',
-        'options' => array(
-            'type' => 'text',
-            'help_text' => __('message to show if the record page was accessed without a valid identifier. Leave this empty if you want nothing at all to show.', 'participants-database'),
-            'value' => sprintf(__("No record was found.", 'participants-database'), get_bloginfo('name')),
         )
     );
 
@@ -688,7 +718,7 @@ class PDb_Settings extends Plugin_Settings {
             'attributes' => array('other' => 'Post ID'),
             'type' => 'dropdown-other',
             'help_text' => __('this is the page where the [pdb_single] shortcode is located. If you want to assign a post or custom post type, select "Post ID" and enter the post ID in the "other" box.', 'participants-database'),
-            'options' => $this->_get_pagelist(),
+            'options' => $this->_get_pagelist(false,true),
         )
     );
 
@@ -702,40 +732,30 @@ class PDb_Settings extends Plugin_Settings {
             'value' => __('No Records Found', 'participants-database'),
         )
     );
-
     $this->plugin_settings[] = array(
-        'name' => 'display_count_template',
-        'title' => __('Display Count Template', 'participants-database'),
-        'group' => 'pdb-list',
-        'options' => array(
-            'type' => 'text',
-            'help_text' => __('This is the text used to display the count of records at the top of the list. The placeholder [total] is the count, [number] is the number of records listed per page.', 'participants-database'),
-            'value' => __('Total Records Found: [total], showing [number] per page', 'participants-database'),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'strict_search',
-        'title' => __('Strict User Searching', 'participants-database'),
+        'name' => 'show_count',
+        'title' => __('Show Count', 'participants-database'),
         'group' => 'pdb-list',
         'options' => array
             (
             'type' => 'checkbox',
-            'help_text' => __('When checked, the frontend list search must match the whole field exactly. If unchecked, the search will match if the search term is found in part of the field. Searches are not case-sensitive either way.', 'participants-database'),
+            'help_text' => __("Show the list count on list displays. Can also be set in the shortcode.", 'participants-database'),
             'value' => 0,
             'options' => array(1, 0),
         ),
     );
+    
     $this->plugin_settings[] = array(
-        'name' => 'ajax_search',
-        'title' => __('Enable AJAX Search Functionality', 'participants-database'),
+        'name' => 'count_template',
+        'title' => __('List Count Template', 'participants-database'),
         'group' => 'pdb-list',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __("This enables list search results that are updated without reloading the page. It requires Javascript, but search will still work if Javascript is disabled in the user's browser.", 'participants-database'),
-            'value' => 0,
-            'options' => array(1, 0),
+        'options' => array(
+            'type' => 'text-area',
+            'help_text' => sprintf(__('template for displaying the list count. %1$s - total number of records found, %2$s - number of records shown per page, %3$s - starting record number, %4$s - ending record number, %5$s - the current page number', 'participants-database'),'<br /><strong>%1$s</strong>','<strong>%2$s</strong>','<strong>%3$s</strong>','<strong>%4$s</strong>','<strong>%5$s</strong>'),
+            'value' => __('Total Records Found: %1$s, showing %2$s per page', 'participants-database'),
+            'attributes' => array(
+                'style' => 'height: 4em;'
+            ),
         ),
     );
 
@@ -761,7 +781,7 @@ class PDb_Settings extends Plugin_Settings {
             'type' => 'dropdown',
             'help_text' => __('Sets the default order of the records shown by the list shortcode.', 'participants-database'),
             'value' => 'desc',
-            'options' => array(__('Ascending', 'participants-database') => 'asc', __('Descending', 'participants-database') => 'desc'),
+            'options' => array(__('Ascending', 'participants-database') => 'asc', __('Descending', 'participants-database') => 'desc', 'null_select' => false),
         )
     );
 
@@ -787,7 +807,7 @@ class PDb_Settings extends Plugin_Settings {
             'type' => 'dropdown',
             'help_text' => __('Sets the default order of the record list in the admin.', 'participants-database'),
             'value' => 'desc',
-            'options' => array(__('Ascending', 'participants-database') => 'asc', __('Descending', 'participants-database') => 'desc'),
+            'options' => array(__('Ascending', 'participants-database') => 'asc', __('Descending', 'participants-database') => 'desc', 'null_select' => false),
         )
     );
     
@@ -800,6 +820,164 @@ class PDb_Settings extends Plugin_Settings {
             'type' => 'checkbox',
             'help_text' => '',
             'value' => 0,
+            'options' => array(1, 0),
+        ),
+    );
+    
+    /******************************************************
+     *
+     *   advanced settings
+     *
+     * *****************************************************/
+
+    $this->plugin_settings[] = array(
+        'name' => 'use_plugin_css',
+        'title' => __('Use the Plugin CSS', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('use the plugin\'s CSS to style the output of shortcodes', 'participants-database'),
+            'value' => 1,
+            'options' => array(1, 0),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'rich_text_editor',
+        'title' => __('Use Rich Text Editor', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('enable the rich text editor on "rich-text" fields for front-end users. If deselected, "rich-text" fields will appear as text-area fields. This does not affect admin users, who always have the use of the rich-text editor.', 'participants-database'),
+            'value' => 1,
+            'options' => array(1, 0),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'enable_wpautop',
+        'title' => __('Use WordPress Auto Formatting', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('Use WordPress&#39; auto formatting on rich text fields.', 'participants-database'),
+            'value' => 1,
+            'options' => array(1, 0),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'primary_email_address_field',
+        'title' => __('Primary Email Address Field', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'dropdown',
+            'help_text' => __('this field is the primary email address for the record', 'participants-database'),
+            'value' => 'email',
+            'options' => $this->_get_identifier_columns(),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'html_email',
+        'title' => __('Send HTML Email', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('use rich text in plugin emails? If you turn this off, be sure to remove all HTML tags from the email body settings for the plugin.', 'participants-database'),
+            'value' => 1,
+            'options' => array(1, 0),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'strict_dates',
+        'title' => __('Strict Date Format', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => sprintf(__('This forces date inputs to be interpreted strictly according to the "Input Date Format" setting. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database'), date(isset(Participants_Db::$plugin_options['input_date_format']) ? Participants_Db::$plugin_options['input_date_format'] : get_option('date_format')), (function_exists('date_create') ? '' : '<strong>(' . __('Your current PHP installation does not support this setting.', 'participants-database') . ' )</strong>')),
+            'value' => 0,
+            'options' => array(1, 0),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'input_date_format',
+        'title' => __('Input Date Format', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'text-line',
+            'help_text' => __('date formatting string for all plugin date inputs when "Strict Date Format" is enabled. You should use this for all localized (non-American English) date formats.', 'participants-database'),
+            'value' => get_option('date_format'),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'show_time',
+        'title' => __('Show Timestamp Time', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('Show time with timestamp dates', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'record_edit_capability',
+        'title' => __('Record Edit Access Level', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array(
+            'type' => 'dropdown',
+            'help_text' => __('sets the user access level for adding, editing and listing records.', 'participants-database'),
+            'value' => 'edit_others_posts',
+            'options' => $this->get_role_select(),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'plugin_admin_capability',
+        'title' => __('Plugin Admin Access Level', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array(
+            'type' => 'dropdown',
+            'help_text' => __('sets the user access level for fields management, plugin settings, deleting records and CSV operations.', 'participants-database'),
+            'value' => 'manage_options',
+            'options' => $this->get_role_select(),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'strict_search',
+        'title' => __('Strict User Searching', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('When checked, the frontend list search must match the whole field exactly. If unchecked, the search will match if the search term is found in part of the field. Searches are not case-sensitive either way.', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        ),
+    );
+    $this->plugin_settings[] = array(
+        'name' => 'ajax_search',
+        'title' => __('Enable AJAX Search Functionality', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __("This enables list search results that are updated without reloading the page. It requires Javascript, but search will still work if Javascript is disabled in the user's browser.", 'participants-database'),
+            'value' => 1,
             'options' => array(1, 0),
         ),
     );
@@ -841,9 +1019,11 @@ class PDb_Settings extends Plugin_Settings {
     );
   }
 
-  private function _get_pagelist($with_none = false) {
+  private function _get_pagelist($with_none = false, $with_blank = false) {
 
     $pagelist = array();
+    
+    if (!$with_blank) $pagelist['null_select'] = false;
 
     if ($with_none)
       $pagelist[__('Same Page', 'participants-database')] = 'none';
@@ -874,7 +1054,7 @@ class PDb_Settings extends Plugin_Settings {
 
   private function _get_display_columns() {
 
-    $columnlist = array(__('None', 'participants-database') => 'none');
+    $columnlist = array(__('None', 'participants-database') => 'none', 'null_select' => false);
 
     $columns = Participants_Db::get_column_atts('frontend');
 
@@ -887,9 +1067,15 @@ class PDb_Settings extends Plugin_Settings {
     return $columnlist;
   }
 
-  private function _get_identifier_columns() {
+  /**
+   * this provides a set of field to select from
+   * 
+   * @param bool $null if true include a null value
+   * @return array of fields as $title => $value
+   */
+  private function _get_identifier_columns($null = true) {
 
-    $columnlist = array();
+    $columnlist = $null ? array() : array('null_select' => false);
 
     $columns = Participants_Db::get_column_atts('frontend');
 
@@ -918,7 +1104,7 @@ class PDb_Settings extends Plugin_Settings {
 
   private function _get_sort_columns() {
 
-    $columnlist = array();
+    $columnlist = array('null_select' => false);
 
     $columns = Participants_Db::get_column_atts('sortable');
 
@@ -970,6 +1156,34 @@ class PDb_Settings extends Plugin_Settings {
     }
     return $role_select;
   }
+  
+  
+   
+   /**
+    * grabs a list of available collations
+    */
+  public static function get_collation_list() {
+    global $wpdb;
+    $character_sets = $wpdb->get_results('SHOW CHARACTER SET');
+    
+    $return = array('null_select' => false);
+    foreach($character_sets as $set) {
+      $return[$set->Description] = $set->{'Default collation'};
+    }
+    return $return;
+    
+  }
+  
+  /**
+    * gets the collation of the database
+    */
+  public static function get_collation() {
+    global $wpdb;
+    $character_set = $wpdb->get_row('SHOW TABLE STATUS WHERE `name` = "' . $wpdb->prefix . 'participants_database"');
+
+    return $character_set->Collation;
+    
+  }
 
   /**
    * displays a settings page form using the WP Settings API
@@ -1004,7 +1218,7 @@ class PDb_Settings extends Plugin_Settings {
             'name' => 'submit',
         );
 
-        printf($this->submit_wrap, FormElement::get_element($args));
+        printf($this->submit_wrap, PDb_FormElement::get_element($args));
         ?>
       </form>
 
@@ -1021,7 +1235,7 @@ class PDb_Settings extends Plugin_Settings {
 
     $name = Participants_db::make_anchor(end(explode('_', $section['id'])));
 
-    printf('<a id="%1$s" name="%1$s" class="%2$s" ></a>', $name, Participants_Db::$css_prefix . 'anchor');
+    printf('<a id="%1$s" name="%1$s" class="%2$s" ></a>', $name, Participants_Db::$prefix . 'anchor');
 
     if (isset(self::$section_description[$name]))
       printf('<div class="section-description" ><h4>%s</h4></div>', self::$section_description[$name]);

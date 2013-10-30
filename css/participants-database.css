@@ -1,13 +1,18 @@
 /* stylesheet for participants-database plugin */
 
+.helptext {
+  display: inline-block;
+  margin: 0 5px;
+}
+
 /* SIGNUP FORM */
 
-.pdb-signup label {
+/*.pdb-signup label {
   display:inline-block;
   width:135px;
   margin-right:10px;
   text-align:right;
-}
+}*/
 .pdb-signup .helptext {
   display:block;
   margin-left:150px;
@@ -32,8 +37,8 @@
 .participants_db input,
 .edit-participant input,
 .link-element label {
-  float:left;
-  margin-right:10px;
+  margin-right:2px;
+  vertical-align: middle;
 }
 .participants_db .inline-controls input[type='checkbox'],
 .participants_db .inline-controls input[type='radio'] {
@@ -42,15 +47,6 @@
 .edit-participant h3 {
   margin-top: 2em;
   margin-bottom: 1em;
-}
-.edit-participant .helptext, 
-.participants_db .helptext {
-/*  text-align:left;
-  vertical-align:top;*/
-}
-.edit-participant .helptext {
-/*  display:block;
-  width:100%;*/
 }
 .edit-participant .submit-buttons {
   border:none;
@@ -93,6 +89,8 @@
 }
 .pdb-upload input[type=file] {
   float:none;
+  line-height: 1;
+  vertical-align: text-bottom;
 }
 
 .wrap[class^="pdb-"] td,
@@ -104,18 +102,20 @@
 .selectother label,
 .multicheckbox label,
 .file-delete label,
-.csv-export label {
-  float: left;
+.csv-export label,
+.radio-group label {
   margin: 0 12px 0 0;
   width: auto;
-  line-height: 1.5;
+  line-height: 1;
+  white-space: nowrap;
 }
 .inline-controls label {
   float: none;
 }
 .selectother label input,
 .multicheckbox label input,
-.file-delete label input {
+.file-delete label input,
+.radio-group label input {
   float: none;
   margin:0;
 }
@@ -146,7 +146,7 @@
 .wp-list-table td,
 .form-table th, 
 .form-table td {
-  line-height: 1.1;
+/*  line-height: 1.1;*/
   vertical-align: middle;
 }
 .pdb-list fieldset,
@@ -234,7 +234,7 @@
   float: none;
 }
 .image-filename {
-  display: inline-block;
+  vertical-align: text-bottom;
   margin: 0 0 0 10px;
 }
 .image-upload .helptext {

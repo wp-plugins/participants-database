@@ -22,13 +22,18 @@ $PDb_i18n = array(
     'form_element' => _x('Form Element', 'column name', 'participants-database'),
     'values' => _x('Values', 'column name', 'participants-database'),
     'validation' => _x('Validation', 'column name', 'participants-database'),
-    'display_column' => _x('Display Column', 'column name', 'participants-database'),
-    'admin_column' => _x('Admin Column', 'column name', 'participants-database'),
+    'display_column' => str_replace(' ', '<br />', _x('Display Column', 'column name', 'participants-database')),
+    'admin_column' => str_replace(' ', '<br />', _x('Admin Column', 'column name', 'participants-database')),
     'sortable' => _x('Sortable', 'column name', 'participants-database'),
     'CSV' => _x('CSV', 'column name, acronym for "comma separated values"', 'participants-database'),
     'persistent' => _x('Persistent', 'column name', 'participants-database'),
     'signup' => _x('Signup', 'column name', 'participants-database'),
     'readonly' => _x('Read Only', 'column name', 'participants-database'),
+    'admin' => _x('Admin', 'column name', 'participants-database'),
+    'delete' => _x('Delete', 'column name', 'participants-database'),
+    'display' => _x('Display', 'column name', 'participants-database'),
+    'fields' => _x('Fields', 'column name', 'participants-database'),
+    'description' => _x('Description', 'column name', 'participants-database'),
 );
 // process form submission
 $error_msgs = array();
@@ -37,14 +42,14 @@ if (isset($_POST['action'])) {
   switch ($_POST['action']) {
 
     case 'reorder_fields':
-      unset($_POST['action'], $_POST['submit']);
+      unset($_POST['action'], $_POST['submit-button']);
       foreach ($_POST as $key => $value) {
         $wpdb->update(Participants_Db::$fields_table, array('order' => $value), array('id' => str_replace('row_', '', $key)));
       }
       break;
 
     case 'reorder_groups':
-      unset($_POST['action'], $_POST['submit']);
+      unset($_POST['action'], $_POST['submit-button']);
       foreach ($_POST as $key => $value) {
         $wpdb->update(Participants_Db::$groups_table, array('order' => $value), array('name' => str_replace('order_', '', $key)));
       }
@@ -53,7 +58,7 @@ if (isset($_POST['action'])) {
     case $PDb_i18n['update fields']:
 
       // dispose of these now unneeded fields
-      unset($_POST['action'], $_POST['submit']);
+      unset($_POST['action'], $_POST['submit-button']);
 
       foreach ($_POST as $name => $row) {
 
@@ -67,7 +72,7 @@ if (isset($_POST['action'])) {
 
           if (!empty($row['values'])) {
 
-            $row['values'] = serialize(PDb_prep_values_array(explode(',', $row['values'])));
+            $row['values'] = serialize(PDb_prep_values_array($row['values']));
           }
 
           if (!empty($row['validation']) && !in_array($row['validation'], array('yes', 'no'))) {
@@ -100,7 +105,7 @@ if (isset($_POST['action'])) {
             $row['validation'] = 'captcha';
             foreach (array('display_column', 'admin_column', 'CSV', 'persistent', 'sortable') as $c)
               $row[$c] = 0;
-            $row['signup'] = 1;
+            //$row['signup'] = 1;
           }
 
 
@@ -115,7 +120,7 @@ if (isset($_POST['action'])) {
     case $PDb_i18n['update groups']:
 
       // dispose of these now unneeded fields
-      unset($_POST['action'], $_POST['submit'], $_POST['group_title'], $_POST['group_order']);
+      unset($_POST['action'], $_POST['submit-button'], $_POST['group_title'], $_POST['group_order']);
 
       foreach ($_POST as $name => $row) {
 
@@ -222,82 +227,86 @@ foreach ($groups as $group) {
 }
 ?>
 <div class="wrap participants_db">
-<?php Participants_Db::admin_page_heading() ?>
+  <?php Participants_Db::admin_page_heading() ?>
   <h3><?php _e('Manage Database Fields', 'participants-database') ?></h3>
-<?php
-if (!empty($error_msgs)) :
-  ?>
+  <?php
+  if (!empty($error_msgs)) :
+    ?>
     <div class="error settings-error">
-  <?php foreach ($error_msgs as $error)
-    echo '<p>' . $error . '</p>'; ?>
+      <?php foreach ($error_msgs as $error)
+        echo '<p>' . $error . '</p>';
+      ?>
     </div>
 <?php endif; ?>
   <h4><?php _e('Field Groups', 'participants-database') ?>:</h4>
   <div id="fields-tabs">
     <ul>
-  <?php
-  foreach ($groups as $group) {
-    echo '<li><a href="#' . $group . '" id="tab_' . $group . '">' . ucwords(str_replace('_', ' ', $group)) . '</a></li>';
-  }
-  echo '<li><a href="#field_groups">' . __('Field Groups', 'participants-database') . '</a></li>';
-  echo '<li><a href="#help">' . __('Help', 'participants-database') . '</a></li>';
-  ?>
+      <?php
+      $mask = '<span class="mask"></span>';
+      foreach ($groups as $group) {
+        echo '<li><a href="#' . $group . '" id="tab_' . $group . '">' . ucwords(str_replace('_', ' ', $group)) . '</a>' . $mask . '</li>';
+      }
+      echo '<li class="utility"><a href="#field_groups">' . __('Field Groups', 'participants-database') . '</a>' . $mask . '</li>';
+      echo '<li class="utility"><a href="#help">' . __('Help', 'participants-database') . '</a>' . $mask . '</li>';
+      ?>
     </ul>
-<?php
-foreach ($groups as $group) :
-  ?>
+    <?php
+    foreach ($groups as $group) :
+      ?>
       <div id="<?php echo $group ?>" class="manage-fields-wrap" >
         <form id="manage_<?php echo $group ?>_fields" method="post" autocomplete="off">
           <h3><?php echo ucwords(str_replace('_', ' ', $group)), ' ', __('Fields', 'participants-database') ?></h3>
           <p>
-        <?php
-        if ('internal' !== $group) :
-          // "add field" functionality
-          FormElement::print_element(array(
-              'type' => 'submit',
-              'value' => $PDb_i18n['add field'],
-              'name' => 'action',
-              'attributes' => array(
-                  'class' => 'add_field_button',
-                  'onclick' => 'return false;'
-              )
+            <?php
+            if ('internal' !== $group) :
+              // "add field" functionality
+              PDb_FormElement::print_element(array(
+                  'type' => 'submit',
+                  'value' => $PDb_i18n['add field'],
+                  'name' => 'action',
+                  'attributes' => array(
+                      'class' => 'add_field_button',
+                      'onclick' => 'return false;'
                   )
-          );
-          FormElement::print_element(array(
-              'type' => 'text',
-              'name' => 'title',
-              'value' => $PDb_i18n['new field title'] . '&hellip;',
-              'attributes' => array(
-                  'onfocus' => "this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",
-                  'class' => 'add_field'
-              )
+                      )
+              );
+              PDb_FormElement::print_element(array(
+                  'type' => 'text',
+                  'name' => 'title',
+                  'value' => $PDb_i18n['new field title'] . '&hellip;',
+                  'attributes' => array(
+                      'onfocus' => "this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",
+                      'class' => 'add_field'
                   )
-          );
+                      )
+              );
 
-        endif; // skip internal groups
-        // number of rows in the group
-        $num_group_rows = count($database_rows[$group]);
+            endif; // skip internal groups
+            // number of rows in the group
+            $num_group_rows = count($database_rows[$group]);
 
-        $last_order = $num_group_rows > 1 ? $database_rows[$group][$num_group_rows - 1]['order'] + 1 : 1;
+            $last_order = $num_group_rows > 1 ? $database_rows[$group][$num_group_rows - 1]['order'] + 1 : 1;
 
-        FormElement::print_hidden_fields(array('group' => $group, 'order' => $last_order));
-        ?>
+            PDb_FormElement::print_hidden_fields(array('group' => $group, 'order' => $last_order));
+            ?>
           </p>
           <table class="wp-list-table widefat fixed manage-fields" cellspacing="0" >
             <thead>
               <tr>
-            <?php if ('internal' !== $group) : ?>
+                <?php if ('internal' !== $group) : ?>
                   <th scope="col" class="delete vertical-title"><span><?php echo PDb_header('delete') ?></span></th>
-              <?php
-            endif; // internal group test
+                  <?php
+                endif; // internal group test
 
-            foreach ($attribute_columns[$group] as $attribute_column) {
+                foreach ($attribute_columns[$group] as $attribute_column) {
 
-              if ('internal' == $group && in_array($attribute_column, array('order')))
-                continue;
+                  if ('internal' == $group && in_array($attribute_column, array('order')))
+                    continue;
 
-              $column_class = in_array($attribute_column, array('order', 'persistent', 'sortable', 'admin_column', 'display_column', 'CSV', 'signup', 'display', 'readonly')) ? $attribute_column . ' vertical-title' : $attribute_column;
-              ?>
+                  $column_class = $attribute_column;
+                  $column_class .= in_array($attribute_column, array('order', 'persistent', 'sortable', 'admin_column', 'display_column', 'CSV', 'signup', 'display', 'readonly')) ? ' vertical-title' : '';
+                  $column_class .= in_array($attribute_column, array('admin_column', 'display_column',)) ? ' number-column' : '';
+                  ?>
                   <th scope="col" class="<?php echo $column_class ?>"><span><?php echo PDb_header($attribute_column) ?></span></th>
                   <?php
                 }
@@ -305,72 +314,77 @@ foreach ($groups as $group) :
               </tr>
             </thead>
             <tbody id="<?php echo $group ?>_fields">
-                <?php
-                if ($num_group_rows < 1) { // there are no rows in this group to show
-                  ?>
+              <?php
+              if ($num_group_rows < 1) { // there are no rows in this group to show
+                ?>
                 <tr><td colspan="<?php echo count($attribute_columns[$group]) + 1 ?>"><?php _e('No fields in this group', 'participants-database') ?></td></tr>
-                  <?php
-                } else {
-                  // add the rows of the group
-                  foreach ($database_rows[$group] as $database_row) :
-                    ?>
+                <?php
+              } else {
+                // add the rows of the group
+                foreach ($database_rows[$group] as $database_row) :
+                  ?>
                   <tr id="db_row_<?php echo $database_row['id'] ?>">
-      <?php if ('internal' !== $group) : ?>
+                      <?php if ('internal' !== $group) : ?>
                       <td>
-                    <?php
-                  endif; // hidden field test
-                  // add the hidden fields
-                  foreach (array('id'/* ,'name' */) as $attribute_column) {
-
-                    $value = Participants_Db::prepare_value($database_row[$attribute_column]);
-
-                    $element_atts = array_merge(Participants_Db::get_edit_field_type($attribute_column), array(
-                        'name' => 'row_' . $database_row['id'] . '[' . $attribute_column . ']',
-                        'value' => $value,
-                            ));
-                    FormElement::print_element($element_atts);
-                  }
-                  FormElement::print_element(array(
-                      'type' => 'hidden',
-                      'value' => '',
-                      'name' => 'row_' . $database_row['id'] . '[status]',
-                      'attributes' => array('id' => 'status_' . $database_row['id']),
-                  ));
-                  if ('internal' !== $group) :
-                    ?>
-                        <a href="#" name="delete_<?php echo $database_row['id'] ?>" class="delete" ref="<?php _e('field', 'participants-database') ?>"></a>
-                      </td>
                         <?php
-                      endif; // internal group test
-                      // list the fields for editing
-                      foreach ($attribute_columns[$group] as $attribute_column) :
-
-                        if ('internal' == $group && in_array($attribute_column, array('order')))
-                          continue;
-
-                        // preserve backslashes in regex expressions
-                        if ($attribute_column == 'validation')
-                          $database_row[$attribute_column] = str_replace('\\', '&#92;', $database_row[$attribute_column]);
+                      endif; // hidden field test
+                      // add the hidden fields
+                      foreach (array('id'/* ,'name' */) as $attribute_column) {
 
                         $value = Participants_Db::prepare_value($database_row[$attribute_column]);
 
-                        $element_atts = array_merge(Participants_Db::get_edit_field_type($attribute_column), array(
+                        $element_atts = array_merge(PDb_get_edit_field_type($attribute_column), array(
                             'name' => 'row_' . $database_row['id'] . '[' . $attribute_column . ']',
-                            'value' => PDb_prep_value($value, (bool) ( $attribute_column == 'validation' )),
-                                ));
+                            'value' => $value,
+                        ));
+                        PDb_FormElement::print_element($element_atts);
+                      }
+                      PDb_FormElement::print_element(array(
+                          'type' => 'hidden',
+                          'value' => '',
+                          'name' => 'row_' . $database_row['id'] . '[status]',
+                          'attributes' => array('id' => 'status_' . $database_row['id']),
+                      ));
+                      if ('internal' !== $group) :
                         ?>
-                      <td class="<?php echo $attribute_column ?>"><?php FormElement::print_element($element_atts) ?></td>
+                        <a href="#" name="delete_<?php echo $database_row['id'] ?>" class="delete" ref="<?php _e('field', 'participants-database') ?>"></a>
+                      </td>
+                      <?php
+                    endif; // internal group test
+                    // list the fields for editing
+                    foreach ($attribute_columns[$group] as $attribute_column) :
+
+                      $edit_field_type = PDb_get_edit_field_type($attribute_column);
+
+                      if ('internal' == $group && in_array($attribute_column, array('order')))
+                        continue;
+
+                      // preserve backslashes in regex expressions
+                      if ($attribute_column == 'validation') {
+                        $database_row[$attribute_column] = str_replace('\\', '&#92;', $database_row[$attribute_column]);
+                        if ($database_row['name'] == 'email' && $database_row[$attribute_column] == 'email')
+                          $database_row[$attribute_column] = 'email-regex';
+                      }
+
+                      $value = Participants_Db::prepare_value($database_row[$attribute_column]);
+
+                      $element_atts = array_merge($edit_field_type, array(
+                          'name' => 'row_' . $database_row['id'] . '[' . $attribute_column . ']',
+                          'value' => PDb_prep_value($value, (bool) ( $attribute_column == 'validation' )),
+                      ));
+                      ?>
+                      <td class="<?php echo $attribute_column ?>"><?php PDb_FormElement::print_element($element_atts) ?></td>
                       <?php
                     endforeach; // columns
                     ?>
                   </tr>
-                    <?php
-                  endforeach; // rows
-                } // num group rows 
-                ?>
+                  <?php
+                endforeach; // rows
+              } // num group rows 
+              ?>
             </tbody>
           </table>
-                <?php // this javascript handles the drag-reordering of fields ?>
+  <?php // this javascript handles the drag-reordering of fields  ?>
           <script type="text/javascript">
             jQuery(document).ready(function($) {
               $("#<?php echo $group ?>_fields").sortable({
@@ -387,78 +401,78 @@ foreach ($groups as $group) :
             });
           </script>
           <p class="submit">
-  <?php
-  FormElement::print_element(array(
-      'type' => 'submit',
-      'name' => 'action',
-      'value' => $PDb_i18n['update fields'],
-      'class' => 'button-primary'
-          )
-  );
-  ?>
+            <?php
+            PDb_FormElement::print_element(array(
+                'type' => 'submit',
+                'name' => 'action',
+                'value' => $PDb_i18n['update fields'],
+                'class' => 'button-primary'
+                    )
+            );
+            ?>
           </p>
         </form>
       </div><!-- tab content container -->
-  <?php
-endforeach; // groups
+      <?php
+    endforeach; // groups
 // build the groups edit panel
-$groups = Participants_Db::get_groups('`order`,`display`,`name`,`title`,`description`');
-?>
+    $groups = Participants_Db::get_groups('`order`,`display`,`admin`,`name`,`title`,`description`');
+    ?>
     <div id="field_groups" class="manage-fields-wrap">
       <form id="manage_field_groups" method="post">
         <input type="hidden" name="action" value="<?php echo $PDb_i18n['update groups'] ?>" />
         <h3><?php _e('Edit / Add / Remove Field Groups', 'participants-database') ?></h3>
         <p>
-<?php
+          <?php
 // "add group" functionality
-FormElement::print_element(array(
-    'type' => 'submit',
-    'value' => $PDb_i18n['add group'],
-    'name' => 'action',
-    'attributes' => array(
-        'class' => 'add_field_button',
-        'onclick' => 'return false;'
-    )
-        )
-);
-FormElement::print_element(array(
-    'type' => 'text',
-    'name' => 'group_title',
-    'value' => $PDb_i18n['new group title'] . '&hellip;',
-    'attributes' => array(
-        'onfocus' => "this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",
-        'class' => 'add_field'
-    )
-        )
-);
-$next_order = count($groups) + 1;
-FormElement::print_hidden_fields(array('group_order' => $next_order));
-?>
+          PDb_FormElement::print_element(array(
+              'type' => 'submit',
+              'value' => $PDb_i18n['add group'],
+              'name' => 'action',
+              'attributes' => array(
+                  'class' => 'add_field_button',
+                  'onclick' => 'return false;'
+              )
+                  )
+          );
+          PDb_FormElement::print_element(array(
+              'type' => 'text',
+              'name' => 'group_title',
+              'value' => $PDb_i18n['new group title'] . '&hellip;',
+              'attributes' => array(
+                  'onfocus' => "this.value='';jQuery(this).prev('input').removeAttr( 'onclick' )",
+                  'class' => 'add_field'
+              )
+                  )
+          );
+          $next_order = count($groups) + 1;
+          PDb_FormElement::print_hidden_fields(array('group_order' => $next_order));
+          ?>
         </p>
         <table class="wp-list-table widefat fixed manage-fields manage-field-groups" cellspacing="0" >
           <thead>
             <tr>
               <th scope="col" class="fields vertical-title"><span><?php echo PDb_header(__('fields', 'participants-database')) ?></span></th>
               <th scope="col" class="delete vertical-title"><span><?php echo PDb_header(__('delete', 'participants-database')) ?></span></th>
-          <?php
-          foreach (current($groups) as $column => $value) {
+              <?php
+              foreach (current($groups) as $column => $value) {
 
-            $column_class = in_array($column, array('order', 'display')) ? $column . ' vertical-title' : $column;
-            ?>
+                $column_class = in_array($column, array('order', 'admin', 'display')) ? $column . ' vertical-title' : $column;
+                ?>
                 <th scope="col" class="<?php echo $column_class ?>"><span><?php echo PDb_header($column) ?></span></th>
-            <?php
-          }
-          ?>
+                <?php
+              }
+              ?>
             </tr>
           </thead>
           <tbody>
-<?php
-foreach ($groups as $group => $group_values) {
-  if ($group == 'internal')
-    continue;
+            <?php
+            foreach ($groups as $group => $group_values) {
+//  if ($group == 'internal')
+//    continue;
 
-  $group_count = $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM ' . Participants_Db::$fields_table . ' WHERE `group` = "%s"', $group));
-  ?>
+              $group_count = $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM ' . Participants_Db::$fields_table . ' WHERE `group` = "%s"', $group));
+              ?>
               <tr>
                 <td id="field_count_<?php echo $group ?>"><?php echo $group_count ?></td>
                 <td><a href="<?php echo $group_count ?>" name="delete_<?php echo $group ?>" class="delete" ref="<?php _e('group', 'participants-database') ?>"></a></td>
@@ -472,6 +486,8 @@ foreach ($groups as $group => $group_values) {
                   switch ($column) {
 
                     case 'display':
+                    case 'admin':
+                      $attributes = array('style' => 'width:20px');
                       $type = 'checkbox';
                       $options = array(1, 0);
                       break;
@@ -503,14 +519,14 @@ foreach ($groups as $group => $group_values) {
                   if (!empty($options))
                     $element_atts['options'] = $options;
                   ?>
-                  <td class="<?php echo $column ?>"><?php FormElement::print_element($element_atts); ?></td>
+                  <td class="<?php echo $column ?>"><?php PDb_FormElement::print_element($element_atts); ?></td>
                   <?php
                 }
                 ?>
               </tr>
-                <?php
-              }
-              ?>
+              <?php
+            }
+            ?>
           </tbody>
         </table>
         <script type="text/javascript">
@@ -529,15 +545,15 @@ foreach ($groups as $group => $group_values) {
           });
         </script>
         <p class="submit">
-<?php
-FormElement::print_element(array(
-    'type' => 'submit',
-    'name' => 'submit',
-    'value' => $PDb_i18n['update groups'],
-    'class' => 'button-primary'
-        )
-);
-?>
+          <?php
+          PDb_FormElement::print_element(array(
+              'type' => 'submit',
+              'name' => 'submit-button',
+              'value' => $PDb_i18n['update groups'],
+              'class' => 'button-primary'
+                  )
+          );
+          ?>
         </p>
       </form>
     </div><!-- groups tab panel -->
@@ -548,104 +564,235 @@ FormElement::print_element(array(
   <div id="dialog-overlay"></div>
   <div id="confirmation-dialog">
   </div>
-<?php
+  <?php
 
-//
-function PDb_header($string) {
+  /**
+   * sets up the edit table headers
+   * 
+   * @global array $PDb_i18n
+   * @param string $string the header text
+   * @return string
+   */
+  function PDb_header($string)
+  {
 
-            //$string = str_replace( array('readonly'), array('read only'), $string );
-            // check for a translated string, use it if found
-            $string = isset($PDb_i18n[$string]) ? $PDb_i18n[$string] : $string;
+    global $PDb_i18n;
+    //$string = str_replace( array('readonly'), array('read only'), $string );
+    // check for a translated string, use it if found
+    $string = isset($PDb_i18n[$string]) ? $PDb_i18n[$string] : $string;
 
-            return ucwords(str_replace(array('_'), array("<br />\n"), $string));
-}
-
-/**
- * 
- * makes a legal database column name
- * 
- * @param string the proposed name
- * @retun string the legal name
- */
-function PDb_make_name($string) {
-
-  // first scrub non-letter characters
-  $name = strtolower(str_replace(array(' ', '-', "'", '"', '%', '\\', '#', '.', '&'), array('_', '_', '', '', 'pct', '', '', '', 'and'), stripslashes(substr($string, 0, 64))));
-  // now allow only proper unicode letters, numerals and legal symbols
-  return preg_replace('#[^\p{L}\p{N}\$_]#u', '', $name);
-}
-
-function PDb_trim_array($array) {
-
-  $return = array();
-
-  foreach ($array as $element) {
-
-    $return[] = trim($element);
+    return str_replace(array('_'), array(" "), $string);
   }
 
-  return $return;
-}
+  /**
+   * 
+   * makes a legal database column name
+   * 
+   * @param string the proposed name
+   * @retun string the legal name
+   */
+  function PDb_make_name($string)
+  {
 
-function PDb_prep_values_array($array) {
-
-  $return = array();
-
-  foreach ($array as $element) {
-
-    $return[] = PDb_prep_value($element);
+    // first scrub non-letter characters
+    $name = strtolower(str_replace(array(' ', '-', "'", '"', '%', '\\', '#', '.', '&'), array('_', '_', '', '', 'pct', '', '', '', 'and'), stripslashes(substr($string, 0, 64))));
+    // now allow only proper unicode letters, numerals and legal symbols
+    return preg_replace('#[^\p{L}\p{N}\$_]#u', '', $name);
   }
 
-  return $return;
-}
+  function PDb_trim_array($array)
+  {
 
-function PDb_prep_value($value, $slashes = false) {
+    $return = array();
 
-  if ($slashes)
-    return htmlentities(trim($value), ENT_QUOTES, "UTF-8", false);
-  else
-    return htmlentities(trim(stripslashes($value)), ENT_QUOTES, "UTF-8", false);
-}
+    foreach ($array as $element) {
+
+      $return[] = trim($element);
+    }
+
+    return $return;
+  }
+
+  /**
+   * breaks the submitted comma-separated string of values into elements for use in 
+   * select/radio/checkbox type form elements
+   * 
+   * if the substrings contain a '::' we split that, with the first substring being 
+   * the key (title) and the second the value
+   * 
+   * there is no syntax checking...if there is no key string before the ::, the element 
+   * will have an empty key, but it will be obvious to the user
+   * 
+   * @param string $values
+   * @return array
+   */
+  function PDb_prep_values_array($values)
+  {
+
+    /* we can do this beacuse if the matching string is in position 0, it's not 
+     * valid syntax anyway
+     */
+    $has_labels = (bool) strpos($values, '::');
+    $array = array();
+    $a = explode(',', $values);
+    if ($has_labels) {
+      foreach ($a as $e) {
+        if (strpos($e, '::') !== false) {
+          list($key, $value) = explode('::', $e);
+          $array[trim($key)] = PDb_prep_value(trim($value));
+        } else {
+          $array[PDb_prep_value($e)] = PDb_prep_value($e);
+        }
+      }
+    } else {
+      foreach ($a as $e) {
+        $array[] = PDb_prep_value($e);
+      }
+    }
+
+    return $array;
+  }
+
+  /**
+   * prepares a values array for display in the editor interface
+   * 
+   * this is the reverse of PDB_prep_values()
+   * 
+   * @param string $serial the serialized options array
+   * @return string the formatted string for the values field in the editor
+   */
+  function PDb_display_values_array($serial)
+  {
+    
+  }
+
+  /**
+   * prepares a string for storage in the database
+   * 
+   * @param string $value
+   * @param bool $slashes
+   * @return string
+   */
+  function PDb_prep_value($value, $slashes = false)
+  {
+
+    if ($slashes)
+      return htmlentities(trim($value), ENT_QUOTES, "UTF-8", false);
+    else
+      return htmlentities(trim(stripslashes($value)), ENT_QUOTES, "UTF-8", false);
+  }
 
 // this rather kludgy function will do for now
-function PDb_parse_db_error($error, $context) {
+  function PDb_parse_db_error($error, $context)
+  {
 
-  global $PDb_i18n;
+    global $PDb_i18n;
 
-  // unless we find a custom message, use the class error message
-  $message = $error;
+    // unless we find a custom message, use the class error message
+    $message = $error;
 
-  if (false !== strpos($error, 'Duplicate entry')) {
+    if (false !== strpos($error, 'Duplicate entry')) {
 
-    $item = false;
+      $item = false;
 
-    switch ($context) {
+      switch ($context) {
 
-      case $PDb_i18n['add group']:
+        case $PDb_i18n['add group']:
 
-                  $item = __('group', 'participants-database');
-        break;
+          $item = __('group', 'participants-database');
+          break;
 
-      case $PDb_i18n['add field']:
+        case $PDb_i18n['add field']:
 
-                  $item = __('field', 'participants-database');
-        break;
+          $item = __('field', 'participants-database');
+          break;
+      }
+
+      if ($item && false !== stripos($message, 'duplicate')) {
+
+        $message = sprintf(__('The %1$s was not added. There is already a %1$s with that name, please choose another.', 'participants-database'), $item);
+      }
+
+      return $message;
     }
-
-    if ($item && false !== stripos($message, 'duplicate')) {
-
-      $message = sprintf(__('The %1$s was not added. Your new %1$s must have a unique name.', 'participants-database'), $item);
-    }
-
-    return $message;
   }
-}
 
-function PDb_prep_title($title) {
+  function PDb_prep_title($title)
+  {
 
-  $needle = array('"', "'", '\\');
-  $replace = array('&quot;', '&#039;', '');
+    $needle = array('"', "'", '\\');
+    $replace = array('&quot;', '&#039;', '');
 
-  return str_replace($needle, $replace, $title);
-}
-?>
+    return str_replace($needle, $replace, $title);
+  }
+
+  /**
+   * displays an edit field for a field attribute
+   * 
+   * @param string $field name of the field
+   * @return array contains parameters to use in instantiating the FormElement object
+   */
+  function PDb_get_edit_field_type($field)
+  {
+
+    switch ($field) :
+
+      // small integer fields
+      case 'id':
+        return array('type' => 'hidden');
+
+      case 'order':
+        return array('type' => 'drag-sort');
+
+      case 'admin_column':
+      case 'display_column':
+        return array('type' => 'text', 'attributes' => array('class' => 'digit'));
+
+      // all the booleans
+      case 'persistent':
+      case 'sortable':
+      case 'CSV':
+      case 'signup':
+      case 'readonly':
+        return array('type' => 'checkbox', 'options' => array(1, 0));
+
+      // field names can't be edited
+      case 'name':
+        return array('type' => 'text', 'attributes' => array('readonly' => 'readonly'));
+
+      // all the text-area fields
+      case 'values':
+      case 'help_text':
+        return array('type' => 'text-area');
+
+      // drop-down fields
+      case 'form_element':
+        // populate the dropdown with the available field types from the FormElement class
+        return array('type' => 'dropdown', 'options' => array_flip(PDb_FormElement::get_types()) + array('null_select' => false));
+
+      case 'validation':
+        return array(
+            'type' => 'dropdown-other',
+            'options' => array(
+                __('Not Required', 'participants-database') => 'no',
+                __('Required', 'participants-database') => 'yes',
+                __('Email', 'participants-database') => 'email-regex',
+                'CAPTCHA' => 'captcha',
+                'null_select' => false,
+            ),
+            'attributes' => array('other' => 'regex/match'),
+        );
+
+      case 'group':
+        // these options are defined on the "settings" page
+        return array('type' => 'dropdown', 'options' => Participants_Db::get_groups('name', 'internal') + array('null_select' => false));
+
+      case 'link':
+
+      case 'title':
+      default:
+        return array('type' => 'text');
+
+    endswitch;
+  }
+  ?>

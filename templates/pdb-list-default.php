@@ -34,13 +34,10 @@
 ?>
   <table class="wp-list-table widefat fixed pages list-container" cellspacing="0" >
 
-    <?php // print the count if enabled in the shortcode
-		if ( $display_count ) : ?>
-    <caption>
-      Total Records Found: <?php echo $record_count ?>, showing <?php echo $records_per_page ?> per page
-    </caption>
-    <?php endif ?>
-
+    <?php 
+    // print the count if enabled in the shortcode
+		$this->print_list_count($wrap_tag = false); 
+    ?>
     <?php if ( $record_count > 0 ) : // print only if there are records to show ?>
 
       <thead>

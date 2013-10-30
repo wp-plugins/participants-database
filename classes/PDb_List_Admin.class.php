@@ -62,8 +62,8 @@ class PDb_List_Admin {
     get_currentuserinfo();
 
     // set the list limit value
+    self::$limit_cookie = Participants_Db::$prefix . self::$limit_cookie;
     self::set_list_limit();
-    self::$limit_cookie = Participants_Db::$css_prefix . self::$limit_cookie;
 
     self::$registration_page_url = get_bloginfo('url') . '/' . ( isset(self::$options['registration_page']) ? self::$options['registration_page'] : '' );
 
@@ -75,19 +75,21 @@ class PDb_List_Admin {
     $default_values = array(
         'search_field' => 'none',
         'value' => '',
-        'operator' => 'LIKE',
+        'operator' => '=',
         'sortBy' => self::$options['admin_default_sort'],
         'ascdesc' => self::$options['admin_default_sort_order'],
-        'submit_button' => '',
+        'submit-button' => '',
     );
 
     // merge the defaults with the $_REQUEST array so if there are any new values coming in, they're included
     self::$filter = shortcode_atts($default_values, $_REQUEST);
+    
+    //error_log(__METHOD__.' request:'.print_r($_REQUEST,1).' filter:'.print_r(self::$filter,1));
 
     // process delete and items-per-page form submissions
     self::_process_general();
 
-    self::_process_search(self::$filter['submit_button']);
+    self::_process_search(self::$filter['submit-button']);
 
     if (WP_DEBUG)
       error_log(__METHOD__ . ' list query= ' . self::$list_query);
@@ -129,7 +131,7 @@ class PDb_List_Admin {
     self::$pagination->links();
 
     // print the CSV export form (admin users only)
-    if (current_user_can('manage_options'))
+    if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']))
       self::_print_export_form();
 
     // print the plugin footer
@@ -173,7 +175,7 @@ class PDb_List_Admin {
         unset($values[$att]);
     }
 
-    return $URI_parts[0] . '?' . http_build_query($values) . '&' . self::$list_page . '=%s';
+    return $URI_parts[0] . '?' . http_build_query($values) . '&' . self::$list_page . '=%1$s';
   }
 
   /** 	
@@ -185,7 +187,7 @@ class PDb_List_Admin {
 
     if (isset($_POST['action']) && $_POST['action'] == 'list_action') {
 
-      switch ($_POST['submit']) {
+      switch ($_POST['submit-button']) {
 
         case self::$i18n['delete_checked']:
 
@@ -194,6 +196,7 @@ class PDb_List_Admin {
           $pattern = $count > 1 ? 'IN ( ' . trim(str_repeat('%s,', $count), ',') . ' )' : '= %s';
           $sql = "DELETE FROM " . Participants_Db::$participants_table . " WHERE id " . $pattern;
           $wpdb->query($wpdb->prepare($sql, $_POST['pid']));
+          Participants_Db::set_admin_message(__('Record delete successful.', 'participants-database'), 'updated');
           break;
 
         case self::$i18n['change']:
@@ -246,7 +249,7 @@ class PDb_List_Admin {
 
           default:
 
-            $operator = self::$filter['operator'];
+            $operator = mysql_real_escape_string(self::$filter['operator']);
         }
 
         if (self::$filter['search_field'] != 'none') {
@@ -256,47 +259,42 @@ class PDb_List_Admin {
 
           $value = self::$filter['value'];
 
-          if (in_array(self::$filter['search_field'], array('date_recorded', 'date_updated', 'last_accessed'))) {
+          if (in_array($field_atts->form_element, array('timestamp', 'date'))) {
+            
+            $value = Participants_Db::parse_date(self::$filter['value'], $field_atts, true);
+            
+            if ($value !== false) {
+            
+              if ($field_atts->form_element == 'timestamp') {
 
-            /*
-             * these values are stored as MySQL timestamps, so they will be a special case
-             */
-            $value = Participants_Db::parse_date(self::$filter['value'], $field_atts);
-            if ($operator == '=') {
-              /*
-               * exact equalities are actually a search within a 24-hour window because 
-               * timestamps include a time-of-day and we're just interested in the day 
-               * of the timestamp.
-               */
-              $range = (12 * 60 * 60);
-              $value_min = $value - $range;
-              $value_max = $value + $range;
-              $value = '';
-              $operator = 'BETWEEN';
-              $delimiter = array(
-                  'FROM_UNIXTIME(' . $value_min . ') AND FROM_UNIXTIME(',
-                  $value_max . ') + INTERVAL 1 DAY'
-              );
-            } else {
-              $delimiter = array('FROM_UNIXTIME(', ')');
-            }
-          } elseif ($field_atts->form_element == 'date') {
+                if ($operator == 'LIKE') $operator = '=';
 
-            $value = Participants_Db::parse_date(self::$filter['value'], $field_atts);
-            if (!$value) {
-              $value = time();
+                self::$list_query .= ' WHERE DATE(p.' . mysql_real_escape_string(self::$filter['search_field']) . ') ' . $operator . " CONVERT_TZ(FROM_UNIXTIME(" . mysql_real_escape_string($value) . "), @@session.time_zone, '+00:00') ";
+
+              } elseif ($field_atts->form_element == 'date') { 
+
+                if (!$value) {
+                  $value = time();
+                }
+
+                self::$list_query .= ' WHERE DATE(p.' . mysql_real_escape_string(self::$filter['search_field']) . ') ' . $operator . " CAST(" . mysql_real_escape_string($value) . "AS SIGNED) ";
+
+              }
             }
-            $delimiter = array('CAST(', ' AS SIGNED)');
+          } else {
+            
+            self::$list_query .= ' WHERE p.' . mysql_real_escape_string(self::$filter['search_field']) . ' ' . $operator . " " . $delimiter[0] . mysql_real_escape_string($value) . $delimiter[1] . " ";
+            
           }
 
-          self::$list_query .= ' WHERE p.' . mysql_real_escape_string(self::$filter['search_field']) . ' ' . mysql_real_escape_string($operator) . " " . $delimiter[0] . mysql_real_escape_string($value) . $delimiter[1] . " ";
+          
         }
 
         // add the sorting
         self::$list_query .= ' ORDER BY p.' . mysql_real_escape_string(self::$filter['sortBy']) . ' ' . mysql_real_escape_string(self::$filter['ascdesc']);
 
         // go back to the first page to display the newly sorted/filtered list
-        if (isset($_POST['submit_button']))
+        if (isset($_POST['submit-button']))
           $_GET[self::$list_page] = 1;
 
         break;
@@ -428,7 +426,7 @@ class PDb_List_Admin {
             'value' => self::$filter['search_field'],
             'options' => $filter_columns,
         );
-        FormElement::print_element($element);
+        PDb_FormElement::print_element($element);
         ?>
             that
     <?php
@@ -437,6 +435,7 @@ class PDb_List_Admin {
         'name' => 'operator',
         'value' => self::$filter['operator'],
         'options' => array(
+            'null_select' => false,
             __('is', 'participants-database') => '=',
             __('is not', 'participants-database') => '!=',
             __('contains', 'participants-database') => 'LIKE',
@@ -445,11 +444,11 @@ class PDb_List_Admin {
             __('is less than', 'participants-database') => 'lt',
         ),
     );
-    FormElement::print_element($element);
+    PDb_FormElement::print_element($element);
     ?>
             <input id="participant_search_term" type="text" name="value" value="<?php echo @self::$filter['value'] ?>">
-            <input name="submit_button" type="submit" value="<?php echo self::$i18n['filter'] ?>">
-            <input name="submit_button" type="submit" value="<?php echo self::$i18n['clear'] ?>">
+            <input name="submit-button" type="submit" value="<?php echo self::$i18n['filter'] ?>">
+            <input name="submit-button" type="submit" value="<?php echo self::$i18n['clear'] ?>">
           </fieldset>
 
           <fieldset class="widefat inline-controls">
@@ -461,7 +460,7 @@ class PDb_List_Admin {
                 'value' => self::$filter['sortBy'],
                 'options' => self::$sortables,
             );
-            FormElement::print_element($element);
+            PDb_FormElement::print_element($element);
 
             $element = array(
                 'type' => 'radio',
@@ -472,9 +471,9 @@ class PDb_List_Admin {
                     __('Descending', 'participants-database') => 'desc'
                 ),
             );
-            FormElement::print_element($element);
+            PDb_FormElement::print_element($element);
             ?>
-            <input name="submit" type="submit" value="<?php echo self::$i18n['sort'] ?>">
+            <input name="submit-button" type="submit" value="<?php echo self::$i18n['sort'] ?>">
           </fieldset>
         </form>
       </div><?php
@@ -487,13 +486,14 @@ class PDb_List_Admin {
             ?>
 
       <form id="list_form"  method="post"  onKeyPress="return checkEnter(event)" >
-            <?php FormElement::print_hidden_fields(array('action' => 'list_action')) ?>
+            <?php PDb_FormElement::print_hidden_fields(array('action' => 'list_action')) ?>
         <input type="hidden" id="select_count" value="0" />
         <fieldset class="widefat inline-controls">
-
-          <input type="submit" name="submit" value="<?php echo self::$i18n['delete_checked'] ?>" onClick="return delete_confirm();" id="delete_button" >
+          <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
+          <span style="padding-right:20px" ><input type="submit" name="submit-button" value="<?php echo self::$i18n['delete_checked'] ?>" onClick="return delete_confirm();" id="delete_button"  ></span>
+          <?php endif ?>
             <?php
-            $list_limit = FormElement::get_element(array(
+            $list_limit = PDb_FormElement::get_element(array(
                         'type' => 'text-line',
                         'name' => 'list_limit',
                         'value' => self::$page_list_limit,
@@ -504,9 +504,9 @@ class PDb_List_Admin {
                             )
                     )
             ?>
-          <span style="padding-left:20px"><?php printf(__('Show %s items per page.', 'participants-database'), $list_limit) ?>
-      <?php FormElement::print_element(array('type' => 'submit', 'name' => 'submit', 'value' => self::$i18n['change'])) ?>
-          </span>
+          <?php printf(__('Show %s items per page.', 'participants-database'), $list_limit) ?>
+      <?php PDb_FormElement::print_element(array('type' => 'submit', 'name' => 'submit-button', 'value' => self::$i18n['change'])) ?>
+          
         </fieldset>
 
         <?php
@@ -526,7 +526,19 @@ class PDb_List_Admin {
           $PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
 
           // template for printing a header item
-          $head_pattern = '<th class="%2$s" scope="col">%1$s</th>';
+//          $head_pattern = '
+//<th class="%2$s" scope="col">
+//  <a href="' . admin_url('admin.php?page=participants-database-list_participants') . '&submit=Sort&orderBy=%2$s&ascdesc=' . (self::$filter['ascdesc'] == 'asc' ? 'desc' : 'asc') . '">
+//    <span>%1$s</span>
+//    <span class="sorting-indicator"></span>
+//  </a>
+//</th>
+//';
+          $head_pattern = '
+<th class="%2$s" scope="col">
+  <span>%1$s</span>
+</th>
+';
 
           //template for outputting a column
           $col_pattern = '<td>%s</td>';
@@ -560,13 +572,16 @@ class PDb_List_Admin {
                 <tr>
         <?php // print delete check  ?>
                   <td>
-                    <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>"><?php _e('Edit', 'participants-database') ?></a> <input type="checkbox" name="pid[]" value="<?php echo $value['id'] ?>" onClick="addSelects(this.checked)">
+                    <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>"><?php _e('Edit', 'participants-database') ?></a>
+                    <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
+                      <input type="checkbox" name="pid[]" value="<?php echo $value['id'] ?>" onClick="addSelects(this.checked)">
+                    <?php endif ?>
                   </td>
               <?php
               foreach (self::$display_columns as $column) {
 
                 // get the form element value for the field
-                $column_atts = Participants_Db::get_field_atts($column, '`form_element`,`default`');
+                $column_atts = Participants_Db::get_field_atts($column, '`name`,`form_element`,`default`, `group`');
 
                 // this is where we place form-element-specific text transformations for display
                 switch ($column_atts->form_element) {
@@ -597,11 +612,18 @@ class PDb_List_Admin {
                     break;
 
                   case 'date':
+                  case 'timestamp':
 
                     if (!empty($value[$column])) {
 
-                      $time = preg_match('#^[0-9-]+$#', $value[$column]) > 0 ? (int) $value[$column] : strtotime($value[$column]);
-                      $display_value = $value[$column] == '0000-00-00 00:00:00' ? '' : date_i18n(get_option('date_format', 'r'), $time);
+                      $format = Participants_Db::$date_format;
+                      if (Participants_Db::$plugin_options['show_time'] == 1 and $column_atts->form_element == 'timestamp' ) {
+                        // replace spaces with &nbsp; so the time value stays together on a broken line
+                        $format .= ' ' . str_replace(' ', '&\\nb\\sp;', get_option('time_format'));
+                      }
+                      $time = Participants_Db::is_valid_timestamp($value[$column]) ? (int) $value[$column] : Participants_Db::parse_date($value[$column],$column_atts);
+                      $display_value = $value[$column] == '0000-00-00 00:00:00' ? '' : date_i18n($format, $time);
+                      //$display_value = date_i18n($format, $time);
                     }
                     else
                       $display_value = '';
@@ -728,7 +750,7 @@ class PDb_List_Admin {
           <p class="inline-controls">
     <?php _e('File Name', 'participants-database') ?>:
             <input type="text" name="filename" value="<?php echo $suggested_filename ?>" size="<?php echo $namelength ?>" />
-            <input type="submit" name="submit" value="<?php _e('Download CSV for this list', 'participants-database') ?>" />
+            <input type="submit" name="submit-button" value="<?php _e('Download CSV for this list', 'participants-database') ?>" />
             <label for="include_csv_titles"><input type="checkbox" name="include_csv_titles" value="1"><?php _e('Include field titles', 'participants-database') ?></label>
           </p>
           <p>
@@ -748,17 +770,21 @@ class PDb_List_Admin {
      */
     private function _print_header_row($head_pattern) {
 
+      
       // print the "select all" header 
       ?>
       <th scope="col" style="width:6em">
+        <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
           <?php /* translators: uses the check symbol in a phrase that means "check all" */ printf('<span class="checkmark" >&#10004;</span> %s', __('all', 'participants-database')) ?>
         <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" >
+        <?php endif ?>
       </th>
           <?php
           // print the top header row
           foreach (self::$display_columns as $column) {
+            $title = stripslashes(Participants_Db::column_title($column));
             printf(
-                    $head_pattern, htmlspecialchars(stripslashes(Participants_Db::column_title($column)), ENT_QUOTES, "UTF-8", false), $column
+                    $head_pattern, str_replace(array('"',"'"), array('&quot;','&#39;'), $title), $column
             );
           }
         }
@@ -775,9 +801,10 @@ class PDb_List_Admin {
           $limit_value = self::$options['list_limit'];
           if ($transient = get_transient(self::$limit_cookie . '-' . $user_ID))
             $limit_value = $transient;
-          if (isset($_POST['list_limit']) && is_numeric($_POST['list_limit']) && $_POST['list_limit'] > 1)
+          if (isset($_POST['list_limit']) && is_numeric($_POST['list_limit']) && $_POST['list_limit'] > 0)
             $limit_value = $_POST['list_limit'];
           self::$page_list_limit = $limit_value;
+          set_transient(self::$limit_cookie . '-' . $user_ID, $limit_value);
         }
 
         /**

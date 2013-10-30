@@ -5,20 +5,36 @@ body[class*='participants-database'] .widefat td {
   vertical-align:middle;
 }
 body[class*='participants-database']  .widefat tr:nth-child(even) {
-  background-color:#EDEDED;
+  background-color:#f6f6f6;
 }
 .participants_db input[type='text'] {
-  width: 300px;
+  width: 100%;
+  max-width: 400px;
+}
+.participants_db input.add_field {
+  width: 250px;
 }
 .participants_db option[value='none'],
 .participants_db option[value='other'] {
   font-weight:bold;
 }
 .participants_db input[id$='_other'] {
-  width:50px;
 }
 .participants_db input[name='temp'] {
   display:none;
+}
+.participants_db .manage-fields {
+  z-index: 1;
+}
+.participants_db .manage-fields input[type="text"].digit {
+  width: 30px;
+}
+.participants_db .manage-fields select {
+  width: 100%;
+  float: none;
+}
+.participants_db .manage-fields textarea {
+  width: 100%;
 }
 .pagination {
   margin-bottom: 20px;
@@ -34,12 +50,23 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
 }
 #PDb_footer {
   display: inline-block;
-}
-fieldset.widefat,
-#PDb_footer {
   padding:7px;
   width:auto;
   overflow:auto;
+}
+fieldset.widefat {
+  width:100%;
+  overflow:auto;
+}
+fieldset.widefat.inline-controls,
+fieldset.widefat.inline-controls label {
+  line-height: 2em;
+}
+fieldset.widefat.inline-controls input,
+fieldset.widefat.inline-controls  select,
+fieldset.widefat.inline-controls label {
+  margin: 0 5px;
+  vertical-align: middle;
 }
 #PDb_footer .section {
   width:280px;
@@ -49,6 +76,7 @@ fieldset.widefat,
 input[readonly] {
   border:none;
   background:none transparent;
+  width: 100%;
 }
 body[class*='participants-database'] a.delete {
   display:block;
@@ -60,22 +88,28 @@ body[class*='participants-database'] .form-table {
   margin-bottom:4em;
 }
 .pdb-list .image-field-wrap img {
-    height: 30px;
-    width: auto;
+  height: 30px;
+  width: auto;
 }
-.wp-admin .edit-participant .helptext {
+.wp-admin .helptext {
   line-height: 1.5;
+  color: #777777;
+}
+.wp-list-table th, .wp-list-table td, .form-table th, .form-table td {
+  vertical-align: top;
 }
 .participants_db input[type='text']+.helptext,
 .participants_db input[type='checkbox']+.helptext,
 .participants_db select+.helptext,
-.participants_db .wp-editor-wrap+.helptext {
+.participants_db script+.helptext,
+.participants_db .wp-editor-wrap+.helptext,
+.participants_db textarea+.helptext {
   width:390px;
 }
 .participants_db input[type='text']+.helptext,
 .participants_db input[type='checkbox']+.helptext,
 .participants_db select+.helptext {
-  float:left;
+  /*  float:left;*/
 }
 .participants_db .wp-editor-wrap {
   float:left;
@@ -90,8 +124,8 @@ input[type="text"],
 input[type="checkbox"],
 .multicheckbox label,
 .link-element label {
-/*  float: left;
-  margin-right: 10px;*/
+  /*  float: left;
+    margin-right: 10px;*/
 }
 label input[type="checkbox"] {
   float:none;    
@@ -103,9 +137,9 @@ label input[type="checkbox"] {
 .participants_db .inline-controls input[type='text'],
 .participants_db .inline-controls input[type='checkbox'],
 .participants_db .inline-controls select {
-  float: none;
-  display: inline;
-  margin-right:0;
+  /*  float: none;
+    display: inline;
+    margin-right:0;*/
 }
 #checkall {
   margin:4px 0;
@@ -171,6 +205,9 @@ body[class*='participants-database'] .text-block li {
   position:relative;
   top:-5em;
 }
+.edit-participant textarea, .participants_db textarea, .edit-participant select, .participants_db select, .participants_db input, .edit-participant input, .link-element label {
+  vertical-align: top;
+}
 [class*="participants-database"] .wp-editor-wrap {
   max-width: 600px;
 }
@@ -208,12 +245,12 @@ div.manage-fields-wrap {
   min-width:1100px;
 }
 .manage-fields thead > tr {
-  height:6em;
+  height:7em;
 }
 .manage-fields.widefat th {
-  padding:5px 0;
-  vertical-align:middle;
-  text-align:center;
+  padding:0 0 0 10px;
+  vertical-align:text-top;
+  text-align:left;
 }
 .manage-fields th.sortable {
   /*padding:7px 7px 8px;*/
@@ -224,8 +261,8 @@ div.manage-fields-wrap {
 th.vertical-title  {
   width:25px;
 }
-th.admin_column, th.display_column, th.display {
-  width:40px;
+th.vertical-title.number-column {
+  min-width: 43px;
 }
 th.form_element {
   width:150px;
@@ -244,24 +281,33 @@ th.validation, th.title, th.default, th.group, th.name {
 }
 .manage-fields th.vertical-title {
   vertical-align:text-top;
+  padding: 5px 0 0 0;
 }
 .manage-fields th.vertical-title span {
   writing-mode:tb-rl;
+  transform: rotate(90deg);
+  transform-origin: left bottom;
   -moz-transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
   -o-transform: rotate(90deg);
-  white-space:nowrap;
+  -moz-transform-origin: left bottom;
+  -webkit-transform-origin: left bottom;
+  -o-transform-origin: left bottom;
+  display: inline-block;
+  height: auto;
+  left: 0.6em;
+  line-height: 1.1;
+  position: relative;
+  top: -2em;
+  white-space: nowrap;
+  width: auto;
   word-wrap: normal;
-  display:block;
-  width:20px;
-  height:20px;
-  line-height: 1;
-  position:relative;
-  top:0;
-  left:0;
+}
+.manage-field-groups th.vertical-title span {
+  top: -1em;
 }
 .manage-fields th.admin_column span, .manage-fields th.display_column span {
-  left:18px;
+/*  left:18px;*/
 }
 .manage-fields input, 
 .manage-fields textarea {
@@ -324,8 +370,23 @@ a.dragger {
 #fields-tabs.ui-tabs {
   visibility:visible;
 }
-#fields-tabs {
+#fields-tabs, 
+.mask {
   visibility:hidden;
+}
+.mask {
+  position: absolute;
+  background-color: white;
+  display: block;
+  z-index: 1000;
+}
+.ui-tabs-nav .mask {
+  left: 1px;
+  bottom: -2px;
+  height: 3px;
+  width: calc(100% - 6px);
+  display: block;
+  z-index: 1000;
 }
 .participants_db .ui-widget-content {
   background-image: none;
@@ -342,38 +403,46 @@ a.dragger {
   background-color: inherit;
   border: none;
   border-bottom: 1px solid #ccc;
-  height: 30px;
+  height: auto;
   margin: 20px 0;
   padding: 0;
+  overflow: visible;
 }
 .participants_db .ui-tabs-nav li {
   background-color: transparent;
   background-image: none;
   border:none;
-  display: block;
-  float: left;
+  display: inline-block;
+  position: relative;
   margin: 0;
+  height: auto;
+  width: auto;
 }
 .participants_db .ui-tabs-nav .ui-state-default a {
 }
 .participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active a {
   background-color: #ffffff;
-  padding-bottom: 10px;
+  padding-bottom: 6px;
+}
+.participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active .mask {
+  visibility: visible;
 }
 .participants_db .ui-tabs-nav li a {
   padding: 4px 20px 6px;
   font-weight: bold;
 }
 .participants_db .ui-tabs-nav li a {
+  line-height: 1.4;
+  display: inline-block;
+  padding: 9px 12px 5px;
+  margin: 0 4px 0 0;
   border-style: solid;
   border-color: #CCC #CCC #F9F9F9;
   border-width: 1px 1px 0;
-  color: #777777;
+  color: #888888;
+  background-color:#eeeeee;
   text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
-  display: inline-block;
-  padding: 4px 14px 8px;
   text-decoration: none;
-  margin: 0 6px -1px 0;
   -moz-border-radius: 5px 5px 0 0;
   -webkit-border-top-left-radius: 5px;
   -webkit-border-top-right-radius: 5px;
@@ -382,12 +451,19 @@ a.dragger {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
+.participants_db .ui-tabs-nav li a:hover {
+  color: #000000;
+}
+.participants_db .ui-tabs-nav li.utility.ui-state-active a {
+  background: #ffffff;
+}
 .participants_db .ui-tabs-nav li.ui-tabs-selected a, 
 .participants_db .ui-tabs-nav li.ui-state-active a,
 .participants_db .ui-tabs-nav li a:focus {
   color: #333333;
-  background-color:#ffffff;
   outline:none;
+}
+.participants_db .ui-tabs-nav li.ui-state-active a {
 }
 .participants_db .ui-tabs-panel {
   clear: both;
@@ -442,7 +518,7 @@ a.dragger {
   width:328px;
   /* make sure it has the highest z-index */
   position:absolute;
-  z-index:5000;
+  z-index:500000;
   /* hide it by default */
   display:none;
 }

@@ -218,8 +218,8 @@ class PDb_Pagination {
   function setLink($url, $add_variables) {
     
     if ( ! empty($add_variables) )
-      $add_variables = false !== strpos($url,'?') ? '&'.$add_variables : '?'.$add_variables;
-    $this->link = $url.$add_variables;
+      $conj = false !== strpos($url,'?') ? '&' : '?';
+    $this->link = $url . $conj . $add_variables;
   }
 
   /**
@@ -228,7 +228,7 @@ class PDb_Pagination {
   public function set_wrappers($wrappers = array()) {
 
     $defaults = array(
-        'wrap_class' => 'pagination',
+        'wrap_class' => 'pagination ' . Participants_Db::$prefix . 'pagination',
         'wrap_tag' => 'div',
         'all_button_wrap_tag' => 'ul',
         'button_wrap_tag' => 'li',
@@ -371,7 +371,6 @@ class PDb_Pagination {
               $i
       );
     }
-
     $output .= sprintf(
             ($currentPage < $totalPages ? $button_pattern : $disabled_pattern), 
             $this->_sprintf($link, $currentPage + 1), 

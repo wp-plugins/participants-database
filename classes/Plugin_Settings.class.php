@@ -200,10 +200,10 @@ class Plugin_Settings {
                       'type'  => 'submit',
                       'class' => $this->submit_class,
                       'value' => $this->submit_button,
-                      'name'  => 'submit',
+                      'name'  => 'submit_button',
                       );
 
-        printf( $this->submit_wrap, FormElement::get_element( $args ) );
+        printf( $this->submit_wrap, PDb_FormElement::get_element( $args ) );
 
         ?>
       </form>
@@ -290,28 +290,35 @@ class Plugin_Settings {
    *    class - a CSS class name to add
    */
   public function print_settings_field( $input ) {
+    
+    //error_log(__METHOD__.' name:'.$input['name'].' type:'.$input['type'].' title:'.$input['title']);
 
     if ( ! isset( $input['name'] ) ) return NULL;
+    
+    if ($input['type'] == 'header') {
+      //echo '<h3>' . $input['title'] . '</h3>';
+    } else {
 
-    $options = get_option( $this->WP_setting );
+      $options = get_option( $this->WP_setting );
 
-    $args = wp_parse_args( $input, array(
-      'options' => false,
-      'attributes' => '',
-      'value' => ''
-      ) );
+      $args = wp_parse_args( $input, array(
+        'options' => false,
+        'attributes' => '',
+        'value' => ''
+        ) );
 
-    // supply the value of the field from the saved option or the default as defined in the settings init
-    $args['value'] = isset( $options[ $input['name'] ] ) ? $options[ $input['name'] ] : $args['value'];
+      // supply the value of the field from the saved option or the default as defined in the settings init
+      $args['value'] = isset( $options[ $input['name'] ] ) ? $options[ $input['name'] ] : $args['value'];
 
-    $args['name'] = $this->WP_setting.'['.$input['name'].']';
+      $args['name'] = $this->WP_setting.'['.$input['name'].']';
 
-    FormElement::print_element( $args );
+      PDb_FormElement::print_element( $args );
 
-    if ( ! empty( $args['help_text'] ) ) {
+      if ( ! empty( $args['help_text'] ) ) {
 
-      printf( $this->help_text_wrap, trim( $args['help_text'] ) );
+        printf( $this->help_text_wrap, trim( $args['help_text'] ) );
 
+      }
     }
 
   }
@@ -363,6 +370,7 @@ class Plugin_Settings {
 
     if ( ! isset( $options['type'] ) ) $options['type'] = 'text';
     $options['name'] = $name;
+    $options['title'] = $title;
 
     add_settings_field(
         $name,

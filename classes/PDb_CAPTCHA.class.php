@@ -76,6 +76,8 @@ class PDb_CAPTCHA {
     $this->_set_types();
     $this->_set_type();
     $this->captcha_setup();
+    
+    //error_log(__METHOD__.' '.print_r($this,1).' decrypted nonce: '.  PDb_FormValidation::xcrypt($this->info['nonce'], $this->key));
   }
   /**
    * supplies the captcha element HTML
@@ -84,14 +86,14 @@ class PDb_CAPTCHA {
    */
   public function get_html() {
     $return = '';
-    $return .= FormElement::get_element(array(
+    $return .= PDb_FormElement::get_element(array(
         'type' => 'hidden',
         'name' => $this->name,
         'value' => urlencode(json_encode($this->info)),
         'group' => true,
         )
             );
-    $return .= FormElement::BR . $this->HTML;
+    $return .= PHP_EOL . $this->HTML;
     return $return;
   }
   /**
@@ -111,10 +113,13 @@ class PDb_CAPTCHA {
    * @return null
    */
   private function captcha_setup() {
-    $filter = Participants_Db::$css_prefix . 'captcha_setup';
-    if (has_filter($filter)) {
-      apply_filters($filter, &$this);
-    }
+    
+    /*
+     * the pdb-capcha_setup filter expects the PDb_CAPTCHA::HTML property to be filled with the 
+     * HTML of the custom captcha element
+     */
+    Participants_Db::set_filter('captcha_setup', &$this);
+    
     if (empty($this->HTML)) {
       switch ($this->captcha_type) {
         case 'math':
@@ -128,7 +133,7 @@ class PDb_CAPTCHA {
      * expand the types of CAPTCHAS in the future, we can use this to tell the 
      * validation object how to validate the field
      */
-    $this->info = array('type'=>$this->captcha_type,'nonce'=>FormValidation::xcrypt($this->validation,$this->key), 'info' => $this->captcha_params);
+    $this->info = array('type'=>$this->captcha_type,'nonce'=>PDb_FormValidation::xcrypt($this->validation,$this->key), 'info' => $this->captcha_params);
   }
   /**
    * creates the math captcha
@@ -172,9 +177,9 @@ class PDb_CAPTCHA {
       }
       $_SESSION['captcha_vars'] = compact('a', 'o', 'b');
     }
-    $prompt_string = $a .' <span class="' . Participants_Db::$css_prefix . 'operator">' . $o . '</span> ' . $b . ' <span class="' . Participants_Db::$css_prefix . 'operator">=</span> ?';
+    $prompt_string = $a .' <span class="' . Participants_Db::$prefix . 'operator">' . $o . '</span> ' . $b . ' <span class="' . Participants_Db::$prefix . 'operator">=</span> ?';
     $this->HTML = '<span class="math-captcha">' . $prompt_string . '</span>';
-    $this->HTML .= FormElement::get_element(array(
+    $this->HTML .= PDb_FormElement::get_element(array(
         'type' => 'text',
         'name' => $this->name,
         'value' => $this->value,
@@ -197,13 +202,19 @@ class PDb_CAPTCHA {
     }
   }
   /**
-   * this supplies the random key. This func can be updated to grab the key from 
-   * the config file, right now it just supplies a hard-coded value
+   * supplies a random alphanumeric key
+   * 
+   * the key is stored in a transient which changes every day
    * 
    * @return null
    */
   public static function get_key() {
-    return 'dk4Rul2Qs';
+    if (!$key = get_transient(Participants_Db::$prefix . 'captcha_key')) {
+      set_transient(Participants_Db::$prefix . 'captcha_key', self::generate_key(), (60 * 60 * 24));
+    }
+    $key = get_transient(Participants_Db::$prefix . 'captcha_key');
+    //error_log(__METHOD__.' get new key: '.$key);
+    return $key;
   }
   /**
    * sets up the types of captcha that can be used
@@ -242,6 +253,22 @@ class PDb_CAPTCHA {
    */
   public static function last_challenge_met() {
     return isset($_SESSION['captcha_result']) ? $_SESSION['captcha_result'] == 'valid' : false ;
+  }
+  /**
+   * returns a random alphanumeric
+   * 
+   * @param int $length number of characters in the random string
+   * @return string the randomly-generated alphanumeric key
+   */
+  private static function generate_key($length = 8) {
+    
+    $alphanum = str_split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890');
+    $key = '';
+    while ($length > 0) {
+      $key .= $alphanum[array_rand($alphanum)];
+      $length--;
+    }
+    return $key;
   }
   
 }

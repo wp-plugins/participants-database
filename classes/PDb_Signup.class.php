@@ -9,43 +9,85 @@
  * @author     Roland Barker <webdeign@xnau.com>
  * @copyright  2011,2013 xnau webdesign
  * @license    GPL2
- * @version    0.4
+ * @version    0.5
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    FormElement class, Shortcode class
  */
 
 class PDb_Signup extends PDb_Shortcode {
-
-  // a string identifier for the class
-  var $module = 'signup';
-  // holds the target page for the submission
+  /**
+   *
+   * @var string holds the target page for the submission
+   */
   var $submission_page;
-  // holds the submission status: false if the form has not been submitted
+  /**
+   *
+   * @var bool holds the submission status: false if the form has not been submitted
+   */
   var $submitted = false;
-  // holds the recipient values after a form submission
+  /**
+   *
+   * @var array holds the recipient values after a form submission
+   */
   var $recipient;
-  // boolean to send the reciept email
+  /**
+   * @var bool reciept email sent status
+   */
   var $send_reciept;
-  // the receipt subject line
+  /**
+   *
+   * @var string the receipt subject line
+   */
   var $receipt_subject;
-  // holds the body of the signup receipt email
+  /**
+   *
+   * @var string holds the body of the signup receipt email
+   */
   var $receipt_body;
-  // boolean to send the notification email
+  /**
+   * TODO: redundant?
+   * @var bool whether to send the notification email
+   */
   var $send_notification;
-  // holds the notify recipient emails
+  /**
+   *
+   * @var array holds the notify recipient emails
+   */
   public $notify_recipients;
-  // the notification subject line
+  /**
+   *
+   * @var string the notification subject line
+   */
   var $notify_subject;
-  // holds the body of the notification email
+  /**
+   *
+   * @var string holds the body of the notification email
+   */
   var $notify_body;
-  // holds the current email body
+  /**
+   *
+   * @var string holds the current email body
+   */
   var $current_body;
+  /**
+   *
+   * @var string thank message body
+   */
   var $thanks_message;
-  // header added to receipts and notifications
+  /**
+   *
+   * @var string header added to receipts and notifications
+   */
   private $email_header;
-  // holds the submission values
+  /**
+   *
+   * @var array holds the submission values
+   */
   private $post = array();
-  // error messages
+  /**
+   *
+   * @var array error messages
+   */
   private $errors = array();
 
   // methods
@@ -57,43 +99,40 @@ class PDb_Signup extends PDb_Shortcode {
    *
    * this class is called by a WP shortcode
    *
-   * @param array $params   this array supplies the display parameters for the instance
-   *              'title'   string displays a title for the form (default none)
-   *              'captcha' string type of captcha to include: none (default), math, image, word
+   * @param array $shortcode_atts   this array supplies the display parameters for the instance
+   *                 'title'   string displays a title for the form (default none)
    *
    */
-  public function __construct($params) {
+  public function __construct($shortcode_atts) {
 
     // define shortcode-specific attributes to use
-    $add_atts = array();
+    $shortcode_defaults = array(
+        'module' => 'signup'
+    );
+    
+    $sent = true; // start by assuming the notification email has been sent
 
-    /*
-     * if we're coming back from a successful form submission, the id of the new
-     * record will be present, otherwise, the id is set to the default record
-     */
-    if (isset($_SESSION['pdbid'])) {
+    if ((isset($_GET['m']) && $_GET['m'] == 'r') || $shortcode_atts['module'] == 'retrieve') {
+      $shortcode_atts['module'] = 'retrieve';
+    } elseif (isset($_SESSION['pdbid'])) {
 
       $this->participant_id = $_SESSION['pdbid'];
       unset($_SESSION['pdbid']); // clear the ID from the SESSION array
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
-      // check the notification sent status of the record
-      $sent = $this->check_sent_status($this->participant_id);
       if ($this->participant_values) {
+        // check the notification sent status of the record
+        $sent = $this->check_sent_status($this->participant_id);
         $this->submitted = true;
-        $params['type'] = 'thanks';
+        $shortcode_atts['module'] = 'thanks';
       }
-      $add_atts['id'] = $this->participant_id;
-    } elseif ($params['type'] == 'signup') {
+      $shortcode_atts['id'] = $this->participant_id;
+    } elseif ($shortcode_atts['module'] == 'signup') {
 
       $this->participant_values = Participants_Db::get_default_record();
-    }
-    else
-      return; // no type set, nothing to show.
+    } else return; // no type set, nothing to show.
 
-    $this->module = $params['type'];
-
-    // run the parent class initialization to set up the parent methods
-    parent::__construct($this, $params, $add_atts);
+    // run the parent class initialization to set up the $shortcode_atts property
+    parent::__construct($shortcode_atts, $shortcode_defaults);
 
     $this->registration_page = Participants_Db::get_record_link($this->participant_values['private_id']);
 
@@ -111,7 +150,7 @@ class PDb_Signup extends PDb_Shortcode {
       /*
        * filter provides access to the freshly-stored record and the email and thanks message properties so user feedback can be altered.
        */
-      if (has_filter(Participants_Db::$css_prefix . 'before_signup_thanks')) {
+      if (has_filter(Participants_Db::$prefix . 'before_signup_thanks')) {
 
         $signup_feedback_props = array('recipient', 'receipt_subject', 'receipt_body', 'notify_recipients', 'notify_subject', 'notify_body', 'thanks_message', 'participant_values');
         $signup_feedback = new stdClass();
@@ -119,7 +158,7 @@ class PDb_Signup extends PDb_Shortcode {
           $signup_feedback->$prop = &$this->$prop;
         }
 
-        apply_filters(Participants_Db::$css_prefix . 'before_signup_thanks', $signup_feedback);
+        apply_filters(Participants_Db::$prefix . 'before_signup_thanks', $signup_feedback);
       }
 
       /*
@@ -190,7 +229,6 @@ class PDb_Signup extends PDb_Shortcode {
     } else {
 
       // the signup thanks page is not set up, so we submit to the page the form is on
-
       $this->submission_page = $_SERVER['REQUEST_URI'];
     }
   }
@@ -202,18 +240,32 @@ class PDb_Signup extends PDb_Shortcode {
    */
   public function print_form_head($hidden = '') {
 
-    echo $this->_print_form_head((array)$hidden);
+    echo $this->_print_form_head($hidden);
   }
 
   public function print_submit_button($class = 'button-primary', $value = false) {
 
-    FormElement::print_element(array(
+    PDb_FormElement::print_element(array(
         'type' => 'submit',
         'value' => ($value === false ? $this->options['signup_button_text'] : $value),
         'name' => 'submit_button',
         'class' => $class . ' pdb-submit',
         'module' => $this->module,
     ));
+  }
+  
+  
+  /**
+   * prints a private link retrieval link
+   * 
+   * @param string $linktext
+   */
+  public function print_retrieve_link($linktext, $open_tag = '', $close_tag = '') {
+    
+    if ($this->options['show_retrieve_link'] != 0) {
+      $retrieve_link = $this->options['link_retrieval_page'] !== 'none' ? get_permalink($this->options['link_retrieval_page']) : $_SERVER['REQUEST_URI'];
+      echo $open_tag . '<a href="' . Participants_Db::add_uri_conjunction($retrieve_link) . 'm=r">' . $linktext . '</a>' . $close_tag;
+    }
   }
 
   /**
@@ -224,21 +276,6 @@ class PDb_Signup extends PDb_Shortcode {
     $this->output = $this->_proc_tags($this->thanks_message);
     unset($_POST);
     return $this->output;
-  }
-
-  /**
-   * adds a captcha field to the signup form
-   *
-   * @param string $type selects the type of CAPTCHA to employ: none, math, color, reCaptcha
-   */
-  private function _add_captcha() {
-
-    switch ($this->captcha_type) {
-
-      case 'none';
-      default;
-        return false;
-    }
   }
 
   /**
@@ -255,12 +292,14 @@ class PDb_Signup extends PDb_Shortcode {
 
   // sends a receipt email
   private function _do_receipt() {
+    
+    $email_field = Participants_Db::$plugin_options('primary_email_address_field');
 
-    if (!isset($this->participant_values['email']) || empty($this->participant_values['email']))
+    if (!isset($this->participant_values[$email_field]) || empty($this->participant_values[$email_field]))
       return NULL;
 
     $this->_mail(
-            $this->participant_values['email'], $this->_proc_tags($this->receipt_subject), $this->_proc_tags($this->receipt_body)
+            $this->participant_values[$email_field], $this->_proc_tags($this->receipt_subject), $this->_proc_tags($this->receipt_body)
     );
   }
 
@@ -270,6 +309,26 @@ class PDb_Signup extends PDb_Shortcode {
     $this->_mail(
             $this->notify_recipients, $this->_proc_tags($this->notify_subject), $this->_proc_tags($this->notify_body)
     );
+  }
+
+  /**
+   * grab the defined identifier field for display in the retrieve private link form
+   * 
+   * @global type $wpdb
+   * @return string
+   */
+  function get_retrieve_field() {
+
+    global $wpdb;
+
+    $columns = array('name', 'title', 'form_element');
+
+    $sql = 'SELECT v.' . implode(',v.', $columns) . ' 
+            FROM ' . Participants_Db::$fields_table . ' v 
+            WHERE v.name = "' . $this->options['retrieve_link_identifier'] . '" 
+            ';
+
+    return $wpdb->get_results($sql, OBJECT_K);
   }
 
   /**
@@ -327,7 +386,7 @@ message:
    */
   private function _make_text_body($HTML) {
 
-    return strip_tags(preg_replace('#(</[p|h1|h2|h3|h4|h5|h6|div|tr|li]{1,3} *>)#i', "\r", $HTML));
+    return strip_tags(preg_replace('#(</(p|h1|h2|h3|h4|h5|h6|div|tr|li) *>)#i', "\r", $HTML));
   }
   
   /**
@@ -341,26 +400,25 @@ message:
    */
   public static function update_sent_status($id, $state) {
     $check_sent[$id] = $state;
-    $sent_records = get_transient(Participants_Db::$css_prefix . 'signup-email-sent');
+    $sent_records = get_transient(Participants_Db::$prefix . 'signup-email-sent');
     if (is_array($sent_records)) $sent_records = $check_sent + $sent_records;
     else $sent_records = $check_sent;
     /* 
-     * expires after one year...effectively never, but we need to do this in order 
-     * to avoid the transient being needlessly autoloaded
+     * expires after one year, we need to do this in order to avoid the transient 
+     * being needlessly autoloaded
      */
-    set_transient(Participants_Db::$css_prefix . 'signup-email-sent', $sent_records, (365 * 60 * 60 * 12));
+    set_transient(Participants_Db::$prefix . 'signup-email-sent', $sent_records, (365 * 60 * 60 * 12));
   }
   
   /**
-   * checks the status of a signup transient
+   * checks the status of a signup email status transient
    * 
    * @param int $id the id of the record to check
    * @return bool the stored status of the record
    */
   public static function check_sent_status($id)
   {
-
-    $check_sent = get_transient(Participants_Db::$css_prefix . 'signup-email-sent');
+    $check_sent = get_transient(Participants_Db::$prefix . 'signup-email-sent');
     if ($check_sent === false or !isset($check_sent[$id]) or $check_sent[$id] === false) {
       return false;
     } else return true;

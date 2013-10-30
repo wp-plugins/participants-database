@@ -53,6 +53,7 @@
         <?php endif */ ?>
         <div id="submit-button" class="controls">
           <?php $this->print_submit_button('btn btn-primary'); // you can specify a class for the button ?>
+          <span class="pdb-retrieve-link"><?php $this->print_retrieve_link(__('Forget your private link? Click here to have it emailed to you.','participants-database')); ?></span>
         </div>
     </div>
   <?php $this->print_form_close() ?>

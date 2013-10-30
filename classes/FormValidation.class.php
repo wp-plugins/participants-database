@@ -5,7 +5,7 @@
  *
  * tracks form submission validation and provides user feedback
  * 
- * Requires PHP Version 5.3 or greater
+ * Requires PHP Version 5.2 or greater
  * 
  * @category   
  * @package    WordPress
@@ -18,17 +18,17 @@
 class FormValidation {
 
   // this array collects validation errors for each field
-  private $errors;
+  var $errors;
   // holds the error messages
-  public $error_messages = array();
+  var $error_messages = array();
   // holds the CSS for an error indication as defined in the options
-  private $error_style;
-  public $error_CSS;
-  private $error_html_wrap;
+  var $error_style;
+  var $error_CSS;
+  var $error_html_wrap;
   // holds the class name we give the container: error or message
-  private $error_class;
+  var $error_class;
   // holdes an array of all the submitted values
-  private $post_array;
+  var $post_array;
 
   /*
    * instantiates the form validation object
@@ -43,33 +43,14 @@ class FormValidation {
 
     // clear the array
     $this->errors = array();
+    
+    // set the error messages
+    $this->error_messages = array('invalid', 'empty', 'nonmatching', 'duplicate', 'captcha', 'identifier');
 
-    /*
-     * get our error messages from the plugin options
-     * 
-     */
-    foreach (array('invalid', 'empty', 'nonmatching', 'duplicate', 'captcha') as $error_type) {
-      $this->error_messages[$error_type] = Participants_Db::$plugin_options[$error_type . '_field_message'];
-    }
-    /*
-     * this filter provides an opportunity to add or modify validation error messages
-     * 
-     * for example, if there is a custom validation that generates an error type of 
-     * "custom" an error message with a key of "custom" will be shown if it fails.
-     */
-    if (has_filter(Participants_Db::$css_prefix . 'validation_error_messages')) {
-      $this->error_messages = apply_filters(Participants_Db::$css_prefix . 'validation_error_messages', $this->error_messages);
-    }
-
-    $this->error_style = Participants_Db::$plugin_options['field_error_style'];
+    $this->error_style = 'border: 1px solid red';
 
     // set the default error wrap HTML for the validation error feedback display
     $this->error_html_wrap = array('<div class="%s">%s</div>', '<p>%s</p>');
-  }
-
-  function __destruct()
-  {
-    
   }
 
   /**
@@ -80,7 +61,7 @@ class FormValidation {
    *
    * @param string $value       the submitted value of the field
    * @param object $column_atts the column atributes object
-   *                            validation key can be NULL, 'yes', 'email', regex
+   *                            validation key can be NULL, 'yes', 'email-regex', a field name, regex
    * @param array  $post        the post array with all submitted values, defaults 
    *                            to $this->post_array as instantiated
    */
@@ -99,12 +80,22 @@ class FormValidation {
    * @param string $value       the submitted value of the field
    * @param string $name        the name of the field
    * @param string $validation  the validation key to use in validating the
-   *                            submission. Could be 'yes', 'email' or a regex pattern
+   *                            submission. Could be 'yes', 'email-regex', a field name or a regex pattern
    */
   public function validate_field($value, $name, $validation = NULL)
   {
 
     $this->_validate_field($value, $name, $validation);
+  }
+  
+  /**
+   * checks for an error on a given field
+   * 
+   * @param string $name of the field to check
+   * @return bool true if an error has already been set on this field
+   */
+  public function has_error($name) {
+    return isset($this->errors[$name]) && !empty($this->errors[$name]);
   }
 
   /**
@@ -134,42 +125,18 @@ class FormValidation {
 
     foreach ($this->errors as $field => $error) :
 
-      $field_atts = Participants_Db::get_field_atts($field);
-
-      switch ($field_atts->form_element) {
-
-        case 'rich-text':
-        case 'text-area':
-        case 'textarea':
-          $element = 'textarea';
-          break;
-
-        case 'link':
-          $field_atts->name .= '[]';
-        case 'text':
-        case 'text-line':
-        case 'date':
-        case 'captcha':
-          $element = 'input';
-          break;
-
-        case 'image-upload':
-          $element = 'input';
-          break;
-
-        default:
-          $element = false;
-      }
+      // set a default element type
+      $element = 'input';
 
       if ($element)
         $this->error_CSS[] = $element . '[name="' . $field_atts->name . '"]';
 
       if (isset($this->error_messages[$error])) {
-        $error_messages[] = sprintf($this->error_messages[$error], $field_atts->title);
-        $this->error_class = Participants_Db::$css_prefix . 'error';
+        $error_messages[] = sprintf($this->error_messages[$error], $field);
+        $this->error_class = 'error';
       } else {
         $error_messages[] = $error;
-        $this->error_class = empty($field) ? Participants_Db::$css_prefix . 'message' : Participants_Db::$css_prefix . 'error';
+        $this->error_class = empty($field) ? 'message' : 'error';
       }
 
     endforeach; // $this->errors 
@@ -182,11 +149,12 @@ class FormValidation {
    * 
    * @param string $name field name
    * @param string $message message handle or liter message string
+   * @param bool $overwrite if true, overwrites an existing error on the same field
    */
-  public function add_error($name, $message)
+  public function add_error($name, $message, $overwrite = true)
   {
 
-    $this->_add_error($name, $message);
+    $this->_add_error($name, $message, $overwrite);
   }
 
   /**
@@ -194,7 +162,7 @@ class FormValidation {
    *
    *
    */
-  private function _error_html($error_messages)
+  protected function _error_html($error_messages)
   {
 
     if (empty($error_messages))
@@ -229,7 +197,6 @@ class FormValidation {
 
     if (!empty($this->error_CSS))
       return '<style type="text/css">' . implode(', ', $this->error_CSS) . '{ ' . $this->error_style . ' }</style>';
-
     else
       return '';
   }
@@ -255,7 +222,7 @@ class FormValidation {
   }
 
   /**
-   * validates a field submitted to the main database
+   * validates a single field submitted to the main database
    *
    * receives a validation pair and processes it, adding any error to the
    * validation status array
@@ -268,65 +235,30 @@ class FormValidation {
    * @param string $form_element the form element type of the field
    * @return NULL
    */
-  private function _validate_field($value, $name, $validation = NULL, $form_element = false)
+  protected function _validate_field($value, $name, $validation = NULL, $form_element = false)
   {
 
     $error_type = false;
 
     $field = (object) compact('value', 'name', 'validation', 'form_element', 'error_type');
-
+    
     /*
-     * this filter sends the $field object through a filter to allow a custom 
-     * validation to be inserted
-     * 
-     * if a custom validation is implemented, the $field->error_type must be set 
-     * to a validation method key string so the built-in validation won't be 
-     * applied. This key string is an arbitrary unique key, so if can be anything 
-     * except a string that is already defined. If the field passes validation,
-     * $field->validation can be set to false to avoid further validation of the
-     * field.
-     * 
+     * if there is no validation method defined, exit here
      */
-    if (has_filter(Participants_Db::$css_prefix . 'before_validate_field')) {
-      apply_filters(Participants_Db::$css_prefix . 'before_validate_field', $field);
-    }
-
-    /*
-     * set the validation to FALSE if it is not defined or == 'no'
-     */
-    if (empty($field->validation) || $field->validation === NULL || $field->validation == 'no')
-      $field->validation = FALSE;
-
-    /*
-     * first we check if the field needs to be validated at all. Fields not present
-     * in the form are excluded as well as any field with no validation method
-     * defined, or a validation method of 'no'.
-     */
-    if ($field->validation === FALSE || $this->not_submitted($name))
+    if (empty($field->validation) || $field->validation === NULL || $field->validation == 'no' || $field->validation === FALSE) {
       return;
+    }
+    
+    
     /*
      * if the validation method is 'yes' and the field has not already been
      * validated (error_type false) we test the submitted field for empty using
      * a defined method that allows 0, but no whitespace characters.
-     */
+     */ 
     elseif ($field->validation == 'yes') {
 
-      if ($field->form_element === false and $this->is_empty($field->value)) {
-
+      if ($this->is_empty($field->value)) {
         $field->error_type = 'empty';
-      } else {
-        // we can validate each form element differently here
-        switch ($field->form_element) {
-          case 'link':
-            if ($this->is_empty($field->value[0])) {
-              $field->error_type = 'empty';
-            }
-            break;
-          default:
-            if ($this->is_empty($field->value)) {
-              $field->error_type = 'empty';
-            }
-        }
       }
 
       /*
@@ -339,35 +271,15 @@ class FormValidation {
       $test_value = false;
       switch (true) {
 
-        case ( $field->validation == 'email' ) :
+        /*
+         * the validation method key for an email address was formerly 'email' This 
+         * has been changed to 'email-regex' but will still come in as 'email' from 
+         * legacy databases. We test for that by looking for a field named 'email' 
+         * in the incoming values.
+         */
+        case ( $field->validation == 'email-regex' || ($field->validation ==  'email' && $field->name ==  'email') ) :
 
           $regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
-          break;
-
-        case ( 'captcha' == strtolower($validation) ) :
-          
-          $field->value = isset($field->value[1]) ? $field->value[1] : '';
-
-          $filter = Participants_Db::$css_prefix . 'captcha_validation';
-          if (has_filter($filter)) {
-            $regex = apply_filters($filter, $field->value, $this->post_array);
-            // we set the pass/fail regex if the validation was performed by the filter
-            if (is_bool($regex)) {
-              $regex = $regex ? '#.*#' : '#\Zx\A#';
-            }
-          }
-
-          // grab the value and the validation key
-          list($info, $value) = (isset($this->post_array[$validation][1]) ? $this->post_array[$validation] : array($this->post_array[$validation][0],$field->value));
-          $info = json_decode(urldecode($info));
-          
-          /* the $info->type value indicates the type of CAPTCHA that was used. 
-           * There is only one type currently: 'math' and it passes in a regex to 
-           * validate the submission with
-           */
-          if (!$regex) $regex = $this->xcrypt($info->nonce, PDb_CAPTCHA::get_key());
-          //error_log(__METHOD__.' $info:'.print_r($info,1).' $field->value:'.$field->value.' regex:'.$regex);
-
           break;
 
         case ( $this->_is_regex($field->validation) ) :
@@ -378,12 +290,18 @@ class FormValidation {
         /*
          * if it's not a regex, test to see if it's a valid field name for a match test
          */
-        case ( isset($this->post_array[$field->validation]) ) :
+        case ( isset($this->post_array[strtolower($field->validation)]) ) :
 
-          $test_value = $this->post_array[$field->validation];
+          $test_value = $this->post_array[strtolower($field->validation)];
+          break;
+        
+        case (is_bool($field->validation)) :
+          $regex = $field->validation ? '#.*#' : '#\Zx\A#';
           break;
 
         default:
+          // passes validation because the validation method was not properly defined
+          $regex = '#.*#';
       }
 
       if (false !== $test_value && $field->value !== $test_value) {
@@ -399,18 +317,6 @@ class FormValidation {
     } else {
       $valid = 'valid';
     }
-    if (strtolower($validation) === 'captcha') $_SESSION['captcha_result'] = $valid;
-
-    if (false) {
-      error_log(__METHOD__ . '
-  field: ' . $name . '
-  element: ' . $field->form_element . '
-  value: ' . (is_array($field->value) ? print_r($field->value, 1) : $field->value) . '
-  validation: ' . (is_bool($field->validation) ? ($field->validation ? 'true' : 'false') : $field->validation) . '
-  submitted? ' . ($this->not_submitted($name) ? 'no' : 'yes') . '
-  empty? ' . ($this->is_empty($field->value) ? 'yes' : 'no') . '
-  error type: ' . $field->error_type);
-    }
   }
 
   /**
@@ -418,11 +324,14 @@ class FormValidation {
    *
    * @param string $field the name of the field
    * @param string $error the error status of the field
+   * @param bool $overwrite if true, overwrites an existing error on the same field
    */
-  private function _add_error($field, $error)
+  protected function _add_error($field, $error, $overwrite = false)
   {
 
-    $this->errors[$field] = $error;
+    if ($overwrite === true || !isset($this->errors[$field]) || empty($this->errors[$field])) {
+      $this->errors[$field] = $error;
+    }
   }
 
   /**
@@ -465,7 +374,7 @@ class FormValidation {
    * @param array $array the array to test
    * @return bool true if any element tests true
    */
-  private function _is_empty_array($array)
+  protected function _is_empty_array($array)
   {
     foreach ($array as $element) {
       if (!self::is_empty($element))
@@ -474,25 +383,32 @@ class FormValidation {
     return true;
   }
 
-  // tests a string for a regex pattern by looking for a delimiter
-  // not the most robust solution, but will do for most situations
-  private function _is_regex($string)
+  /*
+   * tests a string for a regex pattern
+   * 
+   * since this class uses the regex in a "preg_match" func, we first make sure 
+   * it's a string then test the function and look for a boolean false, which is 
+   * a strong indicator the regex is invalid
+   * 
+   * @param string $string the string to test
+   * @return bool
+   */
+  protected function _is_regex($string)
   {
 
-    if (is_array($string))
+    if (!is_string($string))
       return false;
 
-    return (
-            substr($string, 0, 1) == substr($string, -1, 1)
-            ||
-            substr($string, 0, 1) == substr($string, -2, 1)
-            ) ? true : false;
+    return @preg_match($string,'test string') !== false;
   }
 
   /**
    * makes a display title out of a slug string
+   * 
+   * @param string
+   * @return string the "title-ized" input string
    */
-  private function _make_title($string)
+  protected function _make_title($string)
   {
 
     return ucwords(str_replace(array('_', '-'), ' ', $string));
@@ -510,23 +426,5 @@ class FormValidation {
     return @$_POST[$fieldname] === NULL;
   }
 
-  /**
-   * encodes or decodes a string using a simple XOR algorithm
-   * 
-   * @param string $string the tring to be encoded/decoded
-   * @param string $key the key to use
-   * @return string
-   */
-  public static function xcrypt($string, $key)
-  {
-
-    for ($i = 0; $i < strlen($string); $i++) {
-      $pos = $i % strlen($key);
-      $replace = ord($string[$i]) ^ ord($key[$pos]);
-      $string[$i] = chr($replace);
-    }
-
-    return $string;
-  }
 
 }

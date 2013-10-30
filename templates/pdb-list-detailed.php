@@ -8,7 +8,6 @@ this is a more detailed template showing how the parts of the display can be cus
 */
 ?>
 <div class="wrap <?php echo $this->wrap_class ?>">
-<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
 <?php
   /*
@@ -108,12 +107,13 @@ this is a more detailed template showing how the parts of the display can be cus
 
   <table class="wp-list-table widefat fixed pages list-container" cellspacing="0" >
   
-    <?php // print the count if enabled in the shortcode
-		if ( $display_count ) : ?>
-    <caption>
-      Total Records Found: <?php echo $record_count ?>
-    </caption>
-    <?php endif ?>
+    <?php 
+    /* print the count if enabled in the shortcode
+     * 
+     * the tag wrapping the count statment can be supplied in the function argument, example here
+     */
+		$this->print_list_count('<caption class="list-display-count">'); 
+    ?>
 
     <?php if ( $record_count > 0 ) : ?>
 
@@ -267,7 +267,7 @@ this is a more detailed template showing how the parts of the display can be cus
 							/*
 							 * if the make links setting is enabled, try to make a link out of the field
 							 */
-							if ( $this->options['make_links'] && ! $this->field->is_single_record_link() ) {
+							if ( Participants_Db::$plugin_options['make_links'] && ! $this->field->is_single_record_link() ) {
 								
 								$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
 								
