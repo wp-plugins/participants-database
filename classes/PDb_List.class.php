@@ -173,6 +173,17 @@ class PDb_List extends PDb_Shortcode {
   }
 
   /**
+   * returns the list
+   * 
+   * @deprecated since version 1.5
+   * @var array $atts the shortcode attributes array
+   * @return string the HTML
+   */
+  public static function print_record($atts) {
+    return self::get_list($atts);
+  }
+
+  /**
    * prints a list of records called by a shortcode
    *
    * this function is called statically to instantiate the PDb_List object,

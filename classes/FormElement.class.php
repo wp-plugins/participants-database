@@ -1486,7 +1486,7 @@ class FormElement {
    * entry
    */
   protected function _set_types() {
-     $this->element_types = $this->get_types();
+     $this->element_types = self::get_types();
   }
   /*
    * static function for assembling the types array

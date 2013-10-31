@@ -7,7 +7,7 @@ Tested up to: 3.6
 Stable tag: 1.4.9.3
 License: GPLv2
 
-Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
+Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
 
 == Description ==
 
@@ -140,11 +140,17 @@ An individual record can be edited on the frontend of your website by someone wh
 
 OK, just assign all the fields you want them to fill out to the signup form (this is done in the "manage fields" page). That form can be as big as you want. Then, remove the private link from the email they get when they sign up.
 
-= How do I let people upload an image? =
+= How do I let people upload an image or file? =
 
-Go to the "manage database fields" page and create a new field for your image. Give it a descriptive name like "avatar" or something. Click "add field" and when your new field appears, set the "field type" to "image upload" Be sure to check "signup" if you want it to appear in the signup form. When the form is presented to the user, they will be allowed to upload an image. There are a couple of settings that affect image uploads, including a file size limit.
+Go to the "manage database fields" page and create a new field for your image. Give it a descriptive name like "avatar" or something. Click "add field" and when your new field appears, set the "field type" to "image upload" for images and "file-upload" for other types of file. Be sure to check "signup" if you want it to appear in the signup form. When the form is presented to the user, they will be allowed to upload an image.
 
-It is possible to have multiple images per record, just add more image fields.
+There are several settings you should look at before you go live with your uploads fields. Under the "General Settings" tab, you'll find:
+* File Upload Location - this tells the plugin where to put the uploaded files
+* File Upload Limit - this is the size limit in Kilobytes for your file uploads. Be careful not to put this too high, if you have lots of users, it could use a lot of space on your server!
+* Allowed File Types - this is a comma-separated list of allowed file extensions. You can also define this on a per-field basis.
+* Allow File Delete - if this is checked, the file will be removed from the server when a user deletes it.
+
+Each file upload field can have it's allowed files determined in the "values" field on the Manage Database Fields page. For instance, if you want them to upload only a pdf file, put "pdf" in the values field for that field. The maximum size is determined globally in the settings only.
 
 = When someone signs up, are they now users on my WordPress site? =
 
@@ -174,9 +180,9 @@ You can control which groups of fields show up in the frontend record edit scree
 
 = What if someone loses their private link? =
 
-If someone does not have the private link to edit their record, they can sign up again with the same email address if "Don't Allow Duplicate Email Addresses" is checked in the plugin settings. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address.
+You can show a "Resend Private Link" link on your signup form, just check "Enable Lost Private Link" under the "Retrieve Link Settings" tab. You must define which field is used to identify the record. This must be a unique identifier, usually an email address, but it could be anything. The rest of the settings for this feature are under that tab.
 
-It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the `[pdb_record]` shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
+It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the `[pdb_record]` shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page.
 
 = Is it possible for users to upload files? =
 
@@ -204,11 +210,7 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 = Is a CAPTCHA available for the forms? =
 
-There will be in the future, but for now, I'm suggesting this:
-
-Create a text-line field with the question "what is the sum of 10 and 7?" then put in a regex to verify the answer: #^17$#
-
-You can no doubt come up with many variations on this.
+You can define a "captcha" form element which will show a simple math question for the user to answer.
 
 = I'm getting a blank page in the admin when I click on the plugin menu =
 

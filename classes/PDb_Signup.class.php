@@ -293,7 +293,7 @@ class PDb_Signup extends PDb_Shortcode {
   // sends a receipt email
   private function _do_receipt() {
     
-    $email_field = Participants_Db::$plugin_options('primary_email_address_field');
+    $email_field = Participants_Db::$plugin_options['primary_email_address_field'];
 
     if (!isset($this->participant_values[$email_field]) || empty($this->participant_values[$email_field]))
       return NULL;
