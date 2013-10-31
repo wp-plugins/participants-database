@@ -19,6 +19,7 @@
  *
  */
 
+$retrieve_link_text = Participants_Db::$plugin_options['retrieve_link_text'];
  ?>
 <div class="wrap <?php echo $this->wrap_class ?>" >
 
@@ -66,11 +67,6 @@
 
       endwhile; // groups ?>
       
-        <?php /*if ( $captcha = $this->_add_captcha( $this->captcha_type ) ) : ?>
-        <tr>
-          <td colspan="2" class="pdb-captcha"><?php echo $captcha?></td>
-        </tr>
-        <?php endif */?>
         <tr>
           <td class="submit-buttons">
             
@@ -79,7 +75,7 @@
           </td>
           <td class="submit-buttons">
             
-           <?php $this->print_retrieve_link(__('Forget your private link? Click here to have it emailed to you.','participants-database'), '<span class="pdb-retrieve-link">','</span>'); ?>
+           <?php $this->print_retrieve_link($retrieve_link_text, '<span class="pdb-retrieve-link">','</span>'); // this only prints if enabled in the settings ?>
            
           </td>
         </tr>
