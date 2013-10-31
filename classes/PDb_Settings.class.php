@@ -1005,7 +1005,7 @@ class PDb_Settings extends Plugin_Settings {
         'options' => array(
             'type' => 'text-area',
             'value' => '',
-            'help_text' => __('use this to add your own styles or override styles applied to the output of all plugin shortcodes'),
+            'help_text' => __('use this to add your own styles or override styles applied to the output of all plugin shortcodes', 'participants-database'),
             'attributes' => array(
               'style'=>"height:20em;width:90%;max-width:400px;",
               'class' => 'code',
@@ -1020,7 +1020,7 @@ class PDb_Settings extends Plugin_Settings {
         'options' => array(
             'type' => 'text-area',
             'value' => "/* this prevents the search controls from printing */\r.pdb-searchform {\r\tdisplay:none;\r}",
-            'help_text' => __('use this to format the printed output of all plugin shortcodes'),
+            'help_text' => __('use this to format the printed output of all plugin shortcodes', 'participants-database'),
             'attributes' => array(
               'style'=>"height:20em;width:90%;max-width:400px;",
               'class' => 'code',

@@ -120,13 +120,17 @@ class Participants_Db extends PDb_Base {
    * @var string absolute path to the uploads directory
    */
   public static $uploads_path;
-  
   /**
+   * a general-use prefix to set a namespace
    *
-   * @var string a general-use prefix to set a namespace
+   * @var string
    */
   public static $prefix = 'pdb-';
-  public static $css_prefix = '-pdb'; // for backwards compatibility
+  /**
+   *
+   * @var string this is a duplicate of $prefix for backwards compatibility
+   */
+  public static $css_prefix;
   /**
    *
    * @var object the PDb_FormValidation object
@@ -221,6 +225,7 @@ class Participants_Db extends PDb_Base {
     self::$uploads_path = 'wp-content/uploads/' . self::PLUGIN_NAME . '/';
 
     self::$last_record = self::$prefix . 'last_record';
+    self::$css_prefix = self::$prefix;
 
     // install/deactivate and uninstall methods are handled by the PDB_Init class
     register_activation_hook(__FILE__, array('PDb_Init', 'on_activate'));
