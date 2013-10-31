@@ -473,7 +473,7 @@ class FormElement {
           $return = $field->value;
         } else {
           $upload_dir = wp_upload_dir();
-          $field->link =  $upload_dir['url'] . $field->value;
+          $field->link =  get_bloginfo('url') . '/' . Participants_Db::$plugin_options['image_upload_location'] . $field->value;
           $return = self::make_link($field);
         }
         break;
