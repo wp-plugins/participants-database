@@ -126,6 +126,7 @@ class Participants_Db extends PDb_Base {
    * @var string a general-use prefix to set a namespace
    */
   public static $prefix = 'pdb-';
+  public static $css_prefix = '-pdb'; // for backwards compatibility
   /**
    *
    * @var object the PDb_FormValidation object
