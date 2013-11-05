@@ -468,6 +468,17 @@ class PDb_Settings extends Plugin_Settings {
             'options' => array(1, 0),
         )
     );
+   
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_text',
+        'title' => __('Lost Private Link Text', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('clickable text shown in the signup form', 'participants-database'),
+            'value' => __('Forget your private link? Click here to have it emailed to you.','participants-database'),
+        )
+    );
     $this->plugin_settings[] = array(
         'name' => 'link_retrieval_page',
         'title' => __('Lost Private Link Page', 'participants-database'),
@@ -482,17 +493,6 @@ class PDb_Settings extends Plugin_Settings {
         )
     );
    
-    $this->plugin_settings[] = array(
-        'name' => 'retrieve_link_text',
-        'title' => __('Lost Private Link Text', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => 'text',
-            'help_text' => __('clickable text shown in the signup form', 'participants-database'),
-            'value' => __('Forget your private link? Click here to have it emailed to you.','participants-database'),
-        )
-    );
-
     $this->plugin_settings[] = array(
         'name' => 'retrieve_link_identifier',
         'title' => __('Lost Private Link ID Field', 'participants-database'),

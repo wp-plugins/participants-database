@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5 beta 1
+  Version: 1.5 beta 2
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -43,28 +43,31 @@ spl_autoload_register('PDb_class_loader');
 class Participants_Db extends PDb_Base {
   
   /**
-   * this is same as the plugin directory name
+   *
+   * unique slug for the plugin; this is same as the plugin directory name
    * 
    * @var string unique slug for the plugin
    */
   const PLUGIN_NAME = 'participants-database';
 
   /**
-   * @var string display title
+   *  display title
+   * @var string
    */
   public static $plugin_title;
   /**
-   *
-   * @var string basename of the main participants index table
+   * basename of the main participants index table
+   * @var string
    */
   public static $participants_table;
   /**
-   * @var string base name of the table for all associated values
+   *  base name of the table for all associated values
+   * @var string
    */
   public static $fields_table;
   /**
-   *
-   * @var string name of the table for groups defninitions
+   * name of the table for groups defninitions
+   * @var string
    */
   public static $groups_table;
   /**
@@ -75,49 +78,48 @@ class Participants_Db extends PDb_Base {
    */
   public static $db_version = '0.7';
   /**
-   * @var string name of the WP option where the current db version is stored
+   * name of the WP option where the current db version is stored
+   * @var string
    */
   public static $db_version_option = 'PDb_Db_version';
   /**
-   * @var string current version of plugin
+   *  current version of plugin
+   * @var string
    */
   public static $plugin_version;
   /**
-   * @var string name of the WP plugin options
+   * name of the WP plugin options
+   * @var string
    */
   public static $participants_db_options;
   /**
-   *
-   * @var array of plugin option values $name => $value
+   * plugin option values $name => $value
+   * @var array
    */
   public static $plugin_options;
   /**
-   *
-   * @var object plugin settings object
+   * plugin settings object
+   * @var object
    */
   public static $Settings;
-  
-  // locations
-  
   /**
-   *
-   * @var string name of the plugin admin page
+   * name of the plugin admin page
+   * @var string
    */
   public static $plugin_page;
   /**
-   *
-   * @var string path to the plugin root ditectory
+   * path to the plugin root ditectory
+   * @var string
    */
   public static $plugin_path;
   /**
-   *
-   * @var string URL for the plugin directory
+   * URL for the plugin directory
+   * @var string 
    */
   public static $plugin_url;
-  // file uploads
   /**
-   *
-   * @var string absolute path to the uploads directory
+   * absolute path to the uploads directory
+   * @var string 
    */
   public static $uploads_path;
   /**
@@ -127,74 +129,74 @@ class Participants_Db extends PDb_Base {
    */
   public static $prefix = 'pdb-';
   /**
-   *
-   * @var string this is a duplicate of $prefix for backwards compatibility
+   * duplicate of $prefix for backwards compatibility
+   * @var string
    */
   public static $css_prefix;
   /**
-   *
-   * @var object the PDb_FormValidation object
+   * the PDb_FormValidation object
+   * @var object
    */
   public static $validation_errors;
   /**
-   *
-   * @var string an admin status or error message
+   * an admin status or error message
+   * @var string
    */
   static $admin_message = '';
   /**
-   *
-   * @var string the type of admin message
+   * the type of admin message
+   * @var string
    */
   static $admin_message_type;
   /**
-   *
-   * @var string name of the transient record used to hold the last record
+   * name of the transient record used to hold the last recor
+   * @var string
    */
   public static $last_record;
   /**
-   *
-   * @var bool set if a shortcode is called on a page
+   * set if a shortcode is called on a page
+   * @var bool
    */
   public static $shortcode_present;
   /**
-   *
-   * @var string status code for the last record processed
+   * status code for the last record processed
+   * @var string
    */
   public static $insert_status;
   /**
-   *
-   * @var string header to include with plugin emails
+   * header to include with plugin email
+   * @var strings
    */
   public static $email_headers;
   /**
-   *
-   * @var string enclosure character to use
+   * enclosure character to use
+   * @var string
    */
   static $CSV_enclosure = '"';
   /**
-   *
-   * @var array list of reserved field names
+   * list of reserved field names
+   * @var array
    */
   public static $reserved_names = array('source', 'subsource', 'id', 'private_id', 'record_link', 'action', 'submit', 'submit-button', 'name', 'day', 'month', 'year', 'hour', 'date', 'minute', 'email-regex');
   /**
-   *
-   * @var bool true while sending an email
+   * true while sending an email
+   * @var bool
    */
   public static $sending_email = false;
   /**
-   *
-   * @var array set of internationalized words
+   * set of internationalized words
+   * @var array
    */
   public static $i18n = array();
   /**
-   * the defaults to the WP global setting, but can be changed within the plugin
+   * the date format; defaults to the WP global setting, but can be changed within the plugin
    *
-   * @var string the date format
+   * @var string
    */
   public static $date_format;
   /**
-   *
-   * @var int index for tracking multiple instances of a shortcode
+   * index for tracking multiple instances of a shortcode
+   * @var int
    */
   public static $instance_index = 0;
 
@@ -1275,7 +1277,7 @@ class Participants_Db extends PDb_Base {
 
                 $value_array = $post[$column_atts->name];
                 
-                error_log(__METHOD__.' incoming values:'.print_r($value_array,1));
+                //error_log(__METHOD__.' incoming values:'.print_r($value_array,1));
                 
               } else {
 
@@ -1325,7 +1327,7 @@ class Participants_Db extends PDb_Base {
             case 'date':
               $date = false;
               if (isset($post[$column_atts->name]))
-                $date = self::parse_date($post[$column_atts->name], $column_atts);
+                $date = self::parse_date($post[$column_atts->name], $column_atts, true);
 
               $new_value = $date ? $date : false;
               break;
@@ -2300,10 +2302,6 @@ class Participants_Db extends PDb_Base {
 
       self::_show_validation_error( sprintf(__('For "%s", you may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'), $field_atts->title ), $name);
       return false;
-    } elseif ( $type == 'file' and $valid_image ) {
-      
-      self::_show_validation_error(__('The file you tried to upload is not of an allowed type.', 'participants-database'),$name);
-      return false;
     }
 
     if ($file['size'] > self::$plugin_options['image_upload_limit'] * 1024) {
@@ -2529,7 +2527,7 @@ class Participants_Db extends PDb_Base {
     }
     
     $date = false;
-    // if it is a default timestamp, treat it as "no date"
+    // if it is a default zero timestamp, treat it as "no date"
     if ($string == '0000-00-00 00:00:00') return false;
 
     /*
@@ -2623,13 +2621,28 @@ class Participants_Db extends PDb_Base {
       } elseif (is_object($column) && $column->form_element == 'timestamp') {
         if ($zero_time) {
           /*
+           * we need to zero the time, we first try to do it using the DateTime class
+           */
+          $the_Date = new DateTime($string);
+          if (is_object($the_Date)) {
+            $the_Date->setTime(0, 0);
+            $string = $the_Date->format(self::$date_format);
+          } else {
+            /*
            * remove the time portion of the timestamp
            */
           $string = preg_replace('# [0-9]{2}:[0-9]{2}:[0-9]{2}$#', '', $string);
           $string .= ' 00:00 -0';
         }
       }
-    
+      }
+      /*
+       * Most of the time, the default PHP timezone is the current setting, but 
+       * experience has shown it's necessary to reset it for the conversion to make 
+       * sure. We also must assume that the database server and PHP server are on 
+       * the same TZ.
+       */
+      date_default_timezone_set(ini_get('date.timezone'));
       $date = strtotime($string);
     }
     

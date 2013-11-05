@@ -1085,7 +1085,7 @@ class FormElement {
       
       if ($value === false and !empty($key)) $this->_add_options_divider ($key);
 
-      else $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . $key . '</option>', -1 );
+      else $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . stripslashes($key) . '</option>', -1 );
 
     }
     

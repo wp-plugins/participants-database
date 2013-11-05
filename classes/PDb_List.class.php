@@ -390,6 +390,7 @@ class PDb_List extends PDb_Shortcode {
 
       // a "clear" will take us back to the first page
       $_GET[$this->list_page] = 1;
+      $this->filter['submit'] = '';
     } elseif (
             !empty($this->filter['value']) &&
             'none' != $this->filter['search_field'] &&
@@ -403,14 +404,30 @@ class PDb_List extends PDb_Shortcode {
         
         break; // not a valid field
         
-      } elseif (in_array($search_field->form_element, array('date','timestamp'))) {
+      } elseif ($search_field->form_element == 'date') {
+        /*
+         * process date and timestamp searches
+         */
+        $filter_value = Participants_Db::parse_date($this->to_utf8($this->filter['value']), $search_field, true); // $this->to_utf8($this->filter['value'])
+        if ($filter_value) {
+          /*
+           * regular date fields are stored as signed integers (UNIX timestamp) 
+           * and are simply compared as such
+           */
+          $clause_pattern = " CAST(p.%s AS SIGNED) = CAST(%s AS SIGNED) ";
+        }
+          
+      } elseif ($search_field->form_element == 'timestamp') {
         
         /*
          * process date and timestamp searches
          */
-        $filter_value = Participants_Db::parse_date($this->to_utf8($this->filter['value']), $search_field, true);
+        $filter_value = date('Y-m-d H:i:s',Participants_Db::parse_date($this->to_utf8($this->filter['value']), $search_field, false)); // $this->to_utf8($this->filter['value'])
         if ($filter_value) {
-          $clause_pattern = 'DATE(p.%s) = CONVERT_TZ(FROM_UNIXTIME(%s), @@session.time_zone, "+00:00") ';
+          /*
+           * timestamps are compared using MySQL's date comparsons
+           */
+          $clause_pattern = "DATE(p.%s) = DATE('%s') ";
         } else break;// date could not be parsed
         
       } else {
@@ -952,7 +969,7 @@ class PDb_List extends PDb_Shortcode {
               Participants_Db::$plugin_options['count_template'],
               $this->num_records, // total number of records found
               $this->shortcode_atts['list_limit'], // number of records to show each page
-              (($this->pagination->page - 1) * $this->shortcode_atts['list_limit']) + 1, // starting record number
+              (($this->pagination->page - 1) * $this->shortcode_atts['list_limit']) + ($this->num_records > 1 ? 1 : 0), // starting record number
               ($this->num_records - (($this->pagination->page - 1) * $this->shortcode_atts['list_limit']) > $this->shortcode_atts['list_limit'] ? 
                       $this->pagination->page * $this->shortcode_atts['list_limit'] : 
                       (($this->pagination->page - 1) * $this->shortcode_atts['list_limit']) + ($this->num_records - (($this->pagination->page - 1) * $this->shortcode_atts['list_limit']))), // ending record number

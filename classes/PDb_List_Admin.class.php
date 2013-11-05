@@ -259,27 +259,59 @@ class PDb_List_Admin {
 
           $value = self::$filter['value'];
 
-          if (in_array($field_atts->form_element, array('timestamp', 'date'))) {
+          if ($field_atts->form_element == 'timestamp') {
             
-            $value = Participants_Db::parse_date(self::$filter['value'], $field_atts, true);
+            $value = self::$filter['value'];
+            $value2 = false;
+            if (strpos(self::$filter['value'], ' to ')) {
+              list($value, $value2) = explode('to', self::$filter['value']);
+            }
+            
+            $value = Participants_Db::parse_date($value, $field_atts, false);
+            if ($value2) $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
             
             if ($value !== false) {
             
-              if ($field_atts->form_element == 'timestamp') {
+              $stored_date = "DATE(p." . mysql_real_escape_string(self::$filter['search_field']) . ")";
+            
+              if ($value2 !== false and !empty($value2)) {
+                
+                  self::$list_query .= " WHERE " . $stored_date . " > DATE_ADD(FROM_UNIXTIME(0), interval " . mysql_real_escape_string($value) . " second) AND " . $stored_date . " < DATE_ADD(FROM_UNIXTIME(0), interval " . mysql_real_escape_string($value2) . " second)";
+                  
+              } else {
 
                 if ($operator == 'LIKE') $operator = '=';
 
-                self::$list_query .= ' WHERE DATE(p.' . mysql_real_escape_string(self::$filter['search_field']) . ') ' . $operator . " CONVERT_TZ(FROM_UNIXTIME(" . mysql_real_escape_string($value) . "), @@session.time_zone, '+00:00') ";
+                self::$list_query .= " WHERE " . $stored_date . " " . $operator . " DATE_ADD(FROM_UNIXTIME(0), interval " . mysql_real_escape_string($value) . " second) ";
+              }
 
+            }
               } elseif ($field_atts->form_element == 'date') { 
 
-                if (!$value) {
-                  $value = time();
+            $value = self::$filter['value'];
+            $value2 = false;
+            if (strpos(self::$filter['value'], ' to ')) {
+              list($value, $value2) = explode('to', self::$filter['value']);
                 }
 
-                self::$list_query .= ' WHERE DATE(p.' . mysql_real_escape_string(self::$filter['search_field']) . ') ' . $operator . " CAST(" . mysql_real_escape_string($value) . "AS SIGNED) ";
+            $value = Participants_Db::parse_date($value, $field_atts, true);
+            if ($value2) $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
 
+            if ($value !== false) {
+              
+              $stored_date = "CAST(p." . mysql_real_escape_string(self::$filter['search_field']) . " AS SIGNED)";
+            
+              if ($value2 !== false and !empty($value2)) {
+                
+                  self::$list_query .= " WHERE " . $stored_date . " > CAST(" . mysql_real_escape_string($value) . " AS SIGNED) AND " . $stored_date . " < CAST(" . mysql_real_escape_string($value2) . "  AS SIGNED)";
+                  
+              } else {
+
+                if ($operator == 'LIKE') $operator = '=';
+
+                self::$list_query .= " WHERE " . $stored_date . " " . $operator . " CAST(" . mysql_real_escape_string($value) . " AS SIGNED)";
               }
+                
             }
           } else {
             
@@ -306,6 +338,7 @@ class PDb_List_Admin {
 
         // go back to the first page if the search has just been submitted
         $_GET[self::$list_page] = 1;
+        self::$filter['submit-button'] = '';
 
       default:
 
@@ -621,7 +654,7 @@ class PDb_List_Admin {
                         // replace spaces with &nbsp; so the time value stays together on a broken line
                         $format .= ' ' . str_replace(' ', '&\\nb\\sp;', get_option('time_format'));
                       }
-                      $time = Participants_Db::is_valid_timestamp($value[$column]) ? (int) $value[$column] : Participants_Db::parse_date($value[$column],$column_atts);
+                      $time = Participants_Db::is_valid_timestamp($value[$column]) ? (int) $value[$column] : Participants_Db::parse_date($value[$column],$column_atts, $column_atts->form_element == 'date');
                       $display_value = $value[$column] == '0000-00-00 00:00:00' ? '' : date_i18n($format, $time);
                       //$display_value = date_i18n($format, $time);
                     }
