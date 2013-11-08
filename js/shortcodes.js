@@ -13,7 +13,7 @@
  *    form element placeholders
  */
 jQuery(document).ready(function($) {
-  var pdbform = $('input.pdb-submit').parents("form");
+  var pdbform = $('input.pdb-submit').closest("form");
   pdbform.submit(function(e) {
     if ($(this).hasClass('pdb-disabled')) {
       e.preventDefault();

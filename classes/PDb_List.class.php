@@ -358,9 +358,9 @@ class PDb_List extends PDb_Shortcode {
     unset($this->filter[$this->list_page]);
     
     // decode all passed-in values
-    array_walk($this->filter, function(&$n) {
-              $n = rawurldecode($n);
-            });
+    foreach($this->filter as &$n) {
+      $n = urldecode($n);
+    }
 
     // get the ORDER BY clause
     $order_clause = $this->_build_order_clause();
@@ -425,7 +425,9 @@ class PDb_List extends PDb_Shortcode {
         $filter_value = date('Y-m-d H:i:s',Participants_Db::parse_date($this->to_utf8($this->filter['value']), $search_field, false)); // $this->to_utf8($this->filter['value'])
         if ($filter_value) {
           /*
-           * timestamps are compared using MySQL's date comparsons
+           * if the field is a date, the value is stored as a Unix TS, so we must 
+           * convert it. If the field is a timestamp, there is no need to convert 
+           * the value
            */
           $clause_pattern = "DATE(p.%s) = DATE('%s') ";
         } else break;// date could not be parsed

@@ -1082,17 +1082,20 @@ class PDb_Settings extends Plugin_Settings {
    * this provides a set of field to select from
    * 
    * @param bool $null if true include a null value
+   * @global object $wpdb
    * @return array of fields as $title => $value
    */
   private function _get_identifier_columns($null = true) {
 
+    global $wpdb;
+
     $columnlist = $null ? array() : array('null_select' => false);
 
-    $columns = Participants_Db::get_column_atts('frontend');
+    $sql = 'SELECT v.*, g.order FROM ' . Participants_Db::$fields_table . ' v INNER JOIN ' . Participants_Db::$groups_table . ' g ON v.group = g.name AND v.form_element IN ("text-line","hidden") ORDER BY g.order, v.order';
+
+    $columns = $wpdb->get_results($sql, OBJECT_K);
 
     foreach ($columns as $column) {
-
-      if (in_array($column->form_element, array('text-line')))
         $columnlist[$column->title] = $column->name;
     }
 

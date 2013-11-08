@@ -411,9 +411,11 @@ class PDb_Base {
    */
   public static function set_admin_message($message, $type = 'error')
   {
-    $_SESSION['admin_message'] = array($message, $type);
-    Participants_Db::$admin_message = $message;
-    Participants_Db::$admin_message_type = $type;
+    if (is_admin()) {
+			$_SESSION['admin_message'] = array($message, $type);
+			Participants_Db::$admin_message = $message;
+			Participants_Db::$admin_message_type = $type;
+		}
   }
 
   /**

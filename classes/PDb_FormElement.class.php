@@ -366,7 +366,7 @@ class PDb_FormElement extends FormElement {
          'hidden'             => __('Hidden Field', 'participants-database'), 
          'password'           => __('Password Field', 'participants-database'), 
          'captcha'            => __('CAPTCHA', 'participants-database'),
-         'timestamp'          => __('Timestamp', 'participants-database'),
+//         'timestamp'          => __('Timestamp', 'participants-database'),
          );
     /*
      * this gives access to the list of form element types for alteration before

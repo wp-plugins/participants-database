@@ -21,13 +21,12 @@ class PDb_Init
     public static $main_fields;
     public static $admin_fields;
     public static $personal_fields;
-    public static $source_fields;
     public static $field_groups;
 
     function __construct( $mode = false )
     {
         if ( ! $mode )
-            wp_die( 'class must be be called on the activation hooks', 'object not correctly instantiated' );
+            wp_die( 'class must be called on the activation hooks', 'object not correctly instantiated' );
 
         // error_log( __METHOD__.' called with '.$mode );
 
@@ -118,6 +117,7 @@ class PDb_Init
           `id` INT(3) NOT NULL AUTO_INCREMENT,
           `order` INT(3) NOT NULL DEFAULT 0,
           `display` BOOLEAN DEFAULT 1,
+          `admin` BOOLEAN NOT NULL DEFAULT 0,
           `title` TINYTEXT NOT NULL,
           `name` VARCHAR(30) NOT NULL,
           `description` TEXT NULL,
@@ -575,7 +575,7 @@ class PDb_Init
         /*
          * adds a new column to the goups database so a group cna be designated as a "admin" group
          */
-        $sql = "ALTER TABLE ".Participants_Db::$groups_table." ADD COLUMN `admin` INT(3) NOT NULL DEFAULT 0 AFTER `order`";
+        $sql = "ALTER TABLE ".Participants_Db::$groups_table." ADD COLUMN `admin` BOOLEAN NOT NULL DEFAULT 0 AFTER `order`";
         
           if ($wpdb->query( $sql ) !== false) {
           // update the stored DB version number
@@ -667,7 +667,6 @@ class PDb_Init
                                   'main'      => 'Participant Info',
                                   'personal'  => 'Personal Info',
                                   'admin'     => 'Administrative Info',
-                                  'source'    => 'Source of the Record',
                                   'internal'  => 'Record Info',
                                   );
 
@@ -859,23 +858,6 @@ class PDb_Init
                                                         'help_text' => 'how much time they have volunteered',
                                                       ),
 
-                                  );
-      self::$source_fields = array(
-                                  'where'             => array(
-                                                              'title' => 'Signup Location',
-                                                              'form_element' => 'text-line',
-                                                              'persistent' => 1,
-                                                            ),
-                                  'when'              => array(
-                                                              'title' => 'Signup Date',
-                                                              'form_element' => 'date',
-                                                              'persistent' => 1,
-                                                            ),
-                                  'by'                => array(
-                                                              'title' => 'Signup Gathered By',
-                                                              'form_element' => 'text-line',
-                                                              'persistent' => 1,
-                                                            ),
                                   );
 
 

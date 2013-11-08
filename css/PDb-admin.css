@@ -262,7 +262,7 @@ th.vertical-title  {
   width:25px;
 }
 th.vertical-title.number-column {
-  min-width: 43px;
+  width: 43px;
 }
 th.form_element {
   width:150px;

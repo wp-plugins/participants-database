@@ -581,7 +581,7 @@ abstract class PDb_Shortcode {
       case 'signup':
       case 'thanks':
 
-        $sql .= ' AND v.signup = 1';
+        if (!is_array($this->display_columns)) $sql .= ' AND v.signup = 1';
         break;
 
       default:
@@ -728,6 +728,17 @@ abstract class PDb_Shortcode {
       case 'password':
 
         $value = '';
+        break;
+
+      case 'timestamp':
+
+        /* set the timestamp value to current time
+         */
+        if ($this->module == 'signup' or ( empty($value) and $this->module == 'record' )) {
+          $value = date('Y-m-d h:i:s');
+        } else {
+          $value = '';
+        }
         break;
 
       case 'hidden':
@@ -915,19 +926,17 @@ abstract class PDb_Shortcode {
        * 
        * so far, that is only $post amd $current_user
        */
-
-      // set the $current_user global
-      get_currentuserinfo();
-
       global $post, $current_user;
 
       list( $object, $property ) = explode('->', html_entity_decode($value));
 
       $object = ltrim($object, '$');
 
-      if (is_object($$object)) {
+      $value = '';
 
-        $value = isset($$object->$property) ? $$object->$property : '';
+      if (is_object($$object) && isset($$object->$property)) {
+
+        $value = $$object->$property;
       }
     } elseif (false !== strpos(html_entity_decode($value), ':')) {
       
@@ -943,12 +952,13 @@ abstract class PDb_Shortcode {
        */
       $indexes = array();
       if (strpos($name, '[') !== false) {
-        $count = preg_match_all("#^([^]]+)\['?([^]']+)'?\]$#", stripslashes($name), $matches);
-        $name = current($matches[1]);
-        if ($count > 0) $indexes = $matches[2];
+        $count = preg_match("#^([^]]+)(?:\['?([^]']+)'?\])?(?:\['?([^]']+)'?\])?$#", stripslashes($name), $matches);
+        $match = array_shift($matches); // discarded
+        $name = array_shift($matches);
+        $indexes = count($matches) > 0 ? $matches : array();
       }
 
-      // clean this up in case some one puts $_SERVER instead of just SERVER
+      // clean this up in case someone puts $_SERVER instead of just SERVER
       $global = preg_replace('#^[$_]{1,2}#', '', $global);
 
       /*
@@ -983,21 +993,27 @@ abstract class PDb_Shortcode {
        * to two dimensions only. the only way that I know of to do this open-ended 
        * is to use eval, which I won't do
        */
-      switch (count($indexes)) {
+      if (isset($global[$name]) && !is_array($global[$name])) {
+        $value = $global[$name];
+      } elseif (isset($global[$name])) {
         
+        
+        $array = is_object($global[$name]) ? get_object_vars($global[$name]) : (array) $global[$name];
+        switch (count($indexes)) {
         case 1:
-          $value = isset($global[$name][$indexes[0]]) ? $global[$name][$indexes[0]] : '';
+            $value = isset($array[$indexes[0]]) ? $array[$indexes[0]] : '';
           break;
         case 2:
-          $value = isset($global[$name][$indexes[0]][$indexes[1]]) ? $global[$name][$indexes[0]][$indexes[1]] : '';
+            $value = isset($array[$indexes[0]][$indexes[1]]) ? $array[$indexes[0]][$indexes[1]] : '';
           break;
         default:
-          $value = isset($global[$name]) ? $global[$name] : '';
-          
+            // if we don't have an index, grab the first value
+            $value = is_array($array) ? current($array) : '';
+        }
       }
     }
 
-    return $value;
+    return (string) $value;
   }
 
   /**
@@ -1125,7 +1141,10 @@ abstract class PDb_Shortcode {
    */
   protected function _empty($value) {
 
-    // if it is an array, collapse it
+    // if it is an array or object, collapse it
+    if (is_object($value)) {
+      $value = get_object_vars($value);
+    }
     if (is_array($value))
       $value = implode('', $value);
 

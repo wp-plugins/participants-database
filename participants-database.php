@@ -1286,8 +1286,6 @@ class Participants_Db extends PDb_Base {
                 $incoming_value = preg_split('#([ ]*,[ ]*)#', trim($post[$column_atts->name]));
                 $field_values = self::unserialize_array($column_atts->values);
                 
-                error_log(__METHOD__.' incoming values:'.print_r($incoming_value,1).' set values:'.print_r($field_values,1));
-
                 foreach ($incoming_value as $v) {
 
                   if (in_array($v, $field_values)) {
