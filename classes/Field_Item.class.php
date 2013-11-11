@@ -214,11 +214,11 @@ class Field_Item extends Template_Item {
    */
   public function print_element() {
 
-    $this->field_class = ( $this->validation != 'no' ? "required-field" : '' ) . ( in_array($this->form_element, array('text-line', 'date')) ? ' regular-text' : '' );
+    $this->field_class = ( $this->validation != 'no' ? "required-field" : '' ) . ( in_array($this->form_element, array('text-line', 'date', 'timestamp')) ? ' regular-text' : '' );
 
     if ($this->readonly) {
 
-      if ($this->form_element == 'date')
+      if (in_array($this->form_element, array('date', 'timestamp')))
         $this->value = PDb_FormElement::get_field_value_display($this);
 
       echo '<span class="pdb-readonly ' . $this->field_class . '" >' . $this->value . '</span>';

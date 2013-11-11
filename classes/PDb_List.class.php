@@ -758,6 +758,10 @@ class PDb_List extends PDb_Shortcode {
    */
   public function show_search_sort_form() {
 
+    if (Participants_Db::$search_set === true) return;
+    
+    Participants_Db::$search_set = true;
+
     $output = array();
 
     if ($this->_sort_filter_mode() != 'none' && !$this->shortcode_atts['filtering']) {
@@ -1011,7 +1015,10 @@ class PDb_List extends PDb_Shortcode {
     $this->pagination->set_wrappers($this->pagination_wrap);
 
     // print the control
-    if (Participants_Db::$instance_index == 1) echo $this->pagination->create_links();
+    if (!Participants_Db::$pagination_set) {
+      Participants_Db::$pagination_set = true;
+      echo $this->pagination->create_links();
+    }
   }
 
   /**

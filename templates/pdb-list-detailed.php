@@ -293,7 +293,7 @@ this is a more detailed template showing how the parts of the display can be cus
 
     <tbody>
       <tr>
-        <td><?php _e('No records found', 'participants-database' )?></td>
+          <td><?php echo Participants_Db::$plugin_options['no_records_message'] ?></td>
       </tr>
     </tbody>
 

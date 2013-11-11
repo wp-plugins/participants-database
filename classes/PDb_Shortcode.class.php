@@ -708,6 +708,13 @@ abstract class PDb_Shortcode {
       $value = $this->_esc_submitted_value($_POST[$field->name]);
     }
 
+    /*
+     * make sure id and private_id fields are read only
+     */
+    if (in_array($field->name, array('id', 'private_id'))) {
+      $this->display_as_readonly($field);
+    }
+
     switch ($field->form_element) {
 
       case 'text-line':
@@ -736,8 +743,6 @@ abstract class PDb_Shortcode {
          */
         if ($this->module == 'signup' or ( empty($value) and $this->module == 'record' )) {
           $value = date('Y-m-d h:i:s');
-        } else {
-          $value = '';
         }
         break;
 
@@ -749,7 +754,7 @@ abstract class PDb_Shortcode {
         if ($this->module == 'signup' or ( empty($value) and $this->module == 'record' )) {
           $value = $this->get_dynamic_value($field->default);
         } else {
-          $value = '';
+          $this->display_as_readonly($field);
         }
         break;
     }
@@ -900,6 +905,15 @@ abstract class PDb_Shortcode {
   private function _esc_value($value) {
 
     return esc_html(stripslashes($value));
+  }
+
+  /*
+   * temporarily sets a field to a read-only text line field 
+   */
+  protected function display_as_readonly(&$field)
+  {
+    $field->form_element = 'text-line';
+    $field->readonly = 1;
   }
 
   /**

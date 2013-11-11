@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5 beta 2
+  Version: 1.5 beta 3
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -199,6 +199,17 @@ class Participants_Db extends PDb_Base {
    * @var int
    */
   public static $instance_index = 0;
+  /**
+   * this is set when the PDb_List::show_pagination_control() methid is called so 
+   * that only one pagination control is shown on a page
+   * @var bool 
+   */
+  public static $pagination_set = false;
+  /**
+   * set when a list search form is shown to prevent more than one form appearing on a page
+   * @var bool
+   */
+  public static $search_set = false;
 
   /**
    * initializes the static class

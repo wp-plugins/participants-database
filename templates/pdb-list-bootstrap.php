@@ -217,7 +217,7 @@ $this->print_list_count('<h5 class="list-count"');
 
     <tbody>
       <tr>
-        <td>No Records Found</td>
+        <td><?php echo Participants_Db::$plugin_options['no_records_message'] ?></td>
       </tr>
     </tbody>
 

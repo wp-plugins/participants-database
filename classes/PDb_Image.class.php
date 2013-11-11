@@ -21,11 +21,19 @@ class PDb_Image extends Image_Handler {
    *                     'filename' => an image path, filename or URL
    *                     'classname' => a classname for the image
    *                     'wrap_tags' => array of open and close HTML
+   *                     'link' URI for a wrapping anchor tag
+   *                     'mode' => display mode: as an image or a filename or both
+   *                     'module' => calling module
    */
   function __construct( $config ) {
     
     parent::__construct($config);
-    $this->classname = Participants_Db::$prefix . 'image image-field-wrap';
+    
+    $this->classname .= ' ' . Participants_Db::$prefix . 'image image-field-wrap';
+    
+    if (empty($this->link) and $this->link !== false) {
+      $this->link = $this->image_defined && Participants_Db::$plugin_options['image_link'] == 1 ? $this->image_uri : '';
+    }
     
   }
   
@@ -74,13 +82,14 @@ class PDb_Image extends Image_Handler {
    */
   protected function _set_image_wrap() {
     
-    if( $this->link === false) {
+    if($this->link === false || empty($this->link)) {
       
       $this->image_wrap = array(
           '<span class="%1$s">',
           '</span>'
       );
-    } elseif ( Participants_Db::$plugin_options['image_link'] == 1 and $this->file_exists and $this->image_uri !== $this->default_image ) {
+      
+    } elseif ( Participants_Db::$plugin_options['image_link'] == 1 and $this->image_defined) {
       
       $this->image_wrap = array(
                         '<span class="%1$s"><a href="%2$s" rel="lightbox" title="%3$s" >',
@@ -93,13 +102,6 @@ class PDb_Image extends Image_Handler {
                         '<span class="%1$s single-record-link"><a href="%2$s" title="%3$s" >',
                         '</a></span>'
                         );
-      
-    } else {
-
-      $this->image_wrap = array(
-          '<span class="%1$s">',
-          '</span>'
-      );
       
     }
     

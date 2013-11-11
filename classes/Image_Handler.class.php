@@ -111,6 +111,12 @@ abstract class Image_Handler {
    * @var mixed
    */
   var $link;
+  /**
+   * the calling module
+   * 
+   * @var string
+   */
+  var $module;
 
   /**
    * intializes the object with a setup array
@@ -119,6 +125,9 @@ abstract class Image_Handler {
    *                     'filename' => an image path, filename or URL
    *                     'classname' => a classname for the image
    *                     'wrap_tags' => array of open and close HTML
+   *                     'link' => URI for a wrapping anchor tag
+   *                     'mode' => display mode: as an image or a filename or both
+   *                     'module' => calling module
    */
   function __construct($config) {
 
@@ -130,6 +139,7 @@ abstract class Image_Handler {
     $this->link = isset($config['link']) ? $config['link'] : '';
     $this->classname = isset($config['classname']) ? $config['classname'] : 'image-field-wrap';
     $this->display_mode = isset($config['mode']) ? $config['mode'] : 'image';
+    $this->module = $config['module'];
 
     $this->_file_setup();
     $this->set_image_wrap(isset($config['wrap_tags']) and is_array($config['wrap_tags']) ? $config['wrap_tags'] : '');
@@ -257,8 +267,6 @@ abstract class Image_Handler {
       
     }
     
-    $this->link = ($this->link === false ? false : (empty($this->link) ? $this->image_uri : $this->link));
-
     $this->classname .= ' ' . $status;
   }
   
