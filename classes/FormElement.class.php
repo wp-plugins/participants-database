@@ -165,7 +165,7 @@ class FormElement {
    *
    * @var array of all available form element types
    */
-  static $element_types;
+  var $element_types;
   
   /**
    * a namespacing prefix for CSS classes and such

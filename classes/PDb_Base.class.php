@@ -192,7 +192,7 @@ class PDb_Base {
    * @param unknown $term the term to filter
    * @return unknown the filtered or unfiltered term
    */
-  public static function set_filter($tag, $term)
+  public static function set_filter($tag, &$term)
   {
     $tag = Participants_Db::$prefix . $tag;
     if (!has_filter($tag)) {

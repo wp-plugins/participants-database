@@ -118,7 +118,7 @@ class PDb_CAPTCHA {
      * the pdb-capcha_setup filter expects the PDb_CAPTCHA::HTML property to be filled with the 
      * HTML of the custom captcha element
      */
-    Participants_Db::set_filter('captcha_setup', &$this);
+    Participants_Db::set_filter('captcha_setup', $this);
     
     if (empty($this->HTML)) {
       switch ($this->captcha_type) {

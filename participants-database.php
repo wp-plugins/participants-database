@@ -293,7 +293,8 @@ class Participants_Db extends PDb_Base {
    */
   public static function init() {
     
-    session_start();
+    $sessid = session_id();
+    if (empty($sessid)) session_start();
 
     load_plugin_textdomain('participants-database', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 

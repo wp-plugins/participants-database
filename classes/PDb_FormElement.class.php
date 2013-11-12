@@ -57,7 +57,7 @@ class PDb_FormElement extends FormElement {
      * a filter handle that includes the name of the custom form element. The 
      * external func is expected to fill the output property
      */
-    Participants_Db::set_filter('form_element_build_' . $this->type, &$this);
+    Participants_Db::set_filter('form_element_build_' . $this->type, $this);
 
     if (empty($this->output)) {
       parent::build_element();

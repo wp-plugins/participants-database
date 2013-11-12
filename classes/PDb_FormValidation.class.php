@@ -78,7 +78,7 @@ class PDb_FormValidation extends FormValidation {
      * by the filter callback, no further processing will be applied.
      * 
      */
-    Participants_Db::set_filter('before_validate_field', &$field);
+    Participants_Db::set_filter('before_validate_field', $field);
     
     /*
      * if there is no validation method defined, exit here
