@@ -139,7 +139,7 @@ abstract class Image_Handler {
     $this->link = isset($config['link']) ? $config['link'] : '';
     $this->classname = isset($config['classname']) ? $config['classname'] : 'image-field-wrap';
     $this->display_mode = isset($config['mode']) ? $config['mode'] : 'image';
-    $this->module = $config['module'];
+    $this->module = isset($config['module']) ? $config['module'] : '';
 
     $this->_file_setup();
     $this->set_image_wrap(isset($config['wrap_tags']) and is_array($config['wrap_tags']) ? $config['wrap_tags'] : '');

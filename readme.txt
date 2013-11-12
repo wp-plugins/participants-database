@@ -2,8 +2,8 @@
 Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
-Requires at least: 3.0
-Tested up to: 3.6
+Requires at least: 3.4
+Tested up to: 3.7
 Stable tag: 1.4.9.3
 License: GPLv2
 
@@ -223,6 +223,12 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.5 =
+* complete overhaul of the entire plugin
+* several new features: file uploads, lost link resend, CAPTCHA
+* new shortcodes for showing totals or stats, record search
+* expanded API
 
 = 1.4.9.3 =
 * reworked class autoloading to avoid conflicts
@@ -573,6 +579,9 @@ This plugin uses a number of different shortcodes to place it's functionality in
 3. `[pdb_list]` - This shortcode prints out a list of records from the database. Which records get displayed and how can all be determined by the admin. It is also possible to allow the site visitor to filter (search) the list and also sort it.
 4. `[pdb_single]` - This shows a single record as determined by the record ID present in the URL used to access the page. It is possible to set a link to the single record in the record list, allowing for a detail display of a single record.
 5. `[pdb_signup_thanks]` - If you want to send the people who use the signup form to another page after they submit, you can use this shortcode to display the thankyou message. This is not needed if you have them just go back to the signup page, the signup shortcode will take care if it. <a id="list"></a>
+6. `[pdb_search]` - will show a search form which can be placed anywhere. When the search is performend, the user is taken to a page with a [pdb_list] shortcode and shown the result of their search.
+7. `[pdb_request_link]` - shows a form for requesting the private link to be resent.
+8. `[pdb_total]` – shows the either the number of records matching a given filter or the numeric total of a given column of values.
 
 = Showing a List of Records on Your Website =
 
@@ -722,7 +731,7 @@ For those with some Javascript skills, you can use these fields to store dynamic
 
 Files can be uploaded and managed using the "File Upload" field type. The allowed filetypes (determined by extension) are defined in the "Allowed File Types" setting. This is a global setting for all uploads. Image files are uploaded and managed using the "Image Upload" field type.
 
-Images can be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'File Upload Location' setting will always determine the location for files uploaded using the plugin forms. The files are stored in the database as filenames without any path information.
+Uploaded images and files can be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'File Upload Location' setting will always determine the location for files uploaded using the plugin forms. The files are stored in the database as filenames without any path information.
 
 The plugin has a "default image" that will be shown if no image is present. You can create your own, but you shouldn't keep it in the plugin folder. Keep it in the uploads directory or in your theme directory. Change the "Default Image" setting to point to your image. If you don't want anything to show if no image is present, make the "Default Image" setting blank.
 

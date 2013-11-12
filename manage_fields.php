@@ -108,6 +108,10 @@ if (isset($_POST['action'])) {
             //$row['signup'] = 1;
           }
 
+          foreach(array('title','help_text','default') as $field) {
+            $row[$field] = stripslashes($row[$field]);
+          }
+
 
           // remove the fields we won't be updating
           unset($row['status'], $row['id'], $row['name']);

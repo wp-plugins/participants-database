@@ -1955,7 +1955,7 @@ class Participants_Db extends PDb_Base {
 
             $data['header'] = $header_row;
 
-            if ($_POST['include_csv_titles']) $data[] = $title_row;
+            if (isset($_POST['include_csv_titles'])) $data[] = $title_row;
 
             $query = str_replace('*', ' ' . trim($import_columns, ',') . ' ', rawurldecode($_POST['query']));
 
@@ -2201,7 +2201,7 @@ class Participants_Db extends PDb_Base {
       }
 
       // decode HTML entities and convert line breaks to <br>
-      $output[$key] = html_entity_decode(str_replace(array("\n","\r"), '<br />', $value), ENT_QUOTES, "utf-8");
+      $output[$key] = html_entity_decode(str_replace(array("\n","\r"), '<br />', stripslashes($value)), ENT_QUOTES, "UTF-8");
 
       $column = next($columns);
     }
