@@ -189,7 +189,7 @@ class PDb_Base {
    * this function also allows for two extra parameters
    * 
    * @param string $tag the slug of the plugin API filter
-   * @param unknown $term the term to filter
+   * @param unknown $term the term to filter (passed by reference)
    * @return unknown the filtered or unfiltered term
    */
   public static function set_filter($tag, &$term)

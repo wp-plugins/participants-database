@@ -202,7 +202,7 @@ class PDb_List extends PDb_Shortcode {
   /**
    * includes the shortcode template
    */
-  protected function _include_template() {
+  public function _include_template() {
 
     // set some local variables for use in the template
     $filter_mode = $this->_sort_filter_mode();
@@ -223,7 +223,7 @@ class PDb_List extends PDb_Shortcode {
    * this takes all the fields that are going to be displayed and organizes them
    * under their group so we can easily run through them in the template
    */
-  protected function _setup_iteration() {
+  public function _setup_iteration() {
 
     // process any search/filter/sort terms and build the main query
     $this->_build_shortcode_query();
@@ -409,6 +409,7 @@ class PDb_List extends PDb_Shortcode {
          * process date and timestamp searches
          */
         $filter_value = Participants_Db::parse_date($this->to_utf8($this->filter['value']), $search_field, true); // $this->to_utf8($this->filter['value'])
+        
         if ($filter_value) {
           /*
            * regular date fields are stored as signed integers (UNIX timestamp) 

@@ -1083,9 +1083,11 @@ class FormElement {
     
     foreach ( $this->_make_assoc( $this->options ) as $key => $value ) {
       
-      if ($value === false and !empty($key)) $this->_add_options_divider ($key);
-
-      else $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . stripslashes($key) . '</option>', -1 );
+      if (($value === false or $value === 'false') and !empty($key)) {
+        $this->_add_options_divider ($key);
+      } elseif (!empty($value)) {
+        $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . stripslashes($key) . '</option>', -1 );
+      }
 
     }
     

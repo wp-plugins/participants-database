@@ -547,7 +547,7 @@ abstract class PDb_Shortcode {
 
     global $wpdb;
 
-    $columns = array('name', 'title', 'default', 'help_text', 'form_element', 'validation', 'readonly', 'values');
+    $columns = array('name', 'title', 'default', 'help_text', 'form_element', 'validation', 'readonly', 'values', 'persistent');
 
     $sql = 'SELECT v.' . implode(',v.', $columns) . ', "' . $this->module . '" AS "module" 
             FROM ' . Participants_Db::$fields_table . ' v 
@@ -570,7 +570,7 @@ abstract class PDb_Shortcode {
 
     global $wpdb;
 
-    $columns = array('name', 'title', 'default', 'help_text', 'form_element', 'validation', 'readonly', 'values');
+    $columns = array('name', 'title', 'default', 'help_text', 'form_element', 'validation', 'readonly', 'values', 'persistent');
 
     $sql = 'SELECT v.' . implode(',v.', $columns) . ', "' . $this->module . '" AS "module" 
             FROM ' . Participants_Db::$fields_table . ' v 
@@ -699,8 +699,12 @@ abstract class PDb_Shortcode {
 
   protected function _set_field_value(&$field) {
 
-    // get the existing value if any
-    $value = isset($this->participant_values[$field->name]) ? Participants_Db::unserialize_array($this->participant_values[$field->name]) : '';
+    /*
+     * get the value from the record; if it is empty, use the default value if the 
+     * "persistent" flag is set.
+     */
+    $record_value = isset($this->participant_values[$field->name]) ? $this->participant_values[$field->name] : '';
+    $value = $this->_empty($record_value) ? ($field->persistent == 1 && $this->module == 'record' ? $field->default : '') : Participants_Db::unserialize_array($record_value);
 
     // replace it with the new value if provided, escaping the input
     if (in_array($this->module, array('record','signup','retrieve')) && isset($_POST[$field->name])) {
@@ -752,6 +756,7 @@ abstract class PDb_Shortcode {
          * value in the record module if there is no previously set value
          */
         if ($this->module == 'signup' or ( empty($value) and $this->module == 'record' )) {
+          
           $value = $this->get_dynamic_value($field->default);
         } else {
           $this->display_as_readonly($field);

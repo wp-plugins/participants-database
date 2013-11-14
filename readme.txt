@@ -178,6 +178,16 @@ The form will only appear if someone uses a valid private link to access the pag
 
 You can control which groups of fields show up in the frontend record edit screen (the one with the `[pdb_record]` shortcode) by going to the "manage database fields" page, clicking on the "field groups" tab and deselecting the "display" checkbox for those field groups you don't want shown on the frontend.
 
+= I want people to provide their email when they sign up, but I don't want that information showing to the public =
+
+It's a good practice to use field groups for something like this. Place all your "don't show to the public" fields in a group with it's "display" checkbox unchecked. This will prevent those fields from being shown in record detail pages, and also the signup form, but you can force them to display by specifying in the shortcode which groups you want included. The normally hidden groups will be included, but only those fields marked with the "signup" checkbox will appear. 
+
+For example, let's say you have two groups: 'public' and 'private.' The email field is in the private group because you don't want it displayed. In the signup form shortcode, specify the groups to show like this: `[pdb_signup groups=public,private]` Now, both groups will be included in the signup form. Remember, only those fields marked as "signup" fields will be shown.
+
+= I don't want group titles showing in the forms, how do I do that? =
+
+The easiest way to do this is to simply blank out the title for the group.
+
 = What if someone loses their private link? =
 
 You can show a "Resend Private Link" link on your signup form, just check "Enable Lost Private Link" under the "Retrieve Link Settings" tab. You must define which field is used to identify the record. This must be a unique identifier, usually an email address, but it could be anything. The rest of the settings for this feature are under that tab.

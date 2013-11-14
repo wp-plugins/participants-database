@@ -53,7 +53,7 @@ class PDb_List_Admin {
   /**
    * initializes and outputs the list for the backend
    */
-  public function initialize() {
+  public static function initialize() {
 
     self::_setup_i18n();
 
@@ -145,7 +145,7 @@ class PDb_List_Admin {
    *
    * @return string the re-constituted URI
    */
-  public function prepare_page_link($uri) {
+  public static function prepare_page_link($uri) {
 
     $URI_parts = explode('?', $uri);
 
@@ -181,7 +181,7 @@ class PDb_List_Admin {
   /** 	
    * processes all the general list actions: delete and  set items-per-page
    */
-  private function _process_general() {
+  private static function _process_general() {
 
     global $wpdb;
 
@@ -217,7 +217,7 @@ class PDb_List_Admin {
    *
    * @param string $submit the value of the submit field
    */
-  private function _process_search($submit) {
+  private static function _process_search($submit) {
 
     switch ($submit) {
 
@@ -349,7 +349,7 @@ class PDb_List_Admin {
   /**
    * top section for admin listing
    */
-  private function _admin_top() {
+  private static function _admin_top() {
     ?>
     <script type="text/javascript" language="javascript">
 
@@ -432,7 +432,7 @@ class PDb_List_Admin {
    * @param string $mode determines whether to print filter, sort, both or 
    *                     none of the two functions
    */
-  private function _sort_filter_forms() {
+  private static function _sort_filter_forms() {
 
     global $post;
     ?>
@@ -515,7 +515,7 @@ class PDb_List_Admin {
           /**
            * prints the general list form controls for the admin lising: deleting and items-per-page selector
            */
-          private function _general_list_form_top() {
+          private static function _general_list_form_top() {
             ?>
 
       <form id="list_form"  method="post"  onKeyPress="return checkEnter(event)" >
@@ -550,7 +550,7 @@ class PDb_List_Admin {
        *
        * @param string $mode dtermines the print mode: 'noheader' skips headers, (other choices to be determined)
        */
-      private function _main_table($mode = '') {
+      private static function _main_table($mode = '') {
         ?>
 
         <table class="wp-list-table widefat fixed pages pdb-list" cellspacing="0" >
@@ -764,7 +764,7 @@ class PDb_List_Admin {
             /**
              * prints the CSV export form
              */
-            private function _print_export_form() {
+            private static function _print_export_form() {
               ?>
 
       <div class="postbox">
@@ -801,7 +801,7 @@ class PDb_List_Admin {
     /**
      * prints a table header row
      */
-    private function _print_header_row($head_pattern) {
+    private static function _print_header_row($head_pattern) {
 
       
       // print the "select all" header 
@@ -827,7 +827,7 @@ class PDb_List_Admin {
          * 
          * @global int $user_ID
          */
-        private function set_list_limit() {
+        private static function set_list_limit() {
 
           global $user_ID;
 
@@ -843,7 +843,7 @@ class PDb_List_Admin {
         /**
          * sets up the internationalization strings
          */
-        private function _setup_i18n() {
+        private static function _setup_i18n() {
 
           /* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
           self::$i18n = array(

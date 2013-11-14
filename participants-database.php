@@ -1264,16 +1264,27 @@ class Participants_Db extends PDb_Base {
 
         default :
 
+          /*
+           * NOTE: not sure why we were doing this, there doesn't seem to be a need 
+           * to put in a default value here; it will be supplied with the form and 
+           * if the user wants to keep the default value they can leave it in, or 
+           * they can replace it or blank it out: this code doesn't allow that, so 
+           * we've replaced it with a simple continue in the case of an unsubmitted 
+           * value.
+           */
           // replace unsubmitted fields with the default if defined
-          if (!empty($column_atts->default)) {
-            
-              if (
-                      (!isset($post[$column_atts->name]) or (isset($post[$column_atts->name]) and empty($post[$column_atts->name]))) and $column_atts->form_element != 'hidden' and $action == 'insert'
-              ) {
-            $new_value = $column_atts->default;
-            $post[$column_atts->name] = $new_value;
-              }
-          } elseif (!isset($post[$column_atts->name])) {
+//          if (!empty($column_atts->default)) {
+//            
+//              if (
+//                      (!isset($post[$column_atts->name]) or (isset($post[$column_atts->name]) and empty($post[$column_atts->name]))) and $column_atts->form_element != 'hidden' and $action == 'insert'
+//              ) {
+//            $new_value = $column_atts->default;
+//            $post[$column_atts->name] = $new_value;
+//              }
+//          } elseif (!isset($post[$column_atts->name])) {
+//            continue;
+//          }
+          if (!isset($post[$column_atts->name])) {
             continue;
           }
           
@@ -1285,6 +1296,7 @@ class Participants_Db extends PDb_Base {
                * values of the multi-select. Any extra values are placed in an
                * 'other' array element
                */
+              if (isset($post[$column_atts->name])) {
               if (is_array($post[$column_atts->name])) {
 
                 $value_array = $post[$column_atts->name];
@@ -1312,6 +1324,7 @@ class Participants_Db extends PDb_Base {
                 if (isset($value_array['other']) && is_array($value_array['other']))
                   $value_array['other'] = implode(',', $value_array['other']);
               }
+              } else $value_array = array();
 
               $new_value = self::_prepare_array_mysql($value_array);
               break;
@@ -1498,6 +1511,7 @@ class Participants_Db extends PDb_Base {
         }
       }
     }
+    
     // fill in some convenience values
     global $current_user;
 
@@ -1636,7 +1650,7 @@ class Participants_Db extends PDb_Base {
 
     global $wpdb;
 
-    $id_exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM " . self::$participants_table . " p WHERE p." . $field . " = %s", $id));
+    $id_exists = $wpdb->get_var($wpdb->prepare("SELECT EXISTS( SELECT 1 FROM " . self::$participants_table . " p WHERE p." . $field . " = '%s' LIMIT 1 )", $id));
 
     if (NULL !== $id_exists)
       return $id_exists < 1 ? false : true;
@@ -1831,7 +1845,8 @@ class Participants_Db extends PDb_Base {
       return;
 
     // add a filter to check the submission before anything is done with it
-    $check = self::set_filter('check_submission', true);
+    $check = true;
+    self::set_filter('check_submission', $check);
     if ($check === false) return;
 
     // error_log( __METHOD__.' post:'.print_r( $_POST, true ) );

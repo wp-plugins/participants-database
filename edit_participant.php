@@ -111,8 +111,16 @@ if ($participant_values) :
             <th><?php echo $column_title . $add_title ?></th>
             <td id="<?php echo Participants_Db::$prefix . $column->name ?>" >
               <?php
+              
+
+              /*
+               * get the value from the record; if it is empty, use the default value if the 
+               * "persistent" flag is set.
+               */
+              $column->value = empty($participant_values[$column->name]) ? ($column->persistent == '1' ? $column->default : '') : Participants_Db::unserialize_array($participant_values[$column->name]);
+              
               // get the existing value if any
-              $column->value = isset($participant_values[$column->name]) ? Participants_Db::unserialize_array($participant_values[$column->name]) : '';
+              //$column->value = isset($participant_values[$column->name]) ? Participants_Db::unserialize_array($participant_values[$column->name]) : '';
 
               // replace it with the new value if provided
               if (isset($_POST[$column->name])) {
