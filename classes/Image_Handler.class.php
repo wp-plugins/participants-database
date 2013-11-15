@@ -150,7 +150,9 @@ abstract class Image_Handler {
    * prints the HTML
    *
    */
-  public function print_image() {
+  public function print_image()
+  {
+    $this->set_image_wrap();
 
     echo $this->get_image_html();
   }

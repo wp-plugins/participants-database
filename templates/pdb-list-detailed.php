@@ -185,7 +185,13 @@ this is a more detailed template showing how the parts of the display can be cus
 
 							case 'image-upload': 
                 
-                $image = new PDb_Image(array('filename' => $value));
+                $image = new PDb_Image(
+                        array(
+                            'filename' => $value,
+                            'mode' => 'image',
+                            'module' => 'list',
+                      )
+                        );
                 $image->print_image();
                 break;
 								

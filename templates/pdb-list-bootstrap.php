@@ -135,7 +135,13 @@ $this->print_list_count('<h5 class="list-count"');
 
 							case 'image-upload':
 
-                $image = new PDb_Image(array('filename' => $value));
+                $image = new PDb_Image(
+                        array(
+                            'filename' => $value,
+                            'mode' => 'image',
+                            'module' => 'list',
+                      )
+                        );
                 $image->print_image();
                 break;
 								

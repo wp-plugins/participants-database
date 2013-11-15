@@ -2802,6 +2802,8 @@ class Participants_Db extends PDb_Base {
  */
 function PDb_class_loader($class) {
 
+  if (!class_exists($class)) {
+
     $class_file = plugin_dir_path(__FILE__) . 'classes/' . $class . '.class.php';
     
     //error_log( __FUNCTION__. ' attempting to load: '.$class_file );
@@ -2813,6 +2815,7 @@ function PDb_class_loader($class) {
       require_once $class_file;
     }
   }
+}
 //
 Participants_Db::initialize();
 ?>
