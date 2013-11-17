@@ -1103,7 +1103,7 @@ class PDb_List extends PDb_Shortcode {
    */
   public function show_date($value, $format = false, $print = true) {
 
-    $time = Participants_Db::is_valid_timestamp($time) ? $value : Participants_Db::parse_date($value);
+    $time = Participants_Db::is_valid_timestamp($value) ? $value : Participants_Db::parse_date($value);
 
     $dateformat = $format ? $format : Participants_Db::$date_format;
 

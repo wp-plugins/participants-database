@@ -115,8 +115,9 @@ class PDb_CAPTCHA {
   private function captcha_setup() {
     
     /*
-     * the pdb-capcha_setup filter expects the PDb_CAPTCHA::HTML property to be filled with the 
-     * HTML of the custom captcha element
+     * the pdb-capcha_setup filter expects the PDb_CAPTCHA::HTML property to be 
+     * filled with the HTML of the custom captcha element. The validation of the 
+     * response should be included as a regex string in PDb_CAPTCHA::validation
      */
     Participants_Db::set_filter('captcha_setup', $this);
     

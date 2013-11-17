@@ -1067,7 +1067,7 @@ class PDb_Settings extends Plugin_Settings {
 
     $columnlist = array(__('None', 'participants-database') => 'none', 'null_select' => false);
 
-    $columns = Participants_Db::get_column_atts('frontend');
+    $columns = Participants_Db::get_column_atts('all');
 
     foreach ($columns as $column) {
 
@@ -1247,7 +1247,8 @@ class PDb_Settings extends Plugin_Settings {
    */
   public function options_section($section) {
 
-    $name = Participants_db::make_anchor(end(explode('_', $section['id'])));
+    $parts = explode('_', $section['id']);
+    $name = Participants_db::make_anchor(end($parts));  
 
     printf('<a id="%1$s" name="%1$s" class="%2$s" ></a>', $name, Participants_Db::$prefix . 'anchor');
 

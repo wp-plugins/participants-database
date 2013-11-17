@@ -18,8 +18,6 @@
  * around, but leave all the parts between the <> brackets as they are.
  *
  */
-
-$retrieve_link_text = Participants_Db::$plugin_options['retrieve_link_text'];
  ?>
 <div class="wrap <?php echo $this->wrap_class ?>" >
 
@@ -75,7 +73,7 @@ $retrieve_link_text = Participants_Db::$plugin_options['retrieve_link_text'];
           </td>
           <td class="submit-buttons">
             
-           <?php $this->print_retrieve_link($retrieve_link_text, '<span class="pdb-retrieve-link">','</span>'); // this only prints if enabled in the settings ?>
+           <?php $this->print_retrieve_link(); // this only prints if enabled in the settings ?>
            
           </td>
         </tr>

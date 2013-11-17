@@ -51,7 +51,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-class FormElement {
+abstract class FormElement {
   
   /**
    * defines the type of form element for the object
@@ -260,11 +260,17 @@ class FormElement {
   }
   
   /**
+   * give the child class a chance to insert it's modifications to the build method
+   */
+  abstract function build_element();
+
+
+  /**
    * builds the form element by calling it's method
    * 
    * @return null
    */
-  protected function build_element() {
+  protected function call_element_method() {
     
       switch ( $this->type ) :
 
@@ -365,7 +371,7 @@ class FormElement {
    *
    * @static
    */
-  protected static function _HTML( $parameters ) {
+  static function _HTML( $parameters ){
 
     $Element = new FormElement( $parameters );
     
@@ -385,7 +391,9 @@ class FormElement {
    */
   public static function print_element( $parameters ) {
     
-    echo self::_HTML( $parameters );
+    $Element = new FormElement( $parameters );
+    
+    echo $Element->_output();
     
   }
 
@@ -397,7 +405,9 @@ class FormElement {
    */
   public static function get_element( $parameters ) {
 
-    return self::_HTML( $parameters );
+    $Element = new FormElement( $parameters );
+    
+    return $Element->_output();
 
   }
   
@@ -459,8 +469,6 @@ class FormElement {
         } else {
           $return = $field->value;
         }
-
-
 
       break;
 
@@ -1328,10 +1336,10 @@ class FormElement {
     $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : true;
     // remove the null_select from the options array
     if (isset($this->options['null_select'])) unset($this->options['null_select']);
-    if ($null_select !== false or empty($this->value)) {
+    if (($null_select !== false or $null_select !== 'false') or empty($this->value)) {
       $value = is_string($null_select) ? $null_select : '';
       $selected = empty($this->value) ? $this->_set_selected( true, true, 'selected' ) : '';
-      $this->_addline( '<option value="' . $value  . '" ' . $selected . '  ></option>' );
+      $this->_addline( '<option value="" ' . $selected . '  >' . $value  . '</option>' );
     }
     
   }

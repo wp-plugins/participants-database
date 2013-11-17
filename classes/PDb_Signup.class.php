@@ -9,7 +9,7 @@
  * @author     Roland Barker <webdeign@xnau.com>
  * @copyright  2011,2013 xnau webdesign
  * @license    GPL2
- * @version    0.5
+ * @version    0.7
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    FormElement class, Shortcode class
  */
@@ -260,7 +260,9 @@ class PDb_Signup extends PDb_Shortcode {
    * 
    * @param string $linktext
    */
-  public function print_retrieve_link($linktext, $open_tag = '', $close_tag = '') {
+  public function print_retrieve_link($linktext = '', $open_tag = '<span class="pdb-retrieve-link">', $close_tag = '</span>') {
+    
+    $linktext = empty($linktext) ? Participants_Db::$plugin_options['retrieve_link_text'] : $linktext;
     
     if ($this->options['show_retrieve_link'] != 0) {
       $retrieve_link = $this->options['link_retrieval_page'] !== 'none' ? get_permalink($this->options['link_retrieval_page']) : $_SERVER['REQUEST_URI'];
@@ -343,7 +345,7 @@ class PDb_Signup extends PDb_Shortcode {
    */
   private function _mail($recipients, $subject, $body) {
 
-    error_log(__METHOD__.'
+    if (WP_DEBUG) error_log(__METHOD__.'
       
 header:'.$this->email_header.'
 to:'.$recipients.' 

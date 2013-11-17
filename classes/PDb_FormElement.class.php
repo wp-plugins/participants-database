@@ -43,6 +43,72 @@ class PDb_FormElement extends FormElement {
   }
   
   /**
+   * builds the HTML string for display
+   *
+   * @var array parameters as per __construct()
+   * @static
+   */
+  public static function _HTML( $parameters ) {
+
+    $Element = new PDb_FormElement( $parameters );
+    
+    return $Element->_output();
+    
+  }
+  /**********************
+	 * PUBLIC METHODS
+	 */
+  
+  /** 
+   * prints a form element
+   *
+   * @param array $parameters (same as __construct() )
+   * @static
+   */
+  public static function print_element( $parameters ) {
+
+    $Element = new PDb_FormElement( $parameters );
+    
+    echo $Element->_output();
+    
+  }
+
+  /** 
+   * returns a form element
+   *
+   * @param array $parameters (same as __construct() )
+   * @static
+   */
+  public static function get_element( $parameters ) {
+
+    $Element = new PDb_FormElement( $parameters );
+    
+    return $Element->_output();
+
+  }
+  
+  /**
+   * outputs a set of hidden inputs
+   *
+   * @param array $fields name=>value pairs for each hidden input tag
+   */
+  public static function print_hidden_fields( $fields, $print = true ) {
+    
+    $atts = array( 'type' => 'hidden');
+    
+    foreach ( $fields as $k => $v ) {
+      
+      $atts['name'] = $k;
+      $atts['value'] = $v;
+      
+      if ( $print ) echo self::_HTML( $atts );
+			else return self::_HTML( $atts );
+      
+    }
+    
+  }
+  
+  /**
    * builds the form element
    * 
    * allows an external func to build the element. If that doens't happen, uses 
@@ -51,7 +117,6 @@ class PDb_FormElement extends FormElement {
    * @return null
    */
   function build_element() {
-    
     /*
      * if the filter is defined, we pass the object to an external function with 
      * a filter handle that includes the name of the custom form element. The 
@@ -60,23 +125,10 @@ class PDb_FormElement extends FormElement {
     Participants_Db::set_filter('form_element_build_' . $this->type, $this);
 
     if (empty($this->output)) {
-      parent::build_element();
+      $this->call_element_method();
     }
   }
   
-  /**
-   * builds the HTML string for display
-   *
-   * @static
-   */
-  protected static function _HTML( $parameters ) {
-
-    $Element = new PDb_FormElement( $parameters );
-    
-    return $Element->_output();
-    
-  }
-
   /**
    * returns an element value formatted for display or storage
    * 
@@ -89,12 +141,10 @@ class PDb_FormElement extends FormElement {
    */
   public static function get_field_value_display($field, $html = true) {
     
-    //error_log(__METHOD__.' field:'.print_r($field,1));
-    
     $return = '';
     
     if (has_filter(Participants_Db::$prefix . 'before_display_field'))
-            $return = Participants_Db::set_filter('before_display_field', $field->value, $field->form_element);
+            $return = Participants_Db::set_filter('before_display_field', $return, $field->value, $field->form_element);
     
     if (empty($return)) {
 
@@ -152,15 +202,6 @@ class PDb_FormElement extends FormElement {
         $return = '';
         if (self::is_empty($field->value) === false) {
           $date = Participants_Db::parse_date($field->value, $field);
-          
-//          if (is_admin()) {
-//            $format = get_option('date_format', 'r');
-//            if (Participants_Db::$plugin_options['show_time'] == '1' and $field->form_element == 'timestamp') {
-//              $format .= ' ' . get_option('time_format');
-//            }
-//          } else {
-//            $format = Participants_Db::$date_format;
-//          }
           $format = Participants_Db::$date_format;
           if (Participants_Db::$plugin_options['show_time'] == '1' and $field->form_element == 'timestamp') {
             $format .= ' ' . get_option('time_format');
@@ -174,6 +215,7 @@ class PDb_FormElement extends FormElement {
 
       case 'multi-checkbox' :
       case 'multi-select-other' :
+        
         
         $multivalues = Participants_Db::unserialize_array($field->value);
         if ( is_array($multivalues) and empty( $multivalues['other'] ) ) unset($multivalues['other']);

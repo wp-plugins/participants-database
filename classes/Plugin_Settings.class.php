@@ -347,7 +347,7 @@ class Plugin_Settings {
       add_settings_section(
         $this->WP_setting.'_'.$name,
         $title,
-        array( $this->plugin_class, 'options_section' ),
+        array( $this, 'options_section' ),
         $this->settings_page
       );
 

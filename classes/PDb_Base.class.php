@@ -28,7 +28,7 @@ class PDb_Base {
    * @param string $filter the filter string
    * @return array the string parsed into an array of statement arrays
    */
-  public function parse_filter_string($filter) {
+  public static function parse_filter_string($filter) {
     $return = array();
     $statements = preg_split('/(&|\|)/', html_entity_decode($filter), null, PREG_SPLIT_DELIM_CAPTURE);
     foreach($statements as $s) {
@@ -188,13 +188,13 @@ class PDb_Base {
    * 
    * this function also allows for two extra parameters
    * 
-   * @param string $tag the slug of the plugin API filter
+   * @param string $slug the base slug of the plugin API filter
    * @param unknown $term the term to filter (passed by reference)
    * @return unknown the filtered or unfiltered term
    */
-  public static function set_filter($tag, &$term)
+  public static function set_filter($slug, &$term)
   {
-    $tag = Participants_Db::$prefix . $tag;
+    $tag = Participants_Db::$prefix . $slug;
     if (!has_filter($tag)) {
       return $term;
     }
@@ -202,7 +202,18 @@ class PDb_Base {
     $var2 = '';
     $args = func_get_args();
     if (count($args) > 2) {
-      list($tag, $term, $var1, $var2) = $args;
+      $var1 = $args[2];
+      $var2 = isset($args[3]) ? $args[3] : '';
+    }
+    if (WP_DEBUG) {
+      ob_start();
+      var_dump($term);
+      $dump = ob_get_clean();
+      error_log(__METHOD__.' applying filter "'.$tag.'" to
+      
+term: '. $dump .'
+var1: '.$var1.'
+var2: '.$var2);
     }
     return apply_filters($tag, $term, $var1, $var2);
   }
@@ -395,7 +406,7 @@ class PDb_Base {
    * @param string $PHP_date_format the date format string
    *
    */
-  static function get_jQuery_date_format($PHP_date_format = '')
+  static function get_jqueryUI_date_format($PHP_date_format = '')
   {
 
     $dateformat = empty($PHP_date_format) ? Participants_Db::$date_format : $PHP_date_format;

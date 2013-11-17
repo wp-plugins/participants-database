@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5 beta 3
+  Version: 1.5 beta 4
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -571,7 +571,7 @@ class Participants_Db extends PDb_Base {
    * @param array $atts array of attributes drawn from the shortcode
    * @return string the HTML of the record edit form
    */
-  function print_record_edit_form($atts) {
+  public static function print_record_edit_form($atts) {
 
     $atts['id'] = isset($_GET['pid']) ? self::get_participant_id($_GET['pid']) : ( isset($atts['id']) ? $atts['id'] : false );
 
@@ -1025,7 +1025,7 @@ class Participants_Db extends PDb_Base {
 
       case 'frontend':
 
-        $where = 'WHERE g.display = 1 AND v.readonly = 0 AND v.form_element <> "captcha"';
+        $where = 'WHERE g.display = 1 AND v.form_element <> "captcha"';
         break;
 
       case 'readonly':
@@ -2216,8 +2216,12 @@ class Participants_Db extends PDb_Base {
             $value = implode(', ', unserialize($value));
       }
 
-      // decode HTML entities and convert line breaks to <br>
-      $output[$key] = html_entity_decode(str_replace(array("\n","\r"), '<br />', stripslashes($value)), ENT_QUOTES, "UTF-8");
+      /*
+       * decode HTML entities and convert line breaks to <br>, then pass to a filter 
+       * for processing beforebeing added to the output array
+       */
+      $output_value = Participants_Db::set_filter('csv_export_value', html_entity_decode(str_replace(array("\n","\r"), '<br />', stripslashes($value)), ENT_QUOTES, "UTF-8"), $column);
+      $output[$key] = $output_value;
 
       $column = next($columns);
     }
@@ -2544,6 +2548,8 @@ class Participants_Db extends PDb_Base {
     // return the now() timestamp
     if (false === $string)
       return time();
+
+    $string = Participants_Db::set_filter('parse_date', $string, $column);
 
     // it's already a timestamp
     if (self::is_valid_timestamp($string)) {

@@ -151,21 +151,6 @@ class PDb_FormValidation extends FormValidation {
 
           $field->value = isset($field->value[1]) ? $field->value[1] : '';
 
-          if (has_filter(Participants_Db::$prefix . 'captcha_validation')){
-            $regex = Participants_Db::set_filter('captcha_validation', $field->value, $this->post_array);
-            /*
-             * we set the pass/fail regex if the validation was performed by the filter
-             * 
-             * we do this because the filter has to return a regex to do anyting, so if 
-             * the result of the filter is a boolean, it is converted into a regex that 
-             * either allows or blocks all input
-             */
-            if (is_bool($regex)) {
-              $regex = $regex ? '#.*#' : '#\Zx\A#';
-              break;
-            }
-          }
-
           // grab the value and the validation key
           list($info, $value) = (isset($this->post_array[$validation][1]) ? $this->post_array[$validation] : array($this->post_array[$validation][0], $field->value));
           $info = json_decode(urldecode($info));
