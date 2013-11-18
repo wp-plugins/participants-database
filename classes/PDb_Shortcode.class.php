@@ -249,7 +249,17 @@ abstract class PDb_Shortcode {
    */
   private function _find_template() {
 
+    $template = false;
+
     $template = get_stylesheet_directory() . '/templates/pdb-' . $this->module . '-' . $this->template_name . '.php';
+
+    if (!file_exists($template)) {
+      /*
+       * we do this here so that the callback can choose to provide a default template 
+       * or override the custom template.
+       */
+      $template = Participants_Db::set_filter('template_select', $template);
+    }
 
     if (!file_exists($template)) {
       
@@ -264,11 +274,9 @@ abstract class PDb_Shortcode {
     if (!file_exists($template)) {
 
       error_log(__METHOD__ . ' template not found: ' . $template);
-
-      $template = false;
     }
 
-    $this->template = $template;
+		$this->template = $template;
   }
 
   /**

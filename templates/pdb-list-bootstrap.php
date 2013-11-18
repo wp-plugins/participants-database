@@ -223,7 +223,7 @@ $this->print_list_count('<h5 class="list-count"');
 
     <tbody>
       <tr>
-        <td><?php echo Participants_Db::$plugin_options['no_records_message'] ?></td>
+        <td><?php if ($this->is_search_result === true)  echo Participants_Db::$plugin_options['no_records_message'] ?></td>
       </tr>
     </tbody>
 

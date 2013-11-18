@@ -96,6 +96,12 @@ class PDb_List extends PDb_Shortcode {
    * @var bool the suppression state: true suppresses list output
    */
   var $suppress = false;
+  /**
+   * set to true if list is the result of a search
+   * 
+   * @var bool
+   */
+  var $is_search_result = false;
 
   /**
    * initializes and outputs the list on the frontend as called by the shortcode
@@ -391,12 +397,14 @@ class PDb_List extends PDb_Shortcode {
       // a "clear" will take us back to the first page
       $_GET[$this->list_page] = 1;
       $this->filter['submit'] = '';
+      $this->is_search_result = false;
     } elseif (
             !empty($this->filter['value']) &&
             'none' != $this->filter['search_field'] &&
             in_array($this->filter['search_field'], $this->searchable_columns())
     ) {
       
+      $this->is_search_result = true;
       // grab the attributes of the search field
       $search_field = Participants_Db::get_field_atts($this->filter['search_field']);
       
@@ -468,6 +476,8 @@ class PDb_List extends PDb_Shortcode {
         
       }
       
+      // we are adding search clauses, don't suppress list
+      $this->suppress = false;
       // we have a valid search, add it to the where clauses
       $clauses[] = sprintf(
               $clause_pattern, 
@@ -480,10 +490,10 @@ class PDb_List extends PDb_Shortcode {
       $this->search_error('search');
 
     /*
-     * add the blocking 'id' = 0 clause no other clauses present and the list is 
+     * add the blocking 'id' = 0 clause if no search clauses are present and the list is 
      * set to be suppressed
      */
-    if (count($clauses) == 0 and $this->suppress === true) {
+    if ($this->suppress === true) {
       $clauses[] = 'p.id = 0';
     }
     // assemble there WHERE clause

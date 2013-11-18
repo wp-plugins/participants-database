@@ -373,10 +373,6 @@ abstract class FormElement {
    */
   static function _HTML( $parameters ){
 
-    $Element = new FormElement( $parameters );
-    
-    return $Element->_output();
-    
   }
   
   /**********************
@@ -386,15 +382,14 @@ abstract class FormElement {
   /** 
    * prints a form element
    *
+   * this func is calls the child class so any legacy implementations using the 
+   * FormElement class alone can still work
+   *
    * @param array $parameters (same as __construct() )
    * @static
    */
   public static function print_element( $parameters ) {
-    
-    $Element = new FormElement( $parameters );
-    
-    echo $Element->_output();
-    
+    PDb_FormElement::print_element($parameters);
   }
 
   /** 
@@ -404,11 +399,7 @@ abstract class FormElement {
    * @static
    */
   public static function get_element( $parameters ) {
-
-    $Element = new FormElement( $parameters );
-    
-    return $Element->_output();
-
+    PDb_FormElement::get_element($parameters);
   }
   
   /**
@@ -712,8 +703,12 @@ abstract class FormElement {
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
 
-    if ( $other ) $this->_addline( '<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
-    else $this->_addline( '<select id="' . $js_prefix . '_select" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
+    if ( $other ) {
+      $this->_addline( '<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
+    } else {
+      $id = isset($this->attributes['id']) ? $this->attributes['id'] : $js_prefix . '_select';
+      $this->_addline( '<select id="' . $id . '" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
+    }
 
     $this->indent++;
     
