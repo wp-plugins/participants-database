@@ -274,7 +274,7 @@ class PDb_Settings extends Plugin_Settings {
         'options' => array(
             'type' => 'dropdown-other',
             'help_text' => __('after they register, send them to this page for a thank you message. This page is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have to do that if you have them go back to the same page. You can also use a Post ID for posts and custom post types.', 'participants-database'),
-            'options' => $this->_get_pagelist(false),
+            'options' => $this->_get_pagelist(true),
             'attributes' => array('other' => 'Post ID'),
             'value' => 'none',
         )

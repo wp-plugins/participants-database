@@ -409,17 +409,7 @@ abstract class FormElement {
    */
   public static function print_hidden_fields( $fields, $print = true ) {
     
-    $atts = array( 'type' => 'hidden');
-    
-    foreach ( $fields as $k => $v ) {
-      
-      $atts['name'] = $k;
-      $atts['value'] = $v;
-      
-      if ( $print ) echo self::_HTML( $atts );
-			else return self::_HTML( $atts );
-      
-    }
+   PDb_FormElement::print_hidden_fields($fields, $print);
     
   }
 
@@ -1088,7 +1078,7 @@ abstract class FormElement {
       
       if (($value === false or $value === 'false') and !empty($key)) {
         $this->_add_options_divider ($key);
-      } elseif (!empty($value)) {
+      } elseif (!empty($value) or $value === 0) {
         $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . stripslashes($key) . '</option>', -1 );
       }
 
@@ -1331,7 +1321,11 @@ abstract class FormElement {
     $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : true;
     // remove the null_select from the options array
     if (isset($this->options['null_select'])) unset($this->options['null_select']);
-    if (($null_select !== false or $null_select !== 'false') or empty($this->value)) {
+    /*
+     * the null select option is added if it is not canceled by a null select value 
+     * of false or 'false'
+     */
+    if (($null_select !== false and $null_select !== 'false')) {
       $value = is_string($null_select) ? $null_select : '';
       $selected = empty($this->value) ? $this->_set_selected( true, true, 'selected' ) : '';
       $this->_addline( '<option value="" ' . $selected . '  >' . $value  . '</option>' );

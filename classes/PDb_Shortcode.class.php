@@ -276,6 +276,7 @@ abstract class PDb_Shortcode {
       error_log(__METHOD__ . ' template not found: ' . $template);
     }
 
+    // pass the found template value through a filter so it can be changed by a plugin
 		$this->template = $template;
   }
 
