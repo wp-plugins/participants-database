@@ -211,6 +211,17 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5 =
+* complete overhaul of the entire plugin
+* several new features: file uploads, lost link resend, CAPTCHA
+* new shortcodes for showing totals or stats, record search
+* expanded API
+
+= 1.4.9.3 =
+* reworked class autoloading to avoid conflicts
+* 'list_query' filter now happens before the length of the list is calculated so if it is altered, the length will be correct
+* 'list_query' filter no longer includes the pagination limit statement
+
 = 1.4.9.2 =
 * improved date formatting for numeric non-American style dates (dd/mm/yyyy)
 * fields omitted from the signup form are no longer validated, making it easier to construct different signup forms
