@@ -431,7 +431,7 @@ Taking defensive precautions against other plugins in the admin:
 
 = 1.5 =
 **BETA RELEASE**
-Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions before updating.
+Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions or test in development site before updating.
 
 == Using the Plugin ==
 
