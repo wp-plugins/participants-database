@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5 beta 4
+  Version: 1.5 beta 5
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -270,7 +270,28 @@ class Participants_Db extends PDb_Base {
     add_shortcode('pdb_search',        array(__CLASS__, 'print_search_form'));
     add_shortcode('pdb_total',         array(__CLASS__, 'print_total'));
 
-    //PDb_Init::db_integrity_check();
+    /*
+     * sets up the update notification
+     * 
+     * in this case, we use this to simulate a new releaase for testing.
+     * 
+     * uncomment to enable
+     */
+    //add_filter('pre_set_site_transient_update_plugins', array(__CLASS__, 'check_for_plugin_update'));// for plugin update test
+    /*
+     * uncomment this to enable custom upgrade details window
+     */
+    //add_filter('plugins_api', array(__CLASS__, 'plugin_update_info'), 10, 3);
+    /*
+     * this adds a custom update message to the plugin list 
+     */
+    global $pagenow;
+    if ( 'plugins.php' === $pagenow )
+    {
+        $plugin_path = plugin_basename( __FILE__ );
+        $hook = "in_plugin_update_message-" . $plugin_path;
+        add_action( $hook, array(__CLASS__, 'plugin_update_message'), 20, 2 );
+    }
         }
 
   /**
@@ -2796,6 +2817,142 @@ class Participants_Db extends PDb_Base {
     return $links;
   }
     
+  /**
+   * prints a plugin update message
+   * 
+   * this is seen in the plugins list
+   * 
+   * @param array $plugin_data
+   * @param object $r
+   * @return string $output
+   */
+  public static function plugin_update_message($plugin_data, $r)
+  {
+
+    $upgrade_notice = self::get_update_message_text();
+
+    $upgrade_notice = preg_replace('#(==?[^=]+==?)#', '', $upgrade_notice);
+
+    $upgrade_notice = preg_replace('#(\*\*([^*]+)\*\*)#', '<span style="color:#BC0B0B">\2</span>', $upgrade_notice);
+
+    $response = $r;
+    $response->name = Participants_Db::$plugin_title;
+    $response->requires = '3.4';
+    $response->tested = '3.7';
+    $response->version = $plugin_data['Version'];
+    $response->homepage = $plugin_data['PluginURI'];
+    
+    // we got all that info, but really we just need to print the message we got from the readme
+    
+    echo wpautop($upgrade_notice);
+  }
+  /**
+   * gets the update message text
+   * 
+   * @return string
+   */
+  public static function get_update_message_text()
+  {
+    // readme contents
+    $data = file_get_contents(plugins_url('readme.txt', __FILE__));
+
+    // assuming you've got a Changelog section
+    // @example == Changelog ==
+    $upgrade_notice = stristr($data, '== Upgrade Notice ==');
+
+    // assuming you've got a Screenshots section
+    // @example == Screenshots ==
+    $upgrade_notice = stristr($upgrade_notice, '== Using the Plugin ==', true);
+    return $upgrade_notice;
+  }
+  /**
+   * creates the update notice for this version
+   * 
+   * @param object $response
+   * @return object
+   */
+  public static function check_for_plugin_update($checkdata)
+  {
+
+    if (empty($checkdata->checked)) {
+      return $checkdata;
+    }
+
+    // readme contents
+    $data = file_get_contents('http://plugins.svn.wordpress.org/participants-database/trunk/readme.txt?format=txt');
+    $plugin_path = plugin_basename(__FILE__);
+    $plugin_data = get_plugin_data(__FILE__);
+    
+    $upgrade_notice = self::get_update_message_text();
+    
+    $upgrade_notice = preg_replace('#(==?[^=]+==?)#', '', $upgrade_notice);
+    
+    $response = (object) array(
+                'slug' => self::PLUGIN_NAME,
+                'new_version' => '1.5', 
+                'requires' => '3.4',  
+                'tested' => '3.7',
+                'upgrade_notice' => $upgrade_notice,
+                'package' => 'https://downloads.wordpress.org/plugin/participants-database.1.4.9.4.zip',
+                'url' => 'http://wordpress.org/plugins/participants-database/',
+    );
+    
+    $checkdata->response[$plugin_path] = $response;
+
+    //error_log(__METHOD__ . ' data returned:' . print_r($checkdata->response, 1));
+
+    return $checkdata;
+  }
+  /**
+   * creates the update notice for this version
+   * 
+   * @param boolean $false
+   * @param array $action
+   * @param object $arg
+   * @return bool|object
+   */
+  public static function plugin_update_info($false, $action, $arg)
+  {
+
+    error_log(__METHOD__.' called with: '.print_r($arg,1));
+    
+    if ($arg->slug !== self::PLUGIN_NAME) return false;
+
+    // readme contents
+    $data = file_get_contents('http://plugins.svn.wordpress.org/participants-database/trunk/readme.txt?format=txt');
+    $plugin_path = plugin_basename(__FILE__);
+    $plugin_data = get_plugin_data(__FILE__);
+    
+    // assuming you've got a Changelog section
+    // @example == Changelog ==
+    $changelog = stristr($data, '== Upgrade Notice ==');
+
+    // assuming you've got a Screenshots section
+    // @example == Screenshots ==
+    $changelog = stristr($changelog, '== Using the Plugin ==', true);
+    
+    $response = (object) array(
+                'slug' => self::PLUGIN_NAME,
+                'new_version' => '1.5',
+                'upgrade_notice' => self::get_update_message_text(),
+                'package' => 'https://downloads.wordpress.org/plugin/participants-database.1.4.9.4.zip',
+                'url' => 'http://wordpress.org/plugins/participants-database/',
+    );
+
+    $response->name = Participants_Db::$plugin_title;
+    $response->requires = '3.4';
+    $response->tested = '3.7';
+    $response->version = $plugin_data['Version'];
+    $response->homepage = $plugin_data['PluginURI'];
+    $response->sections = array(
+        'description' => '<h3>New Features Included in this Update:</h3>',
+        'changelog' => wpautop($changelog),
+    );
+
+    //error_log(__METHOD__ . ' data returned:' . print_r($response, 1));
+
+    return $response;
+  }
 }
 
 // class

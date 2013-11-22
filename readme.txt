@@ -235,10 +235,32 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 == Changelog ==
 
 = 1.5 =
+
+**BETA RELEASE**
+
+Please back up before installing
+
+For critical production sites I recommend you try the new plugin version first in a development site
+
 * complete overhaul of the entire plugin
-* several new features: file uploads, lost link resend, CAPTCHA
-* new shortcodes for showing totals or stats, record search
-* expanded API
+* new classes to handle templating and plugin updates
+* added infrastructure for add-on and premium plugins
+* dozens of bug fixes and code hardening for more reliable performance in your particular installation
+
+**New Features:**
+
+* **file upload field** allows any type of file to be uploaded
+* **resend private link** for users who've lost theirs
+* **math captcha** sets a simple test for a human user
+* **custom CSS setting** for easy presentation tweaks
+* **wildcard characters** allowed in searches
+* **total shortcode** shows total records and more
+* **search shortcode** to place search controls anywhere
+* **groups attribute in shortcodes** to show only selected groups of fields
+* **date range filters** in the admin list
+* **expanded API** for more ways to customize functionality
+* **“busy” spinner** image for AJAX-powered searches so the user knows something is happening while the data loads
+* **labeled selection items** for better readability
 
 = 1.4.9.3 =
 * reworked class autoloading to avoid conflicts
@@ -405,145 +427,11 @@ Taking defensive precautions against other plugins in the admin:
 * list shortcode can now specify which columns (fields) to show
 * dates before 1970 now work
 
-= 1.2.8.2 =
-* bugfix for bobbled databse update to 0.5
-
-= 1.2.8.1 =
-* fixed bug where image files are not saved with record in some cases
-
-= 1.2.8 =
-* fixed bug with some databases not getting updated
-* added setting for display text on record form
-
-= 1.2.7 =
-* bug fix: attempting to validate main form fields while on signup form
-
-= 1.2.6 =
-* bug fix for blank dates resolving to UNIX time 0
-
-= 1.2.5 =
-* added "link" form element for storing a link with link text
-* added "make link" setting to make URLs clickable
-* changed "import" field definition column to more appropriate "CSV"
-* fixed display bug with array data from multi-select form elements
-* fixed documentation error in `[pdb_list]` filtering section
-* fixed skipped validation on thanks page redirect to new page
-
-= 1.2.4 =
-* fixed bug in `[pdb_list]` shortcode display filter
-
-= 1.2.3 =
-* added access level control setting for records
-* added filtering and sorting to the `[pdb_list]` shortcode
-* fixed documentation error for list shortcode: the list limit parameter must be labeled 'list_limit', not 'list-limit'
-* improved handling of date values
-* added greater than and less than operators to record list filters
-
-= 1.2.2 =
-* added option to show groups and group descriptions in signup form
-* fixed bug in signup form submissions that contain multi-select form fields
-* it is now possible to edit the titles of the internal fields
-
-= 1.2.1 =
-* timestamps can now be displayed in the admin record list
-* added "internal" group tab to control display and export of internal fields
-* signup form "thanks" page can now be any page
-* new shortcode `[pdb_signup_thanks]` to display signup thank you message
-* better organized settings page
-
-= 1.2 =
-* added email notifications for record updates
-* new settings layout with new group for record edit form
-* added ability to display the group description in the record edit form
-* error message for record form called with invalid ID
-* more space provided for form element select options
-* database version to 0.3
-
-= 1.1.3 =
-* fixed bug with default values not preloading into the signup form
-* improved handling of quotes in form fields
-* better forms security
-* better handing of array values and select settings for multi-select form elements
-
-= 1.1.2 =
-* fixed private record link for sites using query links
-* changed "registration page" setting from text entry to page list dropdown
-* split CSS files so only the needed rules are loaded by shortcodes
-
-
-= 1.1.1 =
-* fixed shortcode content placement issues
-* added feedback message for successfully submitted `[pdb_record]` form
-* added plugin setting for the feedback message
-
-= 1.1 =
-* added list display shortcode `[pdb_list]`
-* added database upgrade code
-* database to version 0.2
-* added display column setting for frontend list display
-* improved handling of quotes and apostrophes in names and titles
-* changed CSV export to export only selected columns
-* added 'class' parameter to signup and record shortcodes
-
-= 1.0.1 =
-* fix to issue with new records private id not getting assigned
-
-= 1.0 =
-* internationalization on all display strings
-* added image upload field
-* CSV export and import functions are more robust
-
-= 0.9.6 =
-* added ability to change group name
-* smoother logic and JS enhancements for deleting field groups
-* added "number of fields in group" column on field groups list
-* fixed install db error: integrity check on nonexistent table
-
-= 0.9.5 =
-* prevent frontend record edit submission from redirecting to admin
-* further CSS improvements to backend fields management page
-* better default settings for field groups
-* logic to allow both signup and record shortcodes to be on the same page
-* setting to show the private ID and link on the admin participant listing page
-
-= 0.9.4 =
-* improved CSS on manage fields page
-
-= 0.9.3 =
-* fixed possible submit failure on non-unique email
-* added unique email setting to allow multiple records with same email address
-* polished CSV output for readable array data fields
-* frontend edit form stays on frontend for admin user
-
-= 0.9.2 =
-* fixed new fields not getting correctly added to database in all cases
-* fixed validation bug on empty validation
-* set default validation to NO on new fields
-* added database integrity test and fix
-* fixed select disply for multi-select elements
-* CSS improvements for multi-selects
-
-= 0.9.1 =
-* fixed settings object instantiation bug
-* fixed problem with private id dropping off record form
-
-= 0.9 =
-* critical update
-* fixed major bug in signup class
-* minor security enhancements
-
-= 0.8.1 =
-* release version
-* tested working all features
-
-= 0.7 =
-* Initial version
-* No internationalization
-
 == Upgrade Notice ==
 
-= 1.4.9.3 =
-* several bugs fixed
+= 1.5 =
+**BETA RELEASE**
+Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions before updating.
 
 == Using the Plugin ==
 

@@ -19,36 +19,86 @@
 if (!class_exists('PDb_Aux_Plugin')) :
 class PDb_Aux_Plugin {
 
-  // boolean true if the Participants Database plugin is found and active
+  /**
+   * boolean true if the Participants Database plugin is found and active
+   * @var bool
+   */
   var $connected = false;
-  // holds the path to the parent plugin
+  /**
+   * the directory and path of the main plugin file
+   * @var string
+   */
+  var $plugin_path;
+  /**
+   * holds the path to the parent plugin
+   * @var string
+   */
   var $parent_path;
-  // name of the instasntiating subclass
+  /**
+   * name of the instantiating subclass
+   * @var string
+   */
   var $subclass;
-  // slug of the aux plugin
+  /**
+   * slug of the aux plugin
+   * @var string
+   */
   var $aux_plugin_name;
-  // title of the aux plugin
+  /**
+   * title of the aux plugin
+   * @var string
+   */
   var $aux_plugin_title;
-  // slug of the aux plugin settings page
+  /**
+   * slug of the aux plugin settings page
+   * @var string
+   */
   var $settings_page;
-  // name of the WP option used for the plugin settings
+  /**
+   * name of the WP option used for the plugin settings
+   * @var string
+   */
   var $aux_plugin_settings;
-  // holds the plugin's options
+  /**
+   * holds the plugin's options
+   * @var array
+   */
   var $plugin_options;
+  /**
+   * holds the plugin info fields as parsed from the main plugin file header
+   * @var array
+   */
+  var $plugin_data;
+  /**
+   * the updater class instance for this plugin
+   * @var object
+   */
+  var $Updater;
+  /**
+   * 
+   * this is typically instantiated in the child class with: 
+   * parent::__construct(__CLASS__, __FILE__);
+   * 
+   * @param string $subclass name of the instantiating subclass
+   * @param string $plugin_file absolute path
+   */
 
-  function __construct($subclass,$plugin_file)
+  function __construct($subclass, $plugin_file)
   {
 
+    $this->plugin_path = plugin_basename($plugin_file);
     $this->connected = $this->check_connection();
     register_activation_hook($plugin_file, array($this, '_activate_plugin'));
 
     if($this->connected) {
+      $this->plugin_data = get_plugin_data($plugin_file);
       $this->aux_plugin_settings = $this->aux_plugin_name;
       $this->subclass = $subclass;
       $this->set_settings_containers();
       $this->plugin_options = get_option($this->aux_plugin_settings);
       add_action('admin_menu', array($this, 'add_settings_page'));
       add_action('admin_init', array($this, 'settings_api_init'));
+      add_action('init', array(&$this, 'initialize_updater'));
     }
   }
   
@@ -66,6 +116,14 @@ class PDb_Aux_Plugin {
       }
     }
     return false;
+  }
+
+  /**
+   * initializes the update class
+   * 
+   */
+  function initialize_updater() {
+    $this->Updater = new PDb_Update($this->plugin_path, $this->plugin_data['Version']);
   }
 
   /**
@@ -88,7 +146,7 @@ class PDb_Aux_Plugin {
   {
     if (WP_DEBUG) error_log(__METHOD__. ' ' . Participants_Db::$plugin_title . ' activating aux plugin: '. $subclass);
     if(!$this->connected) {
-      deactivate_plugins( plugin_basename( __FILE__ ) );
+      deactivate_plugins($this->plugin_path);
       $this->_trigger_error('The Participants Database plugin must be installed and activated for the ' . $this->aux_plugin_title . ' plugin to be activated.');
     }
   }
