@@ -51,32 +51,32 @@ if ($participant_values) :
 
   $section = '';
   ?>
-  <div class="wrap edit-participant">
+  <div class="wrap admin-edit-participant">
     <h2><?php echo $page_title ?></h2>
-  <?php
-  if (is_object(Participants_Db::$validation_errors)) {
-
-    echo Participants_Db::$validation_errors->get_error_html();
-  } else {
-    Participants_Db::admin_message();
-  }
-  ?>
-    <form method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>" enctype="multipart/form-data" autocomplete="off" >
     <?php
-    FormElement::print_hidden_fields($hidden);
+    if (is_object(Participants_Db::$validation_errors)) {
 
-    // get the columns and output form
-    $readonly_columns = Participants_Db::get_readonly();
-    foreach (Participants_db::get_column_atts('backend') as $column) :
+      echo Participants_Db::$validation_errors->get_error_html();
+    } else {
+      Participants_Db::admin_message();
+    }
+    ?>
+    <form method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>" enctype="multipart/form-data" autocomplete="off" >
+      <?php
+      PDb_FormElement::print_hidden_fields($hidden);
 
-      $id_line = '';
-    
-      $attributes = array();
+      // get the columns and output form
+      $readonly_columns = Participants_Db::get_readonly();
+      foreach (Participants_db::get_column_atts('backend') as $column) :
 
-      // set a new section
-      if ($column->group != $section) {
-        if (!empty($section)) {
-          ?>
+        $id_line = '';
+
+        $attributes = array();
+
+        // set a new section
+        if ($column->group != $section) {
+          if (!empty($section)) {
+            ?>
             </table>
             <?php
           } else {
@@ -85,140 +85,163 @@ if ($participant_values) :
           $section = $column->group
           ?>
           <h3><?php echo $groups[$section]['title'] ?></h3>
-          <?php if ($options['show_group_descriptions']) echo '<p class="' . Participants_Db::$css_prefix . 'group-description">' . $groups[$section]['description'] . '</p>' ?>
+          <?php if ($options['show_group_descriptions']) echo '<p class="' . Participants_Db::$prefix . 'group-description">' . $groups[$section]['description'] . '</p>' ?>
           <table class="form-table">
-          <?php
-        }
-        echo $id_line;
-        ?>
+            <?php
+          }
+          echo $id_line;
+          ?>
 
           <tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) ?>">
-          <?php
-          $column_title = htmlspecialchars(stripslashes($column->title), ENT_QUOTES, "UTF-8", false);
-          if ($options['mark_required_fields'] && $column->validation != 'no') {
-            $column_title = sprintf($options['required_field_marker'], $column_title);
-          }
-          ?>
-            <th><?php echo $column_title . ( ( 'hidden' == $column->form_element ) ? ' (hidden)' : '' ) ?></th>
-            <td id="<?php echo Participants_Db::$css_prefix . $column->name ?>" >
             <?php
-            if( in_array($column->name, $readonly_columns) ) $attributes['readonly'] = 'readonly';
-
-            // get the existing value if any
-            $value = isset($participant_values[$column->name]) ? Participants_Db::unserialize_array($participant_values[$column->name]) : '';
-
-            // replace it with the new value if provided
-            if (isset($_POST[$column->name])) {
-
-              if (is_array($_POST[$column->name]))
-                $value = $_POST[$column->name];
-
-              elseif ('rich-text' == $column->form_element)
-                $value = $_POST[$column->name];
-
-              else
-                $value = esc_html(stripslashes($_POST[$column->name]));
+            $column_title = str_replace(array('"',"'"), array('&quot;','&#39;'), stripslashes($column->title));
+            if ($options['mark_required_fields'] && $column->validation != 'no') {
+              $column_title = sprintf($options['required_field_marker'], $column_title);
             }
+            ?>
+            <?php
+            $add_title = '';
+            if ($column->form_element == 'hidden') {
+              $add_title = sprintf(' (%s)', __('hidden', 'participants-database'));
+            } elseif (in_array($column->name, $readonly_columns) or $column->form_element == 'timestamp') {
+              $attributes['readonly'] = 'readonly';
+              $add_title = sprintf(' (%s)', __('read only', 'participants-database'));
+            }
+            ?>
+            <th><?php echo $column_title . $add_title ?></th>
+            <td id="<?php echo Participants_Db::$prefix . $column->name ?>" >
+              <?php
+              
 
-            $field_class = ( $column->validation != 'no' ? "required-field" : '' ) . ( in_array($column->form_element, array('text-line', 'date')) ? ' regular-text' : '' );
+              /*
+               * get the value from the record; if it is empty, use the default value if the 
+               * "persistent" flag is set.
+               */
+              $column->value = empty($participant_values[$column->name]) ? ($column->persistent == '1' ? $column->default : '') : Participants_Db::unserialize_array($participant_values[$column->name]);
+              
+              // get the existing value if any
+              //$column->value = isset($participant_values[$column->name]) ? Participants_Db::unserialize_array($participant_values[$column->name]) : '';
 
-            if (isset($value)) {
+              // replace it with the new value if provided
+              if (isset($_POST[$column->name])) {
 
-              //error_log(basename(__FILE__) . ' ' . $column->name . ':' . $value);
+                if (is_array($_POST[$column->name]))
+                  $column->value = $_POST[$column->name];
 
-              if ($column->name == 'last_accessed' && (!isset($value) or '0000-00-00 00:00:00' == $value ))
-                $value = false;
-
-              switch ($column->form_element) {
-
-                case 'date':
-
-                  /*
-									 * if it's not a timestamp, format it for display; if it is a
-									 * timestamp, it will be formatted by the FormElement class
-									 */
-									if (!empty($value) and ! Participants_Db::is_valid_timestamp($value)) {
-                    $value = Participants_Db::prep_field_for_display($value,$column->form_element);
-                  }
-
-                  break;
-
-                case 'image-upload':
-
-                  $value = empty($value) ? '' : $value;
-
-                  break;
-
-                case 'multi-select-other':
-                case 'multi-checkbox':
-
-                  $value = is_array($value) ? $value : explode(',', $value);
-
-                  break;
-
-                case 'password':
-
-                  $value = '';
-                  break;
-
-                case 'hidden':
-
-                  $column->form_element = 'text-line';
-                  break;
+                elseif ('rich-text' == $column->form_element)
+                  $column->value = $_POST[$column->name];
+                else
+                  $column->value = esc_html(stripslashes($_POST[$column->name]));
               }
-            }
 
-            if ('rich-text' == $column->form_element) {
+              $field_class = ( $column->validation != 'no' ? "required-field" : '' ) . ( in_array($column->form_element, array('text-line', 'date')) ? ' regular-text' : '' );
 
-              wp_editor(
-                      $value, preg_replace('#[0-9_-]#', '', Participants_Db::$css_prefix . $column->name), array(
-                  'media_buttons' => false,
-                  'textarea_name' => $column->name,
-                  'editor_class' => $field_class,
-                      )
-              );
-            } else {
+              if (isset($column->value)) {
 
-              FormElement::print_element(
-                      array(
-                          'type' => $column->form_element,
-                          'value' => $value,
-                          'name' => $column->name,
-                          'options' => $column->values,
-                          'class' => $field_class,
-                          'attributes' => $attributes,
-                      )
-              );
-            }
+                //error_log(basename(__FILE__) . ' ' . $column->name . ':' . $column->value);
 
-            if (!empty($column->help_text)) :
-              ?>
+//                if ($column->name == 'last_accessed' && (!isset($column->value) or '0000-00-00 00:00:00' == $column->value ))
+//                  $column->value = false;
+
+                switch ($column->form_element) {
+                  
+                  case 'timestamp':
+                  case 'date':
+
+                    /*
+                     * if it's not a timestamp, format it for display; if it is a
+                     * timestamp, it will be formatted by the FormElement class
+                     */
+                    if (!empty($column->value) and !Participants_Db::is_valid_timestamp($column->value)) {
+                      //$column->value = FormElement::get_field_value_display($column);
+                      $column->value = Participants_Db::parse_date($column->value);
+                    }
+
+                    break;
+
+                  case 'image-upload':
+
+                    $column->value = empty($column->value) ? '' : $column->value;
+
+                    break;
+
+                  case 'multi-select-other':
+                  case 'multi-checkbox':
+
+                    $column->value = is_array($column->value) ? $column->value : explode(',', $column->value);
+
+                    break;
+
+                  case 'password':
+
+                    $column->value = '';
+                    break;
+
+                  case 'hidden':
+
+                    $column->form_element = 'text-line';
+                    break;
+                }
+              }
+
+              if ('rich-text' == $column->form_element) {
+
+                wp_editor(
+                        $column->value, preg_replace('#[0-9_-]#', '', Participants_Db::$prefix . $column->name), array(
+                    'media_buttons' => false,
+                    'textarea_name' => $column->name,
+                    'editor_class' => $field_class,
+                        )
+                );
+              } else {
+
+                PDb_FormElement::print_element(
+                        array(
+                            'type' => $column->form_element,
+                            'value' => $column->value,
+                            'name' => $column->name,
+                            'options' => $column->values,
+                            'class' => $field_class,
+                            'attributes' => $attributes,
+                            'module' => 'admin',
+                        )
+                );
+              }
+
+              if (!empty($column->help_text)) :
+                ?>
                 <span class="helptext"><?php echo stripslashes(trim($column->help_text)) ?></span>
-              <?php endif; ?>
+    <?php endif; ?>
             </td>
           </tr>
-              <?php
-            endforeach;
-            ?>
+          <?php
+        endforeach;
+        ?>
       </table>
       <table class="form-table">
-            <?php if (is_admin()) : ?>
+  <?php if (is_admin()) : ?>
           <tr>
             <th><h3><?php _e('Save the Record', 'participants-database') ?></h3></th>
-          <td class="submit-buttons"><input class="button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit">
-            <input class="button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit">
-            <input class="button-primary" type="submit" value="<?php echo self::$i18n['next'] ?>" name="submit">
+          <td class="submit-buttons">
+            <?php if (isset($_GET['id'])) : ?><input class="button-secondary button-leftarrow" type="submit" value="<?php echo self::$i18n['previous'] ?>" name="submit_button"><?php endif ?>
+            <input class="button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit_button">
+            <input class="button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit_button">
+            <input class="button-secondary button-rightarrow" type="submit" value="<?php echo self::$i18n['next'] ?>" name="submit_button">
           </td>
           </tr>
           <tr>
-            <td colspan="2"><?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', 'participants-database') ?> </td>
+            <td colspan="2">
+              <?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', 'participants-database') ?>
+              <br />
+              <?php if (isset($_GET['id'])) {_e('<strong>Previous:</strong> save and move to previous record', 'participants-database'); } ?>
+            </td>
           </tr>
-        <?php else : ?>
+  <?php else : ?>
           <tr>
             <th><h3><?php echo $options['save_changes_label'] ?></h3></th>
           <td class="submit-buttons">
             <input class="button-primary pdb-submit" type="submit" value="<?php echo $options['save_changes_button'] ?>" name="save">
-            <input name="submit" type="hidden" value="<?php echo self::$i18n['apply'] ?>">
+            <input name="submit_button" type="hidden" value="<?php echo self::$i18n['apply'] ?>">
           </td>
           </tr>
   <?php endif; ?>
@@ -226,20 +249,20 @@ if ($participant_values) :
     </form>
   </div>
 <?php endif; // ID is valid  ?>
-      <?php /* ?>
-        <script type="text/javascript">
-        jQuery(document).ready( function($) {
-        $.datepicker.setDefaults({
-        dateFormat : '<?php echo Participants_Db::get_jqueryUI_date_format() ?>'
-        });
-        $( ".edit-participant input.date_field" ).each( function() {
-        var datefield = $(this);
-        var fieldname = datefield.attr('name');
-        datefield.datepicker({
-        changeMonth: true,
-        changeYear: true
-        });
-        });
-        });
-        </script>
-        <?php */ ?>
+<?php /* ?>
+  <script type="text/javascript">
+  jQuery(document).ready( function($) {
+  $.datepicker.setDefaults({
+  dateFormat : '<?php echo Participants_Db::get_jqueryUI_date_format() ?>'
+  });
+  $( ".edit-participant input.date_field" ).each( function() {
+  var datefield = $(this);
+  var fieldname = datefield.attr('name');
+  datefield.datepicker({
+  changeMonth: true,
+  changeYear: true
+  });
+  });
+  });
+  </script>
+  <?php */ ?>

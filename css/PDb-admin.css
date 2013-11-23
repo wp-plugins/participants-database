@@ -2,67 +2,121 @@
 
 /* Participants DB Admin CSS */
 body[class*='participants-database'] .widefat td {
-    vertical-align:middle;
+  vertical-align:middle;
 }
 body[class*='participants-database']  .widefat tr:nth-child(even) {
-    background-color:#EDEDED;
+  background-color:#f6f6f6;
 }
 .participants_db input[type='text'] {
-    width: 300px;
+  width: 100%;
+  max-width: 400px;
 }
-.participants_db input[type=checkbox] {
-    margin-top: 4px;
-}
-.participants_db .wp-editor-wrap {
-    width: 500px;
+.participants_db input.add_field {
+  width: 250px;
 }
 .participants_db option[value='none'],
 .participants_db option[value='other'] {
-    font-weight:bold;
+  font-weight:bold;
 }
 .participants_db input[id$='_other'] {
-    width:50px;
 }
 .participants_db input[name='temp'] {
-    display:none;
+  display:none;
+}
+.participants_db .manage-fields {
+  z-index: 1;
+}
+.participants_db .manage-fields input[type="text"].digit {
+  width: 30px;
+}
+.participants_db .manage-fields select {
+  width: 100%;
+  float: none;
+}
+.participants_db .manage-fields textarea {
+  width: 100%;
+}
+.pagination {
+  margin-bottom: 20px;
+}
+.redfade {
+  box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
+  border-color: rgba(197, 99, 59, 0.5);
+}
+[class*="pdb-"] p,
+.multicheckbox,
+.selectother {
+  max-width: 950px;
 }
 #PDb_footer {
-    box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
-    border-color: rgba(197, 99, 59, 0.5);
+  display: inline-block;
+  padding:7px;
+  width:auto;
+  overflow:auto;
 }
-fieldset.widefat,
-#PDb_footer {
-    padding:7px;
-    width:auto;
-    margin-top: 1.4em;
-    overflow:auto;
+fieldset.widefat {
+  width:100%;
+  overflow:auto;
+}
+fieldset.widefat.inline-controls,
+fieldset.widefat.inline-controls label {
+  line-height: 2em;
+}
+fieldset.widefat.inline-controls input,
+fieldset.widefat.inline-controls  select,
+fieldset.widefat.inline-controls label {
+  margin: 0 5px;
+  vertical-align: middle;
 }
 #PDb_footer .section {
-    width:280px;
-    float:left;
-    margin:0 18px;
+  width:280px;
+  float:left;
+  margin:0 18px;
 }
 input[readonly] {
-    border:none;
-    background:none transparent;
+  border:none;
+  background:none transparent;
+  width: 100%;
 }
 body[class*='participants-database'] a.delete {
-    display:block;
-    width:12px;
-    height:26px;
-    background:url('../ui/delete.png') no-repeat center center;
+  display:block;
+  width:12px;
+  height:26px;
+  background:url('../ui/delete.png') no-repeat center center;
 }
 body[class*='participants-database'] .form-table {
-	margin-bottom:4em;
+  margin-bottom:4em;
 }
-.wp-admin .edit-participant .helptext {
-    display:inline;
+.pdb-list .image-field-wrap img {
+  height: 30px;
+  width: auto;
+}
+.wp-admin .helptext {
+  line-height: 1.5;
+  color: #777777;
+}
+.wp-list-table th, .wp-list-table td, .form-table th, .form-table td {
+  vertical-align: top;
+}
+.participants_db input[type='text']+.helptext,
+.participants_db input[type='checkbox']+.helptext,
+.participants_db select+.helptext,
+.participants_db script+.helptext,
+.participants_db .wp-editor-wrap+.helptext,
+.participants_db textarea+.helptext {
+  width:390px;
 }
 .participants_db input[type='text']+.helptext,
 .participants_db input[type='checkbox']+.helptext,
 .participants_db select+.helptext {
-    float:left;
-    width:390px;
+  /*  float:left;*/
+}
+.participants_db .wp-editor-wrap {
+  float:left;
+}
+.participants_db .wp-editor-wrap+.helptext {
+  display:inline-block;
+  margin: 30px 0 0 10px;
 }
 textarea,
 select,
@@ -70,15 +124,22 @@ input[type="text"],
 input[type="checkbox"],
 .multicheckbox label,
 .link-element label {
-    float: left;
-    margin-right: 10px;
+  /*  float: left;
+    margin-right: 10px;*/
+}
+label input[type="checkbox"] {
+  float:none;    
+  margin: 0 4px 0 0;
+}
+.pdb-searchform fieldset {
+  display: inline-block;
 }
 .participants_db .inline-controls input[type='text'],
 .participants_db .inline-controls input[type='checkbox'],
 .participants_db .inline-controls select {
-  float: none;
-  display: inline;
-  margin-right:0;
+  /*  float: none;
+    display: inline;
+    margin-right:0;*/
 }
 #checkall {
   margin:4px 0;
@@ -93,24 +154,24 @@ input[type="checkbox"],
   text-transform: uppercase;
 }
 body[class*='participants-database'] .selectother input[type=text] {
-	width:auto;
+  width:auto;
 }
 table.spreadsheet {
-    width:90%;
-    border-collapse:collapse;
+  width:90%;
+  border-collapse:collapse;
 }
 .spreadsheet td, .spreadsheet th {
-    border:1px dashed #AAAAAA;
-    padding:3px;
+  border:1px dashed #AAAAAA;
+  padding:3px;
 }
 body[class*='participants-database'] .text-block {
-    max-width: 35em;
-    font-size: 1.3em;
-    line-height: 1;
+  max-width: 35em;
+  font-size: 1.3em;
+  line-height: 1;
 }
 body[class*='participants-database'] .text-block p,
 body[class*='participants-database'] .text-block li {
-    line-height: 1.2;
+  line-height: 1.2;
 }
 .participants_db input[type="submit"] {
   background-color:#ffffff;
@@ -128,11 +189,11 @@ body[class*='participants-database'] .text-block li {
   padding:0 10px 1px;
 }
 #delete_button.unarmed {
-    opacity:0.5;
+  opacity:0.5;
 }
 #delete_button.armed {
-    border: 1px solid rgba(204, 0, 0, 0.5);
-    box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
+  border: 1px solid rgba(204, 0, 0, 0.5);
+  box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
 }
 #delete_button.armed:hover {
   box-shadow: 0 0 2px rgba(204, 0, 0, 0.1) inset;
@@ -141,17 +202,20 @@ body[class*='participants-database'] .text-block li {
   margin-right: 5px;
 }
 .participants_db.settings-class .pdb_anchor {
-    position:relative;
-    top:-5em;
+  position:relative;
+  top:-5em;
+}
+.edit-participant textarea, .participants_db textarea, .edit-participant select, .participants_db select, .participants_db input, .edit-participant input, .link-element label {
+  vertical-align: top;
 }
 [class*="participants-database"] .wp-editor-wrap {
   max-width: 600px;
 }
 [class*="participants-database"] .wp-editor-area {
-    background-color: #FFFFFF;
-    border: 2px solid #DFDFDF;
-    color: #333333;
-    height: 20em;
+  background-color: #FFFFFF;
+  border: 2px solid #DFDFDF;
+  color: #333333;
+  height: 20em;
 }
 .pdb-list span.textarea {
   display: block;
@@ -159,13 +223,9 @@ body[class*='participants-database'] .text-block li {
   max-width: 150px;
   overflow: auto;
 }
-.image-filename {
-  display: inline-block;
-  margin: 0 0 0 10px;
-}
 /* set placeholder colors */
 ::-webkit-input-placeholder {
-    color: #AAAAAA;
+  color: #AAAAAA;
 }
 :-moz-placeholder {
   color: #AAAAAA !important;
@@ -182,127 +242,151 @@ body[class*='participants-database'] .text-block li {
 
 /* manage fields */
 div.manage-fields-wrap {
-    min-width:1100px;
+  min-width:1100px;
 }
 .manage-fields thead > tr {
-    height:6em;
+  height:7em;
 }
 .manage-fields.widefat th {
-    padding:5px 0;
-    vertical-align:middle;
-    text-align:center;
+  padding:0 0 0 10px;
+  vertical-align:text-top;
+  text-align:left;
 }
 .manage-fields th.sortable {
-    /*padding:7px 7px 8px;*/
+  /*padding:7px 7px 8px;*/
 }
 .id, .order, .persistent, .sortable, .admin_column, .display_column, .CSV {
-    text-align:center;
+  text-align:center;
 }
 th.vertical-title  {
-    width:25px;
+  width:25px;
 }
-th.admin_column, th.display_column, th.display {
-    width:40px;
+th.vertical-title.number-column {
+  width: 43px;
 }
 th.form_element {
-    width:150px;
+  width:150px;
 }
 th.validation, th.title, th.default, th.group, th.name {
-    width:8%;
+  width:8%;
 }
 #internal th.name, #internal th.title {
-    width:100%;
+  width:100%;
 }
 #internal table.manage-fields {
-    width: 360px;
+  width: 360px;
 }
 #field_groups th.title {
-    width:auto;
+  width:auto;
 }
 .manage-fields th.vertical-title {
-    vertical-align:text-top;
+  vertical-align:text-top;
+  padding: 5px 0 0 0;
 }
 .manage-fields th.vertical-title span {
-    writing-mode:tb-rl;
-    -moz-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    white-space:nowrap;
-    word-wrap: normal;
-    display:block;
-    width:20px;
-    height:20px;
-    line-height: 1;
-    position:relative;
-    top:0;
-    left:0;
+  writing-mode:tb-rl;
+  transform: rotate(90deg);
+  transform-origin: left bottom;
+  -moz-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -moz-transform-origin: left bottom;
+  -webkit-transform-origin: left bottom;
+  -o-transform-origin: left bottom;
+  display: inline-block;
+  height: auto;
+  left: 0.6em;
+  line-height: 1.1;
+  position: relative;
+  top: -2em;
+  white-space: nowrap;
+  width: auto;
+  word-wrap: normal;
+}
+.manage-field-groups th.vertical-title span {
+  top: -1em;
 }
 .manage-fields th.admin_column span, .manage-fields th.display_column span {
-    left:18px;
+/*  left:18px;*/
 }
 .manage-fields input, 
 .manage-fields textarea {
-    width:100%;
+  width:100%;
 }
 .manage-fields input[type="checkbox"], 
 .manage-fields input[type="radio"] {
-    width:auto;
-    position:relative;
-    top:-1px;
+  width:auto;
+  position:relative;
+  top:-1px;
 }
 .manage-fields textarea {
-    height:3.5em;
+  height:3.5em;
 }
 .manage-field-groups th.name {
-    width:160px;
+  width:160px;
 }
 
 .manage-field-groups th.fields {
-    width:30px;
+  width:30px;
 }
 .manage-field-groups td[id^='field_count'] {
-    text-align:center;
+  text-align:center;
 }
 .manage-field-groups th.column span {
-    position:relative;
-    left:5px;
+  position:relative;
+  left:5px;
 }
 td.order {
-    padding:3px 0;
-    text-align: center;
+  padding:3px 0;
+  text-align: center;
 }
 a.dragger {
-    background-color: #EEEEEE;
-    border: 1px solid #DDDDDD;
-    border-radius: 2px 2px 2px 2px;
-    cursor: move;
-    display: block;
-    letter-spacing: 0;
-    line-height: 15px;
-    padding: 3px 0;
-    margin-top : 2px;
+  background-color: #EEEEEE;
+  border: 1px solid #DDDDDD;
+  border-radius: 2px 2px 2px 2px;
+  cursor: move;
+  display: block;
+  letter-spacing: 0;
+  line-height: 15px;
+  padding: 3px 0;
+  margin-top : 2px;
 }
 
 #message {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 /* SETTINGS PAGE */
 .settings-class textarea {
-    float:left;
-    margin-right:10px;
-    height:140px;
-    width:300px;
+  float:left;
+  margin-right:10px;
+  height:140px;
+  width:300px;
 }
 
 /*   UI TABS   */
 
 /* hide before tabs kicks in */
 #fields-tabs.ui-tabs {
-    visibility:visible;
+  visibility:visible;
 }
-#fields-tabs {
-    visibility:hidden;
+#fields-tabs, 
+.mask {
+  visibility:hidden;
+}
+.mask {
+  position: absolute;
+  background-color: white;
+  display: block;
+  z-index: 1000;
+}
+.ui-tabs-nav .mask {
+  left: 1px;
+  bottom: -2px;
+  height: 3px;
+  width: calc(100% - 6px);
+  display: block;
+  z-index: 1000;
 }
 .participants_db .ui-widget-content {
   background-image: none;
@@ -315,145 +399,160 @@ a.dragger {
 }
 
 .participants_db .ui-tabs-nav {
-	background-image: none;
-	background-color: inherit;
-	border: none;
-    border-bottom: 1px solid #ccc;
-    height: 30px;
-    margin: 20px 0;
-    padding: 0;
+  background-image: none;
+  background-color: inherit;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  height: auto;
+  margin: 20px 0;
+  padding: 0;
+  overflow: visible;
 }
 .participants_db .ui-tabs-nav li {
-		background-color: transparent;
-    background-image: none;
-		border:none;
-    display: block;
-    float: left;
-    margin: 0;
+  background-color: transparent;
+  background-image: none;
+  border:none;
+  display: inline-block;
+  position: relative;
+  margin: 0;
+  height: auto;
+  width: auto;
 }
 .participants_db .ui-tabs-nav .ui-state-default a {
 }
 .participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active a {
-	background-color: #ffffff;
-  padding-bottom: 10px;
+  background-color: #ffffff;
+  padding-bottom: 6px;
+}
+.participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active .mask {
+  visibility: visible;
 }
 .participants_db .ui-tabs-nav li a {
-    padding: 4px 20px 6px;
-    font-weight: bold;
+  padding: 4px 20px 6px;
+  font-weight: bold;
 }
 .participants_db .ui-tabs-nav li a {
-    border-style: solid;
-    border-color: #CCC #CCC #F9F9F9;
-    border-width: 1px 1px 0;
-    color: #777777;
-    text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
-    display: inline-block;
-    padding: 4px 14px 8px;
-    text-decoration: none;
-    margin: 0 6px -1px 0;
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 5px;
-    -khtml-border-top-left-radius: 5px;
-    -khtml-border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+  line-height: 1.4;
+  display: inline-block;
+  padding: 9px 12px 5px;
+  margin: 0 4px 0 0;
+  border-style: solid;
+  border-color: #CCC #CCC #F9F9F9;
+  border-width: 1px 1px 0;
+  color: #888888;
+  background-color:#eeeeee;
+  text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
+  text-decoration: none;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -khtml-border-top-left-radius: 5px;
+  -khtml-border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.participants_db .ui-tabs-nav li a:hover {
+  color: #000000;
+}
+.participants_db .ui-tabs-nav li.utility.ui-state-active a {
+  background: #ffffff;
 }
 .participants_db .ui-tabs-nav li.ui-tabs-selected a, 
 .participants_db .ui-tabs-nav li.ui-state-active a,
 .participants_db .ui-tabs-nav li a:focus {
-    color: #333333;
-    background-color:#ffffff;
-    outline:none;
+  color: #333333;
+  outline:none;
+}
+.participants_db .ui-tabs-nav li.ui-state-active a {
 }
 .participants_db .ui-tabs-panel {
-    clear: both;
-    position: relative;
-    left:0;
+  clear: both;
+  position: relative;
+  left:0;
 }
 .participants_db .ui-tabs-panel h3 {
-    font: italic normal normal 24px/29px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
-    margin: 0;
-    padding: 0 0 5px;
-    line-height: 35px;
-    text-shadow: 0 1px 0 #fff;
+  font: italic normal normal 24px/29px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+  margin: 0;
+  padding: 0 0 5px;
+  line-height: 35px;
+  text-shadow: 0 1px 0 #fff;
 }
 .participants_db .ui-tabs-panel h4 {
-    font-size: 15px;
-    font-weight: bold;
-    margin: 1em 0;
+  font-size: 15px;
+  font-weight: bold;
+  margin: 1em 0;
 }
 /* DIALOG BOXES */
 #dialog-overlay {
-    /* set it to fill the whole screen */
-    width:100%;
-    height:100%;
-    /* transparency for different browsers */
-    filter:alpha(opacity=50);
-    -moz-opacity:0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-    background:#000;
-    /* make sure it appear behind the dialog box but above everything else */
-    position:absolute;
-    top:0;
-    left:0;
-    z-index:3000;
-    /* hide it by default */
-    display:none;
+  /* set it to fill the whole screen */
+  width:100%;
+  height:100%;
+  /* transparency for different browsers */
+  filter:alpha(opacity=50);
+  -moz-opacity:0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+  background:#000;
+  /* make sure it appear behind the dialog box but above everything else */
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:3000;
+  /* hide it by default */
+  display:none;
 }
 .ui-dialog.ui-widget {
-    font-family: inherit;
-    font-size:1.1em;
-    /* css3 drop shadow */
-    -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    /* css3 border radius */
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    background:#FFFBCC;
-    border: 1px solid #E6DB55;
-    /* styling of the dialog box, i have a fixed dimension for this demo */
-    width:328px;
-    /* make sure it has the highest z-index */
-    position:absolute;
-    z-index:5000;
-    /* hide it by default */
-    display:none;
+  font-family: inherit;
+  font-size:1.1em;
+  /* css3 drop shadow */
+  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  /* css3 border radius */
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  background:#FFFBCC;
+  border: 1px solid #E6DB55;
+  /* styling of the dialog box, i have a fixed dimension for this demo */
+  width:328px;
+  /* make sure it has the highest z-index */
+  position:absolute;
+  z-index:500000;
+  /* hide it by default */
+  display:none;
 }
 .ui-dialog {
-    padding:20px 40px;
+  padding:20px 40px;
 }
 .ui-dialog a.button{
-    /*stylesforbutton*/
-    margin:10px auto 0 auto;
-    text-align:center;
-    display:block;
-    width:50px;
-    padding:5px 10px 6px;
-    color:#fff;
-    text-decoration:none;
-    font-weight:bold;
-    line-height:1;
-    /*buttoncolor*/
-    background-color:#e33100;
-    /*css3implementation:)*/
-    /*roundedcorner*/
-    -moz-border-radius:5px;
-    -webkit-border-radius:5px;
-    /*dropshadow*/
-    -moz-box-shadow:0 1px 3px rgba(0,0,0,0.5);
-    -webkit-box-shadow:0 1px 3px rgba(0,0,0,0.5);
-    /*textshadow*/
-    text-shadow:0 -1px 1px rgba(0,0,0,0.25);
-    border-bottom:1px solid rgba(0,0,0,0.25);
-    position:relative;
-    cursor:pointer;
+  /*stylesforbutton*/
+  margin:10px auto 0 auto;
+  text-align:center;
+  display:block;
+  width:50px;
+  padding:5px 10px 6px;
+  color:#fff;
+  text-decoration:none;
+  font-weight:bold;
+  line-height:1;
+  /*buttoncolor*/
+  background-color:#e33100;
+  /*css3implementation:)*/
+  /*roundedcorner*/
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  /*dropshadow*/
+  -moz-box-shadow:0 1px 3px rgba(0,0,0,0.5);
+  -webkit-box-shadow:0 1px 3px rgba(0,0,0,0.5);
+  /*textshadow*/
+  text-shadow:0 -1px 1px rgba(0,0,0,0.25);
+  border-bottom:1px solid rgba(0,0,0,0.25);
+  position:relative;
+  cursor:pointer;
 }
 .ui-dialog a.button:hover{
-    background-color:#c33100;
+  background-color:#c33100;
 }
 .ui-dialog .ui-widget-header {
   display: none;
@@ -468,26 +567,26 @@ a.dragger {
   clear: none;
 }
 .ui-dialog .ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
-    font-family: inherit;
+  font-family: inherit;
 }
 .ui-dialog .ui-state-default {
-    background: #E6E6E6;
-    border: 1px solid #D3D3D3;
-    font-weight: normal;    
-    cursor: pointer;
-    margin: 0.5em 0.4em 0.5em 0;
-    line-height: 1.8;
+  background: #E6E6E6;
+  border: 1px solid #D3D3D3;
+  font-weight: normal;    
+  cursor: pointer;
+  margin: 0.5em 0.4em 0.5em 0;
+  line-height: 1.8;
 }
 .ui-dialog .ui-state-hover {
-    border: 1px solid #b3b3b3;
+  border: 1px solid #b3b3b3;
 }
 #confirmation-dialog p{
 }
 .ui-button {
-    margin:0.6em 2em 0.6em 0;
+  margin:0.6em 2em 0.6em 0;
 }
 .ui-dialog-titlebar {
-    position:absolute;
-    top:1.6em;
-    right:1.6em;
+  position:absolute;
+  top:1.6em;
+  right:1.6em;
 }

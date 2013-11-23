@@ -7,361 +7,312 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdeign@xnau.com>
- * @copyright  2011 xnau webdesign
+ * @copyright  2011,2013 xnau webdesign
  * @license    GPL2
- * @version    0.3
+ * @version    0.7
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    FormElement class, Shortcode class
  */
+
 class PDb_Signup extends PDb_Shortcode {
-  
-	// a string identifier for the class
-  var $module = 'signup';
-  
-  // class for the wrapper
-  var $wrap_class = 'pdb-signup';
-	
-	// holds the target page for the submission
-	private $submission_page;
-  
-  // holds the submission status: false if the form has not been submitted
-  private $submitted = false;
-
-	// holds the recipient values after a form submission
-	private $recipient;
-
-	// holds the current email object
-	public $email_message;
-	
-	// boolean to send the reciept email
-	private $send_reciept;
-	
-	// boolean to send the notification email
-	private $send_notification;
-  
-  // holds the current email body
+  /**
+   *
+   * @var string holds the target page for the submission
+   */
+  var $submission_page;
+  /**
+   *
+   * @var bool holds the submission status: false if the form has not been submitted
+   */
+  var $submitted = false;
+  /**
+   *
+   * @var array holds the recipient values after a form submission
+   */
+  var $recipient;
+  /**
+   * @var bool reciept email sent status
+   */
+  var $send_reciept;
+  /**
+   *
+   * @var string the receipt subject line
+   */
+  var $receipt_subject;
+  /**
+   *
+   * @var string holds the body of the signup receipt email
+   */
+  var $receipt_body;
+  /**
+   * TODO: redundant?
+   * @var bool whether to send the notification email
+   */
+  var $send_notification;
+  /**
+   *
+   * @var array holds the notify recipient emails
+   */
+  public $notify_recipients;
+  /**
+   *
+   * @var string the notification subject line
+   */
+  var $notify_subject;
+  /**
+   *
+   * @var string holds the body of the notification email
+   */
+  var $notify_body;
+  /**
+   *
+   * @var string holds the current email body
+   */
   var $current_body;
+  /**
+   *
+   * @var string thank message body
+   */
+  var $thanks_message;
+  /**
+   *
+   * @var string header added to receipts and notifications
+   */
+  private $email_header;
+  /**
+   *
+   * @var array holds the submission values
+   */
+  private $post = array();
+  /**
+   *
+   * @var array error messages
+   */
+  private $errors = array();
 
-	// holds the submission values
-	private $post = array();
+  // methods
 
-	// error messages
-	private $errors = array();
-
-	// methods
-	//
+  //
 
 	/**
-	 * instantiates the signup form object
-	 *
-	 * this class is called by a WP shortcode
-	 *
-	 * @param array $params   this array supplies the display parameters for the instance
-	 *              'title'   string displays a title for the form (default none)
-	 *              'captcha' string type of captcha to include: none (default), math, image, word
-	 *
-	 */
-	public function __construct( $params ) {
+   * instantiates the signup form object
+   *
+   * this class is called by a WP shortcode
+   *
+   * @param array $shortcode_atts   this array supplies the display parameters for the instance
+   *                 'title'   string displays a title for the form (default none)
+   *
+   */
+  public function __construct($shortcode_atts) {
+
+    // define shortcode-specific attributes to use
+    $shortcode_defaults = array(
+        'module' => 'signup'
+    );
     
-		// define shortcode-specific attributes to use
-		$add_atts = array(
-                      'type'   => 'signup',
-                      );
-    
-		/*
-     * if we're coming back from a successful form submission, the id of the new
-     * record will be present, otherwise, the id is set to the default record
-     */
-    if ( isset( $_GET['id'] ) ) {
-      
-      $this->participant_id = $_GET['id'];
-      $this->submitted = true;
-      $this->participant_values = Participants_Db::get_participant( $this->participant_id );
-      $add_atts['id'] = $this->participant_id;
-      
-    } else {
-      
+    $sent = true; // start by assuming the notification email has been sent
+
+    if ((isset($_GET['m']) && $_GET['m'] == 'r') || $shortcode_atts['module'] == 'retrieve') {
+      $shortcode_atts['module'] = 'retrieve';
+    } elseif (isset($_SESSION['pdbid'])) {
+
+      $this->participant_id = $_SESSION['pdbid'];
+      unset($_SESSION['pdbid']); // clear the ID from the SESSION array
+      $this->participant_values = Participants_Db::get_participant($this->participant_id);
+      if ($this->participant_values) {
+        // check the notification sent status of the record
+        $sent = $this->check_sent_status($this->participant_id);
+        $this->submitted = true;
+        $shortcode_atts['module'] = 'thanks';
+      }
+      $shortcode_atts['id'] = $this->participant_id;
+    } elseif ($shortcode_atts['module'] == 'signup') {
+
       $this->participant_values = Participants_Db::get_default_record();
-      
-    }
-    
-    if ( isset($_GET['retrieve']) ) $this->module = 'retrieve';
-		
-    // run the parent class initialization to set up the parent methods 
-    parent::__construct( $this, $params, $add_atts );
-		
-    $this->module = $this->shortcode_atts['type'];
-    
-    $this->registration_page = Participants_Db::get_record_link( $this->participant_values['private_id'] );
-		
+    } else return; // no type set, nothing to show.
+
+    // run the parent class initialization to set up the $shortcode_atts property
+    parent::__construct($shortcode_atts, $shortcode_defaults);
+
+    $this->registration_page = Participants_Db::get_record_link($this->participant_values['private_id']);
+
+    // set up the signup form email preferences
+    $this->_set_email_prefs();
+
     // set the action URI for the form
-		$this->_set_submission_page();
+    $this->_set_submission_page();
 
     // set up the template iteration object
     $this->_setup_iteration();
-	
-		if ( ! $this->submitted ) {
 
-				/*
-				 * no submission has been made: do we show the signup form?
-				 *
-				 * yes if there's no valid PID in the GET string
-				 * but not if we're actually showing a [pdb_signup_thanks] shortcode 
-				 * and there's no submission
-				 *
-				 * this is because we use the same code for both shortcodes
-				 *
-				 * we will get a no-show if we end up here with a valid ID, but 
-				 * there's no [pdb_record] shortcode there.
-				 */
-				if (
-						( 
-						 ! isset( $_GET['pid'] )
-						 ||
-						 ( isset( $_GET['pid'] ) && false === Participants_Db::get_participant_id( $_GET['pid'] ) ) 
-						)
-						&&
-						$this->module == 'signup'
-					 )
-				{
-					// no submission; output the form
-					$this->_print_from_template();
-			
-				}
-			
-		} elseif ( $this->submitted ) {
-      
+    if ($this->submitted) {
+
       /*
-       * filter provides access to the freshly-stored record-- actually the whole 
-       * object so things like the email parameters can be altered. The properties 
-       * would need to be public, or we create methods to alter them
+       * filter provides access to the freshly-stored record and the email and thanks message properties so user feedback can be altered.
        */
-      apply_filters('pdb_after_submit_signup', $this);
+      if (has_filter(Participants_Db::$prefix . 'before_signup_thanks')) {
 
-			/*
+        $signup_feedback_props = array('recipient', 'receipt_subject', 'receipt_body', 'notify_recipients', 'notify_subject', 'notify_body', 'thanks_message', 'participant_values');
+        $signup_feedback = new stdClass();
+        foreach ($signup_feedback_props as $prop) {
+          $signup_feedback->$prop = &$this->$prop;
+        }
+
+        apply_filters(Participants_Db::$prefix . 'before_signup_thanks', $signup_feedback);
+      }
+
+      /*
        * check to see if the thanks email has been sent and send it if it has not
        */
-			if ( 'sent' != get_transient( 'signup-'.$this->participant_id ) ) {
-        
-        $this->_send_email();
-			
-        // mark the record as sent to prevent duplicate emails
-        set_transient( 'signup-'.$this->participant_id, 'sent', 120 );
-        
-      }
-			
-			// print the thank you note
-			if ( is_object($this->email_message) ) $this->_thanks();
-			
-		}
-		
-	}
+      if ($sent === false) {
 
-	/**
-	 * prints a signup form called by a shortcode
-	 *
-	 * this function is called statically to instantiate the Signup object,
-	 * which captures the processed template output and returns it for display
-	 *
-	 * @param array $params parameters passed by the shortcode
-	 * @return string form HTML
-	 */
-	public function print_form( $params ) {
-		
-		if ( ! isset( self::$instance ) ) self::$instance = new PDb_Signup( $params );
-		
-		return self::$instance->output;
-		
-	}
-  
+        $this->_send_email();
+
+        // mark the record as sent
+        $this->update_sent_status($this->participant_id, true);
+      }
+      else
+        return false; // the thanks message and email have already been sent for this ID
+    }
+    // print the shortcode output
+    $this->_print_from_template();
+  }
+
+  /**
+   * prints a signup form called by a shortcode
+   *
+   * this function is called statically to instantiate the Signup object,
+   * which captures the processed template output and returns it for display
+   *
+   * @param array $params parameters passed by the shortcode
+   * @return string form HTML
+   */
+  public static function print_form($params) {
+
+    self::$instance = new PDb_Signup($params);
+
+    return self::$instance->output;
+  }
+
   /**
    * includes the shortcode template
    */
   protected function _include_template() {
-    
+
     include $this->template;
-		
   }
-  
+
+  /**
+   * sets up the signup form email preferences
+   */
+  private function _set_email_prefs() {
+
+    $this->send_reciept = $this->options['send_signup_receipt_email'];
+    $this->send_notification = $this->options['send_signup_notify_email'];
+    $this->notify_recipients = $this->options['email_signup_notify_addresses'];
+    $this->notify_subject = $this->options['email_signup_notify_subject'];
+    $this->notify_body = $this->options['email_signup_notify_body'];
+    $this->receipt_subject = $this->options['signup_receipt_email_subject'];
+    $this->receipt_body = $this->options['signup_receipt_email_body'];
+    $this->thanks_message = $this->options['signup_thanks'];
+    $this->email_header = Participants_Db::$email_headers;
+  }
+
   /**
    * sets the form submission page
    */
-  private function _set_submission_page() {
-		
-		if ( isset( $this->options['signup_thanks_page'] ) and $this->options['signup_thanks_page'] != 'none' ) {
-			
-			$this->submission_page = get_permalink( $this->options['signup_thanks_page'] );
-			
-		} else {
-			
-			// the signup thanks page is not set up, so we submit to the page the form is on
-			
-			$this->submission_page = $_SERVER['REQUEST_URI'];
-			
-		}
-    
+  protected function _set_submission_page() {
+
+    if (isset($this->options['signup_thanks_page']) and $this->options['signup_thanks_page'] != 'none') {
+
+      $this->submission_page = get_permalink($this->options['signup_thanks_page']);
+    } else {
+
+      // the signup thanks page is not set up, so we submit to the page the form is on
+      $this->submission_page = $_SERVER['REQUEST_URI'];
+    }
   }
 
+  /**
+   * prints a signup form top
+   * 
+   * @param array array of hidden fields supplied in the template
+   */
+  public function print_form_head($hidden = '') {
+
+    echo $this->_print_form_head($hidden);
+  }
+
+  public function print_submit_button($class = 'button-primary', $value = false) {
+
+    PDb_FormElement::print_element(array(
+        'type' => 'submit',
+        'value' => ($value === false ? $this->options['signup_button_text'] : $value),
+        'name' => 'submit_button',
+        'class' => $class . ' pdb-submit',
+        'module' => $this->module,
+    ));
+  }
   
-
-  // prints a signup form top
-  public function print_form_head() {
-    ?>
-    <form method="post" enctype="multipart/form-data" >
-        <?php
-        FormElement::print_hidden_fields( array(
-                                                'action'         => $this->module,
-                                                'subsource'      => Participants_Db::PLUGIN_NAME,
-                                                'shortcode_page' => basename( $_SERVER['REQUEST_URI'] ),
-                                                'thanks_page'    => $this->submission_page
-                                                ) );
-
+  
+  /**
+   * prints a private link retrieval link
+   * 
+   * @param string $linktext
+   */
+  public function print_retrieve_link($linktext = '', $open_tag = '<span class="pdb-retrieve-link">', $close_tag = '</span>') {
+    
+    $linktext = empty($linktext) ? Participants_Db::$plugin_options['retrieve_link_text'] : $linktext;
+    
+    if ($this->options['show_retrieve_link'] != 0) {
+      $retrieve_link = $this->options['link_retrieval_page'] !== 'none' ? get_permalink($this->options['link_retrieval_page']) : $_SERVER['REQUEST_URI'];
+      echo $open_tag . '<a href="' . Participants_Db::add_uri_conjunction($retrieve_link) . 'm=r">' . $linktext . '</a>' . $close_tag;
+    }
   }
-	
-	public function print_submit_button( $class = 'button-primary' ) {
-		
-		FormElement::print_element( array(
-                                      'type'       => 'submit',
-                                      'value'      => $this->options['signup_button_text'],
-                                      'name'       => 'submit',
-                                      'class'      => $class.' pdb-submit',
-                                      ) );
-	}
-	
-	/**
-	 * prints a thank you note
-	 */
-	private function _thanks() {
-		ob_start(); ?>
-    
-		<div class="<?php echo $this->wrap_class ?> signup-thanks">
-      <?php echo TemplateEmail::proc_tags( $this->options['signup_thanks'], $this->email_message->get_tags() ); ?>
-		</div>
-    
-		<?php $this->output = ob_get_clean();
-		
-		unset( $_POST );
-		
-	}
-	
-	/**
-	 * adds a captcha field to the signup form
-	 *
-	 * @param string $type selects the type of CAPTCHA to employ: none, math, color, reCaptcha
-	 */
-	private function _add_captcha() {
-		
-		switch ( $this->captcha_type ) {
-			
-			case 'none';
-			default;
-				return false;
-				
-		}
-		
-	}
 
-	/**
+  /**
+   * prints a thank you note
+   */
+  private function get_thanks_message() {
+
+    $this->output = $this->_proc_tags($this->thanks_message);
+    unset($_POST);
+    return $this->output;
+  }
+
+  /**
    * sends the notification and receipt emails for a signup submission
    *
    */
-	private function _send_email() {
+  private function _send_email() {
 
-		if ( $this->options['send_signup_notify_email'] ) $this->_do_notify();
-		if ( $this->options['send_signup_receipt_email'] ) $this->_do_receipt();
-	
-	}
-
-	// sends a receipt email
-	private function _do_receipt() {
-		
-		if ( ! isset( $this->participant_values['email'] ) || empty( $this->participant_values['email'] ) ) return NULL;
-    
-    $this->email_message = new PDb_TemplateEmail(
-                    array(
-                        'recipients' => $this->participant_values['email'],
-                        'subject' => $this->options['signup_receipt_email_subject'],
-                        'body' => $this->options['signup_receipt_email_body'],
-                        'id' => $this->participant_id,
-                    )
-    );
-    $this->email_message->send();
-		
-	}
-
-	// sends a notification email
-	private function _do_notify() {
-    
-    $this->email_message = new PDb_TemplateEmail(
-                    array(
-                        'recipients' => $this->options['email_signup_notify_addresses'],
-                        'subject' => $this->options['email_signup_notify_subject'],
-                        'body' => $this->options['email_signup_notify_body'],
-                        'id' => $this->participant_id,
-                    )
-    );
-    $this->email_message->send();
-		
-	}
-  
-  /**
-   * sends a private link given an email address or other record identifier
-   * 
-   * sends an email to the querent and optionally to the admin
-   * 
-   * checks the querent's IP and allows three tries before access is blocked for a day
-   * 
-   * returns a string indicating the result of the operation so a suitable feedback 
-   * message can be shown to the user: 'not found', 'IP blocked', 'email sent'
-   *
-   * @param string $identifier the information used to identify an account
-   * @return string
-   */
-  public function send_private_link($identifier) {
-    
-    $request_ip = str_replace('.','',$_SERVER['REMOTE_ADDR']);
-    $transient = Participants_Db::$css_prefix . 'lost-private-link-timeout-' . $request_ip;
-    // check the timeout: they get three tries and then the IP is blocked for a day
-    $check = get_transient($transient);
-    if ( $check === false ) {
-      set_transient($transient, 1, (60 * 60 * 24) ); 
-    } else {
-      if ($check <= 3) {
-        set_transient($transient, $check++, (60 * 60 * 24) );
-      } else {
-        error_log('Participants Database Plugin: blocked private link request from IP:'. $_SERVER['REMOTE_ADDR']);
-        return 'IP blocked';
-      }
-    }
-    
-    $record_id = get_record_id_by_term($this->options['retrieve_link_identifier'], $identifier);
-    if (!Participants_Db::field_value_exists($record_id,'id')) return 'not found'; // no record was found
-    
-    $this->email_message = new PDb_TemplateEmail(
-                    array(
-                        'recipients' => '',
-                        'subject' => $this->options['retrieve_link_email_subject'],
-                        'body' => $this->options['retrieve_link_email_body'],
-                        'id' => $record_id,
-                    )
-    );
-    $this->email_message->send();
-    
-    if ( 0 != $this->options['send_retrieve_link_notify_email'] ) {
-      $this->email_message = new PDb_TemplateEmail(
-                      array(
-                          'recipients' => $this->options['email_signup_notify_addresses'],
-                          'subject' => $this->options['retrieve_link_notify_subject'],
-                          'body' => $this->options['retrieve_link_notify_body'],
-                          'id' => $record_id,
-                      )
-      );
-      $this->email_message->send();
-    }
-    
-    return 'email sent';
-    
+    if ($this->send_notification)
+      $this->_do_notify();
+    if ($this->send_reciept)
+      $this->_do_receipt();
   }
+
+  // sends a receipt email
+  private function _do_receipt() {
+    
+    $email_field = Participants_Db::$plugin_options['primary_email_address_field'];
+
+    if (!isset($this->participant_values[$email_field]) || empty($this->participant_values[$email_field]))
+      return NULL;
+
+    $this->_mail(
+            $this->participant_values[$email_field], $this->_proc_tags($this->receipt_subject), $this->_proc_tags($this->receipt_body)
+    );
+  }
+
+  // sends a notification email
+  private function _do_notify() {
+
+    $this->_mail(
+            $this->notify_recipients, $this->_proc_tags($this->notify_subject), $this->_proc_tags($this->notify_body)
+    );
+  }
+
   /**
    * grab the defined identifier field for display in the retrieve private link form
    * 
@@ -369,18 +320,110 @@ class PDb_Signup extends PDb_Shortcode {
    * @return string
    */
   function get_retrieve_field() {
-    
+
     global $wpdb;
-    
-    $columns = array( 'name','title','form_element');
-    
-    $sql = 'SELECT v.'. implode( ',v.',$columns ) . ' 
-            FROM '.Participants_Db::$fields_table.' v 
-            WHERE v.name = "'.$this->options['retrieve_link_identifier'].'" 
+
+    $columns = array('name', 'title', 'form_element');
+
+    $sql = 'SELECT v.' . implode(',v.', $columns) . ' 
+            FROM ' . Participants_Db::$fields_table . ' v 
+            WHERE v.name = "' . $this->options['retrieve_link_identifier'] . '" 
             ';
-            
-    return $wpdb->get_results( $sql, OBJECT_K );
-    
+
+    return $wpdb->get_results($sql, OBJECT_K);
+  }
+
+  /**
+   * sends a mesage through the WP mail handler function
+   *
+   * @todo these email functions should be handled by an email class
+   *
+   * @param string $recipients comma-separated list of email addresses
+   * @param string $subject    the subject of the email
+   * @param string $body       the body of the email
+   *
+   */
+  private function _mail($recipients, $subject, $body) {
+
+    if (WP_DEBUG) error_log(__METHOD__.'
+      
+header:'.$this->email_header.'
+to:'.$recipients.' 
+subj.:'.$subject.' 
+message:
+'.$body 
+            );
+
+    $this->current_body = $body;
+
+    if ($this->options['html_email'])
+      //add_action('phpmailer_init', array($this, 'set_alt_body'));
+
+    $sent = wp_mail($recipients, $subject, $body, $this->email_header);
+
+    if (false === $sent)
+      error_log(__METHOD__ . ' sending returned false');
+  }
+
+  /**
+   * set the PHPMailer AltBody property with the text body of the email
+   *
+   * @param object $phpmailer an object of type PHPMailer
+   * @return null
+   */
+  public function set_alt_body(&$phpmailer) {
+
+    if (is_object($phpmailer))
+      $phpmailer->AltBody = $this->_make_text_body($this->current_body);
+  }
+
+  /**
+   * strips the HTML out of an HTML email message body to provide the text body
+   *
+   * this is a fairly crude conversion here. I should include some kind of library
+   * to do this properly.
+   *
+   * @param string $HTML the HTML body of the email
+   * @return string
+   */
+  private function _make_text_body($HTML) {
+
+    return strip_tags(preg_replace('#(</(p|h1|h2|h3|h4|h5|h6|div|tr|li) *>)#i', "\r", $HTML));
+  }
+  
+  /**
+   * updates the signup transient
+   * 
+   * "true" here indicates that the record signup notification has been sent
+   * 
+   * @param int $id the record id
+   * @param bool $state the state to set the transient value to
+   * @return null
+   */
+  public static function update_sent_status($id, $state) {
+    $check_sent[$id] = $state;
+    $sent_records = get_transient(Participants_Db::$prefix . 'signup-email-sent');
+    if (is_array($sent_records)) $sent_records = $check_sent + $sent_records;
+    else $sent_records = $check_sent;
+    /* 
+     * expires after one year, we need to do this in order to avoid the transient 
+     * being needlessly autoloaded
+     */
+    set_transient(Participants_Db::$prefix . 'signup-email-sent', $sent_records, (365 * 60 * 60 * 12));
+  }
+  
+  /**
+   * checks the status of a signup email status transient
+   * 
+   * @param int $id the id of the record to check
+   * @return bool the stored status of the record
+   */
+  public static function check_sent_status($id)
+  {
+    $check_sent = get_transient(Participants_Db::$prefix . 'signup-email-sent');
+    if ($check_sent === false or !isset($check_sent[$id]) or $check_sent[$id] === false) {
+      return false;
+    } else return true;
   }
 
 }

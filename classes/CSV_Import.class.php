@@ -179,7 +179,7 @@ abstract class CSV_Import {
 
       foreach ($csv_line as $value) {
 
-        $values[] = $wpdb->escape($this->_enclosure_trim($value, '', $this->CSV->enclosure));
+        $values[] = $this->process_value($value);
       }
 
       if (count($values) != $this->column_count) {
@@ -203,6 +203,18 @@ abstract class CSV_Import {
     }
 
     return true;
+  }
+
+  /**
+   * applies conditioning and escaping to the incoming value
+   * 
+   * @global object $wpdb
+   * @param type $value
+   * @return string
+   */
+  protected function process_value($value) {
+    global $wpdb;
+    return $wpdb->escape($this->_enclosure_trim($value, '', $this->CSV->enclosure));
   }
 
   /**

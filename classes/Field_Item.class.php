@@ -6,44 +6,82 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdeign@xnau.com>
- * @copyright  2011 xnau webdesign
+ * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    0.1
+ * @version    0.2
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Template_Item class
  */
 class Field_Item extends Template_Item {
   
-  // properties
-  
-  // the field's value string
+  /**
+   * @var string the field's value
+   */
   var $value;
   
-  // the fields option values
+  /**
+   * @var array option values
+   */
   var $values;
   
-  // the validation method for the field
+  /**
+   * @var array additional attributes
+   */
+  var $attributes = array();
+  
+  /**
+   *
+   * @var string the validation method for the field
+   */
   var $validation;
   
-  // the field's form element
+  /**
+   *
+   * @var string the field's form element
+   */
   var $form_element;
-  // the field's id
+  
+  /**
+   *
+   * @var int id of the current record
+   */
   var $record_id;
   
-  // the field's defualt value
+  /**
+   *
+   * @var string the field's defualt value
+   */
   var $default;
   
-  // the help text
+  /**
+   *
+   * @var string the help text
+   */
   var $help_text;
   
-  // the readonly status of the field
+  /**
+   *
+   * @var bool the readonly status of the field
+   */
   var $readonly;
   
-  // the element class name
+  /**
+   *
+   * @var string the element class name
+   */
   var $field_class;
   
-  // methods
+  /**
+   *
+   * @var string the link href for elements wrapped in an anchor tag
+   */
+  var $link = false;
   
+  /**
+   * 
+   * @param array $field the field attributes
+   * @param mixed $id the id of the source record if available
+   */
   public function __construct( $field, $id = false ) {
     
     parent::__construct( $field );
@@ -52,10 +90,15 @@ class Field_Item extends Template_Item {
     
     $this->record_id = $id;
     
+    //error_log(__METHOD__.' instantiated:'.print_r($this,1));
+    
   }
   
   // template methods
   
+  /**
+   * prints a field label
+   */
   public function print_label() {
     
     echo $this->_label();
@@ -66,19 +109,22 @@ class Field_Item extends Template_Item {
    * prints a field value, wrapping with a link as needed
    * 
    */
-  public function print_value() {
+  public function print_value($print = true) {
     
-    if ( $this->is_single_record_link() ) {
-      
-      $output = $this->output_single_record_link();
-      
-    } else {
-      
-      $output = Participants_Db::prep_field_for_display( $this->value, $this->form_element );
-      
-    }
+    if ($print) echo $this->get_value();
+    else return $this->get_value();
     
-    echo $output;
+  }
+  
+  /**
+   * returns a field value, wrapping with a link as needed
+   * 
+   * @return string the field's value, prepped for display
+   * 
+   */
+  public function get_value() {
+    
+    return PDb_FormElement::get_field_value_display($this);
     
   }
   
@@ -96,11 +142,11 @@ class Field_Item extends Template_Item {
   private function _is_single_record_link() {
 
     return (
-            isset( $this->options['single_record_link_field'] )
+            isset( Participants_Db::$plugin_options['single_record_link_field'] )
             &&
-            $this->name == $this->options['single_record_link_field']
+            $this->name == Participants_Db::$plugin_options['single_record_link_field']
             &&
-            ! empty( $this->options['single_record_page'] )
+            ! empty( Participants_Db::$plugin_options['single_record_page'] )
             &&
             ! in_array( $this->form_element, array('rich-text', 'link' ) )
             &&
@@ -110,22 +156,21 @@ class Field_Item extends Template_Item {
   }
   
   /**
-	 * outputs a single record link
-	 *
-	 * @param string $template an optional template for showing the link
-	 *
-	 * @return string the HTML for the single record link
-	 *
-	 */
-	public function output_single_record_link($template = false) {
-      
-		$template = $template ? $template : '<a class="single-record-link" href="%1$s" title="%2$s" >%2$s</a>';
-		$url = get_permalink($this->options['single_record_page']);
-		$url = Participants_Db::add_uri_conjunction($url) . 'pdb='.$this->record_id;
-		
-		return sprintf($template, $url, (empty($this->value)?$this->default:$this->value));
-		
-	}
+   * outputs a single record link
+   *
+   * @param string $template an optional template for showing the link
+   *
+   * @return string the HTML for the single record link
+   *
+   */
+  public function output_single_record_link($template = false) {
+
+    $template = $template ? $template : '<a class="single-record-link" href="%1$s" title="%2$s" >%2$s</a>';
+    $url = get_permalink(Participants_Db::$plugin_options['single_record_page']);
+    $url = Participants_Db::add_uri_conjunction($url) . 'pdb=' . $this->record_id;
+
+    return sprintf($template, $url, (empty($this->value) ? $this->default : $this->value));
+  }
   
   /**
    * adds the required marker to a field label as needed
@@ -135,9 +180,9 @@ class Field_Item extends Template_Item {
     
     $label = $this->prepare_display_value( $this->title );
     
-    if ( $this->options['mark_required_fields'] && $this->validation != 'no' && $this->module != 'single' ) {
+    if ( Participants_Db::$plugin_options['mark_required_fields'] && $this->validation != 'no' && in_array($this->module,array('signup','record'))) {
       
-      $label = sprintf( $this->options['required_field_marker'], $label );
+      $label = sprintf( Participants_Db::$plugin_options['required_field_marker'], $label );
       
     }
     
@@ -168,27 +213,19 @@ class Field_Item extends Template_Item {
    *
    */
   public function print_element() {
-    
-    $this->field_class = ( $this->validation != 'no' ? "required-field" : '' ) . ( in_array( $this->form_element, array( 'text-line','date' ) ) ? ' regular-text' : '' );
 
-		if ( $this->readonly ) {
-      
-      if ( $this->form_element == 'date' ) $this->value = FormElement::format_date($this->value);
-      
-      echo '<span class="pdb-readonly '.$this->field_class.'" >'.$this->value.'</span>';
-      
+    $this->field_class = ( $this->validation != 'no' ? "required-field" : '' ) . ( in_array($this->form_element, array('text-line', 'date', 'timestamp')) ? ' regular-text' : '' );
+
+    if ($this->readonly) {
+
+      if (in_array($this->form_element, array('date', 'timestamp')))
+        $this->value = PDb_FormElement::get_field_value_display($this);
+
+      echo '<span class="pdb-readonly ' . $this->field_class . '" >' . $this->value . '</span>';
     } else {
-    
-      if ( $this->form_element == 'dynamic-value' ) {
-        
-        echo '<span class="pdb-readonly '.$this->field_class.'" >'.$this->value.'</span>';
-      
-      }
-    
-      $this->_print();
 
+      $this->_print();
     }
-    
   }
   
   /**
@@ -196,12 +233,14 @@ class Field_Item extends Template_Item {
    */
   public function _print() {
     
-    FormElement::print_element( array(
+    PDb_FormElement::print_element( array(
                                         'type'       => $this->form_element,
                                         'value'      => $this->value,
                                         'name'       => $this->name,
                                         'options'    => $this->values,
                                         'class'      => $this->field_class,
+                                        'attributes' => $this->attributes,
+                                        'module'     => $this->module,
                                         )
                                  );
     

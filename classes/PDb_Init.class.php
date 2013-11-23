@@ -21,13 +21,12 @@ class PDb_Init
     public static $main_fields;
     public static $admin_fields;
     public static $personal_fields;
-    public static $source_fields;
     public static $field_groups;
 
     function __construct( $mode = false )
     {
         if ( ! $mode )
-            wp_die( 'class must be be called on the activation hooks', 'object not correctly instantiated' );
+            wp_die( 'class must be called on the activation hooks', 'object not correctly instantiated' );
 
         // error_log( __METHOD__.' called with '.$mode );
 
@@ -118,6 +117,7 @@ class PDb_Init
           `id` INT(3) NOT NULL AUTO_INCREMENT,
           `order` INT(3) NOT NULL DEFAULT 0,
           `display` BOOLEAN DEFAULT 1,
+          `admin` BOOLEAN NOT NULL DEFAULT 0,
           `title` TINYTEXT NOT NULL,
           `name` VARCHAR(30) NOT NULL,
           `description` TEXT NULL,
@@ -234,7 +234,12 @@ class PDb_Init
 				delete_option( Participants_Db::$db_version_option );
 
 				// clear transients
-				delete_transient( 'pdb_last_record' );
+        $sql = 'SELECT `option_name` FROM ' . $wpdb->prefix . 'options WHERE `option_name` LIKE "%' . Participants_Db::$prefix . '%" OR `option_name` LIKE "%' . PDb_List_Admin::$limit_cookie . '-%" OR `option_name` LIKE "%pdb%" OR `option_name` LIKE "%signup-email-sent%"';
+        $transients = $wpdb->get_col($sql);
+        foreach($transients as $name) {
+          delete_transient(Participants_Db::$prefix . $name);
+        }
+        
 				
         error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
         
@@ -243,7 +248,7 @@ class PDb_Init
     /**
      * performs an update to the database if needed
      */
-    public function on_update() {
+    public static function on_update() {
       
       global $wpdb;
       
@@ -552,6 +557,33 @@ class PDb_Init
         }
 			
 			}
+      if ( '0.6' == get_option( Participants_Db::$db_version_option ) ) {
+        /*
+         * this database version changes the internal timestamp fields from "date" 
+         * type to "timestamp" type fields, also sets the 'readonly' flag of internal 
+         * fields so we don't have to treat them as a special case any more.
+         * 
+         * set the field type of internal timestamp fields to 'timestamp'
+         */
+        $sql = "UPDATE ".Participants_Db::$fields_table." p SET p.form_element = 'timestamp', p.readonly = '1' WHERE p.name IN ('date_recorded','last_accessed','date_updated')";
+        if ($wpdb->query( $sql ) !== false) {
+          // update the stored DB version number
+          update_option( Participants_Db::$db_version_option, '0.65' );
+        }
+      }
+      if ( '0.65' == get_option( Participants_Db::$db_version_option ) ) {
+        /*
+         * adds a new column to the goups database so a group cna be designated as a "admin" group
+         */
+        $sql = "ALTER TABLE ".Participants_Db::$groups_table." ADD COLUMN `admin` BOOLEAN NOT NULL DEFAULT 0 AFTER `order`";
+        
+          if ($wpdb->query( $sql ) !== false) {
+          // update the stored DB version number
+          update_option( Participants_Db::$db_version_option, '0.7' );
+        }
+        $sql = "UPDATE ".Participants_Db::$groups_table." g SET g.admin = '1' WHERE g.name ='internal'";
+        $wpdb->query( $sql );
+      }
       
       error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );
       
@@ -560,8 +592,13 @@ class PDb_Init
     /**
      * performs a series of tests on the database to determine it's actual version
      * 
-     * this is beacuse it is apparently possible for the database version option 
-     * to be incorrect or missing
+     * this is becuse it is apparently possible for the database version option 
+     * to be incorrect or missing. This way, we know with some certainty which version 
+     * the database really is. Every time we create a new database version, we add 
+     * a test for it here.
+     * 
+     * @global object $wpdb
+     * @return null
      */
     private function _set_database_real_version() {
 
@@ -602,6 +639,20 @@ class PDb_Init
         update_option(Participants_Db::$db_version_option, '0.6');
       else return;
       
+      // check for version 0.65
+      $value_test = $wpdb->get_var('SELECT `form_element` FROM ' . Participants_Db::$fields_table . ' WHERE `name` = "date_recorded"');
+      
+      
+      if ($value_test == 'timestamp')
+        update_option(Participants_Db::$db_version_option, '0.65');
+      else return;
+      
+      // check for version 0.7
+      $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$groups_table . ' LIKE "admin"');
+      if (!empty($column_test))
+        update_option(Participants_Db::$db_version_option, '0.7');
+      else return;
+      
   }
 
     /**
@@ -616,7 +667,6 @@ class PDb_Init
                                   'main'      => 'Participant Info',
                                   'personal'  => 'Personal Info',
                                   'admin'     => 'Administrative Info',
-                                  'source'    => 'Source of the Record',
                                   'internal'  => 'Record Info',
                                   );
 
@@ -808,23 +858,6 @@ class PDb_Init
                                                         'help_text' => 'how much time they have volunteered',
                                                       ),
 
-                                  );
-      self::$source_fields = array(
-                                  'where'             => array(
-                                                              'title' => 'Signup Location',
-                                                              'form_element' => 'text-line',
-                                                              'persistent' => 1,
-                                                            ),
-                                  'when'              => array(
-                                                              'title' => 'Signup Date',
-                                                              'form_element' => 'date',
-                                                              'persistent' => 1,
-                                                            ),
-                                  'by'                => array(
-                                                              'title' => 'Signup Gathered By',
-                                                              'form_element' => 'text-line',
-                                                              'persistent' => 1,
-                                                            ),
                                   );
 
 

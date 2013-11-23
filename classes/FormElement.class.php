@@ -22,7 +22,7 @@
  * The class operates as a static factory, with each element called as a 
  * static method with the minimum necessary parameters as an associative 
  * array or get-request-like string in the WordPress style. The static 
- * method instantiates the element object, which itself remains private. 
+ * method instantiates the element object, which itself remains protected. 
  * See the constructor method for details.
  *
  * Requires PHP Version 5.3 or greater
@@ -30,7 +30,7 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2011, 2012 xnau webdesign
+ * @copyright  2011, 2012, 2013 xnau webdesign
  * @license    GPL2
  * @version    Release: 1.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
@@ -51,58 +51,133 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-// form elements class
-//
-class FormElement {
+abstract class FormElement {
   
-  // defines the type of form element for the object
+  /**
+   * defines the type of form element for the object
+   *
+   * @var string 
+   */
   var $type;
   
-  // holds the current value of the element
+  /**
+   * holds the current value of the element
+   *
+   * @var string
+   */
   var $value;
   
-  // the name attribute of the form data field
+  /**
+   * the name attribute of the form data field
+   *
+   * @var string
+   */
   var $name;
   
-  // for elements that have set options such as checkboxes and dropdowns, this 
-  // array holds the name=>value pairs
+  /**
+   * for elements that have set options such as checkboxes and dropdowns, this 
+   * array holds the name=>value pairs
+   *
+   * @var array
+   */
   var $options;
   
-  // this array holds all other html element attributes
+  /**
+   * holds any other html element attributes in name=>value pairs
+   * 
+   * @var array 
+   */
   var $attributes;
   
-  // space-separated string of class names for the form element
+  /**
+   * space-separated string of class names for the form element
+   *
+   * @var string
+   */
   var $classes;
 
-  // array holding the text lines of an element to be output
+  /**
+   * array holding the text lines of an element to be output
+   *
+   * @var array
+   */
   var $output = array();
   
-  // the size attribute of the input tag
-  public $size;
-  
-  // a random key for a simple cipher
-  static $key = 'dk4Rul2Qs';
+  /**
+   * the size attribute of the input tag
+   *
+   * @var type 
+   */
+  var $size;
 
-	// sets the height and width of the textarea element
-	private $textarea_dims = array( 'rows'=> 2, 'cols'=> 40 );
+	/**
+   * sets the height and width of the textarea element
+   *
+   * @var array
+   */
+	var $textarea_dims = array( 'rows'=> 2, 'cols'=> 40 );
   
-  // boolean: is the element part of a group?
+  /**
+   * element group status
+   * 
+   * this pertains to elements which are part of a group of form elements sharing 
+   * a common name, such as for multi-selects
+   *
+   * @var bool
+   */
   public $group;
   
-  // linebreak character
+  /**
+   * holds "inside wrapping tag" status
+   * 
+   * this is used in constructing complex elements that use wrapping tags such as 
+   * optgroups
+   * 
+   * @var bool
+   */
+  var $inside = false;
+  
+  /**
+   * @var string the linebreak character
+   */
   const BR = PHP_EOL;
   
-  // tab character
+  /**
+   * 
+   * @var string the tab character
+   */
   const TAB = "\t";
   
-  // holds current indent level
-  private $indent;
+  /**
+   * holds current indent level
+   *
+   * @var int
+   */
+  protected $indent;
   
-  // holds the internationaliztion strings
-  private $i18n;
+  /**
+   *
+   * @var array holds the internationaliztion strings
+   */
+  protected $i18n;
   
-  // define an array of all available form element types
-  public static $element_types;
+  /**
+   *
+   * @var array of all available form element types
+   */
+  var $element_types;
+  
+  /**
+   * a namespacing prefix for CSS classes and such
+   */
+  var $prefix = 'form-element';
+  
+  /**
+   * name of the instantiating module
+   * 
+   * @var string
+   */
+  var $module;
   
   /**
    * instantiates a FormElement object
@@ -113,13 +188,17 @@ class FormElement {
    *                    value        string the current value of the element
    *                    name         string the name attribute of the element
    *                    options      mixed  an optional array of values for checkboxes, selects, etc. Can also
-   *                                        be serialized array
+   *                                        be serialized array. A special element in this array has the key 
+   *                                        "null_select" which if bool false prevents the selected null case of 
+   *                                        dropdown elements from being added. If it has another value, the null 
+   *                                        case (which has a blank label) will hold this value and be selected 
+   *                                        if no value property is provided to the instance
    *                    attributes   array  an optional array of name=>value set of HTML attributes to include
    *                                        (can include a class attribute)
    *                    class        string a class name for the element; more than one class name must be
    *                                        space-separated string
    *                    indent       int    starting indent value
-   *                    size         int    the size of the field
+   *                    size         int    the size of the field (text type fields only)
    *                    container_id string CSS id for the element containter (if any)
    *
    * @return NULL
@@ -140,12 +219,14 @@ class FormElement {
     $params = wp_parse_args( $parameters, $defaults );
     
     $this->type         = $params['type'];
+    $this->form_element = $params['type'];
     $this->value        = $params['value'];
     $this->name         = $params['name'];
     $this->classes      = $params['class'];
     $this->size         = $params['size'];
     $this->container_id = $params['container_id'];
     $this->group        = $params['group'];
+    $this->module       = isset($params['module']) ? $params['module'] : '';
     
     if ( NULL !== $params['options'] || ! empty( $params['options'] ) ) {
       
@@ -175,19 +256,30 @@ class FormElement {
     // clear the output array
     $this->output = array();
     
-    /*
-     * if the type is unknown, we pass the object to an external function with 
-     * a filter handle that includes the name of the custom form element
-     */
-    apply_filters('pdb-form_element-build-' . $this->type, $this);
+    $this->build_element();
+  }
+  
+  /**
+   * give the child class a chance to insert it's modifications to the build method
+   */
+  abstract function build_element();
 
-    if (empty($this->output)) {
-      
-      // build the element by calling the type's method if it has been built by the filter callback
+
+  /**
+   * builds the form element by calling it's method
+   * 
+   * @return null
+   */
+  protected function call_element_method() {
+    
       switch ( $this->type ) :
 
         case 'date':
           $this->_date_field();
+          break;
+        
+        case 'timestamp':
+          $this->_timestamp_field();
           break;
 
         case 'text-area':
@@ -196,8 +288,7 @@ class FormElement {
           break;
 
         case 'rich-text':
-          if ( Participants_Db::$plugin_options['rich_text_editor'] ) $this->_rich_text_field();
-          else $this->_text_field();
+          $this->_rich_text_field();
           break;
 
         case 'checkbox':
@@ -217,8 +308,8 @@ class FormElement {
           break;
 
         case 'multi-checkbox':
-         $this->_multi_checkbox();
-         break;
+          $this->_multi_checkbox();
+          break;
 
         case 'text':
         case 'text-line':
@@ -273,8 +364,6 @@ class FormElement {
         default:
 
       endswitch;
-    }
-    
   }
   
   /**
@@ -282,12 +371,8 @@ class FormElement {
    *
    * @static
    */
-  private function _HTML( $parameters ) {
+  static function _HTML( $parameters ){
 
-    $Element = new FormElement( $parameters );
-    
-    return $Element->_output();
-    
   }
   
   /**********************
@@ -297,13 +382,14 @@ class FormElement {
   /** 
    * prints a form element
    *
+   * this func is calls the child class so any legacy implementations using the 
+   * FormElement class alone can still work
+   *
    * @param array $parameters (same as __construct() )
    * @static
    */
   public static function print_element( $parameters ) {
-    
-    echo self::_HTML( $parameters );
-    
+    PDb_FormElement::print_element($parameters);
   }
 
   /** 
@@ -313,9 +399,7 @@ class FormElement {
    * @static
    */
   public static function get_element( $parameters ) {
-
-    return self::_HTML( $parameters );
-
+    PDb_FormElement::get_element($parameters);
   }
   
   /**
@@ -325,17 +409,141 @@ class FormElement {
    */
   public static function print_hidden_fields( $fields, $print = true ) {
     
-    $atts = array( 'type' => 'hidden');
+   PDb_FormElement::print_hidden_fields($fields, $print);
     
-    foreach ( $fields as $k => $v ) {
+  }
+
+  /**
+   * returns an element value formatted for display or storage
+   * 
+   * @param object $field a Field_Item object
+   * @param bool   $html  if true, retuns the value wrapped in HTML, false returns 
+   *                      the formatted value alone
+   * @return string the object's current value, formatted
+   */
+  public static function get_field_value_display($field, $html = true) {
+    
+    //error_log(__METHOD__.' field:'.print_r($field,1));
+
+    switch ($field->form_element) :
+
+      case 'image-upload' :
+
+        $image = new PDb_Image(array(
+            'filename' => $field->value,
+            'link' => (isset($field->link) ? $field->link : ''),
+            'mode' => 'both',
+            'module' => $field->module,
+            ));
+
+        if ($html and (!is_admin() or (defined('DOING_AJAX') and DOING_AJAX))) {
+          if (isset($field->module) and in_array($field->module, array('single','list'))) {
+            $image->display_mode = 'image';
+          } elseif (isset($field->module) and $field->module == 'signup') {
+            $image->display_mode = $image->image_defined ? 'both' : 'none';
+            $image->link = false;
+          }
+          $image->set_image_wrap();
+          $return = $image->get_image_html();
+        } elseif ($image->file_exists) {
+          $return = $image->get_image_file();
+        } else {
+          $return = $field->value;
+        }
+
+      break;
+
+    case 'file-upload' :
+
+      if ($html and ! empty($field->value)) {
+
+        if ($field->module == 'signup') {
+          $field->link = false;
+          $return = $field->value;
+        } else {
+          $upload_dir = wp_upload_dir();
+          $field->link =  get_bloginfo('url') . '/' . Participants_Db::$plugin_options['image_upload_location'] . $field->value;
+          $return = self::make_link($field);
+        }
+        break;
+      } else {
+
+        $return = $field->value;
+        break;
+      }
+
+    case 'date' :
+    case 'timestamp' :
+
+      $return = '';
+      if (self::is_empty($field->value) === false) {
+        
+        $date = strtotime($field->value);
+        
+        $format = get_option('date_format', 'r');
+        $return = date_i18n($format, $date);
+      }
+      break;
+
+    case 'multi-checkbox' :
+    case 'multi-select-other' :
+
+      $multivalues = maybe_unserialize($field->value);
+      if ( is_array($multivalues) and empty( $multivalues['other'] ) ) unset($multivalues['other']);
+
+      $return = implode(', ', (array) $multivalues);
+      break;
+
+    case 'link' :
       
-      $atts['name'] = $k;
-      $atts['value'] = $v;
-      
-      if ( $print ) echo self::_HTML( $atts );
-			else return self::_HTML( $atts );
-      
-    }
+      /*
+       * value is indexed array: array( $url, $linktext )
+       */
+
+      if (!$linkdata = unserialize_array($field->value)) {
+
+        $return = '';
+        break;
+      }
+
+      if (empty($linkdata[1]))
+        $linkdata[1] = str_replace('http://', '', $linkdata[0]);
+
+      if ($html)
+        $return = vsprintf(( empty($linkdata[0]) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>'), $linkdata);
+      else
+        $return = $linkdata[0];
+      break;
+
+    case 'text-line' :
+
+      if ($html) {
+
+        $return = self::make_link($field);
+        break;
+      } else {
+
+        $return = $field->value;
+        break;
+      }
+
+    case 'text-area':
+    case 'textarea':
+
+      $return = sprintf('<span class="textarea">%s</span>',$field->value );
+      break;
+    case 'rich-text':
+
+      $return = '<span class="textarea richtext">' . $field->value . '</span>';
+      break;
+    default :
+
+      $return = $field->value;
+
+    endswitch;
+
+    return $return;
+  
     
   }
 
@@ -346,7 +554,7 @@ class FormElement {
   /**
    * builds a input text element
    */
-  private function _text_line() {
+  protected function _text_line() {
     
     $this->_addline( $this->_input_tag() );
     
@@ -355,12 +563,30 @@ class FormElement {
   /**
    * builds a date field
    */
-  private function _date_field() {
+  protected function _date_field() {
     
     $this->add_class( 'date_field' );
     
     if (!empty($this->value)) {
-      $this->value = $this->format_date( $this->value );
+      $this->value = $this->format_date( $this->value, false );
+    }
+    
+    $this->_addline( $this->_input_tag() );
+    
+  }
+  
+  /**
+   * builds a timestamp field
+   */
+  protected function _timestamp_field() {
+    
+    $this->add_class( 'timestamp_field' );
+    
+    // test for a timestamp
+    if (is_int($this->value) or ((string) (int) $this->value === $this->value)) {
+      $this->value = $this->format_date($this->value, true );
+    } else {
+      $this->value = $this->format_date(strtotime($this->value), true );
     }
     
     $this->_addline( $this->_input_tag() );
@@ -370,7 +596,7 @@ class FormElement {
   /**
    * builds a text-field (textarea) element
    */
-  private function _text_field() {
+  protected function _text_field() {
     
     $value = ! empty( $this->value ) ? $this->value : '';
     
@@ -381,13 +607,13 @@ class FormElement {
   /**
    * builds a rich-text editor (textarea) element
    */
-  private function _rich_text_field() {
+  protected function _rich_text_field() {
     
-    $value = ! empty( $this->value ) ? $this->value : '';
+    $value = isset( $this->value ) ? $this->value : '';
     
     wp_editor(
             htmlspecialchars_decode($value),
-            preg_replace( '#[0-9_-]#', '', Participants_Db::$css_prefix . $this->name ),
+            preg_replace( '#[0-9_-]#', '', $this->prefix . $this->name ),
             array(
                 'media_buttons' => false,
                 'textarea_name' => $this->name,
@@ -399,7 +625,7 @@ class FormElement {
   /**
    * builds a password text element
    */
-  private function _password() {
+  protected function _password() {
     
     $this->_addline( $this->_input_tag('password') );
     
@@ -418,7 +644,7 @@ class FormElement {
    * will be the label for the checkbox. If no key is provided, no label will be
    * printed
    */
-  private function _checkbox() {
+  protected function _checkbox() {
     
       // if no options are defined, then it's a selectbox
       if ( false === $this->options or ! is_array( $this->options ) ) {
@@ -448,7 +674,7 @@ class FormElement {
   /**
    * builds a radio button element
    */
-  private function _radio() {
+  protected function _radio() {
     
     $this->_add_radio_series();
        
@@ -457,7 +683,7 @@ class FormElement {
   /**
    * builds a dropdown or dropdown-other element
    */
-  private function _dropdown( $other = false ) {
+  protected function _dropdown( $other = false ) {
     
     if ( isset( $this->attributes['other'] ) ) {
       $otherlabel = $this->attributes['other'];
@@ -467,14 +693,19 @@ class FormElement {
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
 
-    if ( $other ) $this->_addline( '<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
-    else $this->_addline( '<select id="' . $js_prefix . '_select" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
+    if ( $other ) {
+      $this->_addline( '<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
+    } else {
+      $id = isset($this->attributes['id']) ? $this->attributes['id'] : $js_prefix . '_select';
+      $this->_addline( '<select id="' . $id . '" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
+    }
 
     $this->indent++;
     
-    // start with blank option if there's no value for the field
-    if ( empty( $this->value ) )
-      $this->_addline( '<option value="" ' . ( empty( $this->value ) ? $this->_set_selected( true, true, 'selected' ) : '' ) . '  ></option>' );
+    /*
+     * include the "nothing selected" state
+     */
+    $this->_set_null_select();
     
     $this->_add_option_series();
     
@@ -528,7 +759,7 @@ class FormElement {
    *
    * @return string
    */
-  private function _dropdown_other() {
+  protected function _dropdown_other() {
 
     $this->_dropdown( true );
       
@@ -539,7 +770,7 @@ class FormElement {
    *
    * a set of checkboxes enclosed in a div tag
    */
-  private function _multi_checkbox() {
+  protected function _multi_checkbox() {
 
 		$this->value = (array) $this->value;
 
@@ -559,7 +790,7 @@ class FormElement {
    *
    * @param string $type can be either 'radio' or 'checkbox' (for a multi-select element)
    */
-  private function _select_other( $type = 'radio' ) {
+  protected function _select_other( $type = 'radio' ) {
     
     if ( $type == 'radio' ) {
       $this->value = is_array($this->value) ? current($this->value) : $this->value;
@@ -632,7 +863,7 @@ class FormElement {
   /**
    * builds a multi-select/other form element
    */
-  private function _select_other_multi() {
+  protected function _select_other_multi() {
     
     $this->_select_other( 'checkbox' );
     
@@ -643,27 +874,26 @@ class FormElement {
 	 *
 	 * stores an array: first element is the URL the optional second the link text
 	 */
-	private function _link_field( $linktext = true ) {
+	protected function _link_field() {
+    
+    // this element is stored as an array
+    $this->group = true;
 		
     $link_placeholder = '(URL)';
     $linktext_placeholder = $this->i18n['linktext'];
 		
-		if ( true === $linktext ) {
-			
-			$parts = is_serialized( $this->value ) ? unserialize( $this->value ) : (array) $this->value;
-			
-      // if the value contains only a URL, the linktext and URL are made the same
-      // if the value is not a URL, only the linked text is used
-			if ( count( $parts ) < 2 ) {
-        $parts[1] = $parts[0];
-        if ( ! filter_var( $parts[0], FILTER_VALIDATE_URL ) ) $parts[0] = '';
-      }
-		
-			list( $url, $title ) = $parts;
-			
-			$this->_addline( '<div class="link-element">' );
-			
-		} else $url = $this->value;
+    $parts = is_serialized( $this->value ) ? unserialize( $this->value ) : (array) $this->value;
+
+    // if the value contains only a URL, the linktext and URL are made the same
+    // if the value is not a URL, only the linked text is used
+    if ( count( $parts ) < 2 ) {
+      $parts[1] = $parts[0];
+      if ( ! filter_var( $parts[0], FILTER_VALIDATE_URL ) ) $parts[0] = '';
+    }
+
+    list( $url, $title ) = $parts;
+
+    $this->_addline( '<div class="link-element">' );
 		
 		//$url = empty( $url ) ? $link_placeholder : $url;
     $title = empty( $title ) ? '' : $title;
@@ -672,17 +902,11 @@ class FormElement {
 		
 		$this->attributes['placeholder'] = $link_placeholder;
 		
-		$this->_addline( $this->_input_tag( 'text', $url, false, $linktext ) );
+		$this->_addline( $this->_input_tag( 'text', $url, false ) );
 		
 		$this->attributes['placeholder'] = $linktext_placeholder;
 		
-		if ( true === $linktext )  {
-		
-      // previous label: '<label for="'.$this->name.'">'.$linktext_placeholder.'</label>'
-      
-			$this->_addline( $this->_input_tag( 'text', $title, false, true ).'</div>' );
-			
-		}
+		$this->_addline( $this->_input_tag( 'text', $title, false ).'</div>' );
 		
 	}
 																			
@@ -694,7 +918,7 @@ class FormElement {
    * requires js on page to function; this just supplies a suitable handle
    *
    */
-  private function _drag_sort() {
+  protected function _drag_sort() {
     
     $name = preg_replace( '#(\[.*\])#','', $this->name );
 
@@ -706,7 +930,7 @@ class FormElement {
   /**
    * builds a submit button
    */
-  private function _submit_button() {
+  protected function _submit_button() {
     
     $this->_addline( $this->_input_tag( 'submit' ) );
     
@@ -716,101 +940,61 @@ class FormElement {
    * builds a selector box
    * special checkbox with no unselected value
    */
-  private function _selectbox() {
+  protected function _selectbox() {
     
-    $this->_addline( $this->_input_tag( 'checkbox', $this->value, false, $this->group ) );
+    $this->_addline( $this->_input_tag( 'checkbox', $this->value, false ) );
     
   }
   
   /**
    * build a hidden field
    */
-  private function _hidden() {
+  protected function _hidden() {
     
     $this->_addline( $this->_input_tag( 'hidden' ) );
     
   }
 	
-	/**
-	 * builds a file upload element
+ /**
+   * builds a file upload element
    * 
    * @param string $type the upload type: file or image
-	 */
-	private function _upload($type) {
-		
-		// if a file is already defined, show it
-		if ( ! empty( $this->value ) ) {
-			
-if ( 'image' == $type)
-        $this->_addline( Participants_Db::prep_field_for_display( $this->value, 'image-upload' ) );
-      else {
-        $pattern = Participants_Db::$plugin_options[ 'make_links' ] ? '<a class="file-link-wrap"  href="%2$s%1$s" >%1$s</a>' : '<span class="file-link-wrap"  >%1$s</span>';
-        $this->_addline( sprintf($pattern, $this->value, Image_Handler::concatenate_directory_path(get_bloginfo('url'), Participants_Db::$plugin_options[ 'image_upload_location' ]) ));
-      }
-			
-		}
-		
-		// add the MAX_FILE_SIZE field
-		// this is really just for guidance, not a valid safeguard; this must be checked on submission
-		if ( isset( $this->options[ 'max_file_size' ] ) ) $max_size = $this->options[ 'max_file_size' ];
-		else $max_size = ( ini_get( 'post_max_size' ) / 2 ) * 1048576;// half it to give a cushion
-		
-		$this->_addline( $this->print_hidden_fields( array( 'MAX_FILE_SIZE'=>$max_size,$this->name=>$this->value ) ) );
-		
-		$this->_addline( $this->_input_tag( 'file' ) );
-    
+   */
+  protected function _upload($type) {
+
+    $this->_addline('<div class="' . $this->prefix . 'upload">');
+   // if a file is already defined, show it
+    if (!empty($this->value)) {
+
+      $this->_addline(self::get_field_value_display($this));
+    }
+
+    // add the MAX_FILE_SIZE field
+    // this is really just for guidance, not a valid safeguard; this must be checked on submission
+    if (isset($this->options['max_file_size']))
+      $max_size = $this->options['max_file_size'];
+    else
+      $max_size = ( ini_get('post_max_size') / 2 ) * 1048576; // half it to give a cushion
+
+    $this->_addline($this->print_hidden_fields(array('MAX_FILE_SIZE' => $max_size, $this->name => $this->value)));
+
+    $this->_addline($this->_input_tag('file'));
+
     // add the delete checkbox if there is a file defined
-    if ( ! empty($this->value)) $this->_addline( '<label class="file-delete">'.__('delete','participants-database').$this->_input_tag('checkbox','',false).'</label>' );
-		
-	}
-  
+    if (!empty($this->value))
+      $this->_addline('<span class="file-delete" ><label><input type="checkbox" value="delete" name="' . $this->name . '-deletefile">' . __('delete', 'participants-database') . '</label></span>');
+    
+    $this->_addline('</div>');
+  }
+
   /**
    * builds a captcha element
    * 
-   * there will be at least two types of captcha produced here: a simple match 
-   * captcha and a reCaptcha; the default is the math captcha
-   * 
-   * @param string $type selects the type of captcha to produce; currently only 'math' type
-   * 
    */
-  private function _captcha($type = 'math') {
+  protected function _captcha() {
     
-    $this->size = 3;
-    
-    /* generate the math question. We try to make it a simple arithmetic problem
-     */
-    $operators = array(
-        '&times;'  => 'bcmul',
-      /*'&divide;' => 'bcdiv',*/
-        '+'        => 'bcadd',
-        '&minus;'  => 'bcsub',
-    );
-    $o = array_rand($operators);
-    switch ($o){
-      case '&times;':
-        $a = rand( 1, 10 );
-        $b = rand( 1, 5 );
-        break;
-      case '&minus;':
-        $a = rand( 2, 10 );
-        do { $b = rand( 1, 9 ); } while($b>=$a);
-        break;
-      default:
-        $a = rand( 1, 10 );
-        $b = rand( 1, 10 );
-    }
-    $math_string = $a .' ' . $o . ' ' . $b . ' = ?';
-    $validation = '#^' . call_user_func($operators[$o], $a, $b ) . '$#';
-    if (is_array($this->value)) $this->value = $this->value[1];
-    /*
-     * the $info array will be used to pass values to the validation object; What 
-     * we are calling 'nonce' is actually the XOR-encrypted regex. If we need to 
-     * expand the types of CAPTCHAS in the future, we can use this to tell the 
-     * validation object how to validate the field
-     */
-    $info = array('type'=>$type,'nonce'=>FormValidation::xcrypt($validation,self::$key));
-    $this->_addline($this->_input_tag('hidden', urlencode(json_encode($info)), false, true ));
-    $this->_addline( '<span class="math-captcha">' . $math_string . '</span>' . $this->_input_tag('text', false, false, true ) );
+    $captcha = new PDb_CAPTCHA($this);
+    $this->_addline($captcha->get_html());
   }
 
   /************************ 
@@ -829,12 +1013,12 @@ if ( 'image' == $type)
    * @return string
    *
    */
-  private function _input_tag( $type='text', $value = false, $select = false, $group = false ) {
+  protected function _input_tag( $type='text', $value = false, $select = false ) {
 
     if ( $value === false ) $value = $this->value;
     $size = $this->size ? ' size="'.$this->size.'" ' : '';
 
-    return '<input type="' . $type . '" name="' . $this->name . ( $group ? '[]' : '' ) . '"' . $size . ( false !== $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . '  value="' . $value . '" />';
+    return '<input type="' . $type . '" name="' . $this->name . ( $this->group ? '[]' : '' ) . '"' . $size . ( false !== $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . '  value="' . $value . '" />';
 
   }
   
@@ -843,10 +1027,10 @@ if ( 'image' == $type)
    *
    * @param string $type sets the type of input series, defaults to checkbox
    */
-  private function _add_checkbox_series( $type = 'checkbox' ) {
+  protected function _add_checkbox_series( $type = 'checkbox' ) {
     
     // checkboxes are grouped, radios are not
-    $group = $type == 'checkbox' ? true : false;
+    $this->group = $type == 'checkbox' ? true : false;
 		
 		$class = '';
 		if ( ! empty( $this->classes ) ) {
@@ -854,21 +1038,29 @@ if ( 'image' == $type)
 			$this->classes = '';
 			}
     
-    foreach ( $this->_make_assoc( $this->options ) as $key => $value ) {
+    $null_select = isset($this->options['null_select']) ?  $this->options['null_select'] : false;
+    if ($null_select !== false) {
+      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), ''), 1);
+    }
+    unset($this->options['null_select']);
+    
+    $this->_addline('<span class="' . $type . '-group" >');
        
-      $this->_addline( '<label '.$class.' for="'.$this->name.'">' );
-      $this->_addline( $this->_input_tag( $type, $value, 'checked', $group ), 1 );
-      $this->_addline( $key );
-      $this->_addline( '</label>', -1 );
+    foreach ($this->_make_assoc($this->options) as $option_key => $option_value) {
       
+      $this->attributes['id'] = $this->legal_name($this->name . '-' . strtolower($option_value));
+      $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
+      $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
+      $this->_addline($option_key . '</label>');
     }
     
+    $this->_addline('</span>');
   }
   
   /**
    * adds a series of radio buttons
    */
-  private function _add_radio_series() {
+  protected function _add_radio_series() {
     
     $this->_add_checkbox_series( 'radio' );
     
@@ -876,13 +1068,25 @@ if ( 'image' == $type)
   
   /**
    * builds an option series
+   * 
+   * if an element in the options array has a value of bool false, it will open an 
+   * optgroup using the key as the group 
    */
-  private function _add_option_series() {
+  protected function _add_option_series() {
     
     foreach ( $this->_make_assoc( $this->options ) as $key => $value ) {
       
-      $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . $key . '</option>', -1 );
+      if (($value === false or $value === 'false') and !empty($key)) {
+        $this->_add_options_divider ($key);
+      } elseif (!empty($value) or $value === 0) {
+        $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . stripslashes($key) . '</option>', -1 );
+      }
 
+    }
+    
+    if ($this->inside) {
+       $this->_addline ('</optgroup>');
+       $this->inside = false;
     }
     
   }
@@ -894,7 +1098,7 @@ if ( 'image' == $type)
   /**
    * builds an output string
    */
-  private function _output() {
+  protected function _output() {
 
     return implode( self::BR, $this->output ).self::BR;
 
@@ -910,7 +1114,7 @@ if ( 'image' == $type)
    * @param int     $tab_increment change to the current tab level ( +/- 1 ); false
    *                               for no indent
    */
-  private function _addline( $line, $tab_increment = 0 ) {
+  protected function _addline( $line, $tab_increment = 0 ) {
 
     $indent = '';
 
@@ -929,6 +1133,59 @@ if ( 'image' == $type)
 	 * UTILITY FUNCTIONS
 	 */ 
   
+  /**
+   * outputs a link (HTML anchor tag) in specified format if enabled by "make_links"
+   * option
+   * 
+   * this func validates the link as being either an email addres or URI, then
+   * (if enabled) builds the HTML and returns it
+   * 
+   * @param object $field the field object
+   * @param string $linktext the clickable text (optional)
+   * @param string $template the format of the link (optional)
+   * @param array  $get an array of name=>value pairs to include in the get string
+   *
+   * @return string HTML or HTML-escaped string (if it's not a link)
+   */
+  public static function make_link($field, $template = false, $get = false) {
+  
+
+    // clean up the provided link string
+    $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($field->value))));
+    $linktext = empty($field->value) ? $field->default : $field->value;
+
+    if (isset($field->link) and !empty($field->link)) {
+      // if the field is a single record link or other kind of defined link field
+      $URI = $field->link;
+    } elseif (filter_var($URI, FILTER_VALIDATE_URL)) {
+
+      // convert the get array to a get string and add it to the URI
+      if (is_array($get)) {
+
+        $URI .= false !== strpos($URI, '?') ? '&' : '?';
+
+        $URI .= http_build_query($get);
+      }
+    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL)) {
+
+      // in admin, emails are plaintext
+      if (is_admin())
+        return esc_html($field->value);
+
+      $URI = 'mailto:' . $URI;
+    } else {
+      return $field->value; // if it is neither URL nor email address nor defined link
+    }
+      
+    // default template for links
+    $linktemplate = $template === false ? '<a href="%1$s" >%2$s</a>' : $template;
+
+    $linktext = empty($linktext) ? str_replace(array('http://', 'https://'), '', $URI) : $linktext;
+
+    //construct the link
+    return sprintf($linktemplate, $URI, esc_html($linktext));
+  }
+  
   
   /**
    * adds a class name to the class property
@@ -944,7 +1201,7 @@ if ( 'image' == $type)
    *
    * @return string
    */
-  private function _attributes() {
+  protected function _attributes() {
     
     $attributes_array = array();
     $output = '';
@@ -988,26 +1245,26 @@ if ( 'image' == $type)
    *
    * @return string selection state string for HTML element
    */
-  private function _set_selected($element_value, $new_value, $attribute = 'selected', $state = true)
+  protected function _set_selected($element_value, $new_value, $attribute = 'selected', $state = true)
   {
 
     if (is_array($new_value)) { 
       return $this->_set_multi_selected($element_value, $new_value, $attribute, $state);
     }
-		
-    $new_value = $this->_prep_comp_string($new_value);
+
     $add_attribute = false;
-    // we break up the logic here so it's easier to read
-    if (!empty($new_value)) {
-      if (is_array($element_value)) {
-        if ($state === in_array($new_value, $this->_prep_comp_array($element_value))) {
+    $new_value = $this->_prep_comp_string($new_value);
+    $element_value = $this->_prep_comp_array($element_value);
+    
+    switch (true) {
+      case ($element_value === true and $new_value === true):
+      case (is_array($element_value) and ($state === in_array($new_value, $element_value))):
+      case ($element_value == $new_value):
           $add_attribute = true;
-        } 
-      } elseif ($this->_prep_comp_string($element_value) == $new_value) {
-          $add_attribute = true;
+        break;
+      default:
       }
-    }
-		
+    
     return $add_attribute ? sprintf(' %1$s="%1$s" ', $attribute) : '';
   }
 
@@ -1015,10 +1272,15 @@ if ( 'image' == $type)
    * prepares a string for a comparison
    *
    * converts HTML entities to UTF-8 characters
+   * 
+   * if the argument is not a string, returns it unchanged
+   * 
+   * @param mixed $string
+   * @return mixed converted string or unchanged input
    */
-  private function _prep_comp_string( $string ) {
+  protected function _prep_comp_string( $string ) {
 
-    return html_entity_decode( (string) $string, ENT_QUOTES, 'UTF-8');
+    return is_string($string) ? html_entity_decode( $string, ENT_QUOTES, 'UTF-8') : $string;
 
   }
 
@@ -1028,7 +1290,9 @@ if ( 'image' == $type)
    * @param array $array the array to prepare for comparison
    * @return array an indexed array of prepared strings
    */
-  private function _prep_comp_array( $array ) {
+  protected function _prep_comp_array( $array ) {
+
+    if (!is_array($array)) return $this->_prep_comp_string( $array );
 
     $output = array();
 
@@ -1036,6 +1300,54 @@ if ( 'image' == $type)
 
     return $output;
 
+  }
+
+  /**
+   * sets up the "nothing selected" option element
+   *      
+   * include the null state if it is not overridden. This adds a blank option which 
+   * will be selected if there is no value property set for the element. 
+   * 
+   * If $this->options['null_select'] has a string value, it will be used as the 
+   * display value for the null option. 
+   * If $this->options['null_select'] is true or the field value is empty, a blank 
+   * unselected null option will be added. 
+   * If $this->options['null_select'] is false no null state option will be added.
+   * 
+   * @return null
+   */
+  protected function _set_null_select() {
+    
+    $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : true;
+    // remove the null_select from the options array
+    if (isset($this->options['null_select'])) unset($this->options['null_select']);
+    /*
+     * the null select option is added if it is not canceled by a null select value 
+     * of false or 'false'
+     */
+    if (($null_select !== false and $null_select !== 'false')) {
+      $value = is_string($null_select) ? $null_select : '';
+      $selected = empty($this->value) ? $this->_set_selected( true, true, 'selected' ) : '';
+      $this->_addline( '<option value="" ' . $selected . '  >' . $value  . '</option>' );
+    }
+    
+  }
+  
+  /**
+   * adds a divider element to an option series
+   * 
+   * @param string $title of the option divider
+   * @return null
+   */
+  protected function _add_options_divider($title) {
+    $divider = '';
+    if ($this->inside) {
+      $divider = '</optgroup>' . self::BR;
+      $this->inside = false;
+    }
+    $divider .= sprintf('<optgroup label="%s">', $title);
+    $this->inside = true;
+    $this->_addline($divider);
   }
 
   /**
@@ -1051,24 +1363,24 @@ if ( 'image' == $type)
 	 * @param boolean $state           true to check for a match or false for a non-match
 	 * @return string                  the attribute string for the element
 	 */
-	private function _set_multi_selected( $element_value, $new_value_array, $attribute = 'selected', $state = true ) {
+  protected function _set_multi_selected($element_value, $new_value_array, $attribute = 'selected', $state = true) {
 		
-		$prepped_new_value_array = $this->_prep_comp_array( $new_value_array );
+    $prepped_new_value_array = $this->_prep_comp_array($new_value_array);
 		
 		$prepped_string = $this->_prep_comp_string($element_value);
 		
-    //if (WP_DEBUG) error_log( __METHOD__.' checking value:'.$prepped_string.'('.$element_value.')'.' against:'.print_r($prepped_new_value_array,true).' state:'.( in_array( $prepped_string, $prepped_new_value_array)?'true':'false').' setting: '.$attribute );
+//    if (WP_DEBUG) error_log( __METHOD__.' checking value:'.$prepped_string.'('.$element_value.')'.' against:'.print_r($prepped_new_value_array,true).' state:'.( in_array( $prepped_string, $prepped_new_value_array)?'true':'false').' setting: '.$attribute );
 			
-		if ( ! empty($prepped_string) && $state === in_array( $prepped_string, $prepped_new_value_array ) ) return  sprintf( ' %1$s="%1$s" ', $attribute );
-		
-		else return '';
-		
+    if (!empty($prepped_string) && $state === in_array($prepped_string, $prepped_new_value_array))
+      return sprintf(' %1$s="%1$s" ', $attribute);
+    else
+      return '';
 	}
 
   /**
    * tests the type of an array, returns true if associative
    */
-  public function is_assoc($array) {
+  public static function is_assoc($array) {
 		
     return ( is_array($array) && ( count($array)==0 || 0 !== count( array_diff_key( $array, array_keys( array_keys( $array ) ) ) ) ) );
 		
@@ -1077,7 +1389,7 @@ if ( 'image' == $type)
   /**
    * makes a string OK to use in javascript as a variable or function name
    */
-  private function _prep_js_string( $string ) {
+  protected function _prep_js_string( $string ) {
 		
     return str_replace( array( '[',']','{','}','-','.','(',')' ), '', $string );
 		
@@ -1091,7 +1403,7 @@ if ( 'image' == $type)
    * @param array the array to be processed
    * @return array an associative array
    */
-  private function _make_assoc( $array ) {
+  protected function _make_assoc( $array ) {
     
     if ( $this->is_assoc( $array ) ) return $array;
     
@@ -1103,30 +1415,77 @@ if ( 'image' == $type)
    * returns an internationalized date string from a UNIX timestamp
    * 
    * @param int $timestamp a UNIX timestamp
+   * @param bool $time if true, adds the time of day to the format
    * @return string a formatted date or input string if invalid
    */
-  public static function format_date($timestamp) {
+  public static function format_date($timestamp, $time = false) {
+    // if it's not a timestamp, we attempt to convert it to one
+    if (!preg_match('#^[0-9-]+$#', $timestamp)) $timestamp = strtotime($timestamp);
 
-    if (Participants_Db::is_valid_timestamp($timestamp)) {
+    if (preg_match('#^[0-9-]+$#', $timestamp)) {
+      $format = get_option('date_format');
       
-      return date_i18n( Participants_Db::$date_format, $timestamp );
+      if ($time) {
+        $format .= ' ' . get_option('time_format');
+      }
+      
+      return date_i18n( $format, $timestamp );
     
     } else {
       // not a timestamp: return unchanged
-      error_log(__METHOD__ . ': timestamp couldn\'t be formatted: ' . $timestamp);
       return $timestamp;
     }
   
   }
   
   /**
+   * builds a legal CSS classname or ID
+   * 
+   * @param string $string
+   * @return string the legalized name
+   */
+  public static function legal_name($string) {
+    // make sure it doens't start with a numeral
+    if (preg_match('/^[0-9]/',$string)) $string = '_' . $string;
+    // eliminate any non-legal characters
+    $string = preg_replace('/[^_a-zA-Z0-9- ]/', '', $string);
+    // replace spaces with a dash
+    return strtolower(str_replace(array(' '),array('-'),$string));
+  }
+  
+  /**
+   * unambiguously test for all the flavors of emptiness
+   * 
+   * @var unknown $test the value to test
+   * @return bool true if the value is the equivalent of empty, zero or undefined
+   */
+  public static function is_empty($test) {
+    // collapse an array
+    if (is_array($test)) $test = implode('', $test);
+    switch (true) {
+      case $test === '0000-00-00 00:00:00':
+      case $test == '0':
+      case $test === 0:
+      case $test === '':
+      case $test === null:
+        return true;
+        break;
+      case $test === false:
+      case $test === true:
+      default:
+        return false;
+    }
+  }
+  
+  /**
    * sets the array of available form element types
    * 
    * merges in an array in the config file, this allowing new types to be registered, 
-   * also a transation of type titles is possible by overwriting an existing entry
+   * also a language translation of type titles is possible by overwriting an existing 
+   * entry
    */
-  private function _set_types() {
-     $this->element_types = $this->get_types();
+  protected function _set_types() {
+     $this->element_types = self::get_types();
   }
   /*
    * static function for assembling the types array
@@ -1150,12 +1509,13 @@ if ( 'image' == $type)
          'hidden'             => 'Hidden Field', 
          'password'           => 'Password Field', 
          'captcha'            => 'CAPTCHA',
+         'timestamp'          => 'Timestamp',
          );
-    if (is_array(Participants_Db::$config['form_element_types'])) {
-      return array_merge($types, Participants_Db::$config['form_element_types']);
-    } else {
-      return $types;
-    }
+    /*
+     * this gives access to the list of form element types for alteration before
+     * it is set
+     */
+    return $types;
   }
   
 } //class

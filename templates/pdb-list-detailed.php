@@ -8,7 +8,6 @@ this is a more detailed template showing how the parts of the display can be cus
 */
 ?>
 <div class="wrap <?php echo $this->wrap_class ?>">
-<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
 <?php
   /*
@@ -74,7 +73,7 @@ this is a more detailed template showing how the parts of the display can be cus
     
     <fieldset class="widefat">
       <legend><?php _e('Sort by', 'participants-database' )?>:</legend>
-
+      
       <?php
       /*
        * this function sets the fields in the sorting dropdown. It has two options:
@@ -91,7 +90,7 @@ this is a more detailed template showing how the parts of the display can be cus
 
     </fieldset>
     <?php endif ?>
-
+  </form>
   </div>
   <?php endif ?>
 
@@ -99,16 +98,22 @@ this is a more detailed template showing how the parts of the display can be cus
   /* END SEARCH/SORT FORM */
 
   /* LIST DISPLAY */
+  /* 
+   * NOTE: the container for the list itself (excluding search and pagination 
+   * controls) must have a class of "list-container" for AJAX search/sort to 
+   * function
+   */
 ?>
 
-  <table class="wp-list-table widefat fixed pages" id="pdb-list" cellspacing="0" >
+  <table class="wp-list-table widefat fixed pages list-container" cellspacing="0" >
   
-    <?php // print the count if enabled in the shortcode
-		if ( $display_count ) : ?>
-    <caption>
-      Total Records Found: <?php echo $record_count ?>
-    </caption>
-    <?php endif ?>
+    <?php 
+    /* print the count if enabled in the shortcode
+     * 
+     * the tag wrapping the count statment can be supplied in the function argument, example here
+     */
+		$this->print_list_count('<caption class="list-display-count">'); 
+    ?>
 
     <?php if ( $record_count > 0 ) : ?>
 
@@ -161,15 +166,15 @@ this is a more detailed template showing how the parts of the display can be cus
                * single record by defining a read-only field with a default value
                */
               $value = empty($value) ? $this->field->default : $value;
-              
+							
 							// add the record ID to the single record link
 							$single_record_uri = Participants_Db::add_uri_conjunction($single_record_link) . 'pdb=' . $this->record->record_id;
-								
+							
 							/*
 							 * print the opening tag of the single record link
-								 */
+							 */
 							echo '<a class="single-record-link" href="' . $single_record_uri . '" >';
-								
+							
             } ?>
 
             <?php /*
@@ -180,7 +185,13 @@ this is a more detailed template showing how the parts of the display can be cus
 
 							case 'image-upload': 
                 
-                $image = new PDb_Image(array('filename' => $value));
+                $image = new PDb_Image(
+                        array(
+                            'filename' => $value,
+                            'mode' => 'image',
+                            'module' => 'list',
+                      )
+                        );
                 $image->print_image();
                 break;
 								
@@ -262,7 +273,7 @@ this is a more detailed template showing how the parts of the display can be cus
 							/*
 							 * if the make links setting is enabled, try to make a link out of the field
 							 */
-							if ( $this->options['make_links'] && ! $this->field->is_single_record_link() ) {
+							if ( Participants_Db::$plugin_options['make_links'] && ! $this->field->is_single_record_link() ) {
 								
 								$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
 								
@@ -288,7 +299,7 @@ this is a more detailed template showing how the parts of the display can be cus
 
     <tbody>
       <tr>
-        <td><?php _e('No records found', 'participants-database' )?></td>
+          <td><?php if ($this->is_search_result === true)  echo Participants_Db::$plugin_options['no_records_message'] ?></td>
       </tr>
     </tbody>
 

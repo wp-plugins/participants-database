@@ -49,6 +49,18 @@ class PDb_CSV_Import extends CSV_Import {
     
   }
   
+  /**
+   * applies conditioning and escaping to the incoming value, also allows for a filter callback
+   * 
+   * @global object $wpdb
+   * @param type $value
+   * @return string
+   */
+  function process_value($value) {
+    global $wpdb;
+    return Participants_Db::set_filter('csv_import_value', $wpdb->escape($this->_enclosure_trim($value, '', $this->CSV->enclosure)));
+  }
+  
   function store_record( $post ) {
     
     // add the record data to the database

@@ -14,35 +14,47 @@
  */
 class Template_Item {
   
-  // properties
-  
-  // the unique string identifier for the object
+  /**
+   *
+   * @var string the unique string identifier for the object
+   */
   var $name;
 	
-  // the printable title of the object
+  /**
+   *
+   * @var string the printable title of the object
+   */
   var $title;
 	
-	// the id of the current record
+	/**
+   *
+   * @var int the id of the current record
+   */
 	var $record_id;
 	
-	// the plugin options
-	var $options;
-	
-	// the instantiating module
+	/**
+   *
+   * @var string the instantiating module
+   */
 	var $module;
   
-  // methods
+  /**
+   *
+   * @var type array of field objects
+   */
+  var $fields;
+  
+  /**
+   * @var array of all record values, indexed by name
+   */
+  var $values;
   
   /**
    * constructs a Template Item object
    *
    * @param object $properties an object with the item's properties
    */
-  public function __construct( $properties ) {
-		
-		$this->options = Participants_Db::$plugin_options;
-    
-  }
+  public function __construct() {}
   
   /**
    * tests a value for emptiness, includinf arrays with empty elements
@@ -77,7 +89,7 @@ class Template_Item {
    */
   protected function prepare_display_value( $string ) {
     
-    return stripslashes( $string );//htmlspecialchars( stripslashes( $string ), ENT_QUOTES, "UTF-8", false );
+    return str_replace(array('"',"'"), array('&quot;','&#39;'), stripslashes($string));//htmlspecialchars( stripslashes( $string ), ENT_QUOTES, "UTF-8", false );
   
   }
   
@@ -119,7 +131,7 @@ class Template_Item {
     // clean out any non-valid CSS name characters
     $classname = preg_replace( '/[^_a-zA-Z0-9-]/','', $classname );
     
-    return $prefix ? Participants_Db::$css_prefix.$classname : $classname;
+    return $prefix ? Participants_Db::$prefix.$classname : $classname;
     
   }
   

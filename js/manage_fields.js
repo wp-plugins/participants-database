@@ -1,3 +1,12 @@
+/*
+ * Participants Database Plugin
+ * 
+ * version: 0.5
+ * 
+ * xnau webdesign xnau.com
+ * 
+ * js support for manage database fields page
+ */
 jQuery(document).ready(function($){
 
   // flag the row as changed

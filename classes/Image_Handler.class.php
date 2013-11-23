@@ -7,9 +7,9 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdeign@xnau.com>
- * @copyright  2011 xnau webdesign
+ * @copyright  2011, 2013 xnau webdesign
  * @license    GPL2
- * @version    0.2
+ * @version    0.3
  * @link       http://xnau.com/wordpress-plugins/
  *
  * functionality provided here:
@@ -29,100 +29,177 @@
 
 abstract class Image_Handler {
 
-  // holds the setup array
-  protected $setup;
-  // holds the "file found" status
+  /**
+   * true if the image file has been located and verified
+   * 
+   * @var bool
+   */
   var $file_exists = false;
-  // holds the image filename
-  protected $image_file;
-  // holds the URI to the image
-  protected $image_uri;
-  // holds the pixel dimensions of the image
+  /**
+   * the the image defined and not a default image?
+   *
+   * @var bool true if the image file is defined and is not a default image
+   */
+  var $image_defined = false;
+  /**
+   * holds the image filename
+   * 
+   * @var string
+   */
+  var $image_file;
+  /**
+   * holds the URI to the image
+   * @var string
+   */
+  var $image_uri;
+  /**
+   * holds the pixel width of the image
+   * @var int
+   */
   var $width = 0;
+  /**
+   * holds the pixel height of the image
+   * @var int
+   */
   var $height = 0;
-  // holds the CSS classname for the image
-  protected $classname;
-  // hold the wrap tags for the image HTML
-  protected $open = '';
-  protected $close = '';
-  // holds the default wrap tags
-  protected $default_wrap;
-  // holds the path to the default image
-  protected $default_image = false;
-  // holds the path to the image directory
-  protected $image_directory;
-  // holds the URL for the image directory
-  protected $image_directory_uri;
-  // class name for an undefined image, default image
+  /**
+   * the CSS classname for the image
+   * @var string
+   */
+  var $classname;
+  /**
+   * the image wrap HTML
+   * @var array first element is open tag, second is close tag
+   */
+  var $image_wrap;
+  /**
+   *
+   * @var string holds the path to the default image
+   */
+  var $default_image = false;
+  /**
+   * @var string the path to the image directory
+   */
+  var $image_directory;
+  /**
+   * @var string the URL for the image directory
+   */
+  var $image_directory_uri;
+  /**
+   * @var string class name for an undefined image
+   */
   var $emptyclass = 'no-image';
+  /**
+   * @var string class name for a default image
+   */
   var $defaultclass = 'default-image';
+  /**
+   * determines the display mode for the returned HTML:
+   *    image - shows the image (default)
+   *    filename - shows the filename
+   *    both - shows the image and the filename
+   * 
+   * @var string the current display mode
+   */
+  var $display_mode;
+
+  /**
+   * the href value for the link
+   * 
+   * if bool false, no link is shown, if empty, the file URL is used, otherwise, 
+   * the string value is used
+   * @var mixed
+   */
+  var $link;
+  /**
+   * the calling module
+   * 
+   * @var string
+   */
+  var $module;
 
   /**
    * intializes the object with a setup array
    *
-   * @param array $setup
+   * @param array $config
    *                     'filename' => an image path, filename or URL
    *                     'classname' => a classname for the image
    *                     'wrap_tags' => array of open and close HTML
+   *                     'link' => URI for a wrapping anchor tag
+   *                     'mode' => display mode: as an image or a filename or both
+   *                     'module' => calling module
    */
-  function __construct($config, $subclass_atts) {
+  function __construct($config) {
 
     $this->set_image_directory();
 
-    $this->_set_default_wrap($config);
-
-    $defaults = array(
-        'filename' => '',
-        'classname' => 'image-field-wrap',
-        'wrap_tags' => $this->default_wrap,
-    );
-
-    $this->setup = shortcode_atts(array_merge($defaults, $subclass_atts), $config);
-
-    $this->_set_props();
-
     $this->set_default_image();
+    
+    $this->image_file = isset($config['filename']) ? $config['filename'] : '';
+    $this->link = isset($config['link']) ? $config['link'] : '';
+    $this->classname = isset($config['classname']) ? $config['classname'] : 'image-field-wrap';
+    $this->display_mode = isset($config['mode']) ? $config['mode'] : 'image';
+    $this->module = isset($config['module']) ? $config['module'] : '';
 
     $this->_file_setup();
+    $this->set_image_wrap(isset($config['wrap_tags']) and is_array($config['wrap_tags']) ? $config['wrap_tags'] : '');
+
   }
 
   /**
    * prints the HTML
    *
    */
-  public function print_image() {
+  public function print_image()
+  {
+    $this->set_image_wrap();
 
     echo $this->get_image_html();
   }
 
   /**
-   * returns the HTML for the image
+   * supplies the HTML for the image
+   * 
+   * @return string HTML
    */
   public function get_image_html() {
 
-    $pattern = $this->file_exists ?
-            (
-             $this->in_admin() ?
-                    '%1$s<img src="%2$s" class="PDb-list-image" /><span class="image-filename">%4$s</span>%3$s' :
-                    '%1$s<img src="%2$s" class="PDb-list-image" />%3$s'
-            ) :
-            '%1$s%2$s%3$s';
+    if ($this->file_exists) {
+      switch ($this->display_mode) {
+        case 'both':
+          $pattern = '%1$s<img src="%2$s" /><span class="image-filename">%4$s</span>%3$s';
+          break;
+        case 'filename':
+          $pattern = '%1$s%4$s%3$s';
+          break;
+        case 'none':
+          $pattern = '';
+          break;
+        case 'image':
+        default:
+          $pattern = '%1$s<img src="%2$s" />%3$s';
+      }
+    } else {
+      $pattern = '%1$s%2$s%3$s';
+      if ($this->in_admin()) $this->image_uri = $this->image_file;
+    }
 
     return sprintf($pattern,
-            sprintf($this->open, 
+            sprintf($this->image_wrap[0], 
                     $this->classname, 
-                    $this->image_uri, 
+                    $this->link, 
                     basename($this->image_uri)
                     ), 
             $this->image_uri, 
-            $this->close,
+            $this->image_wrap[1],
             $this->image_file
             );
   }
 
   /**
-   * returns the name of the image file
+   * supplies the name of the image file
    *
+   * @return string the image filename
    */
   public function get_image_file() {
 
@@ -136,7 +213,7 @@ abstract class Image_Handler {
   abstract function set_image_directory();
 
   /**
-   * sets the default image path
+   * sets the default image source path
    *
    * @param string $image absolute path to the default image file
    */
@@ -145,27 +222,29 @@ abstract class Image_Handler {
   /**
    * process the filename to test it's validity, set it's path and find its properties
    *
-   * sets the path to the file, sets dimensions, sets file_exists flag
+   * sets the path to the file, sets dimensions, sets file_exists flag, sets the HTML 
+   * class to indicate the type of filename supplied
+   * 
+   * @param unknown $filename if set, string image file name, possibly including a path
    */
-  protected function _file_setup($filename = false) {
+  protected function _file_setup() {
 
-    if (false === $filename)
-      $filename = $this->setup['filename'];
-    
     $status = 'untested';
     
     switch (true) {
       
-      case (empty($filename)):
+      case (empty($this->image_file)):
         
-        $status = $this->_showing_default_image();
+        if (!$this->in_admin()) $status = $this->_showing_default_image();
+        else $status = 'admin';
         break;
       
-      case ($this->test_absolute_path_image($filename)) :
+      case ($this->test_absolute_path_image($this->image_file)) :
         $status = 'absolute';
-        $this->image_file = basename($filename);
-        $this->image_uri = $filename;
+        $this->image_file = basename($this->image_file);
+        $this->image_uri = $this->image_file;
         $this->file_exists = true;
+        $this->image_defined = true;
         $this->_set_dimensions();
         break;
       
@@ -175,21 +254,21 @@ abstract class Image_Handler {
          * set the image file path with the full system path to the image
          * directory as defined in the plugin settings
          */
-        $filename = $this->concatenate_directory_path( $this->image_directory, basename($filename), false );
-  
         $status = 'basename';
-        $this->_testfile($filename);
+        $this->_testfile($this->concatenate_directory_path( $this->image_directory, basename($this->image_file), false ));
   
         // if we still have no valid image, drop in the default
         if (!$this->file_exists) {
-         $status = $this->_showing_default_image($filename);
+         if (!$this->in_admin()) $status = $this->_showing_default_image($this->image_file);
+         else $status = 'file-notfound';
         } else {
+         $this->image_defined = true;
          $this->_set_dimensions();
         }
         
       
     }
-
+    
     $this->classname .= ' ' . $status;
   }
   
@@ -230,6 +309,8 @@ abstract class Image_Handler {
    * sets the file_exists flag to true if the file exists
    */
   protected function _testfile($filename) {
+    
+    //error_log(__METHOD__.' testing:'.$filename.' getting:'.($this->_file_exists($filename)?'yes':'no'));
 
     if ($this->_file_exists($filename)) {
       
@@ -249,7 +330,9 @@ abstract class Image_Handler {
    *
    */
   protected function _file_exists($filepath) {
-
+      
+    //error_log(__METHOD__.' checking path:'.$filepath.' is_file:'.(is_file($filepath)?'yes':'no'));
+    
     if (empty($filepath)) return false;
 
     // first use the standard function
@@ -258,40 +341,99 @@ abstract class Image_Handler {
     }
 
     /*
-     * if we're testing an absolute path
+     * if we're testing the file using http
+     * 
+     * this is pretty slow and probably isn't needed, so we'll keep it commented out
      */
-    if (function_exists('curl_exec')) {
-
-      // check the header with cURL
-      return $this->url_exists($this->concatenate_directory_path($this->image_directory_uri,basename($filepath),false));
-    }
+//    if (function_exists('stream_context_create')) {
+//      
+//      error_log(__METHOD__.' checking URL:'.$this->concatenate_directory_path($this->image_directory_uri,basename($filepath),false));
+//
+//      return $this->url_exists($this->concatenate_directory_path($this->image_directory_uri,basename($filepath),false));
+//    }
 
     // we give up, can't find the file
     return false;
   }
 
   /**
-   * uses cURL to test if a file exists
+   * uses file_get_contents to test if a file exists
    *
-   * This must be used as a last resort, it can take a long tome to get the
+   * This must be used as a last resort, it can take a long time to get the
    * server's response in some cases
    *
    * @param string $url the absolute url of the file to test
    * @return bool
    */
   function url_exists($url) {
+    
+    $code = $this->get_http_response_code($url);
+    
+    return $code == 200;
+  }
+  
+  /**
+   * gets an HTTP response header
+   * 
+   * @param string $url the URI to test
+   * @return int the final http response code
+   */
+  function get_http_response_code($url) {
+    $options['http'] = array(
+        'method' => "HEAD",
+        'ignore_errors' => 1,
+    );
 
-    $handle = curl_init($url);
-    if (false === $handle)
-      return false;
-    curl_setopt($handle, CURLOPT_HEADER, false);
-    curl_setopt($handle, CURLOPT_FAILONERROR, true);
-    curl_setopt($handle, CURLOPT_HTTPHEADER, Array("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.15) Gecko/20080623 Firefox/2.0.0.15")); // request as if Firefox    
-    curl_setopt($handle, CURLOPT_NOBODY, true);
-    curl_setopt($handle, CURLOPT_RETURNTRANSFER, false);
-    $connectable = curl_exec($handle);
-    curl_close($handle);
-    return $connectable;
+    $context = stream_context_create($options);
+    $body = file_get_contents($url, NULL, $context);
+    $responses = $this->parse_http_response_header($http_response_header);
+    
+    $last = array_pop($responses);
+    
+    return $last['status']['code']; // last status code
+  }
+  /**
+   * parse_http_response_header
+   *
+   * @param array $headers as in $http_response_header
+   * @return array status and headers grouped by response, last first
+   */
+  function parse_http_response_header(array $headers) {
+    $responses = array();
+    $buffer = NULL;
+    foreach ($headers as $header) {
+      if ('HTTP/' === substr($header, 0, 5)) {
+        // add buffer on top of all responses
+        if ($buffer)
+          array_unshift($responses, $buffer);
+        $buffer = array();
+
+        list($version, $code, $phrase) = explode(' ', $header, 3) + array('', FALSE, '');
+
+        $buffer['status'] = array(
+            'line' => $header,
+            'version' => $version,
+            'code' => (int) $code,
+            'phrase' => $phrase
+        );
+        $fields = &$buffer['fields'];
+        $fields = array();
+        continue;
+      }
+      list($name, $value) = explode(': ', $header, 2) + array('', '');
+      // header-names are case insensitive
+      $name = strtoupper($name);
+      // values of multiple fields with the same name are normalized into
+      // a comma separated list (HTTP/1.0+1.1)
+      if (isset($fields[$name])) {
+        $value = $fields[$name] . ',' . $value;
+      }
+      $fields[$name] = $value;
+    }
+    unset($fields); // remove reference
+    array_unshift($responses, $buffer);
+
+    return $responses;
   }
   
   /**
@@ -336,32 +478,27 @@ abstract class Image_Handler {
   /**
    * sets the image wrap HTML
    *
-   * @param string $open  the HTML to place before the image tag; %s is replaced
-   *                      with the classname
-   * @param string $close the HTML to put after the image tag
+   * @param array $wrap_tags  the HTML to place before and after the image tag; 
+   * %s is replaced with the classname
    */
-  public function set_image_wrap($open, $close) {
+  public function set_image_wrap($wrap_tags = array()) {
 
-    $this->open = $open;
-    $this->close = $close;
-  }
-
-  /**
-   * sets up the object properties from the construct parameters
-   *
-   */
-  private function _set_props() {
-
-    $this->classname = $this->setup['classname'];
-    $this->set_image_wrap($this->setup['wrap_tags'][0], $this->setup['wrap_tags'][1]);
+    if (!empty($wrap_tags)) {
+      $this->image_wrap = array(
+          $wrap_tags[0],
+          $wrap_tags[1],
+          );
+    } else $this->_set_image_wrap (); 
   }
 
   /**
    * sets up the default wrap tags
+   * 
+   * @return null
    */
-  protected function _set_default_wrap($config) {
+  protected function _set_image_wrap() {
 
-    $this->default_wrap = array(
+    $this->image_wrap = array(
         '<span class="%s">',
         '</span>'
     );

@@ -1,13 +1,18 @@
 /* stylesheet for participants-database plugin */
 
+.helptext {
+  display: inline-block;
+  margin: 0 5px;
+}
+
 /* SIGNUP FORM */
 
-.pdb-signup label {
+/*.pdb-signup label {
   display:inline-block;
   width:135px;
   margin-right:10px;
   text-align:right;
-}
+}*/
 .pdb-signup .helptext {
   display:block;
   margin-left:150px;
@@ -18,49 +23,37 @@
 .pdb-signup .checkbox .helptext {
   display: inline-block;
 }
-.math-captcha {
-  display:inline-block;
-  margin-right:10px;
+.pdb-signup .math-captcha {
+  display: inline-block;
+  margin-right: 12px
 }
 
 /* RECORD FORM */
 
-.edit-participant  input[type='checkbox'] {
-  position:relative;
-  top:2px;
-}
 .edit-participant textarea,
 .participants_db textarea,
-.participants_db input[type='text'],
-.edit-participant input[type='text'],
-.edit-participant input[type='checkbox'],
-.multicheckbox label,
+.edit-participant select,
+.participants_db select,
+.participants_db input,
+.edit-participant input,
 .link-element label {
-  float:left;
-  margin-right:10px;
+  margin-right:2px;
+  vertical-align: middle;
 }
-.edit-participant input[type='checkbox'] {
-	margin-right: 3px;
+.participants_db .inline-controls input[type='checkbox'],
+.participants_db .inline-controls input[type='radio'] {
+  float:none;
 }
 .edit-participant h3 {
   margin-top: 2em;
   margin-bottom: 1em;
-}
-.edit-participant .helptext, 
-.participants_db .helptext {
-  text-align:left;
-  vertical-align:top;
-}
-.edit-participant .helptext {
-  display:block;
-  width:100%;
 }
 .edit-participant .submit-buttons {
   border:none;
 }
 .edit-participant .form-table th {
   width:195px;
-  vertical-align:top;
+  vertical-align:middle;
   padding-top: 1ex;
 }
 .edit-participant .form-table h3 {
@@ -86,15 +79,52 @@
   color: #333333;
   height: 20em;
 }
-.edit-participant label.file-delete {
-	display: block;
+.file-delete {
+	display: inline;
+  white-space: nowrap;
+}
+.file-delete input[type=checkbox] {
+	float:none;
+  display: inline;
+}
+.pdb-upload input[type=file] {
+  float:none;
+  line-height: 1;
+  vertical-align: text-bottom;
+}
+
+.wrap[class^="pdb-"] td,
+.wrap[class^="pdb-"] th {
+  vertical-align: middle;
 }
 
 /* Select Other */
-.selectother label {
-  float: left;
-  margin: 0 6px 0 3px;
+.selectother label,
+.multicheckbox label,
+.file-delete label,
+.csv-export label,
+.radio-group label {
+  margin: 0 12px 0 0;
   width: auto;
+  line-height: 1;
+  white-space: nowrap;
+}
+.inline-controls label {
+  float: none;
+}
+.selectother label input,
+.multicheckbox label input,
+.file-delete label input,
+.radio-group label input {
+  float: none;
+  margin:0;
+}
+.file-delete label {
+  background-color: #FFBBBB;
+   padding: 3px 5px;
+   border-radius: 3px;
+   border: 1px solid #DFDFDF;
+   float:none;
 }
 .selectother {
   display: inline-block;
@@ -112,9 +142,11 @@
 
 /* LIST */
 
-.pdb-list .wp-list-table th,
-.pdb-list .wp-list-table td {
-  line-height: 1.1;
+.wp-list-table th,
+.wp-list-table td,
+.form-table th, 
+.form-table td {
+/*  line-height: 1.1;*/
   vertical-align: middle;
 }
 .pdb-list fieldset,
@@ -201,6 +233,13 @@
 .pdb-single .image-field-wrap {
   float: none;
 }
+.image-filename {
+  vertical-align: text-bottom;
+  margin: 0 0 0 10px;
+}
+.image-upload .helptext {
+  display:block;
+}
 .pdb-single span.textarea {
   height: auto;
 }
@@ -208,7 +247,7 @@
 /* images */
 
 .image-field-wrap {
-  display: block;
+  display: inline-block;
 }
 .image-field-wrap.empty {
   height: auto;
@@ -218,8 +257,10 @@
   width: auto;
 }
 .pdb-record .image-field-wrap,
-.pdb-record .file-link-wrap {
-  float: left;
+.pdb-record .file-link-wrap,
+.edit-participant .file-link-wrap,
+.edit-participant .image-field-wrap {
+  display: inline-block;
   margin-right:10px;
 }
 

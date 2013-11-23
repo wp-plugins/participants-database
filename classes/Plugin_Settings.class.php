@@ -43,6 +43,11 @@ class Plugin_Settings {
   protected $submit_button;
 
   /**
+   * @var string type to use for text area settings; rich or plain text
+   */
+  var $textarea_type = 'text-area';
+
+  /**
    * constructor
    *
    * @param string $class    the classname of the extending subclass (required)
@@ -79,20 +84,20 @@ class Plugin_Settings {
         $this->WP_setting,
         array( $this->plugin_class, 'validate'));
 
-		// register the sections
-    $this->_register_sections();
-
   }
 	
 	/**
 	 * registers the individual plugin options
 	 */
-	protected function initialize() {
+  public function initialize() {
 		
 		// register the individual settings
+    if (function_exists('add_settings_field')) {
 		$this->_register_options();
-		
+      // register the sections
+      $this->_register_sections();
 	}
+  }
 		
 
   /*************************
@@ -195,10 +200,10 @@ class Plugin_Settings {
                       'type'  => 'submit',
                       'class' => $this->submit_class,
                       'value' => $this->submit_button,
-                      'name'  => 'submit',
+                      'name'  => 'submit_button',
                       );
 
-        printf( $this->submit_wrap, FormElement::get_element( $args ) );
+        printf( $this->submit_wrap, PDb_FormElement::get_element( $args ) );
 
         ?>
       </form>
@@ -224,6 +229,35 @@ class Plugin_Settings {
 
     }
 
+  }
+
+  /**
+   * gets a setting default value
+   * 
+   * @param string $name name of the setting default to get
+   * @return unknown the default value
+   */
+  public function get_default_value($name) {
+    foreach($this->plugin_settings as $setting) {
+      if ($setting['name'] == $name and isset($setting['options']['value'])) {
+        return $setting['options']['value'];
+      }
+    }
+  }
+  
+  /**
+   * gets all options names
+   * 
+   * @return array of all defined option names
+   */
+  public function get_option_names() {
+    
+    $names = array();
+    foreach($this->plugin_settings as $setting) {
+      $names[] = $setting['name'];
+    }
+    return $names;
+    
   }
 
   /********************
@@ -256,28 +290,35 @@ class Plugin_Settings {
    *    class - a CSS class name to add
    */
   public function print_settings_field( $input ) {
+    
+    //error_log(__METHOD__.' name:'.$input['name'].' type:'.$input['type'].' title:'.$input['title']);
 
     if ( ! isset( $input['name'] ) ) return NULL;
+    
+    if ($input['type'] == 'header') {
+      //echo '<h3>' . $input['title'] . '</h3>';
+    } else {
 
-    $options = get_option( $this->WP_setting );
+      $options = get_option( $this->WP_setting );
 
-    $args = wp_parse_args( $input, array(
-      'options' => false,
-      'attributes' => '',
-      'value' => ''
-      ) );
+      $args = wp_parse_args( $input, array(
+        'options' => false,
+        'attributes' => '',
+        'value' => ''
+        ) );
 
-    // supply the value of the field from the saved option or the default as defined in the settings init
-    $args['value'] = isset( $options[ $input['name'] ] ) ? $options[ $input['name'] ] : $args['value'];
+      // supply the value of the field from the saved option or the default as defined in the settings init
+      $args['value'] = isset( $options[ $input['name'] ] ) ? $options[ $input['name'] ] : $args['value'];
 
-    $args['name'] = $this->WP_setting.'['.$input['name'].']';
+      $args['name'] = $this->WP_setting.'['.$input['name'].']';
 
-    FormElement::print_element( $args );
+      PDb_FormElement::print_element( $args );
 
-    if ( ! empty( $args['help_text'] ) ) {
+      if ( ! empty( $args['help_text'] ) ) {
 
-      printf( $this->help_text_wrap, trim( $args['help_text'] ) );
+        printf( $this->help_text_wrap, trim( $args['help_text'] ) );
 
+      }
     }
 
   }
@@ -306,7 +347,7 @@ class Plugin_Settings {
       add_settings_section(
         $this->WP_setting.'_'.$name,
         $title,
-        array( $this->plugin_class, 'options_section' ),
+        array( $this, 'options_section' ),
         $this->settings_page
       );
 
@@ -329,6 +370,7 @@ class Plugin_Settings {
 
     if ( ! isset( $options['type'] ) ) $options['type'] = 'text';
     $options['name'] = $name;
+    $options['title'] = $title;
 
     add_settings_field(
         $name,
