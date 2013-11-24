@@ -35,7 +35,7 @@ The plugin can be easily adapted to work as a database for other applications su
 * many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, rich text, etc.
 * export CSV files for interacting with other databases, mass email, print records
 * import CSV files to add large numbers of records from spreadsheets such as Open Office or Google Docs
-* form can be organized into groups of fields, making long forms easier to navigate and fill out
+* forms can be organized into groups of fields, making long forms easier to navigate and fill out
 
 = Database =
 
@@ -240,7 +240,7 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 Please back up before installing
 
-For critical production sites I recommend you try the new plugin version first in a development site
+For critical production sites I recommend you try this new plugin version first in a development site.
 
 * complete overhaul of the entire plugin
 * new classes to handle templating and plugin updates
@@ -477,7 +477,7 @@ This plugin uses a number of different shortcodes to place it's functionality in
 3. `[pdb_list]` - This shortcode prints out a list of records from the database. Which records get displayed and how can all be determined by the admin. It is also possible to allow the site visitor to filter (search) the list and also sort it.
 4. `[pdb_single]` - This shows a single record as determined by the record ID present in the URL used to access the page. It is possible to set a link to the single record in the record list, allowing for a detail display of a single record.
 5. `[pdb_signup_thanks]` - If you want to send the people who use the signup form to another page after they submit, you can use this shortcode to display the thankyou message. This is not needed if you have them just go back to the signup page, the signup shortcode will take care if it. <a id="list"></a>
-6. `[pdb_search]` - will show a search form which can be placed anywhere. When the search is performend, the user is taken to a page with a [pdb_list] shortcode and shown the result of their search.
+6. `[pdb_search]` - will show a search form which can be placed anywhere. When the search is performed, the user is taken to a page with a [pdb_list] shortcode and shown the result of their search.
 7. `[pdb_request_link]` - shows a form for requesting the private link to be resent.
 8. `[pdb_total]` – shows the either the number of records matching a given filter or the numeric total of a given column of values.
 
@@ -569,8 +569,6 @@ I have created a help page for custom templates which includes a tutorial: http:
 
 = Single Record Templates =
 
-**Please Note:** As of version 1.4 the way the single record template works has changed. It is now consistent with the other templates, but different from the way it worked before. The old templates will still work, but you should update them to the new way of doing things. If you look at your custom template and the pdb-single-default.php template provided, you'll easily see how to convert it to the new way of doing the templates.
-
 Templates for the single record shortcode include an array that can be used to prevent any fields from displaying. Let's say you wanted to exclude the city, state and postcode. In that case the array would be filled with those names like this:
 
 `$exclude = array('city','state','postcode');`
@@ -583,7 +581,7 @@ To show an individual record on the website, use the `[pdb_single]` shortcode. Y
 
 You can put a link to the single record in the participant list by defining the page on which the `[pdb_single]` is placed, and the column where you want the link to appear. In the plugin settings, general settings tab, look for "Single Record Page": set that to the page where your `[pdb_single]` shortcode is. Then, go to "Single Record Link Field" and choose which field will be the link to the single record page. You can set the link on any text field or an image field.
 
-If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW". You must use the "detailed" list template for this to work.
+If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW". Set the field to "read only" so it can't be edited.
 
 If you are good with CSS, you can easily make the link look like a button.
 
@@ -627,7 +625,7 @@ For those with some Javascript skills, you can use these fields to store dynamic
 
 = Image & File Uploads =
 
-Files can be uploaded and managed using the "File Upload" field type. The allowed filetypes (determined by extension) are defined in the "Allowed File Types" setting. This is a global setting for all uploads. Image files are uploaded and managed using the "Image Upload" field type.
+Files can be uploaded and managed using the "File Upload" field type. The allowed filetypes (determined by extension) are defined in the "Allowed File Types" setting. This is a global setting for all uploads. Image files are uploaded and managed using the "Image Upload" field type. If you use a "File Upload" type field for image uploads, the image itself won't show in listings, only the filename.
 
 Uploaded images and files can be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'File Upload Location' setting will always determine the location for files uploaded using the plugin forms. The files are stored in the database as filenames without any path information.
 
@@ -635,9 +633,7 @@ The plugin has a "default image" that will be shown if no image is present. You 
 
 IMPORTANT: Don't store your files in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have files in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
 
-File uploads can present a security risk to a website, so some precautions should be taken. The plugin secures uploads by replacing the filename of the uploaded file with a sanitized filename. We are depending on the hosting server to prevent the possibility of executing an uploaded file based on the filename extension.
-
-<a id="csv" name="csv"></a>
+File uploads can present a security risk to a website, so some precautions should be taken. The plugin secures uploads by replacing the filename of the uploaded file with a sanitized filename. We are depending on the hosting server to prevent the possibility of executing an uploaded file based on the filename extension.<a id="csv" name="csv"></a>
 
 = Importing CSV Files =
 
