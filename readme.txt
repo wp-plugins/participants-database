@@ -2,12 +2,12 @@
 Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
-Requires at least: 3.0
-Tested up to: 3.5
+Requires at least: 3.4
+Tested up to: 3.7
 Stable tag: 1.4.9.3
 License: GPLv2
 
-Build and maintain a fully customizable database of participants or members with signup forms, admin backend, custom lists, and CSV support.
+Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
 
 == Description ==
 
@@ -16,6 +16,8 @@ This plugin offers all the functionality needed to build and maintain a database
 This plugin was developed for an organization with the mission of educating and empowering voters. This organization needed to quickly build a database of concerned voters, supporters, and volunteers, giving them an ability to collect input and feedback, organize volunteers, and mobilize it's voter constituency with actions such as petition drives and voter education campaigns.
 
 This database could be of use to any organization that needs to build and maintain lists of constituents, supporters, members, volunteers, etc. for any purpose. It is designed to be easy to use and serve multiple purposes, with several very powerful features to customize it's functionality to the needs of your organization, club, sports team, or any other large group of people.
+
+The plugin can be easily adapted to work as a database for other applications such as indexes, directories, catalogs, or anything, really. The plugin uses a system of customizable templates for all it's displays, and an API for the customization and extension of it's capabilities. The plugin is fully internationalized with a growing set of translations.
 
 = Some of the features of the Participants Database Plugin: =
 
@@ -26,13 +28,14 @@ This database could be of use to any organization that needs to build and mainta
 * completing the sign-up form can direct visitors to another page for a thank you message or reward
 * shortcode for inserting a full-length form for people to fill out and maintain their own records
 * shortcode for displaying the list on the site, including the ability to select and order columns to display, sorting and filtering rules to determine which records are shown and in what order
+* shortcode for showing a search form that takes the user to the search results page
 * email notification and confirmation with secure individual access link
 * email notification when a user edits a record
 * searchable, sortable record listings in the WordPress admin
 * many form elements to choose from including dropdowns, checkboxes, radio buttons, image upload, rich text, etc.
 * export CSV files for interacting with other databases, mass email, print records
 * import CSV files to add large numbers of records from spreadsheets such as Open Office or Google Docs
-* form can be organized into groups of fields, making long forms easier to navigate and fill out
+* forms can be organized into groups of fields, making long forms easier to navigate and fill out
 
 = Database =
 
@@ -46,11 +49,11 @@ The plugin provides a shortcode for a sign-up form that presents a customizable 
 
 Signup forms are produced by a template, making it easy to add extra functionality and match the presentation of the form to your theme.
 
-= Frontend Form =
+= Frontend Record Edit Form =
 
 This is where people who have signed up can fill in any additional information about themselves you wish to collect. It can be additional demographic info, survey questions, what they would be willing to offer in support. This form is accessible to the signups via an individual link containing an ID number, which is emailed to them when they sign up. They don't need to register as a user or enter a password, they just need the link.
 
-= Backend Form =
+= Backend Record Editing =
 
 For your backend users, the ability to edit and enter new records is provided. This backend form can also contain administrative fields that won't be visible to the front-end (not logged-in) user, so organization staff can keep internal records of volunteer activities, availability, contributions, personal notes, etc.
 
@@ -60,7 +63,7 @@ For textarea fields, a rich-text editor will be used if enabled in the settings.
 
 = List Display =
 
-Display the list on your website with the `[pdb_list]` shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order. Optionally, search and sorting controls can be displayed.
+Display the list on your website with the `[pdb_list]` shortcode. You can determine which fields get shown, and for long lists, the list can be broken up into pages. You can specify which records get displayed and in what order. Optionally, search and sorting controls can be displayed. Each record listing can be linked to the full record showing all the details of the record.
 
 = Record Display =
 
@@ -74,17 +77,21 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 
 = Internationalization and Translations =
 
-This plugin is fully compliant with WordPress Internationalization standards and includes partial translations in Italian and Polish, and a complete translation in Slovak. All of the front-end text is user-customizable, so even if a translation isn't available for your language, your users will be able to use the plugin in their language.
+This plugin is fully compliant with WordPress Internationalization standards and includes several translations, some of which are incomplete at the moment. All of the front-end text is user-customizable, so even if a translation isn't available for your language, your users will be able to use the plugin in their language.
 
 *Translation Credits*
 
-* Slovak: Branco Radenovich [WebHostingGeeks.com](http://webhostinggeeks.com/blog/)
-
-* Polish: Piotr Kubala
+* French: Dominique Chapelle
 
 * Italian: Mario Conte
 
-* French: Dominique Chapelle
+* Dutch: Bas van Erp
+
+* Polish: Piotr Kubala
+
+* Russian: Konstantin Bashevoy [Полиатлон России](http://polyathlon-russia.com/base)
+
+* Slovak: Branco Radenovich [WebHostingGeeks.com](http://webhostinggeeks.com/blog/)
 
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
@@ -133,11 +140,17 @@ An individual record can be edited on the frontend of your website by someone wh
 
 OK, just assign all the fields you want them to fill out to the signup form (this is done in the "manage fields" page). That form can be as big as you want. Then, remove the private link from the email they get when they sign up.
 
-= How do I let people upload an image? =
+= How do I let people upload an image or file? =
 
-Go to the "manage database fields" page and create a new field for your image. Give it a descriptive name like "avatar" or something. Click "add field" and when your new field appears, set the "field type" to "image upload" Be sure to check "signup" if you want it to appear in the signup form. When the form is presented to the user, they will be allowed to upload an image. There are a couple of settings that affect image uploads, including a file size limit.
+Go to the "manage database fields" page and create a new field for your image. Give it a descriptive name like "avatar" or something. Click "add field" and when your new field appears, set the "field type" to "image upload" for images and "file-upload" for other types of file. Be sure to check "signup" if you want it to appear in the signup form. When the form is presented to the user, they will be allowed to upload an image.
 
-It is possible to have multiple images per record, just add more image fields.
+There are several settings you should look at before you go live with your uploads fields. Under the "General Settings" tab, you'll find:
+* File Upload Location - this tells the plugin where to put the uploaded files
+* File Upload Limit - this is the size limit in Kilobytes for your file uploads. Be careful not to put this too high, if you have lots of users, it could use a lot of space on your server!
+* Allowed File Types - this is a comma-separated list of allowed file extensions. You can also define this on a per-field basis.
+* Allow File Delete - if this is checked, the file will be removed from the server when a user deletes it.
+
+Each file upload field can have it's allowed files determined in the "values" field on the Manage Database Fields page. For instance, if you want them to upload only a pdf file, put "pdf" in the values field for that field. The maximum size is determined globally in the settings only.
 
 = When someone signs up, are they now users on my WordPress site? =
 
@@ -146,6 +159,8 @@ No, these signups and records are separate from people who can register on your 
 The idea is to use the database as a roster of volunteers, supporters, etc. for the organization, not the website.
 
 = People are signing up, but emails are not getting sent =
+
+Use my [Email Troubleshooting Flowchart](http://xnau.com/participants-database-email-troubleshooting/) to help you diagnose the problem.
 
 Of course make sure your settings are set to send emails.
 
@@ -163,15 +178,29 @@ The form will only appear if someone uses a valid private link to access the pag
 
 You can control which groups of fields show up in the frontend record edit screen (the one with the `[pdb_record]` shortcode) by going to the "manage database fields" page, clicking on the "field groups" tab and deselecting the "display" checkbox for those field groups you don't want shown on the frontend.
 
+= I want people to provide their email when they sign up, but I don't want that information showing to the public =
+
+It's a good practice to use field groups for something like this. Place all your "don't show to the public" fields in a group with it's "display" checkbox unchecked. This will prevent those fields from being shown in record detail pages, and also the signup form, but you can force them to display by specifying in the shortcode which groups you want included. The normally hidden groups will be included, but only those fields marked with the "signup" checkbox will appear. 
+
+For example, let's say you have two groups: 'public' and 'private.' The email field is in the private group because you don't want it displayed. In the signup form shortcode, specify the groups to show like this: `[pdb_signup groups=public,private]` Now, both groups will be included in the signup form. Remember, only those fields marked as "signup" fields will be shown.
+
+= I don't want group titles showing in the forms, how do I do that? =
+
+The easiest way to do this is to simply blank out the title for the group.
+
 = What if someone loses their private link? =
 
-If someone does not have the private link to edit their record, they can sign up again with the same email address if "Don't Allow Duplicate Email Addresses" is checked in the plugin settings. If someone signs up with the same email address as an existing record, they will be sent the same code as before, giving them access to their previously established record. This also prevents more than one record having the same email address.
+You can show a "Resend Private Link" link on your signup form, just check "Enable Lost Private Link" under the "Retrieve Link Settings" tab. You must define which field is used to identify the record. This must be a unique identifier, usually an email address, but it could be anything. The rest of the settings for this feature are under that tab.
 
-It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the `[pdb_record]` shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page. This is currently the only way to re-send a record edit link when unique emails are not enforced by the plugin setting.
+It's also possible to send them the link again in an email, but the plugin does not currently provide a way to do this. You will have to sent them a link to the edit record page (the one with the `[pdb_record]` shortcode), adding their code at the end of the link like this: ?pid=RH45L (using whatever the code for their record is.) The code is visible when you view the record from the "list participants" page.
 
-= Can they upload files too? =
+= Is it possible for users to upload files? =
 
-No, only image files are supported for now, primarily for security reasons.
+File uploads use the "file upload" field type. You should define a set of allowed file extensions in the settings: "allowed file types" under the "general settings" tab.
+
+= My site is not in English and searches using non-English characters are not working properly. =
+
+If you have a non-English site, you should convert your database to the correct "collation" for your language. 
 
 = I'm seeing strange characters in my CSV export. What's going on? =
 
@@ -191,7 +220,11 @@ Even better than that, there is a new form field type called "link" that lets pe
 
 = Is a CAPTCHA available for the forms? =
 
-Currently, there is a "math" captcha that can be used in the signup form. The instructions for use appear on the "using the plugin" page.
+You can define a "captcha" form element which will show a simple math question for the user to answer.
+
+= I'm getting a blank page in the admin when I click on the plugin menu =
+
+This is a problem that crops up on MultiSite installations. It's not a serious error, it's just that that top item is not supposed to be a clickable link, and so it doesn't go anywhere. All the real pages in the admin are working, you just have to avoid clicking on that non-working top menu item. Someday when I have some spare time, I'll figure out how to fix this...so probably never.
 
 == Screenshots ==
 
@@ -200,6 +233,34 @@ Currently, there is a "math" captcha that can be used in the signup form. The in
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.5 =
+
+**BETA RELEASE**
+
+Please back up before installing
+
+For critical production sites I recommend you try this new plugin version first in a development site.
+
+* complete overhaul of the entire plugin
+* new classes to handle templating and plugin updates
+* added infrastructure for add-on and premium plugins
+* dozens of bug fixes and code hardening for more reliable performance in your particular installation
+
+**New Features:**
+
+* **file upload field** allows any type of file to be uploaded
+* **resend private link** for users who've lost theirs
+* **math captcha** sets a simple test for a human user
+* **custom CSS setting** for easy presentation tweaks
+* **wildcard characters** allowed in searches
+* **total shortcode** shows total records and more
+* **search shortcode** to place search controls anywhere
+* **groups attribute in shortcodes** to show only selected groups of fields
+* **date range filters** in the admin list
+* **expanded API** for more ways to customize functionality
+* **“busy” spinner** image for AJAX-powered searches so the user knows something is happening while the data loads
+* **labeled selection items** for better readability
 
 = 1.4.9.3 =
 * reworked class autoloading to avoid conflicts
@@ -366,157 +427,35 @@ Taking defensive precautions against other plugins in the admin:
 * list shortcode can now specify which columns (fields) to show
 * dates before 1970 now work
 
-= 1.2.8.2 =
-* bugfix for bobbled databse update to 0.5
-
-= 1.2.8.1 =
-* fixed bug where image files are not saved with record in some cases
-
-= 1.2.8 =
-* fixed bug with some databases not getting updated
-* added setting for display text on record form
-
-= 1.2.7 =
-* bug fix: attempting to validate main form fields while on signup form
-
-= 1.2.6 =
-* bug fix for blank dates resolving to UNIX time 0
-
-= 1.2.5 =
-* added "link" form element for storing a link with link text
-* added "make link" setting to make URLs clickable
-* changed "import" field definition column to more appropriate "CSV"
-* fixed display bug with array data from multi-select form elements
-* fixed documentation error in `[pdb_list]` filtering section
-* fixed skipped validation on thanks page redirect to new page
-
-= 1.2.4 =
-* fixed bug in `[pdb_list]` shortcode display filter
-
-= 1.2.3 =
-* added access level control setting for records
-* added filtering and sorting to the `[pdb_list]` shortcode
-* fixed documentation error for list shortcode: the list limit parameter must be labeled 'list_limit', not 'list-limit'
-* improved handling of date values
-* added greater than and less than operators to record list filters
-
-= 1.2.2 =
-* added option to show groups and group descriptions in signup form
-* fixed bug in signup form submissions that contain multi-select form fields
-* it is now possible to edit the titles of the internal fields
-
-= 1.2.1 =
-* timestamps can now be displayed in the admin record list
-* added "internal" group tab to control display and export of internal fields
-* signup form "thanks" page can now be any page
-* new shortcode `[pdb_signup_thanks]` to display signup thank you message
-* better organized settings page
-
-= 1.2 =
-* added email notifications for record updates
-* new settings layout with new group for record edit form
-* added ability to display the group description in the record edit form
-* error message for record form called with invalid ID
-* more space provided for form element select options
-* database version to 0.3
-
-= 1.1.3 =
-* fixed bug with default values not preloading into the signup form
-* improved handling of quotes in form fields
-* better forms security
-* better handing of array values and select settings for multi-select form elements
-
-= 1.1.2 =
-* fixed private record link for sites using query links
-* changed "registration page" setting from text entry to page list dropdown
-* split CSS files so only the needed rules are loaded by shortcodes
-
-
-= 1.1.1 =
-* fixed shortcode content placement issues
-* added feedback message for successfully submitted `[pdb_record]` form
-* added plugin setting for the feedback message
-
-= 1.1 =
-* added list display shortcode `[pdb_list]`
-* added database upgrade code
-* database to version 0.2
-* added display column setting for frontend list display
-* improved handling of quotes and apostrophes in names and titles
-* changed CSV export to export only selected columns
-* added 'class' parameter to signup and record shortcodes
-
-= 1.0.1 =
-* fix to issue with new records private id not getting assigned
-
-= 1.0 =
-* internationalization on all display strings
-* added image upload field
-* CSV export and import functions are more robust
-
-= 0.9.6 =
-* added ability to change group name
-* smoother logic and JS enhancements for deleting field groups
-* added "number of fields in group" column on field groups list
-* fixed install db error: integrity check on nonexistent table
-
-= 0.9.5 =
-* prevent frontend record edit submission from redirecting to admin
-* further CSS improvements to backend fields management page
-* better default settings for field groups
-* logic to allow both signup and record shortcodes to be on the same page
-* setting to show the private ID and link on the admin participant listing page
-
-= 0.9.4 =
-* improved CSS on manage fields page
-
-= 0.9.3 =
-* fixed possible submit failure on non-unique email
-* added unique email setting to allow multiple records with same email address
-* polished CSV output for readable array data fields
-* frontend edit form stays on frontend for admin user
-
-= 0.9.2 =
-* fixed new fields not getting correctly added to database in all cases
-* fixed validation bug on empty validation
-* set default validation to NO on new fields
-* added database integrity test and fix
-* fixed select disply for multi-select elements
-* CSS improvements for multi-selects
-
-= 0.9.1 =
-* fixed settings object instantiation bug
-* fixed problem with private id dropping off record form
-
-= 0.9 =
-* critical update
-* fixed major bug in signup class
-* minor security enhancements
-
-= 0.8.1 =
-* release version
-* tested working all features
-
-= 0.7 =
-* Initial version
-* No internationalization
-
 == Upgrade Notice ==
 
-= 1.4.9.2 =
-* major enhancements and bugfix release
+= 1.5 =
+**BETA RELEASE**
+Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions or test in development site before updating.
 
 == Using the Plugin ==
+
+* General Description
+* Quick Start Instructions
+* List of Plugin Shortcodes
+* The List Shortcode
+* Shortcode Templates
+* The Thank You Page
+* Hidden Signup Fields
+* Uploading Images
+* Importing Records
 
 This plugin has two modes of interacting with the database. First, as a tool for logged-in admin or editors to manage the database, second as a way for site visitors to sign up and fill in their information themselves. Depending on what you need, you can use either or both.
 
 *Please read the documentation fully, as this is a complex plugin that can be used in a lot of different ways.*
 
-To collect signups on your website use this shortcode: `[pdb_signup]`. The shortcode will generate a short form to give people a way to add their name to your list. You can customize which fields they need to fill in. `[pdb_record]` displays an expanded version of the form so people can add to or edit their own record. These two shortcodes can be on the same page if you want. The `[pdb_record]` form is only available when accessed using a private link because it allows a user to edit their own record. This link can be provided in an email and is also visible in the admin listing of records.
+To collect signups on your website use this shortcode: `[pdb_signup]`. The shortcode will generate a short form to give people a way to add their name to your list. You can customize which fields they need to fill in. 
+
+When they sign up, they can be provided with a private link to their record, which the can add to or edit.  Place the `[pdb_record]` shortcode on they page you want them to go to to edit their record. This page should also be selected in the settings as the "Participant Record Page."
 
 The idea is your site visitors can sign up with only a name and email (for instance) and then go back and fill out all the other information you want to get from them. It is not necessary for them to log in or register, and the people in the database are separate from your WordPress site users.
 
-When your site visitors fill out and submit the signup form, they will be sent an email with a private link to their full record. This page is where the `[pdb_record]` shortcode goes.
+When your site visitors fill out and submit the signup form, they will be sent an email with a private link to their full record. This page is where the `[pdb_record]` shortcode goes. <a id="quickstart"></a>
 
 = Quick Start Instructions: =
 
@@ -527,7 +466,7 @@ When your site visitors fill out and submit the signup form, they will be sent a
 5. When someone signs up, an email is sent to them with a private link to their record so they can fill out all the fields you want them to. This is why you need to tell the plugin where your `[pdb_record]` shortcode is. You can define which fields they will see there on the "manage fields" page.
 6. Go to the plugin settings page to set up the emails. There are both user and admin emails sent on a signup, and you can determine the content of the emails and also whether to send them and to whom.
 
-Of course, records can be entered in the backend by a user with "edit posts" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file.
+Of course, records can be entered in the backend by a user with "edit posts" or above capabilities. Setting up the fields and plugin settings requires an admin. Records can also be imported with a CSV file. <a id="shortcodes"></a>
 
 = Shortcodes this Plugin Uses =
 
@@ -537,23 +476,10 @@ This plugin uses a number of different shortcodes to place it's functionality in
 2. `[pdb_record]` - This shortcode only displays when accessed with a URL including the record "private id" number. It allows the user to edit and add to their own record, while others won't have access to it. A private link to this record can be included in the "thankyou" email they will receive on submission.
 3. `[pdb_list]` - This shortcode prints out a list of records from the database. Which records get displayed and how can all be determined by the admin. It is also possible to allow the site visitor to filter (search) the list and also sort it.
 4. `[pdb_single]` - This shows a single record as determined by the record ID present in the URL used to access the page. It is possible to set a link to the single record in the record list, allowing for a detail display of a single record.
-5. `[pdb_signup_thanks]` - If you want to send the people who use the signup form to another page after they submit, you can use this shortcode to display the thankyou message. This is not needed if you have them just go back to the signup page, the signup shortcode will take care if it.
-
-= The Signup Form =
-
-This form is designed to be a simple way for your users to sign up. The fields that appear in the signup form are the ones with "signup" checked in the "manage database fields" page. You can put any type of field and any number of fields into your signup form. Check the "signup" tab in the settings to make sure it's set up to work the way you want.
-
-= Signup Form CAPTCHA =
-
-CAPTCHA fields are a common way to prevent spammers from automatically filling out your signup form. To add a CAPTCHA field, add a field on the "manage database fields" page and set it to be a "captcha" field. The other settings you need to use will be automatically filled in. At present, there is only one kind of CAPTCHA integrated into the plugin: the "math" captcha, which asks the user to answer a simple arithmetic question. On the "general" settings tab is the message that is shown if the CAPTCHA is not correctly filled in so you can change it to say whatever you want.
-
-The CAPTCHA field may only be used in the signup form.
-
-= Setting Up the Signup Form "Thank You" Page =
-
-To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the `[pdb_signup_thanks]` shortcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
-
-It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.
+5. `[pdb_signup_thanks]` - If you want to send the people who use the signup form to another page after they submit, you can use this shortcode to display the thankyou message. This is not needed if you have them just go back to the signup page, the signup shortcode will take care if it. <a id="list"></a>
+6. `[pdb_search]` - will show a search form which can be placed anywhere. When the search is performed, the user is taken to a page with a [pdb_list] shortcode and shown the result of their search.
+7. `[pdb_request_link]` - shows a form for requesting the private link to be resent.
+8. `[pdb_total]` – shows the either the number of records matching a given filter or the numeric total of a given column of values.
 
 = Showing a List of Records on Your Website =
 
@@ -579,9 +505,11 @@ Which columns are shown by the shortcode is set up on the fields management page
 
 If you want to get tricky with the CSS, each header column has a class name that corresponds to the name of the field, you can use CSS to lay out the listing exactly as you want.
 
-**Searching and Sorting The List**
+= Searching and Sorting The List =
 
-You can activate list searching and/or sorting for your users with these attributes: `[pdb_list search=true]` or `[pdb_list sort=true]` These attributes will enable a search form and/or sort form displayed above the list. The user can select which field they want to search through a dropdown and type in a search term. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
+You can activate user list searching and/or sorting for your users with these attributes: `[pdb_list search=true]` or `[pdb_list sort=true]` These attributes will enable a search form and/or sort form displayed above the list. The user can select which field they want to search through a dropdown and type in a search term. Only fields that are displayed can be searched. For sorting, the fields offered for sorting must be checked as "sortable" and also be present in the list display.
+
+User list searches now allow for the use of the '*' wildcard, so for instance, to search for records beginning with the letter 'B' the search would be 'B*'.
 
 There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
 
@@ -625,7 +553,7 @@ Normally, a user search can only override the fields they search on. For instanc
 
 = Approving Records for Public Display =
 
-One application for the list filtering option allows you to control whether a record gets displayed, giving you an approval process for new records. Create an administrative field (one that is not displayed or edited on the frontend) called "approved" that is a checkbox. Put this (without the quotes) in the values for the field: 'yes,no' with a default value of 'no'. Then put this in the shortcode: `[pdb_list filter='approved=yes']` Now, only records that have been approved will be included in the list display. You may need to do something like this if you get a problem with spam, for instance.
+One application for the list filtering option allows you to control whether a record gets displayed, giving you an approval process for new records. Create an administrative field (one that is not displayed or edited on the frontend) called "approved" that is a checkbox. Put this (without the quotes) in the values for the field: 'yes,no' with a default value of 'no'. Then put this in the shortcode: `[pdb_list filter='approved=yes']` Now, only records that have been approved will be included in the list display. You may need to do something like this if you get a problem with spam, for instance.<a id="templates"></a>
 
 = Shortcode Templates =
 
@@ -637,13 +565,9 @@ IMPORTANT: if you modify the templates in the shortcode directory, your changes 
 
 Template files use this naming convention: pdb-{shortcode name}-{template name}.php. So, for instance, the default template for the `[pdb_signup]` shortcode is "pdb-signup-default.php" If you want to create your own template file, you would rename it something like: "pdb-signup-mytemplate.php" then, call it in the shortcode like this: `[pdb_signup template="mytemplate"]`.
 
-The default template files include comments to help you develop your own templates easily.
-
 I have created a help page for custom templates which includes a tutorial: http://xnau.com/pdb-templates/
 
 = Single Record Templates =
-
-**Please Note:** As of version 1.4 the way the single record template works has changed. It is now consistent with the other templates, but different from the way it worked before. The old templates will still work, but you should update them to the new way of doing things. If you look at your custom template and the pdb-single-default.php template provided, you'll easily see how to convert it to the new way of doing the templates.
 
 Templates for the single record shortcode include an array that can be used to prevent any fields from displaying. Let's say you wanted to exclude the city, state and postcode. In that case the array would be filled with those names like this:
 
@@ -657,7 +581,7 @@ To show an individual record on the website, use the `[pdb_single]` shortcode. Y
 
 You can put a link to the single record in the participant list by defining the page on which the `[pdb_single]` is placed, and the column where you want the link to appear. In the plugin settings, general settings tab, look for "Single Record Page": set that to the page where your `[pdb_single]` shortcode is. Then, go to "Single Record Link Field" and choose which field will be the link to the single record page. You can set the link on any text field or an image field.
 
-If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW". You must use the "detailed" list template for this to work.
+If you want to make a field that is just for linking to the record, create a field called "link" or something and then put as the default value the text you want to use for your link like "VIEW". Set the field to "read only" so it can't be edited.
 
 If you are good with CSS, you can easily make the link look like a button.
 
@@ -673,7 +597,7 @@ By using custom templates, you can have even more control over how things are di
 
 To have your visitors go to another page after they submit a signup, go to the settings page and set the "Signup Thanks Page" setting to point to your page. Place the `[pdb_signup_thanks]` shortcode on that page to display the thank you message. You don't have to use the shortcode, but it gives you a way to thank them using their name.
 
-It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.
+It's also possible to use this feature to make filling out the signup form required in order to get to another (hidden) page on your website.<a id="hidden"></a>
 
 = Hidden Signup Fields =
 
@@ -695,25 +619,21 @@ At the moment, two WordPress objects are available: $post and $current_user. You
 
 If you just want to put in a fixed value, the hidden field will include any string you put into the "default" for the field.
 
-You can also access some PHP "Superglobals." For instance, to get the IP of the user, put this into the default: "SERVER:REMOTE_ADDR" You can access these superglobals: POST, GET, REQUEST, COOKIE, SERVER. This means you can get the value of a cookie and put it into the form, saving it when the form is submitted. You don't need the '$_' that is used in PHP. A good reference for what is possible can be found here: <http://php.net/manual/en/language.variables.superglobals.php>
+You can also access some PHP "Superglobals." For instance, to get the IP of the user, put this into the default: "SERVER:REMOTE_ADDR" You can access these superglobals: POST, GET, REQUEST, COOKIE, SERVER, SESSION. This means you can get the value of a cookie and put it into the form, saving it when the form is submitted. You don't need the '$_' that is used in PHP. A good reference for what is possible can be found here: <http://php.net/manual/en/language.variables.superglobals.php>
 
-For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden fields are also present in the form presented by the `[pdb_record]` shortcode. These fields are visible and editable in the admin edit page.
+For those with some Javascript skills, you can use these fields to store dynamic information about a signup. The hidden fields are also present in the form presented by the `[pdb_record]` shortcode. These fields are visible and editable in the admin edit page.<a id="images"></a>
 
-= Image Upload Fields =
+= Image & File Uploads =
 
-To allow your users to upload images, add an "image upload" field to the form. The images are stored in the "file upload location" set in the general settings. Only the name of the file is saved in the database, it looks for an image of that name in the file upload location. It is also necessary to have the image file types you wish to allow users to upload in the "Allowed File Types" setting. The image type is determined by the file extension and is typically one of 'jpg', 'png', or 'gif'.
+Files can be uploaded and managed using the "File Upload" field type. The allowed filetypes (determined by extension) are defined in the "Allowed File Types" setting. This is a global setting for all uploads. Image files are uploaded and managed using the "Image Upload" field type. If you use a "File Upload" type field for image uploads, the image itself won't show in listings, only the filename.
+
+Uploaded images and files can be stored anywhere in the WP install directory, and can be moved without breaking image sources. The 'File Upload Location' setting will always determine the location for files uploaded using the plugin forms. The files are stored in the database as filenames without any path information.
 
 The plugin has a "default image" that will be shown if no image is present. You can create your own, but you shouldn't keep it in the plugin folder. Keep it in the uploads directory or in your theme directory. Change the "Default Image" setting to point to your image. If you don't want anything to show if no image is present, make the "Default Image" setting blank.
 
-IMPORTANT: Don't store images in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have images in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
+IMPORTANT: Don't store your files in the plugin directory, they will be deleted by automatic upgrades. The new default location is in "wp-content/uploads/participants-database/" If you have files in the plugin directory, move them to this directory (it's a good choice, but if you know a better one, use it) and then change the plugin setting to point to the new location.
 
-= File Upload Fields =
-
-To allow your users to upload files (other than images), use the "file upload" field type. In the settings under the "general" tab is a setting allowing you to globally determine which file types you are allowing users to upload. The type is determined by the file extension, and a set of most likely file types in included as a default. You should edit this to only include file types you want users to upload. Is is also possible to set the allowed types on a per-field basis. Just put the allowed file type extensions into the "values" field of the file upload field definition on the "manage database fields" page.
-
-It is important to be aware that allowing users to upload files is risky, so be sure to limit your allowed types to those that are reasonably safe. NEVER allow "executable" files to be uploaded (such as PHP or PERL scripts) unless you are a security expert. Basic precautions have been taken to make it difficult for malicious files to be uploaded, but you are depending on your web server being properly configured to prevent things like image files that are really executable scripts from being actually executed. Do a little research on securing file uploads in WordPress to get some ideas on how you can do this with some safety.
-
-All files will be uploaded into the "file upload location" as defined in the settings.
+File uploads can present a security risk to a website, so some precautions should be taken. The plugin secures uploads by replacing the filename of the uploaded file with a sanitized filename. We are depending on the hosting server to prevent the possibility of executing an uploaded file based on the filename extension.<a id="csv" name="csv"></a>
 
 = Importing CSV Files =
 
