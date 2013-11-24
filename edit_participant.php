@@ -205,7 +205,7 @@ if ($participant_values) :
                             'options' => $column->values,
                             'class' => $field_class,
                             'attributes' => $attributes,
-                            'module' => 'admin',
+                            'module' => 'admin-edit',
                         )
                 );
               }

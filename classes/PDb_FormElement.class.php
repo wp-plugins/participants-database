@@ -159,8 +159,8 @@ class PDb_FormElement extends FormElement {
               'module' => $field->module,
               ));
 
-          if ($html and (!is_admin() or (defined('DOING_AJAX') and DOING_AJAX))) {
-            if (isset($field->module) and in_array($field->module, array('single','list'))) {
+          if ($html) {
+            if (isset($field->module) and in_array($field->module, array('single','list','admin-edit'))) {
               $image->display_mode = 'image';
             } elseif (isset($field->module) and $field->module == 'signup') {
               $image->display_mode = $image->image_defined ? 'both' : 'none';
@@ -288,6 +288,38 @@ class PDb_FormElement extends FormElement {
     
     else parent::_rich_text_field();
     
+  }
+
+  /**
+   * builds a file upload element
+   * 
+   * @param string $type the upload type: file or image
+   */
+  protected function _upload($type) {
+
+    $this->_addline('<div class="' . $this->prefix . 'upload">');
+   // if a file is already defined, show it
+    if (!empty($this->value)) {
+
+      $this->_addline(self::get_field_value_display($this));
+    }
+
+    // add the MAX_FILE_SIZE field
+    // this is really just for guidance, not a valid safeguard; this must be checked on submission
+    if (isset($this->options['max_file_size']))
+      $max_size = $this->options['max_file_size'];
+    else
+      $max_size = ( ini_get('post_max_size') / 2 ) * 1048576; // half it to give a cushion
+
+    $this->_addline($this->print_hidden_fields(array('MAX_FILE_SIZE' => $max_size, $this->name => $this->value)));
+
+    $this->_addline($this->_input_tag('file'));
+
+    // add the delete checkbox if there is a file defined
+    if (!empty($this->value))
+      $this->_addline('<span class="file-delete" ><label><input type="checkbox" value="delete" name="' . $this->name . '-deletefile">' . __('delete', 'participants-database') . '</label></span>');
+    
+    $this->_addline('</div>');
   }
 
   /*************************** 
