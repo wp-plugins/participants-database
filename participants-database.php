@@ -300,8 +300,8 @@ class Participants_Db extends PDb_Base {
   public static function admin_init() {
 
     // if the setting was made in previous versions and is a slug, convert it to a post ID
-    $regpage = self::$plugin_options['registration_page'];
-    if (isset($regpage) && !is_numeric($regpage)) {
+    $regpage = isset(self::$plugin_options['registration_page']) ? self::$plugin_options['registration_page'] : '';
+    if (!empty($regpage) && !is_numeric($regpage)) {
 
       self::$plugin_options['registration_page'] = self::get_id_by_slug($regpage);
 
@@ -1270,7 +1270,8 @@ class Participants_Db extends PDb_Base {
           if ($action == 'insert' ) {
             $new_value = false;
           } else {
-            $new_value = isset($post['date_recorded']) && !empty($post['date_recorded']) ? $post['date_recorded'] : false ;
+            $post_date = isset($post['date_recorded']) ? self::parse_date($post['date_recorded']) : false;
+            $new_value = $post_date !== false ? date('Y-m-d H:i:s', $post_date) : false ;
           }
           break;
 
@@ -1466,7 +1467,7 @@ class Participants_Db extends PDb_Base {
       }
     }
 
-    self::set_admin_message(self::$i18n['updated'],'updated');
+    self::set_admin_message(($action == 'insert' ? self::$i18n['added'] : self::$i18n['updated']),'updated');
 
     return $participant_id;
   }
@@ -2562,13 +2563,12 @@ class Participants_Db extends PDb_Base {
    *                            user feedback
    * @param bool   $zero_time   if set, zero the time portion of the date so it 
    *                            won't interfere with date comparisons
-   * @return unknown UNIX timestamp or false if parse fails
+   * @return int|bool UNIX timestamp or false if parse fails
    */
   public static function parse_date($string = false, $column = '', $zero_time = false) {
 
-    // return the now() timestamp
     if (false === $string)
-      return time();
+      return false;
 
     $string = Participants_Db::set_filter('parse_date', $string, $column);
 
@@ -2726,6 +2726,7 @@ class Participants_Db extends PDb_Base {
         'next' => __('Next','participants-database'),
         'previous' => __('Previous','participants-database'),
         'updated' => __('The record has been updated.','participants-database'),
+        'added' => __('The new record has been added.','participants-database'),
     );
   }
 

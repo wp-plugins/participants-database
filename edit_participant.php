@@ -155,6 +155,8 @@ if ($participant_values) :
                     if (!empty($column->value) and !Participants_Db::is_valid_timestamp($column->value)) {
                       //$column->value = FormElement::get_field_value_display($column);
                       $column->value = Participants_Db::parse_date($column->value);
+                      
+                      if (!Participants_Db::is_valid_timestamp($column->value)) $column->value = false;
                     }
 
                     break;

@@ -677,6 +677,7 @@ class PDb_Init
                                                     'signup' => 1,
                                                     'form_element'=>'text-line',
                                                     'CSV' => 1,
+                                                    'readonly' => 1,
                                                     ),
                             'private_id'     => array(
                                                     'title' => 'Private ID',
@@ -684,22 +685,26 @@ class PDb_Init
                                                     'form_element' => 'text',
 																										'admin_column' => 90,
                                                     'default' => 'RPNE2',
+                                                    'readonly' => 1,
                                                     ),
                             'date_recorded'  => array(
                                                     'title' => 'Date Recorded',
-                                                    'form_element'=>'date',
+                                                    'form_element'=>'timestamp',
 																										'admin_column'=>100,
 																										'sortable'=>1,
+                                                    'readonly' => 1,
                                                     ),
                             'date_updated'   => array(
                                                     'title' => 'Date Updated',
-                                                    'form_element'=>'date',
+                                                    'form_element'=>'timestamp',
 																										'sortable'=>1,
+                                                    'readonly' => 1,
                                                     ),
                             'last_accessed'   => array(
                                                     'title' => 'Last Accessed',
-                                                    'form_element'=>'date',
+                                                    'form_element'=>'timestamp',
 																										'sortable'=>1,
+                                                    'readonly' => 1,
                                                     ),
                             );
 
@@ -829,11 +834,13 @@ class PDb_Init
                                                         'title' => 'Interests or Hobbies',
                                                         'form_element' => 'multi-select-other',
                                                         'values' => array(
-                                                                          'sports',
-                                                                          'photography',
-                                                                          'crafts',
-                                                                          'outdoors',
-                                                                          'yoga'
+                                                                          'Sports' => 'sports',
+                                                                          'Photography' => 'photography',
+                                                                          'Art/Crafts' => 'crafts',
+                                                                          'Outdoors' => 'outdoors',
+                                                                          'Yoga' => 'yoga',
+                                                                          'Music' => 'music',
+                                                                          'Cuisine' => 'cuisine',
                                                                           ),
                                                         ),
                                   );
@@ -848,15 +855,6 @@ class PDb_Init
                                                                           'no',
                                                                           ),
                                                         ),
-                                  'donations'   => array(
-                                                        'title' => 'Donations Made',
-                                                        'form_element' => 'text-area',
-                                                      ),
-                                  'volunteered' => array(
-                                                        'title' => 'Time Volunteered',
-                                                        'form_element' => 'text-area',
-                                                        'help_text' => 'how much time they have volunteered',
-                                                      ),
 
                                   );
 
