@@ -14,33 +14,33 @@ msgstr ""
 "X-Generator: Poedit 1.5.7\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 
-#: classes/CSV_Import.class.php:58
+#: classes/xnau_CSV_Import.class.php:58
 msgid "The file %s has been uploaded."
 msgstr "Был загружен файл s%."
 
-#: classes/CSV_Import.class.php:64
+#: classes/xnau_CSV_Import.class.php:64
 msgid "%s record added"
 msgid_plural "%s records added"
 msgstr[0] "Добавлена запись %s"
 msgstr[1] "%s записей загружено"
 
-#: classes/CSV_Import.class.php:68
+#: classes/xnau_CSV_Import.class.php:68
 msgid "%s matching record updated"
 msgid_plural "%s matching records updated"
 msgstr[0] "Обновлены совпадающие записи %s"
 msgstr[1] "%s записей обновлено"
 
-#: classes/CSV_Import.class.php:73
+#: classes/xnau_CSV_Import.class.php:73
 msgid "%s duplicate record skipped"
 msgid_plural "%s duplicate records skipped"
 msgstr[0] "Пропущены повторяющиеся записи %s"
 msgstr[1] "%s повторяющихся записей пропущено"
 
-#: classes/CSV_Import.class.php:77
+#: classes/xnau_CSV_Import.class.php:77
 msgid "Zero records imported"
 msgstr "Импортированы нулевые записи"
 
-#: classes/CSV_Import.class.php:82
+#: classes/xnau_CSV_Import.class.php:82
 msgid ""
 "There was an error uploading the file. This could be a problem with "
 "permissions on the uploads directory."
@@ -48,11 +48,11 @@ msgstr ""
 "При загрузке файла возникла ошибка. Возможно это связано с проблемами "
 "доступа к папке загрузки"
 
-#: classes/CSV_Import.class.php:82 classes/CSV_Import.class.php:88
+#: classes/xnau_CSV_Import.class.php:82 classes/xnau_CSV_Import.class.php:88
 msgid "Destination"
 msgstr "Обозначение"
 
-#: classes/CSV_Import.class.php:88
+#: classes/xnau_CSV_Import.class.php:88
 msgid ""
 "Target directory does not exist and could not be created. Try creating it "
 "manually."
@@ -61,18 +61,18 @@ msgstr ""
 "создать ее вручную"
 
 #. translators: the %s will be the name of the file
-#: classes/CSV_Import.class.php:142
+#: classes/xnau_CSV_Import.class.php:142
 msgid "Error occured while trying to add the data to the database"
 msgstr "Произошла ошибка во время попытки добавить данные в базу данных"
 
-#: classes/CSV_Import.class.php:142
+#: classes/xnau_CSV_Import.class.php:142
 msgid ""
 "Input file does not exist or path is incorrect.<br />Attempted to load: %s"
 msgstr ""
 "Вводный файл не существует или путь к нему указан неверно. <br /> Попытка "
 "загрузить: %s"
 
-#: classes/CSV_Import.class.php:188
+#: classes/xnau_CSV_Import.class.php:188
 msgid ""
 "The number of items in line %s is incorrect.<br />There are %s and there "
 "should be %s."
@@ -80,27 +80,27 @@ msgstr ""
 "Числа элементов в строке %s некорректно. <br /> В ней %s строк, а должно "
 "быть %s."
 
-#: classes/CSV_Import.class.php:197
+#: classes/xnau_CSV_Import.class.php:197
 msgid "Number of values does not match number of columns"
 msgstr "Количество значений не совпадает с количеством столбцов"
 
-#: classes/CSV_Import.class.php:286
+#: classes/xnau_CSV_Import.class.php:286
 msgid "New columns imported from the CSV file."
 msgstr "Новые колонки импортированы из CSV-файла."
 
-#: classes/FormElement.class.php:239
+#: classes/xnau_FormElement.class.php:239
 msgctxt "indicates a write-in choice"
 msgid "other"
 msgstr "прочий"
 
-#: classes/FormElement.class.php:240
+#: classes/xnau_FormElement.class.php:240
 msgctxt "indicates the text to be clicked to go to another web page"
 msgid "Link Text"
 msgstr ""
 "Текст ссылки [указывает на текст, который необходимо нажать, чтобы перейти к "
 "другой веб-странице]"
 
-#: classes/FormElement.class.php:992 manage_fields.php:456
+#: classes/xnau_FormElement.class.php:992 manage_fields.php:456
 msgid "delete"
 msgstr "удалить"
 

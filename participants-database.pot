@@ -78,17 +78,17 @@ msgstr ""
 msgid "New columns imported from the CSV file."
 msgstr ""
 
-#: classes/FormElement.class.php:239
+#: classes/xnau_FormElement.class.php:239
 msgctxt "indicates a write-in choice"
 msgid "other"
 msgstr ""
 
-#: classes/FormElement.class.php:240
+#: classes/xnau_FormElement.class.php:240
 msgctxt "indicates the text to be clicked to go to another web page"
 msgid "Link Text"
 msgstr ""
 
-#: classes/FormElement.class.php:992 manage_fields.php:456
+#: classes/xnau_FormElement.class.php:992 manage_fields.php:456
 msgid "delete"
 msgstr ""
 

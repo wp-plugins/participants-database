@@ -1,7 +1,7 @@
 /*
  * Participants Database Plugin
  * 
- * version: 0.5
+ * version: 0.6
  * 
  * xnau webdesign xnau.com
  * 
@@ -59,8 +59,18 @@ jQuery(document).ready(function($){
   }
   $("#fields-tabs").tabs(tabsettings);
 
-  // set up the delete functionality
+  // pre-set CAPTCHA settings
+  $('.manage-fields-wrap').on('change', '.manage-fields tbody td.form_element select', function(){
+    if ($(this).val() == 'captcha') {
+      var row = $(this).closest('tr');
+      row.find('td.validation select').val('captcha');
+      row.find('td.readonly input[type=checkbox], td.signup input[type=checkbox]').prop('checked', true);
+      row.find('td.sortable input[type=checkbox], td.CSV input[type=checkbox], , td.persistent input[type=checkbox]').prop('checked', false);
+    }
+  });
 
+
+  // set up the delete functionality
   // set up the click function
   $('#fields-tabs .manage-fields a.delete').click(function (e) { // if a user clicks on the "delete" image
 

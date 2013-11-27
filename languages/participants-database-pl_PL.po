@@ -14,12 +14,12 @@ msgstr ""
 "X-Poedit-Language: Polish\n"
 "X-Poedit-Country: POLAND\n"
 
-#: classes/FormElement.class.php:150
+#: classes/xnau_FormElement.class.php:150
 msgctxt "indicates a write-in choice"
 msgid "other"
 msgstr "inny"
 
-#: classes/FormElement.class.php:151
+#: classes/xnau_FormElement.class.php:151
 msgctxt "indicates the text to be clicked to go to another web page"
 msgid "Link Text"
 msgstr "Tekst odnośnika"

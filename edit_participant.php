@@ -150,10 +150,10 @@ if ($participant_values) :
 
                     /*
                      * if it's not a timestamp, format it for display; if it is a
-                     * timestamp, it will be formatted by the FormElement class
+                     * timestamp, it will be formatted by the xnau_FormElement class
                      */
                     if (!empty($column->value) and !Participants_Db::is_valid_timestamp($column->value)) {
-                      //$column->value = FormElement::get_field_value_display($column);
+                      //$column->value = xnau_FormElement::get_field_value_display($column);
                       $column->value = Participants_Db::parse_date($column->value);
                       
                       if (!Participants_Db::is_valid_timestamp($column->value)) $column->value = false;

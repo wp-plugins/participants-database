@@ -13,27 +13,27 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: Poedit 1.5.4\n"
 
-#: classes/CSV_Import.class.php:58
+#: classes/xnau_CSV_Import.class.php:58
 msgid "The file %s has been uploaded."
 msgstr "Súbor %s bol nahraný."
 
-#: classes/CSV_Import.class.php:64
+#: classes/xnau_CSV_Import.class.php:64
 msgid "%s record added"
 msgstr "%s record pridanej"
 
-#: classes/CSV_Import.class.php:68
+#: classes/xnau_CSV_Import.class.php:68
 msgid "%s matching record updated"
 msgstr "%s zodpovedajúci záznam aktualizované"
 
-#: classes/CSV_Import.class.php:73
+#: classes/xnau_CSV_Import.class.php:73
 msgid "%s duplicate record skipped"
 msgstr "%s duplicitný záznam vynechané"
 
-#: classes/CSV_Import.class.php:77
+#: classes/xnau_CSV_Import.class.php:77
 msgid "Zero records imported"
 msgstr "Nulové záznamy importované"
 
-#: classes/CSV_Import.class.php:82
+#: classes/xnau_CSV_Import.class.php:82
 msgid ""
 "There was an error uploading the file. This could be a problem with "
 "permissions on the uploads directory."
@@ -41,11 +41,11 @@ msgstr ""
 "Došlo k chybe pri nahrávaní súboru. To by mohol byť problém s oprávnením na "
 "nahratých adresára."
 
-#: classes/CSV_Import.class.php:82 classes/CSV_Import.class.php:88
+#: classes/xnau_CSV_Import.class.php:82 classes/xnau_CSV_Import.class.php:88
 msgid "Destination"
 msgstr "Určenia"
 
-#: classes/CSV_Import.class.php:88
+#: classes/xnau_CSV_Import.class.php:88
 msgid ""
 "Target directory does not exist and could not be created. Try creating it "
 "manually."
@@ -53,16 +53,16 @@ msgstr ""
 "Cieľový adresár neexistuje a nemohol byť vytvorený. Skúste vytvoriť ručne."
 
 #. translators: the %s will be the name of the file
-#: classes/CSV_Import.class.php:142
+#: classes/xnau_CSV_Import.class.php:142
 msgid "Error occured while trying to add the data to the database"
 msgstr "Vyskytla sa chyba pri pokuse o pridanie údajov do databázy"
 
-#: classes/CSV_Import.class.php:142
+#: classes/xnau_CSV_Import.class.php:142
 msgid ""
 "Input file does not exist or path is incorrect.<br />Attempted to load: %s"
 msgstr "Cieľový Adresár neexistuje nemohol byt vytvorený. Skus vytvoriť ručne."
 
-#: classes/CSV_Import.class.php:188
+#: classes/xnau_CSV_Import.class.php:188
 msgid ""
 "The number of items in line %s is incorrect.<br />There are %s and there "
 "should be %s."
@@ -70,20 +70,20 @@ msgstr ""
 "Počet položiek v S line% je nesprávna. <br /> Existuje% s, a tam by mala byť"
 "% s"
 
-#: classes/CSV_Import.class.php:197
+#: classes/xnau_CSV_Import.class.php:197
 msgid "Number of values does not match number of columns"
 msgstr "Počet hodnôt nezodpovedá počtu stĺpcov"
 
-#: classes/CSV_Import.class.php:286
+#: classes/xnau_CSV_Import.class.php:286
 msgid "New columns imported from the CSV file."
 msgstr "Nové stĺpce dovážané zo súboru CSV."
 
-#: classes/FormElement.class.php:150
+#: classes/xnau_FormElement.class.php:150
 msgctxt "indicates a write-in choice"
 msgid "other"
 msgstr "Ostatné"
 
-#: classes/FormElement.class.php:151
+#: classes/xnau_FormElement.class.php:151
 msgctxt "indicates the text to be clicked to go to another web page"
 msgid "Link Text"
 msgstr "Text odkazu"

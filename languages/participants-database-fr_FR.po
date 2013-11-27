@@ -13,43 +13,43 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: classes/CSV_Import.class.php:58
+#: classes/xnau_CSV_Import.class.php:58
 msgid "The file %s has been uploaded."
 msgstr "Le fichier %s a bien été chargé"
 
-#: classes/CSV_Import.class.php:64
+#: classes/xnau_CSV_Import.class.php:64
 msgid "%s record added"
 msgid_plural "%s records added"
 msgstr[0] "%s entrée ajoutée"
 msgstr[1] "%s entrées ajoutées"
 
-#: classes/CSV_Import.class.php:68
+#: classes/xnau_CSV_Import.class.php:68
 msgid "%s matching record updated"
 msgid_plural "%s matching records updated"
 msgstr[0] "%s entrée correspondante mise à jour"
 msgstr[1] "%s entrées correspondantes mises à jour"
 
-#: classes/CSV_Import.class.php:73
+#: classes/xnau_CSV_Import.class.php:73
 msgid "%s duplicate record skipped"
 msgid_plural "%s duplicate records skipped"
 msgstr[0] "%s entrée redondante omise"
 msgstr[1] "%s entrées redondantes omises"
 
-#: classes/CSV_Import.class.php:77
+#: classes/xnau_CSV_Import.class.php:77
 msgid "Zero records imported"
 msgstr "Aucune entrée importée"
 
-#: classes/CSV_Import.class.php:82
+#: classes/xnau_CSV_Import.class.php:82
 msgid ""
 "There was an error uploading the file. This could be a problem with "
 "permissions on the uploads directory."
 msgstr "Echec du chargement de fichier. Cela peut venir d'un problème de droits sur le répertoire d'upload."
 
-#: classes/CSV_Import.class.php:82 classes/CSV_Import.class.php:88
+#: classes/xnau_CSV_Import.class.php:82 classes/xnau_CSV_Import.class.php:88
 msgid "Destination"
 msgstr "Destination"
 
-#: classes/CSV_Import.class.php:88
+#: classes/xnau_CSV_Import.class.php:88
 msgid ""
 "Target directory does not exist and could not be created. Try creating it "
 "manually."
@@ -58,17 +58,17 @@ msgstr ""
 "Tentez de le créer manuellement."
 
 #. translators: the %s will be the name of the file
-#: classes/CSV_Import.class.php:142
+#: classes/xnau_CSV_Import.class.php:142
 msgid "Error occured while trying to add the data to the database"
 msgstr "Erreur en essayant d'ajouter les données dans la base"
 
-#: classes/CSV_Import.class.php:142
+#: classes/xnau_CSV_Import.class.php:142
 msgid ""
 "Input file does not exist or path is incorrect.<br />Attempted to load: %s"
 msgstr ""
 "Le fichier à importer n'a pas pu être trouvé à l'endroit indiqué: %s"
 
-#: classes/CSV_Import.class.php:188
+#: classes/xnau_CSV_Import.class.php:188
 msgid ""
 "The number of items in line %s is incorrect.<br />There are %s and there "
 "should be %s."
@@ -76,25 +76,25 @@ msgstr ""
 "Le nombre d'éléments dans la ligne %s est incorrect.<br />Il y "
 "en a %s au lieu de %s attendu."
 
-#: classes/CSV_Import.class.php:197
+#: classes/xnau_CSV_Import.class.php:197
 msgid "Number of values does not match number of columns"
 msgstr "Le nombre de valeurs et de colonnes ne correspondent pas"
 
-#: classes/CSV_Import.class.php:286
+#: classes/xnau_CSV_Import.class.php:286
 msgid "New columns imported from the CSV file."
 msgstr "Nouvelles colonnes importées depuis le fichier CSV"
 
-#: classes/FormElement.class.php:150
+#: classes/xnau_FormElement.class.php:150
 msgctxt "indicates a write-in choice"
 msgid "other"
 msgstr "autre"
 
-#: classes/FormElement.class.php:151
+#: classes/xnau_FormElement.class.php:151
 msgctxt "indicates the text to be clicked to go to another web page"
 msgid "Link Text"
 msgstr "Texte du lien"
 
-#: classes/FormElement.class.php:734 manage_fields.php:386
+#: classes/xnau_FormElement.class.php:734 manage_fields.php:386
 msgid "delete"
 msgstr "détruire"
 

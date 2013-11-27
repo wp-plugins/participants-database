@@ -12,7 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Template_Item class
  */
-class Field_Item extends Template_Item {
+class PDb_Field_Item extends PDb_Template_Item {
   
   /**
    * @var string the field's value
@@ -216,7 +216,7 @@ class Field_Item extends Template_Item {
 
     $this->field_class = ( $this->validation != 'no' ? "required-field" : '' ) . ( in_array($this->form_element, array('text-line', 'date', 'timestamp')) ? ' regular-text' : '' );
 
-    if ($this->readonly) {
+    if ($this->readonly && $this->form_element != 'captcha') {
 
       if (in_array($this->form_element, array('date', 'timestamp')))
         $this->value = PDb_FormElement::get_field_value_display($this);

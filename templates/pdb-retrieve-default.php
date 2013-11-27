@@ -20,7 +20,7 @@ $mode = isset($_POST['action']) && $_POST['action'] == 'success' ? 'success' : '
 
   <?php $this->print_form_head(); // this must be included before any fields are output ?>
   
-  <?php $this->field = new Field_Item( current($this->get_retrieve_field()) ); ?>
+  <?php $this->field = new PDb_Field_Item( current($this->get_retrieve_field()) ); ?>
     
     <table class="form-table pdb-signup">
 

@@ -384,9 +384,9 @@ abstract class PDb_Shortcode {
 
     // the first time through, use current()
     if ($this->current_group_pointer == 1)
-      $this->group = new Field_Group_Item(current($this->record), $this->module);
+      $this->group = new PDb_Field_Group_Item(current($this->record), $this->module);
     else
-      $this->group = new Field_Group_Item(next($this->record), $this->module);
+      $this->group = new PDb_Field_Group_Item(next($this->record), $this->module);
 
     $this->reset_field_counter();
 
@@ -414,14 +414,14 @@ abstract class PDb_Shortcode {
     // the first time through, use current()
     if ($this->current_field_pointer == 1) {
       if (is_object($this->group))
-        $this->field = new Field_Item(current($this->group->fields));
+        $this->field = new PDb_Field_Item(current($this->group->fields));
       else
-        $this->field = new Field_Item(current($this->record->fields), $this->record->record_id);
+        $this->field = new PDb_Field_Item(current($this->record->fields), $this->record->record_id);
     } else {
       if (is_object($this->group))
-        $this->field = new Field_Item(next($this->group->fields));
+        $this->field = new PDb_Field_Item(next($this->group->fields));
       else
-        $this->field = new Field_Item(next($this->record->fields), $this->record->record_id);
+        $this->field = new PDb_Field_Item(next($this->record->fields), $this->record->record_id);
     }
     
     $this->field->module = $this->module;
@@ -473,7 +473,7 @@ abstract class PDb_Shortcode {
       $the_record = next($this->records);
     }
 
-    $this->record = new Record_Item($the_record, key($this->records), $this->module);
+    $this->record = new PDb_Record_Item($the_record, key($this->records), $this->module);
 
     $this->reset_field_counter();
 

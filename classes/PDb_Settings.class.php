@@ -6,7 +6,7 @@
  * this uses the generic plugin settings class to build the settings specific to
  * the plugin
  */
-class PDb_Settings extends Plugin_Settings {
+class PDb_Settings extends xnau_Plugin_Settings {
 
   function __construct() {
 

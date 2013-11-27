@@ -15,7 +15,7 @@
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 
-class PDb_FormValidation extends FormValidation {
+class PDb_FormValidation extends xnau_FormValidation {
   
 
   /*

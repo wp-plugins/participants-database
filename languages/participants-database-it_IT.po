@@ -14,60 +14,60 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Generator: Poedit 1.5.5\n"
 
-#: classes/CSV_Import.class.php:58
+#: classes/xnau_CSV_Import.class.php:58
 msgid "The file %s has been uploaded."
 msgstr ""
 
-#: classes/CSV_Import.class.php:64
+#: classes/xnau_CSV_Import.class.php:64
 msgid "%s record added"
 msgid_plural "%s records added"
 msgstr[0] ""
 msgstr[1] ""
 
-#: classes/CSV_Import.class.php:68
+#: classes/xnau_CSV_Import.class.php:68
 msgid "%s matching record updated"
 msgid_plural "%s matching records updated"
 msgstr[0] ""
 msgstr[1] ""
 
-#: classes/CSV_Import.class.php:73
+#: classes/xnau_CSV_Import.class.php:73
 msgid "%s duplicate record skipped"
 msgid_plural "%s duplicate records skipped"
 msgstr[0] ""
 msgstr[1] ""
 
-#: classes/CSV_Import.class.php:77
+#: classes/xnau_CSV_Import.class.php:77
 msgid "Zero records imported"
 msgstr ""
 
-#: classes/CSV_Import.class.php:82
+#: classes/xnau_CSV_Import.class.php:82
 msgid ""
 "There was an error uploading the file. This could be a problem with "
 "permissions on the uploads directory."
 msgstr ""
 
-#: classes/CSV_Import.class.php:82 classes/CSV_Import.class.php:88
+#: classes/xnau_CSV_Import.class.php:82 classes/xnau_CSV_Import.class.php:88
 msgid "Destination"
 msgstr ""
 
-#: classes/CSV_Import.class.php:88
+#: classes/xnau_CSV_Import.class.php:88
 msgid ""
 "Target directory does not exist and could not be created. Try creating it "
 "manually."
 msgstr ""
 
 #. translators: the %s will be the name of the file
-#: classes/CSV_Import.class.php:142
+#: classes/xnau_CSV_Import.class.php:142
 msgid "Error occured while trying to add the data to the database"
 msgstr ""
 
-#: classes/CSV_Import.class.php:142
+#: classes/xnau_CSV_Import.class.php:142
 msgid ""
 "Input file does not exist or path is incorrect.<br />Attempted to load: %s"
 msgstr ""
 "File inesistente o percorso non correttot.<br />Tentativo di caricamento: %s"
 
-#: classes/CSV_Import.class.php:188
+#: classes/xnau_CSV_Import.class.php:188
 msgid ""
 "The number of items in line %s is incorrect.<br />There are %s and there "
 "should be %s."
@@ -75,25 +75,25 @@ msgstr ""
 "Numero di  items in line %s non corretto.<br />Sono %s e dovrebbero essere "
 "%s."
 
-#: classes/CSV_Import.class.php:197
+#: classes/xnau_CSV_Import.class.php:197
 msgid "Number of values does not match number of columns"
 msgstr ""
 
-#: classes/CSV_Import.class.php:286
+#: classes/xnau_CSV_Import.class.php:286
 msgid "New columns imported from the CSV file."
 msgstr ""
 
-#: classes/FormElement.class.php:150
+#: classes/xnau_FormElement.class.php:150
 msgctxt "indicates a write-in choice"
 msgid "other"
 msgstr "altro"
 
-#: classes/FormElement.class.php:151
+#: classes/xnau_FormElement.class.php:151
 msgctxt "indicates the text to be clicked to go to another web page"
 msgid "Link Text"
 msgstr "testo link"
 
-#: classes/FormElement.class.php:734 manage_fields.php:386
+#: classes/xnau_FormElement.class.php:734 manage_fields.php:386
 msgid "delete"
 msgstr "cancellare"
 

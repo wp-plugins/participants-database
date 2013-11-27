@@ -12,7 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Template_Item class
  */
-class Record_Item extends Template_Item {
+class PDb_Record_Item extends PDb_Template_Item {
   
   /**
    * instantiates a field group object

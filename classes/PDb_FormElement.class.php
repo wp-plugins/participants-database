@@ -11,10 +11,10 @@
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
-class PDb_FormElement extends FormElement {
+class PDb_FormElement extends xnau_FormElement {
   
   /**
-   * instantiates a FormElement object
+   * instantiates a xnau_FormElement object
 	 * 
    *
    * @param array $parameters carries the parameters to build a form element
@@ -160,9 +160,9 @@ class PDb_FormElement extends FormElement {
               ));
 
           if ($html) {
-            if (isset($field->module) and in_array($field->module, array('single','list','admin-edit'))) {
+            if (isset($field->module) and in_array($field->module, array('single','list'))) {
               $image->display_mode = 'image';
-            } elseif (isset($field->module) and $field->module == 'signup') {
+            } elseif (isset($field->module) and in_array($field->module, array('signup','admin-edit'))) {
               $image->display_mode = $image->image_defined ? 'both' : 'none';
               $image->link = false;
             }
@@ -186,7 +186,7 @@ class PDb_FormElement extends FormElement {
             $field->link = false;
             $return = $field->value;
           } else {
-            $field->link =  Image_Handler::concatenate_directory_path(get_bloginfo('url'), Participants_Db::$plugin_options['image_upload_location']) . $field->value;
+            $field->link =  xnau_Image_Handler::concatenate_directory_path(get_bloginfo('url'), Participants_Db::$plugin_options['image_upload_location']) . $field->value;
             $return = self::make_link($field);
           }
           break;

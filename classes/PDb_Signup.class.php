@@ -11,7 +11,7 @@
  * @license    GPL2
  * @version    0.7
  * @link       http://xnau.com/wordpress-plugins/
- * @depends    FormElement class, Shortcode class
+ * @depends    xnau_FormElement class, Shortcode class
  */
 
 class PDb_Signup extends PDb_Shortcode {

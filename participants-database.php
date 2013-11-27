@@ -1880,7 +1880,7 @@ class Participants_Db extends PDb_Base {
      * 
      * we don't validate in the admin, they will be allowed to leave required field unfilled
      */
-    if (!is_object(self::$validation_errors) and ! is_admin())
+    if (!is_object(self::$validation_errors) and (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) or $_POST['action'] == 'signup'))
       self::$validation_errors = new PDb_FormValidation();
 
     switch ($_POST['action']) :
@@ -2254,7 +2254,7 @@ class Participants_Db extends PDb_Base {
   /**
    * creates an anchor element with clickable link and href
    *
-   * this is simply an interface to the FormElement function of the same name
+   * this is simply an interface to the xnau_FormElement function of the same name
    * 
    * @static
    * @param string $link the URI
@@ -2298,7 +2298,7 @@ class Participants_Db extends PDb_Base {
     $delete = (bool)(isset($_REQUEST[$name . '-deletefile']) and $_REQUEST[$name . '-deletefile'] == 'delete');
 
     // attempt to create the target directory if it does not exist
-    if (!is_dir(Image_Handler::concatenate_directory_path(ABSPATH, self::$plugin_options['image_upload_location']))) {
+    if (!is_dir(xnau_Image_Handler::concatenate_directory_path(ABSPATH, self::$plugin_options['image_upload_location']))) {
 
       if (false === self::_make_uploads_dir(self::$plugin_options['image_upload_location'])) {
         return false;
@@ -2334,7 +2334,7 @@ class Participants_Db extends PDb_Base {
       $new_filename = preg_replace(array('#\.#', "/\s+/", "/[^-\.\w]+/"), array("-", "_", ""), $matches[1]) . '.' . $matches[2];
       // now make sure the name is unique by adding an index if needed
       $index = 1;
-      while (file_exists(Image_Handler::concatenate_directory_path(ABSPATH, self::$plugin_options['image_upload_location']) . $new_filename)) {
+      while (file_exists(xnau_Image_Handler::concatenate_directory_path(ABSPATH, self::$plugin_options['image_upload_location']) . $new_filename)) {
         $filename_parts = pathinfo($new_filename);
         $new_filename = preg_replace(array('#_[0-9]+$#'), array(''), $filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
         $index++;
@@ -2362,7 +2362,7 @@ class Participants_Db extends PDb_Base {
       return false;
     }
 
-    if (false === move_uploaded_file($file['tmp_name'], Image_Handler::concatenate_directory_path( ABSPATH, self::$plugin_options['image_upload_location'] ) . $new_filename)) {
+    if (false === move_uploaded_file($file['tmp_name'], xnau_Image_Handler::concatenate_directory_path( ABSPATH, self::$plugin_options['image_upload_location'] ) . $new_filename)) {
 
       self::_show_validation_error(__('The file could not be saved.', 'participants-database'));
 
@@ -2547,6 +2547,24 @@ class Participants_Db extends PDb_Base {
     header("Content-Type:	text/html");
     echo PDb_List::get_list( $atts );
     exit;
+  }
+  
+  /**
+   * supplied for backwards compatibility
+   * 
+   * the original func has been superceded, but this will allow the old func to be used
+   * 
+   * @var string $value
+   * @var string $form_element
+   * @return string
+   */
+  public static function prep_field_for_display( $value, $form_element ){
+    $field = (object) array(
+        'value' => $value,
+        'form_element' => $form_element,
+        'module' => 'single', // probably not correct, but this is the generic option
+    );
+    return PDb_FormElement::get_field_value_display($field);
   }
 
   /**
