@@ -794,13 +794,13 @@ msgstr ""
 msgid ""
 "<p>Thank you, [first_name], for signing up with %s.</p><p>You may complete "
 "your registration with additional information or update your information by "
-"visiting this private link at any time: <a href=\"[record_link]\">"
-"[record_link]</a>.</p>"
+"visiting this private link at any time: <a href="
+"\"[record_link]\">[record_link]</a>.</p>"
 msgstr ""
 "<p>Hartelijk dank, [first_name], voor uw registratie op %s.</p><p>U kunt uw "
 "registratie afmaken met aanvullende gegevens of uw informatie updaten door "
-"gebruik te maken van uw persoonlijke link: <a href=\"[record_link]\">"
-"[record_link]</a>.</p>"
+"gebruik te maken van uw persoonlijke link: <a href="
+"\"[record_link]\">[record_link]</a>.</p>"
 
 #: classes/PDb_Settings.class.php:396
 msgid "Signup Thanks Message"
@@ -875,9 +875,9 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:449
 msgid ""
-"<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]"
-"</li><li>Email: [email]</li></ul><p>Edit this new record here: <a href="
-"\"[admin_record_link]\">[admin_record_link]</a></p>"
+"<p>A new signup has been submitted</p><ul><li>Name: [first_name] "
+"[last_name]</li><li>Email: [email]</li></ul><p>Edit this new record here: <a "
+"href=\"[admin_record_link]\">[admin_record_link]</a></p>"
 msgstr ""
 "<p>Een nieuwe registratie is ingediend</p><ul><li>Naam: [first_name] "
 "[last_name]</li><li>E-mail: [email]</li></ul><p>Bewerk deze record hier: <a "
@@ -1840,7 +1840,6 @@ msgstr ""
 "\"text\" dataveld. Als u echter een langer stuk tekst wilt gebruiken, kunt u "
 "beter een \"text-field\" type gebruiken, enzovoorts. Hier kunt u aangeven "
 "welk formulier elementtype zal worden gebruikt om dit dataveld weer te geven."
-"\v "
 
 #: manage_fields_help.php:22
 msgid ""
@@ -2298,6 +2297,14 @@ msgstr ""
 
 #. Author URI of the plugin/theme
 msgid "http://xnau.com"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:474
+msgid "Lost Private Link Text"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:478
+msgid "clickable text shown in the signup form"
 msgstr ""
 
 #~ msgid ""
