@@ -51,7 +51,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-abstract class FormElement {
+abstract class xnau_FormElement {
   
   /**
    * defines the type of form element for the object
@@ -180,7 +180,7 @@ abstract class FormElement {
   var $module;
   
   /**
-   * instantiates a FormElement object
+   * instantiates a xnau_FormElement object
 	 * 
    *
    * @param array $parameters carries the parameters to build a form element
@@ -383,7 +383,7 @@ abstract class FormElement {
    * prints a form element
    *
    * this func is calls the child class so any legacy implementations using the 
-   * FormElement class alone can still work
+   * xnau_FormElement class alone can still work
    *
    * @param array $parameters (same as __construct() )
    * @static

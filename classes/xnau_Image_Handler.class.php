@@ -27,7 +27,7 @@
  *   
  */
 
-abstract class Image_Handler {
+abstract class xnau_Image_Handler {
 
   /**
    * true if the image file has been located and verified

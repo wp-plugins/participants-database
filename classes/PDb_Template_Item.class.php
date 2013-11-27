@@ -12,7 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  *
  */
-class Template_Item {
+class PDb_Template_Item {
   
   /**
    *

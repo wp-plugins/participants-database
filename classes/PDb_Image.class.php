@@ -12,7 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Image_Handler class
  */
-class PDb_Image extends Image_Handler {
+class PDb_Image extends xnau_Image_Handler {
   
   /**
    * intializes the object with a setup array

@@ -553,7 +553,7 @@ class PDb_List_Admin {
       private static function _main_table($mode = '') {
         ?>
 
-        <table class="wp-list-table widefat fixed pages pdb-list" cellspacing="0" >
+        <table class="wp-list-table widefat fixed pages pdb-list stuffbox" cellspacing="0" >
           <?php
           // template for printing the registration page link in the admin
           $PID_pattern = '<td><a href="%2$s">%1$s</a></td>';

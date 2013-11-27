@@ -15,7 +15,7 @@
  * @version    Release: 1.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
-class FormValidation {
+class xnau_FormValidation {
 
   // this array collects validation errors for each field
   var $errors;

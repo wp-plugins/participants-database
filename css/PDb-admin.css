@@ -386,7 +386,7 @@ a.dragger {
   height: 3px;
   width: calc(100% - 6px);
   display: block;
-  z-index: 1000;
+  z-index: 900;
 }
 .participants_db .ui-widget-content {
   background-image: none;

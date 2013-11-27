@@ -105,7 +105,7 @@ if (isset($_POST['action'])) {
             $row['validation'] = 'captcha';
             foreach (array('display_column', 'admin_column', 'CSV', 'persistent', 'sortable') as $c)
               $row[$c] = 0;
-            //$row['signup'] = 1;
+            $row['readonly'] = 1;
           }
 
           foreach(array('title','help_text','default') as $field) {
@@ -734,7 +734,7 @@ foreach ($groups as $group) {
    * displays an edit field for a field attribute
    * 
    * @param string $field name of the field
-   * @return array contains parameters to use in instantiating the FormElement object
+   * @return array contains parameters to use in instantiating the xnau_FormElement object
    */
   function PDb_get_edit_field_type($field)
   {
@@ -771,7 +771,7 @@ foreach ($groups as $group) {
 
       // drop-down fields
       case 'form_element':
-        // populate the dropdown with the available field types from the FormElement class
+        // populate the dropdown with the available field types from the xnau_FormElement class
         return array('type' => 'dropdown', 'options' => array_flip(PDb_FormElement::get_types()) + array('null_select' => false));
 
       case 'validation':
