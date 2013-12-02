@@ -1968,7 +1968,8 @@ class Participants_Db extends PDb_Base {
             $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id;
 
         }
-        break;
+        wp_redirect($redirect);
+        exit;
 
       case 'output CSV':
 
