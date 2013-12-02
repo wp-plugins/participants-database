@@ -832,7 +832,7 @@ class PDb_List extends PDb_Shortcode {
     $output = array();
     
     $ref = 'update';
-    if ($target === false && !empty($this->shortcode_atts['action'])) {
+    if ($target === false && !empty($this->shortcode_atts['action']) && $this->module == 'search') {
       $target = get_permalink($this->shortcode_atts['action']);
       if (empty($target)) {
         if ($actionpage = get_page_by_path($this->shortcode_atts['action'])) {

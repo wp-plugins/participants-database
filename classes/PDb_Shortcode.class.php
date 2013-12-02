@@ -175,6 +175,7 @@ abstract class PDb_Shortcode {
         'template' => 'default',
         'fields' => '',
         'groups' => '',
+        'action' => '',
     );
     
     // error_log(__METHOD__.' incoming shorcode atts:'.print_r($shortcode_atts,1));
@@ -219,12 +220,12 @@ abstract class PDb_Shortcode {
 
     ob_start();
     
-    echo '<!-- template: ' . basename($this->template) . ' -->';
+    echo '<!-- template: ' . $this->template_basename($this->template) . ' -->';
 
     // this will be included in the subclass context
     $this->_include_template();
     
-    echo '<!-- end template: ' . basename($this->template) . ' -->';
+    echo '<!-- end template: ' . $this->template_basename($this->template) . ' -->';
 
     $this->output = ob_get_clean();
   }
@@ -1076,6 +1077,26 @@ abstract class PDb_Shortcode {
   }
 
   /**
+   * supplies a template file name and path from the content root
+   * 
+   * this is for labeling the template file used in the HTML comments
+   * 
+   * @return string the template filename with a partial path
+   */
+  public function template_basename() {
+    if (WP_DEBUG) {
+      $path = stristr($this->template, 'wp-content');
+    } else {
+      $path = '';
+      $paths = explode('/', $this->template);
+      for($i = 3;$i>0;$i--) {
+        $path = '/' . array_pop($paths) . $path;
+      }
+    }
+    return ltrim($path, '/');
+  }
+
+  /**
    * replace the tags in text messages
    *
    * a tag contains the column name for the value to use: [column_name]
@@ -1142,7 +1163,11 @@ abstract class PDb_Shortcode {
    */
   protected function _set_submission_page() {
 
+    if (!empty($this->shortcode_atts['action'])) {
+      $this->submission_page = $this->shortcode_atts['action'];
+    } else {
     $this->submission_page = $_SERVER['REQUEST_URI'];
+  }
   }
 
   /**

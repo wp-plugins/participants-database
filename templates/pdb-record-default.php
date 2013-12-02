@@ -11,20 +11,22 @@
  $this->print_errors(); ?>
   
   <?php // print the form header
-  $this->print_form_head() ?>
+  $this->print_form_head()
+  ?>
   
-  <?php
-  
-  while ( $this->have_groups() ) : $this->the_group(); ?>
+  <?php while ($this->have_groups()) : $this->the_group(); ?>
     <?php $this->group->print_title() ?>
     <?php $this->group->print_description() ?>
     
     <table  class="form-table">
       
+      <tbody class="field-group field-group-<?php echo $this->group->name ?>">
+
       <?php
       // step through the fields in the current group
       
-      while ( $this->have_fields() ) : $this->the_field(); ?>
+        while ($this->have_fields()) : $this->the_field();
+          ?>
       
       <tr class="<?php $this->field->print_element_class() ?>">
       
@@ -33,7 +35,7 @@
         
           <?php $this->field->print_element(); ?>
           
-          <?php if ( $this->field->has_help_text() ) :?>
+              <?php if ($this->field->has_help_text()) : ?>
           <span class="helptext"><?php $this->field->print_help_text() ?></span>
           <?php endif ?>
           
@@ -43,11 +45,15 @@
       
       <?php endwhile; // field loop ?>
       
+      </tbody>
+
     </table>
     
   <?php endwhile; // group loop ?>
     <table class="form-table">
       
+    <tbody class="field-group field-group-submit">
+
       <tr>
         <th><h3><?php $this->print_save_changes_label() ?></h3></th>
         <td class="submit-buttons">
@@ -55,6 +61,8 @@
         </td>
       </tr>
       
+    </tbody>
+
     </table><!-- end group -->
   
   <?php $this->print_form_close() ?>

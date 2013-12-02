@@ -41,13 +41,16 @@ class PDb_Template {
    * @param string $base_type
    */
   var $base_type;
+  /**
+   * this is an indexed array of raw field values
+   * 
+   * @param array $values
+   */
+  var $values;
   
   function __construct(&$object)
   {
-    $this->record = $object;
-    $this->base_type = get_class($object);
-    $this->_setup_fields();
-    if($this->base_type == 'Record_Item') reset($object->fields);
+    $this->_setup_fields($object);
   }
   
   /**
@@ -63,6 +66,18 @@ class PDb_Template {
   }
   
   /**
+   * 
+   * prints a formatted field value
+   * 
+   * alias for _print()
+   * 
+   * @param string $name name of the field to print
+   */
+  public function print_value($name) {
+    $this->_print($name);
+  }
+  
+  /**
    * prints a field title
    * 
    * @param string $name
@@ -71,17 +86,6 @@ class PDb_Template {
     
     echo $this->get_field_prop($name, 'title');
       
-  }
-  
-  /**
-   * gets a field property
-   * 
-   * @param string $name the fields name
-   * @param string $prop the field property to get
-   * @return string
-   */
-  public function get_field_prop($name, $prop) {
-    return (isset($this->fields->{$name}->{$prop}) ? $this->fields->{$name}->{$prop} : '');
   }
   
   /**
@@ -96,12 +100,48 @@ class PDb_Template {
   }
   
   /**
+   * prints a group title given it's name
+   * 
+   * @param string $name
+   * @return string
+   */
+  public function print_group_title($name) {
+    echo $this->get_group_prop($name, 'title');
+  }
+  
+  /**
+   * prints a value wrapped in an anchor tag with an href value
+   * 
+   * @param string $name of the field
+   * @param string $href the href value
+   * @return null
+   */
+  public function print_with_link($name, $href) {
+    if (is_object($this->fields->{$name}) && !empty($href)) {
+      $this->_set_link($name, $href);
+      error_log(__METHOD__.' field:'.print_r($this->fields,1));
+      $this->_print($name);
+    }
+  }
+  
+  /**
    * checks a field for a value to show
    * 
    * @param string $name name of the field to check
    */
   public function has_content($name) {
     return !empty($this->fields->{$name}->value);
+  }
+  
+  /**
+   * gets a field property
+   * 
+   * @param string $name the fields name
+   * @param string $prop the field property to get
+   * @return string
+   */
+  public function get_field_prop($name, $prop) {
+    return (isset($this->fields->{$name}->{$prop}) ? $this->fields->{$name}->{$prop} : '');
   }
   
   /**
@@ -113,16 +153,6 @@ class PDb_Template {
    */
   public function get_group_prop($name, $prop) {
     return (isset($this->record->{$name}->{$prop}) ? $this->record->groups->{$name}->{$prop} : '');
-  }
-  
-  /**
-   * prints a group title given it's name
-   * 
-   * @param string $name
-   * @return string
-   */
-  public function print_group_title($name) {
-    echo $this->get_group_prop($name, 'title');
   }
   
   /**
@@ -144,29 +174,71 @@ class PDb_Template {
     $detail_page = get_permalink(Participants_Db::$plugin_options['single_record_page']);
     return $detail_page . (strpos($detail_page, '?') !== false ? '&' : '?') . 'pdb=' . $this->get_value('id');
   }
+  /**
+   * adds a link value to a field object
+   * 
+   * @param string $name
+   * @param string $href
+   */
+  private function _set_link($name, $href) {
+    $linkable_field_types = array(
+        'text-line',
+        'image-upload',
+        'file-upload',
+        'dropdown',
+        'checkbox',
+        'radio',
+        );
+    if (in_array($this->fields->{$name}->form_element, $linkable_field_types))
+    switch ($this->base_type) {
+      case 'PDb_List':
+        $this->fields->{$name}->link = $href;
+        break;
+      case 'PDb_Signup':
+      case 'PDb_Single':
+      case 'PDb_Record':
+      default:
+        $group = $this->fields->{$name}->group;
+        $field = $this->record->{$group}->fields->{$name}->link = $href;
+    }
+  }
+  
 
   /**
    * sets up the fields object
    * 
    * this will use a different method for each type of object used to instantiate the class
    *
+   * @param object $object the instantiating object
    */
-  private function _setup_fields() {
+  private function _setup_fields(&$object) {
+    $this->base_type = get_class($object);
     $this->fields = new stdClass();
     switch ($this->base_type) {
-      case 'Record_Item': // list module
-        foreach($this->record->fields as $field) {
-          $this->fields->{$field->name} = $field;
+      case 'PDb_List':
+        $this->record = ''; // the list module does not have a record iterator
+        $this->values = $object->record->values;
+        foreach($object->record->values as $name => $value) {
+          $this->fields->{$name} = Participants_Db::get_column($name);
+          $this->fields->{$name}->value = $value;
+          $this->fields->{$name}->value = PDb_FormElement::get_field_value_display($this->fields->{$name});
+        }
+        reset($object->record->values);
+        break;
+      case 'PDb_Signup':
+      case 'PDb_Single':
+      case 'PDb_Record':
+      default:
+        $this->record = $object->record;
+        $this->values = $object->participant_values;
+        foreach($this->values as $name => $value) {
+          $this->fields->{$name} = Participants_Db::get_column($name);
+          $this->fields->{$name}->value = $value;
+          $this->fields->{$name}->value = PDb_FormElement::get_field_value_display($this->fields->{$name});
         }
         break;
-      case 'PDb_Single':
-      default:
-        foreach ($this->record as $group) {
-          foreach($group->fields as $field) {
-            $this->fields->{$field->name} = $field;
-          }
-        }
     }
+    //unset($this->record->options);
   }
   
   /**
@@ -181,7 +253,7 @@ class PDb_Template {
         return isset($this->record->values[$name]) ? $this->record->values[$name] : '';
       case 'PDb_Single':
       default:
-        return isset($this->record->participant_values[$name]) ? $this->record->participant_values[$name] : '';
+        return isset($this->values[$name]) ? $this->values[$name] : '';
     }
   }
 }
