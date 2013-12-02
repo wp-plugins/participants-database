@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5 beta 5
+  Version: 1.5 beta 6
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -587,14 +587,21 @@ class Participants_Db extends PDb_Base {
   /**
    * shows the frontend edit screen called by the [pdb_record] shortcode
    *
-   * requires the 'pid' value in the URI or 'id' attribute in the shortcode
+   * the ID of the record to show for editing can be provided one of three ways: 
+   *    $_GET['pid'] (private link), 
+   *    $atts['id'] (in the sortcode), or 
+   *    $_SESSION['pdbid'] (directly from the signup form)
    * 
    * @param array $atts array of attributes drawn from the shortcode
    * @return string the HTML of the record edit form
    */
   public static function print_record_edit_form($atts) {
 
-    $atts['id'] = isset($_GET['pid']) ? self::get_participant_id($_GET['pid']) : ( isset($atts['id']) ? $atts['id'] : false );
+    $atts['id'] = isset($_GET['pid']) ? 
+            self::get_participant_id($_GET['pid']) : 
+              ( isset($atts['id']) ? $atts['id'] : 
+                (isset($_SESSION['pdbid']) ? $_SESSION['pdbid'] : 
+                  false) );
 
     return PDb_Record::print_form($atts);
   }
@@ -1924,31 +1931,41 @@ class Participants_Db extends PDb_Base {
                     self::$email_headers
             );
           }
+          /*
+           * if the "thanks page" is defined as another page, save the ID in a session variable and move to that page.
+           */
+          if (isset($post_data['thanks_page']) && $post_data['thanks_page'] != $_SERVER['REQUEST_URI']) {
+          
+            $_SESSION['pdbid'] = $post_data['id'];
 
-          return;
+            wp_redirect($post_data['thanks_page']); // self::add_uri_conjunction($post_data['thanks_page']) . 'pdbid=' . $post_data['id']
+            
+            exit;
+          }
+
+          //return;
         }
 
         // redirect according to which submit button was used
         switch ($_POST['submit_button']) {
 
           case self::$i18n['apply'] :
-            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant&id=' . $participant_id);
-            exit;
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant&id=' . $participant_id;
+            break;
 
           case self::$i18n['next'] :
             $get_id = $_POST['action'] == 'update' ? '&id=' . self::next_id($participant_id) : '';
-            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant' . $get_id);
-            exit;
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant' . $get_id;
+            break;
 
           case self::$i18n['previous'] :
             $get_id = $_POST['action'] == 'update' ? '&id=' . self::next_id($participant_id, false) : '';
-            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant' . $get_id);
-            exit;
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant' . $get_id;
+            break;
 
           case self::$i18n['submit'] :
           default :
-            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id);
-            exit;
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id;
 
         }
         break;

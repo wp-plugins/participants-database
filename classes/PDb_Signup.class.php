@@ -17,11 +17,6 @@
 class PDb_Signup extends PDb_Shortcode {
   /**
    *
-   * @var string holds the target page for the submission
-   */
-  var $submission_page;
-  /**
-   *
    * @var bool holds the submission status: false if the form has not been submitted
    */
   var $submitted = false;
@@ -114,7 +109,7 @@ class PDb_Signup extends PDb_Shortcode {
 
     if ((isset($_GET['m']) && $_GET['m'] == 'r') || $shortcode_atts['module'] == 'retrieve') {
       $shortcode_atts['module'] = 'retrieve';
-    } elseif (isset($_SESSION['pdbid'])) {
+    } elseif (isset($_SESSION['pdbid'])) { // this will be true after a successful submission
 
       $this->participant_id = $_SESSION['pdbid'];
       unset($_SESSION['pdbid']); // clear the ID from the SESSION array
@@ -220,10 +215,17 @@ class PDb_Signup extends PDb_Shortcode {
 
   /**
    * sets the form submission page
+   * 
+   * if the "action" attribute is not set in the shortcode, use the "thanks page" 
+   * setting if set
    */
-  protected function _set_submission_page() {
+  protected function _set_submission_page()
+  {
 
-    if (isset($this->options['signup_thanks_page']) and $this->options['signup_thanks_page'] != 'none') {
+    if (!empty($this->shortcode_atts['action'])) {
+
+      $this->submission_page = $this->shortcode_atts['action'];
+    } elseif (isset($this->options['signup_thanks_page']) and $this->options['signup_thanks_page'] != 'none') {
 
       $this->submission_page = get_permalink($this->options['signup_thanks_page']);
     } else {

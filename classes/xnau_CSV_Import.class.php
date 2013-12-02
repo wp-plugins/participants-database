@@ -10,7 +10,7 @@
  * @license    GPL2
  * @version    0.1
  * @link       http://xnau.com/wordpress-plugins/
- * @depends    parseCSV class
+ * @depends    zydev_parseCSV class
  *
  * this class is given a $_POST field name for an uploaded file and an optional
  * list of target columns. it parses the file contents as a CSV-format text file
@@ -40,7 +40,7 @@ abstract class xnau_CSV_Import {
   var $skip_count = 0;
   // holds the context string for the internationalization functions
   var $i10n_context;
-  // the parseCSV instance
+  // the zydev_parseCSV instance
   var $CSV;
 
   function __construct($file_field) {

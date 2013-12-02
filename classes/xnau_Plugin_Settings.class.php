@@ -9,6 +9,7 @@
  * plugins requiring a more complex settings scheme, such as multiple pages. It
  * will work well with Javascript tabs, however.
  *
+ * @depends xnau_FormElement class
  */
 class xnau_Plugin_Settings {
 

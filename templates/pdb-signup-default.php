@@ -28,11 +28,10 @@
 
     <table class="form-table pdb-signup">
 
-      <tbody>
-
       <?php while ( $this->have_groups() ) : $this->the_group(); ?>
 
         <?php if ( $this->group->printing_title() ) : // are we printing group titles and descriptions? ?>
+      <tbody class="field-group field-group-<?php echo $this->group->name ?>">
         <tr class="signup-group">
           <td colspan="2">
         
@@ -41,6 +40,8 @@
 
           </td>
         </tr>
+        <?php else : ?>
+      <tbody class="field-group">
         <?php endif; // end group title/description row ?>
 
         <?php while ( $this->have_fields() ) : $this->the_field(); ?>
@@ -61,9 +62,11 @@
 
         </tr>
   
-        <?php endwhile; // fields
+        <?php endwhile; // fields ?>
+        
+        </tbody><tbody class="field-group field-group-submit">
 
-      endwhile; // groups ?>
+      <?php endwhile; // groups ?>
       
         <tr>
           <td class="submit-buttons">
