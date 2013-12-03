@@ -1943,7 +1943,7 @@ class Participants_Db extends PDb_Base {
             exit;
           }
 
-          //return;
+          return;
         }
 
         // redirect according to which submit button was used

@@ -112,7 +112,7 @@ class PDb_List extends PDb_Shortcode {
   public function __construct($shortcode_atts) {
 
     // set the list limit value; this can be overridden by the shortcode atts later
-    $this->page_list_limit = (!isset($_POST['list_limit']) or !is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? Participants_Db::$plugin_options['list_limit'] : $_POST['list_limit'];
+    $this->page_list_limit = intval((!isset($_POST['list_limit']) or !is_numeric($_POST['list_limit']) or $_POST['list_limit'] < 1 ) ? Participants_Db::$plugin_options['list_limit'] : $_POST['list_limit']);
 
     // define the default settings for the shortcode
     $shortcode_defaults = array(
@@ -242,6 +242,10 @@ class PDb_List extends PDb_Shortcode {
 
     // get the number of records returned
     $this->num_records = $wpdb->get_var(preg_replace('#^SELECT.+FROM #', 'SELECT COUNT(*) FROM ', $this->list_query));
+    
+    if ($this->shortcode_atts['list_limit'] < 1 || $this->shortcode_atts['list_limit'] > $this->num_records) {
+      $this->page_list_limit = $this->shortcode_atts['list_limit'] = $this->num_records;
+    }
     
     // set up the pagination object
     $pagination_defaults = array(

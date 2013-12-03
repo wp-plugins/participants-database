@@ -116,8 +116,8 @@ class PDb_Pagination {
                 'add_variables' => '',
             )));
     $this->setPage($page);
-    $this->setSize($size);
     $this->setTotalRecords($total_records);
+    $this->setSize($size);
     $this->setLink($link,$add_variables);
     $this->filtering = $filtering;
     $this->set_wrappers();
@@ -198,7 +198,10 @@ class PDb_Pagination {
    * @param integer $size
    */
   function setSize($size) {
-    $this->size = 0 + $size;
+    $this->size = intval($size);
+    if ($this->size < 1) {
+      $this->size = $this->total_records;
+    }
   }
 
   /**

@@ -179,6 +179,25 @@ class PDb_Base {
 
     return $URI . ( false !== strpos($URI, '?') ? '&' : '?');
   }
+  /**
+   * returns a path to the defined image location
+   *
+   * this func is superceded by the PDb_Image class methods
+   *
+   * can also deal with a path saved before 1.3.2 which included the whole path
+   *
+   * @return the file url if valid; if the file can't be found returns the
+   *         supplied filename
+   */
+  public static function get_image_uri($filename) {
+
+    if (!file_exists($filename)) {
+
+      $filename = get_bloginfo('wpurl') . '/' . Participants_Db::$plugin_options['image_upload_location'] . basename($filename);
+    }
+
+    return $filename;
+  }
 
   /**
    * sets up an API filter
