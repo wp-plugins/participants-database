@@ -1155,7 +1155,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
     $caps = array();
     // collect all standard capabilities and remove standard roles
     foreach(array('administrator','editor','author','contributor','subscriber') as $role) {
-      if ($role !== 'administrator') $caps += array_keys($roles[$role]['capabilities']);
+      if ($role !== 'administrator' && is_array($roles[$role]['capabilities'])) $caps += array_keys($roles[$role]['capabilities']);
       unset($roles[$role]);
     }
     // add any custom roles
