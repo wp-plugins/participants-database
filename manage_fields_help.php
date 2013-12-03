@@ -2,6 +2,7 @@
 ?>
 <div class="text-block">
 <h3><?php _e('Manage Fields Help', 'participants-database' )?></h3>
+<p><?php _e(sprintf('Please visit the %sParticipants Database help pages%s for up-to-date information on using this plugin.','<a href="http://xnau.com/work-2/wordpress-plugins/participants-database/" target="_blank">','</a>'), 'participants-database' )?></p>
 <h4><?php _e('Defining Database Fields', 'participants-database' )?></h4>
 <p><?php _e('The database stores information about people. On this page, you can determine what pieces of information are stored and how they are presented and interacted with. Take a look at the "Add Participant" page to see how the form is presented. You will be able to see your changes to how the fields are set up by checking this page.', 'participants-database' )?></p>
 <p><?php _e('<strong>Important:</strong> Some of the changes you can make here will affect existing records in the database. It is best to set up your database before you begin adding records, but it is possible to add fields to the database at any time. Any records that were entered before the new field was added will have no value for the field. This can be filled in by then editing the record.', 'participants-database' )?></p>
@@ -33,6 +34,7 @@
 <p><?php _e('<strong>Sortable</strong> means the list presented on the "List Participants" page can be sorted by this field. Of course, it must have a non-zero value in "Column" to be seen at all.', 'participants-database' )?></p>
 <p><?php _e('<strong>CSV</strong> means the field is one that can be imported or exported with a CSV file. If you are using CSV files to bring in records, you should set these switches based on which fields you are planning to import. When exporting a CSV, this switch determines whether the field will be exported.<p>', 'participants-database' )?>
 <p><?php _e('<strong>Persistent</strong> is a convenience feature helpful when you are manually entering a series of records in the admin. If set, it means the field will carry over to the next blank entry. For instance, if a group of records from the same city are being entered, set the "city" field to be persistent, then once a city value has been entered in the first record of the series, the next blank record will have this city pre-filled.', 'participants-database' )?></p>
+<p><?php _e('Persistent fields will also use their set default value in record edit forms where no value has been set in the record being edited', 'participants-database' )?></p>
 <p><?php _e('<strong>Signup</strong> selects this field for use in the brief signup form that is presented with the [pdb_signup] shortcode.', 'participants-database' )?></p>
 <p><?php _e('<strong>Readonly</strong> means that plugin users can see the value of the field, but cannot edit it. The field will be editable in the admin.', 'participants-database' )?></p>
 </div>

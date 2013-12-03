@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5
+  Version: 1.5b6
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -27,80 +27,198 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
-/*
- * the main plugin class is set up as a static class
- * this function starts it up
+// register the class autoloading
+spl_autoload_register('PDb_class_loader');
+/**
+ * main static class for running the plugin
+ * 
+ * @category   WordPress Plugins
+ * @package    wordPress
+ * @author     Roland Barker <webdesign@xnau.com>
+ * @copyright  2011 - 2013 7th Veil, LLC
+ * @license    http://www.gnu.org/licenses/gpl-2.0.txt GPL2
+ * @version    Release: 1.5
+ * 
  */
-Participants_Db::initialize();
-
-class Participants_Db {
+class Participants_Db extends PDb_Base {
   
-  // this is same as the plugin directory name
+  /**
+   *
+   * unique slug for the plugin; this is same as the plugin directory name
+   * 
+   * @var string unique slug for the plugin
+   */
   const PLUGIN_NAME = 'participants-database';
 
-  // display title
+  /**
+   *  display title
+   * @var string
+   */
   public static $plugin_title;
-  // main participants index table
+  /**
+   * basename of the main participants index table
+   * @var string
+   */
   public static $participants_table;
-  // table for all associated values
+  /**
+   *  base name of the table for all associated values
+   * @var string
+   */
   public static $fields_table;
-  // table for groups defninitions
+  /**
+   * name of the table for groups defninitions
+   * @var string
+   */
   public static $groups_table;
-  // current Db version
-  public static $db_version = '0.6';
-  // name of the WP option where the current db version is stored
+  /**
+   * to create a new database version, change this value to the new version number. 
+   * This will trigger a database update in the PDb_Init class
+   * 
+   * @var string current Db version
+   */
+  public static $db_version = '0.7';
+  /**
+   * name of the WP option where the current db version is stored
+   * @var string
+   */
   public static $db_version_option = 'PDb_Db_version';
-  // current version of plugin
+  /**
+   *  current version of plugin
+   * @var string
+   */
   public static $plugin_version;
-  // plugin options name
+  /**
+   * name of the WP plugin options
+   * @var string
+   */
   public static $participants_db_options;
+  /**
+   * plugin option values $name => $value
+   * @var array
+   */
   public static $plugin_options;
-  // holds the plugin settings object
-  public static $plugin_settings;
-  // locations
+  /**
+   * plugin settings object
+   * @var object
+   */
+  public static $Settings;
+  /**
+   * name of the plugin admin page
+   * @var string
+   */
   public static $plugin_page;
+  /**
+   * path to the plugin root ditectory
+   * @var string
+   */
   public static $plugin_path;
+  /**
+   * URL for the plugin directory
+   * @var string 
+   */
   public static $plugin_url;
-  // file uploads
+  /**
+   * absolute path to the uploads directory
+   * @var string 
+   */
   public static $uploads_path;
-  public static $allowed_extensions;
-  // arrays for building default field set
-  public static $internal_fields;
-  public static $main_fields;
-  public static $admin_fields;
-  public static $personal_fields;
-  public static $source_fields;
-  public static $field_groups;
-  
-  // this is can be prefixed on CSS classes or id to keep a namespace
-  public static $css_prefix = 'pdb-';
-  // holds the form validation errors
+  /**
+   * a general-use prefix to set a namespace
+   *
+   * @var string
+   */
+  public static $prefix = 'pdb-';
+  /**
+   * duplicate of $prefix for backwards compatibility
+   * @var string
+   */
+  public static $css_prefix;
+  /**
+   * the PDb_FormValidation object
+   * @var object
+   */
   public static $validation_errors;
-  // holds an admin status or error message
+  /**
+   * an admin status or error message
+   * @var string
+   */
   static $admin_message = '';
-  // holds the type of admin message
+  /**
+   * the type of admin message
+   * @var string
+   */
   static $admin_message_type;
-  // name of the transient record used to hold the last record
-  public static $last_record = 'pdb_last_record';
-  // this gets set if a shortcode is called on a page
+  /**
+   * name of the transient record used to hold the last recor
+   * @var string
+   */
+  public static $last_record;
+  /**
+   * set if a shortcode is called on a page
+   * @var bool
+   */
   public static $shortcode_present;
-  // status code for the last record processed
+  /**
+   * status code for the last record processed
+   * @var string
+   */
   public static $insert_status;
-  // these columns are not manually edited
-  public static $internal_columns;
-  // header to include with plugin emails
+  /**
+   * header to include with plugin email
+   * @var strings
+   */
   public static $email_headers;
-  // enclosure character to use
+  /**
+   * enclosure character to use
+   * @var string
+   */
   static $CSV_enclosure = '"';
-  // list of reserved field names
-  public static $reserved_names = array('source', 'subsource', 'id', 'private_id', 'record_link', 'action', 'submit', 'name', 'day', 'month', 'year', 'hour', 'date', 'minute');
+  /**
+   * list of reserved field names
+   * @var array
+   */
+  public static $reserved_names = array('source', 'subsource', 'id', 'private_id', 'record_link', 'action', 'submit', 'submit-button', 'name', 'day', 'month', 'year', 'hour', 'date', 'minute', 'email-regex');
+  /**
+   * true while sending an email
+   * @var bool
+   */
+  public static $sending_email = false;
+  /**
+   * set of internationalized words
+   * @var array
+   */
+  public static $i18n = array();
+  /**
+   * the date format; defaults to the WP global setting, but can be changed within the plugin
+   *
+   * @var string
+   */
+  public static $date_format;
+  /**
+   * index for tracking multiple instances of a shortcode
+   * @var int
+   */
+  public static $instance_index = 0;
+  /**
+   * this is set when the PDb_List::show_pagination_control() methid is called so 
+   * that only one pagination control is shown on a page
+   * @var bool 
+   */
+  public static $pagination_set = false;
+  /**
+   * set when a list search form is shown to prevent more than one form appearing on a page
+   * @var bool
+   */
+  public static $search_set = false;
 
+  /**
+   * initializes the static class
+   * 
+   * sets up the class autoloading, configuration values, hooks, filters and shortcodes
+   * 
+   * @global object $wpdb
+   */
   public static function initialize() {
-
-    // register the class autoloading
-    spl_autoload_extensions('.php');
-    spl_autoload_register('PDb_class_loader');
 
     // set the table names
     global $wpdb;
@@ -114,107 +232,96 @@ class Participants_Db {
     // define some locations
     self::$participants_db_options = self::PLUGIN_NAME . '_options';
     self::$plugin_page = self::PLUGIN_NAME;
-    self::$plugin_url = WP_PLUGIN_URL . '/' . self::PLUGIN_NAME;
     self::$plugin_path = dirname(__FILE__);
+    self::$plugin_url = WP_PLUGIN_URL . '/' . self::PLUGIN_NAME;
     // this is relative to the WP install
     self::$uploads_path = 'wp-content/uploads/' . self::PLUGIN_NAME . '/';
 
-    //self::$plugin_settings = new PDb_Settings();
-    //self::$plugin_options = get_option( self::$participants_db_options );
-    // hard-code some image file extensions
-    self::$allowed_extensions = array('jpg', 'jpeg', 'gif', 'png');
-
+    self::$last_record = self::$prefix . 'last_record';
+    self::$css_prefix = self::$prefix;
 
     // install/deactivate and uninstall methods are handled by the PDB_Init class
     register_activation_hook(__FILE__, array('PDb_Init', 'on_activate'));
     register_deactivation_hook(__FILE__, array('PDb_Init', 'on_deactivate'));
     register_uninstall_hook(__FILE__, array('PDb_Init', 'on_uninstall'));
 
-
-    // define the list of internal columns
-    if ($wpdb->get_var('show tables like "' . self::$groups_table . '"') == self::$groups_table) {
-
-      self::$internal_columns = array();
-
-      $internal_columns = $wpdb->get_results(
-                                             'SELECT f.name 
-																						 	FROM ' . self::$fields_table . ' f 
-																							INNER JOIN ' . self::$groups_table . ' g 
-																							ON f.group = g.name 
-																							WHERE g.display = 0',
-                                              ARRAY_N
-                                              );
-
-      foreach ($internal_columns as $column)
-        self::$internal_columns[] = $column[0];
-    }
-
-    add_filter('query_vars', array(__CLASS__, 'register_queryvars'));
     add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array(__CLASS__, 'add_plugin_action_links') );
     add_filter( 'plugin_row_meta', array(__CLASS__, 'add_plugin_meta_links'), 10, 2 );
 
     // set the WP hooks to finish setting up the plugin
-    add_action('init', array(__CLASS__, 'init'));
-    add_action('admin_menu', array(__CLASS__, 'plugin_menu'));
-    add_action('admin_init', array(__CLASS__, 'admin_init'));
-    add_action('wp_enqueue_scripts', array(__CLASS__, 'include_scripts'));
+    add_action('init',                  array(__CLASS__, 'init'));
+    add_action('admin_menu',            array(__CLASS__, 'plugin_menu'));
+    add_action('admin_init',            array(__CLASS__, 'admin_init'));
+    add_action('wp_enqueue_scripts',    array(__CLASS__, 'include_scripts'));
     add_action('admin_enqueue_scripts', array(__CLASS__, 'admin_includes'));
-    add_action('wp_footer', array(__CLASS__, 'add_scripts'));
+    add_action('wp_footer',             array(__CLASS__, 'add_scripts'));
 
     // handles ajax request from list filter
-    add_action('wp_ajax_pdb_list_filter', array(__CLASS__, 'pdb_list_filter'));
+    add_action('wp_ajax_pdb_list_filter',        array(__CLASS__, 'pdb_list_filter'));
     add_action('wp_ajax_nopriv_pdb_list_filter', array(__CLASS__, 'pdb_list_filter'));
 
     // define our shortcodes
-    //add_shortcode( 'pdb_record', array( __CLASS__, 'frontend_edit') );
-    add_shortcode('pdb_record', array(__CLASS__, 'record_edit'));
-    add_shortcode('pdb_signup', array(__CLASS__, 'print_signup_form'));
+    add_shortcode('pdb_record',        array(__CLASS__, 'print_record_edit_form'));
+    add_shortcode('pdb_signup',        array(__CLASS__, 'print_signup_form'));
     add_shortcode('pdb_signup_thanks', array(__CLASS__, 'print_signup_thanks_form'));
-    //add_shortcode( 'pdb_list', array( 'PDb_List_Static','initialize' ) );
-    add_shortcode('pdb_list', array(__CLASS__, 'print_list'));
-    add_shortcode('pdb_single', array(__CLASS__, 'print_single_record'));
-    //add_shortcode( 'pdb_single', array( __CLASS__, 'show_record' ) );
+    add_shortcode('pdb_request_link',  array(__CLASS__, 'print_retrieval_form'));
+    add_shortcode('pdb_list',          array(__CLASS__, 'print_list'));
+    add_shortcode('pdb_single',        array(__CLASS__, 'print_single_record'));
+    add_shortcode('pdb_search',        array(__CLASS__, 'print_search_form'));
+    add_shortcode('pdb_total',         array(__CLASS__, 'print_total'));
 
     /*
-     * this checks to make sure the columns in the main database match the fields
-     * defined in the fields database
+     * sets up the update notification
+     * 
+     * in this case, we use this to simulate a new releaase for testing.
+     * 
+     * uncomment to enable
      */
-    if ($wpdb->get_var('SHOW TABLES LIKE "' . self::$participants_table . '"') == self::$participants_table) :
-      // db integrity check and fix
-      $query = 'SELECT * FROM ' . self::$fields_table;
-      $fields = $wpdb->get_results($query, ARRAY_A);
-      $columns_raw = self::get_columns();
-      $columns = array();
-      foreach ($columns_raw as $col)
-        $columns[] = $col['Field'];
-      foreach ($fields as $field) {
-
-        if (!in_array($field['name'], $columns)) {
-
-          //error_log( 'adding column:'.print_r( $field, true ));
-
-          self::_add_db_column($field);
+    //add_filter('pre_set_site_transient_update_plugins', array(__CLASS__, 'check_for_plugin_update'));// for plugin update test
+    /*
+     * uncomment this to enable custom upgrade details window
+     */
+    //add_filter('plugins_api', array(__CLASS__, 'plugin_update_info'), 10, 3);
+    /*
+     * this adds a custom update message to the plugin list 
+     */
+    global $pagenow;
+    if ( 'plugins.php' === $pagenow )
+    {
+        $plugin_path = plugin_basename( __FILE__ );
+        $hook = "in_plugin_update_message-" . $plugin_path;
+        add_action( $hook, array(__CLASS__, 'plugin_update_message'), 20, 2 );
+    }
         }
-      }
-    endif; // end integrity check and fix
-  }
 
+  /**
+   * performs a fix for some older versions of the plugin; does nothing with current plugins
+   */
   public static function admin_init() {
 
     // if the setting was made in previous versions and is a slug, convert it to a post ID
-    if (isset(self::$plugin_options['registration_page']) && !is_numeric(self::$plugin_options['registration_page'])) {
+    $regpage = isset(self::$plugin_options['registration_page']) ? self::$plugin_options['registration_page'] : '';
+    if (!empty($regpage) && !is_numeric($regpage)) {
 
-      self::$plugin_options['registration_page'] = self::get_id_by_slug(self::$plugin_options['registration_page']);
+      self::$plugin_options['registration_page'] = self::get_id_by_slug($regpage);
 
       update_option(self::$participants_db_options, self::$plugin_options);
     }
   }
-
+  /**
+   * initializes the plugin in the WP environment
+   * @return null
+   */
   public static function init() {
+    
+    $sessid = session_id();
+    if (empty($sessid)) session_start();
 
     load_plugin_textdomain('participants-database', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
     self::$plugin_title = __('Participants Database', 'participants-database');
+    
+    self::_set_i18n();
     
     /*
      * checks for the need to update the DB
@@ -224,41 +331,53 @@ class Participants_Db {
     if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
       PDb_Init::on_update();
 
-    // set the email content headers
+    // get the plugin options array
     if (!isset(self::$plugin_options)) {
 
       self::$plugin_options = get_option(self::$participants_db_options);
     }
-
-    $options = self::$plugin_options;
-
-    if (0 != $options['html_email']) {
+    /*
+     * set the plugin date display format: if "strict dates" is enabled, use the 
+     * input date format to display all dates, if not, use the blog date format
+     */
+    self::$date_format = self::$plugin_options['strict_dates'] == 1 ? self::$plugin_options['input_date_format'] : get_option('date_format');
+    
+    if (0 != self::$plugin_options['html_email']) {
       $type = 'text/html; charset="' . get_option('blog_charset') . '"';
       //add_filter('wp_mail_content_type', array( __CLASS__, 'set_content_type'));
     } else {
       $type = 'text/plain; charset=us-ascii';
     }
     self::$email_headers = "MIME-Version: 1.0\n" .
-            "From: " . $options['receipt_from_name'] . " <" . $options['receipt_from_address'] . ">\n" .
+            "From: " . self::$plugin_options['receipt_from_name'] . " <" . self::$plugin_options['receipt_from_address'] . ">\n" .
             "Content-Type: " . $type . "\n";
 
-    //self::include_scripts();
+    /*
+     * instantiate the settings class; this only sets up the settings definitions, 
+     * the WP Settings API may not be available at this point, so we register the 
+     * settings on the 'admin_menu' hook
+     */
+    self::$Settings = new PDb_Settings();
+
     // this processes form submits before any output so that redirects can be used
     self::process_page_request();
   }
   
-  public function set_content_type() {
-    return 'text/html';
-  }
-
+  /**
+   * sets up the plugin admin menus
+   * 
+   * @return null
+   */
   public static function plugin_menu() {
 
-    // intialize the plugin settings
-    // we do this here because we need the object for the plugin menus
-    //self::$plugin_settings = new PDb_Settings();
-
-    self::$plugin_settings = new PDb_Settings();
-    self::$plugin_options = get_option(self::$participants_db_options);
+    /*
+     * intialize the plugin settings for the plugin settings pages
+     */
+    if (is_object(self::$Settings)) {
+      self::$Settings->initialize();
+    } else {
+    self::$Settings = new PDb_Settings();
+    }
 
     // define the plugin admin menu pages
     add_menu_page(
@@ -310,7 +429,7 @@ class Participants_Db {
             __('Settings', 'participants-database'), 
             'manage_options', 
             self::$plugin_page . '_settings_page', 
-            array(self::$plugin_settings, 'show_settings_form')
+            array(self::$Settings, 'show_settings_form')
     );
 
     add_submenu_page(
@@ -331,13 +450,21 @@ class Participants_Db {
     );
   }
 
+  /**
+   * processes the admin includes
+   * 
+   * uses WP hook 'admin_enqueue_scripts''
+   * 
+   * @param string $hook the admin menu hook as provided by the WP filter
+   * @return null
+   */
   public static function admin_includes($hook) {
 
-    wp_register_script(self::$css_prefix.'cookie', plugins_url('js/jquery_cookie.js', __FILE__));
-    wp_register_script(self::$css_prefix.'manage_fields', plugins_url('js/manage_fields.js', __FILE__));
-    wp_register_script(self::$css_prefix.'settings_script', plugins_url('js/settings.js', __FILE__));
-    wp_register_script(self::$css_prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
-    wp_register_script(self::$css_prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'cookie', plugins_url('js/jquery_cookie.js', __FILE__));
+    wp_register_script(self::$prefix.'manage_fields', plugins_url('js/manage_fields.js', __FILE__));
+    wp_register_script(self::$prefix.'settings_script', plugins_url('js/settings.js', __FILE__));
+    wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
     //wp_register_script( 'datepicker', plugins_url( 'js/jquery.datepicker.js', __FILE__ ) );
     //wp_register_script( 'edit_record', plugins_url( 'js/edit.js', __FILE__ ) );
 
@@ -347,53 +474,68 @@ class Participants_Db {
       wp_enqueue_script('jquery-ui-tabs');
       wp_enqueue_script('jquery-ui-sortable');
       wp_enqueue_script('jquery-ui-dialog');
-      wp_enqueue_script(self::$css_prefix.'cookie');
-      wp_enqueue_script(self::$css_prefix.'jq-placeholder');
-      wp_enqueue_script(self::$css_prefix.'admin');
+      wp_enqueue_script(self::$prefix.'cookie');
+      wp_enqueue_script(self::$prefix.'jq-placeholder');
+      wp_enqueue_script(self::$prefix.'admin');
+    }
+
+    if (false !== stripos($hook, 'participants-database-list_participants')) {
+      wp_localize_script(self::$prefix.'admin-list', 'L10n', array(
+          "record" => __("Do you really want to delete the selected record?", 'participants-database' ),
+          "records" => __("Do you really want to delete the selected records?", 'participants-database' ),
+      ));
     }
 
     if (false !== stripos($hook, 'participants-database_settings_page')) {
-      wp_enqueue_script(self::$css_prefix.'settings_script');
+      wp_enqueue_script(self::$prefix.'settings_script');
     }
 
     if (false !== stripos($hook, 'participants-database-manage_fields')) {
+      wp_localize_script(self::$prefix.'manage_fields', 'L10n', array(
       /* translators: don't translate the words in brackets {} */
-      wp_localize_script(self::$css_prefix.'manage_fields', 'L10n', array(
-          'must_remove' => '<h4>You must remove all fields from the {name} group before deleting it.</h4>',
-          'delete_confirm' => '<h4>Delete the "{name}" {thing}?</h4>',
+          'must_remove' => '<h4>' . __('You must remove all fields from the {name} group before deleting it.', 'participants-database') . '</h4>',
+          'delete_confirm' => '<h4>' . __('Delete the "{name}" {thing}?', 'participants-database') . '</h4>',
       ));
-      wp_enqueue_script(self::$css_prefix.'manage_fields');
+      wp_enqueue_script(self::$prefix.'manage_fields');
     }
 
     wp_register_style('pdb-global-admin', plugins_url('/css/PDb-admin-global.css', __FILE__), false, false);
-    wp_register_style('pdb-admin', plugins_url('/css/PDb-admin.css', __FILE__));
     wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
+    wp_register_style('pdb-admin', plugins_url('/css/PDb-admin.css', __FILE__));
 
     wp_enqueue_style('pdb-global-admin');
 
     // only incude these stylesheets on the plugin admin pages
     if (false !== stripos($hook, 'participants-database')) {
-      wp_enqueue_style('pdb-admin');
       wp_enqueue_style('pdb-frontend');
+      wp_enqueue_style('pdb-admin');
     }
   }
 
-  // include any JS needed for the front-end
-  public function include_scripts() {
+  /**
+   * includes any javascript needed for the front end
+   * 
+   * fired on WP hook 'wp_enqueue_scripts'
+   * 
+   * @return null
+   */
+  public static function include_scripts() {
 
     // set the global shortcode flag
     self::$shortcode_present = false;
 
     wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
+    wp_register_style('custom_plugin_css', plugins_url('/css/custom_css.php', __FILE__));
 
     if (self::$plugin_options['use_plugin_css']) {
 
       wp_enqueue_style('pdb-frontend');
+      wp_enqueue_style('custom_plugin_css');
     }
 
-    wp_register_script('pdb-shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
-    wp_register_script(self::$css_prefix.'list-filter', plugin_dir_url(__FILE__) . 'js/list-filter.js', array('jquery'));
-    wp_register_script(self::$css_prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
 
     // this is now handled conditionally in the wp_footer action
     //wp_enqueue_script( 'jquery' );
@@ -403,224 +545,237 @@ class Participants_Db {
 
   /**
    * conditionally adds JS to pages that have one of our shortcodes
+   * 
+   * fired on 'wp_footer' hook
+   * 
+   * @return null
    */
-  public function add_scripts() {
+  public static function add_scripts() {
 
     if (false !== self::$shortcode_present) {
-
-      wp_enqueue_script('pdb-shortcode');
-      wp_enqueue_script('jq-placeholder');
+      wp_enqueue_script('jquery');
+      wp_enqueue_script(self::$prefix.'shortcode');
+      wp_enqueue_script(self::$prefix.'jq-placeholder');
     }
   }
 
-  // callback for plugin admin subpages
-  // grabs the name from the request and includes the file to display the page
-  public function include_admin_file() {
+  /**
+   * includes files for generating plugin admin pages  
+   * 
+   * grabs the name from the request and includes the file to display the page; 
+   * this is the admin submenu callback
+   * 
+   * @static
+   * @return null
+   */
+  public static function include_admin_file()
+  {
 
     $parts = explode('-', $_GET['page']);
 
     $file = array_pop($parts);
 
-    // we'll need this in the included file
-    global $wpdb;
+    if (is_file(plugin_dir_path(__FILE__) . $file . '.php')) {
 
-    include $file . '.php';
-  }
+      // we'll need this in the included file
+      global $wpdb;
 
-  // register all the GET variables we want to use
-  public function register_queryvars($qvars) {
-
-    // 'pdb' is used bye the pdb_show shortcode
-    $qvars[] = 'pdb';
-
-    return $qvars;
+      include $file . '.php';
+    }
   }
 
   /**
    * shows the frontend edit screen called by the [pdb_record] shortcode
    *
-   * requires the 'pid' value in the URI or 'id' attribute in the shortcode
+   * the ID of the record to show for editing can be provided one of three ways: 
+   *    $_GET['pid'] (private link), 
+   *    $atts['id'] (in the sortcode), or 
+   *    $_SESSION['pdbid'] (directly from the signup form)
    * 
    * @param array $atts array of attributes drawn from the shortcode
    * @return string the HTML of the record edit form
    */
-  function record_edit($atts) {
+  public static function print_record_edit_form($atts) {
 
-    $atts['id'] = isset($_GET['pid']) ? self::get_participant_id($_GET['pid']) : ( isset($atts['id']) ? $atts['id'] : false );
+    $atts['id'] = isset($_GET['pid']) ? 
+            self::get_participant_id($_GET['pid']) : 
+              ( isset($atts['id']) ? $atts['id'] : 
+                (isset($_SESSION['pdbid']) ? $_SESSION['pdbid'] : 
+                  false) );
 
     return PDb_Record::print_form($atts);
   }
 
   /**
    * updates the "last_accessed" field in the database
+   * 
+   * @ver 1.5 added $wpdb->prepare()
+   * 
+   * @param int $id the record to update
+   * @global $wpdb
    */
-  private function _record_access($id) {
+  private static function _record_access($id) {
 
     global $wpdb;
 
-    $sql = 'UPDATE ' . self::$participants_table . ' SET `last_accessed` = NOW() WHERE `id` = ' . $id;
+    $sql = 'UPDATE ' . self::$participants_table . ' SET `last_accessed` = NOW() WHERE `id` = %s';
 
-    return $wpdb->query($sql);
+    return $wpdb->query($wpdb->prepare($sql, $id));
   }
 
   /**
    * sets the last_accessed timestamp
+   * 
+   * @param int $id id of the record to update
    */
-  public function set_record_access($id) {
+  public static function set_record_access($id) {
 
     self::_record_access($id);
   }
 
+
   /**
-   * displays a single record using a shortcode called with the record ID
-   *
-   * the shorcode is looking for a get variable called 'pdb'
-   *
-   * @param array $atts array of shortcode variables
-   *                 template - name of the template file to use: pdb-single-{template}.php
-   *                 term     - the term to index the record by, defaults to the ID
-   *                 class    - classname of the wrapper div
+   * prints a "total" value
+   * 
+   * called by the "pdb_total" shortcode. this is to print a total number of records, 
+   * the number of records passing a filter, or an arithmetic sum of all the data 
+   * passing a filter.
+   * 
+   * @param array $params the parameters passed in by the shortcode
+   * @return string the output HTML
    */
-  public function show_record($atts) {
+  public static function print_total($params) {
+    
+    $params['module'] = 'total';
+    $params['list_limit'] = 999999999;
 
-    /*
-     * the template attribut selects the template file
-     * the term attribute selects the term to use to look up the record
-     * this should be a unique identifier, but if it's not it will show a series of records
-     */
-    $vars = shortcode_atts(array(
-        'template' => 'default',
-        'term' => 'id',
-        'class' => 'PDb-single'
-            ), $atts);
-
-    if (isset($_GET['pdb'])) {
-
-      $ids = self::_get_participant_id_by_term($vars['term'], $_GET['pdb']);
-
-      $template = self::get_template('single', $vars['template']);
-
-      if (false === $template)
-        return '<p>' . _x('Missing Template', 'message to show if the plugin cannot find the template', 'participants-database') . '</p>';
-
-      ob_start();
-
-      foreach ((array) $ids as $id) :
-
-        if (self::_id_exists($id)) {
-          ?>
-          <div class="<?php echo $vars['class'] ?>">
-
-            <?php include $template ?>
-
-          </div><?php
-        } else
-          echo '<p>' . sprintf(__('No record found for %s.', 'participants-database'), $id) . '</p>';
-
-      endforeach; // cycle through ids
-
-      return ob_get_clean();
-    }
+    return PDb_List::get_list($params);
   }
+
 
   /**
    * prints a single record called by [pdb_list] shortcode
+   * 
+   * @param array $params the parameters passed in by the shortcode
+   * @return string the output HTML
    */
-  public function print_list($params) {
+  public static function print_list($params) {
+    
+    $params['module'] = 'list';
 
-    return PDb_List::print_record($params);
+    return PDb_List::get_list($params);
+  }
+  /**
+   * prints a list search form
+   * 
+   * @param array $params the parameters passed in by the shortcode
+   * @return string the output HTML
+   */
+  public static function print_search_form($params) {
+    
+    $params = (array) $params + array('module' => 'search', 'search' => true); 
+
+    return PDb_List::get_list($params);
   }
 
   /**
    * prints a single record called by [pdb_single] shortcode
+   * 
+   * @param array $params the parameters passed in by the shortcode
+   * @return string the output HTML
    */
-  public function print_single_record($params) {
+  public static function print_single_record($params) {
 
     return PDb_Single::print_record($params);
   }
 
   /**
-   * prints a signup form
+   * prints a form from the Signup class
+   * 
+   * @param array $params the parameters from the shortcode
+   * @return string the output HTML
    */
-  public function print_signup_form($params) {
+  public static function print_signup_class_form($params) {
 
     $params['post_id'] = get_the_ID();
 
     return PDb_Signup::print_form($params);
+  }
+
+  /**
+   * prints a signup form
+   * 
+   * @param array $params the parameters passed in by the shortcode
+   * @return string the output HTML
+   */
+  public static function print_signup_form($params) {
+
+    $params['module'] = 'signup';
+
+    return self::print_signup_class_form($params);  
   }
 
   /**
    * prints the signup thanks form
+   * 
+   * @param array $params the parameters passed in by the shortcode
+   * @return string the output HTML
    */
-  public function print_signup_thanks_form($params) {
+  public static function print_signup_thanks_form($params) {
+  
+    $params['module'] = 'thanks';
 
-    $params['post_id'] = get_the_ID();
-
-    $params['type'] = 'thanks';
-
-    return PDb_Signup::print_form($params);
+    return self::print_signup_class_form($params);
   }
 
   /**
-   * finds and returns a template file URL
-   *
-   * looks first in the theme directory for the template file; then in the
-   * plugin's directory for the named template, then for the default template
-   *
-   * @param string $module        the module name of the shortcode calling the
-   *                              template: single, list, signup
-   * @param string $template_name the name of the template to use
-   *
-   * @return the URL of the template file or false if none found
+   * prints the private ID retrieval form
+   * 
+   * @param array $params the parameters passed in by the shortcode
+   * @return string the output HTML
    */
-  public function get_template($module, $template_name = 'default') {
+  public static function print_retrieval_form($params)
+  {
 
-    $template = get_stylesheet_directory() . '/templates/pdb-' . $module . '-' . $template_name . '.php';
+    $params['module'] = 'retrieve';
 
-    if (!file_exists($template)) {
-
-      $template = self::$plugin_path . '/templates/pdb-' . $module . '-' . $template_name . '.php';
-    }
-
-    if (!file_exists($template)) {
-
-      $template = self::$plugin_path . '/templates/pdb-' . $module . '-default.php';
-    }
-
-    if (!file_exists($template)) {
-
-      error_log(__METHOD__ . ' template not found: ' . $template);
-
-      $template = false;
-    }
-
-    return $template;
+    return self::print_signup_class_form($params);
   }
 
-  // get all the attributes of a field by it's name
-  // an attribute or comma-separated list of attributes can be specified
-  // if not, a default list of attributes is retrieved
-  //
-	// returns data object
-  public function get_field_atts($field = false, $atts = '*') {
+  /**
+   * get all the attributes of a field by it's name
+   * 
+   * an attribute or comma-separated list of attributes can be specified if not, 
+   * a default list of attributes is retrieved
+   * 
+   * @global object $wpdb
+   * @param string $field the name of the field to get
+   * @param string $atts
+   * @return stdClass 
+   */
+  public static function get_field_atts($field = false, $atts = '*') {
 
-    if (!$field) {
+    global $wpdb;
+    
+    if ($field) {
+      $exists = $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM ' . self::$fields_table . ' f WHERE f.name = %s', $field));
+    }
+
+    if (!$field or $exists == 0) {
 
       $return = new stdClass;
       $return->form_element = '';
       return $return;
     }
 
-    global $wpdb;
-
     $sql = "
 		SELECT " . $atts . " 
-		FROM " . self::$fields_table . " 
-		WHERE `name` = '" . $field . "'";
+		FROM " . self::$fields_table . " f 
+		WHERE f.name = %s";
 
     //error_log( __METHOD__.' called with:'. $sql );
 
-    $field_atts = $wpdb->get_row($sql);
+    $field_atts = $wpdb->get_row($wpdb->prepare($sql, $field));
 
     return $field_atts;
   }
@@ -628,11 +783,11 @@ class Participants_Db {
   /**
    * get an array of groups
    *
-   * @param string $column comma-separated list of columns to get, defualts to all (*)
-   * @param mixed $exclude singe group to exclude or array of groups to exclude
+   * @param string $column comma-separated list of columns to get, defaults to all (*)
+   * @param mixed $exclude single group to exclude or array of groups to exclude
    * @return indexed array
    */
-  public function get_groups($column = '*', $exclude = false) {
+  public static function get_groups($column = '*', $exclude = false) {
 
     global $wpdb;
 
@@ -677,27 +832,78 @@ class Participants_Db {
     }
   }
 
-  // get the names of all the persistent fields 
-  public function get_persistent() {
+  /**
+   * gets the names of all the persistent fields
+   * 
+   * @return array of field names
+   */
+  public static function get_persistent() {
 
     return self::get_subset('persistent');
   }
 
-  // get the names of all the sortable fields
-  public function get_sortables() {
+  /**
+   * gets a list of field names/titles
+   * 
+   * assembles a list of columns from those columns set to display. Optionally, 
+   * a list of fields can be supplied with an array. This allows fields that are 
+   * not displayed to be included.
+   * 
+   * as of 1.5 fields named in the $fields array don't need to have their 'sortable' 
+   * flag set in order to be included.
+   *
+   * @param string $type   if 'sortable' will only select fields flagged as sortable  
+   * @param array  $fields array of field names defining the fields listed for the 
+   *                       purpose of overriding the default selection
+   * @param string $sort   sorting method to use, can be 'order' which uses the
+   *                       defined group/field order, 'column' which uses the
+   *                       current display column order or 'alpha' which sorts the
+   *                       list alphabetially; defaults to 'column'
+   * @return array of form: name => title
+   */
+  public static function get_field_list($type = false, $fields = false, $sort = 'column') {
 
     global $wpdb;
+    
+    $where_clauses = array();
+    if ($type == 'sortable' && !is_array($fields)) {
+      $where_clauses[] = 'f.sortable > 0';
+    }
+    if (is_array($fields)) {
+      $where_clauses[] = 'f.name IN ("' . implode('","',$fields) . '")';
+    } elseif (! is_admin()) {
+      $where_clauses[] = 'f.display_column > 0 ';
+    }
+    
+    $where = empty($where_clauses) ? '' : "WHERE " . implode(' AND ', $where_clauses);
 
-    $frontend_fields =  is_admin() ? '' : ' AND `display_column` > 0 ';
-
-    $sql = "
-			SELECT `name`, REPLACE(`title`,'\\\','') as title
-			FROM " . self::$fields_table . "
-			WHERE `sortable` > 0" . $frontend_fields;
+    switch ($sort) {
+      case 'alpha':
+        $sql = "
+          SELECT f.name, REPLACE(f.title,'\\\','') as title
+          FROM " . self::$fields_table . " f
+          " . $where . "
+          ORDER BY f.name";
+        break;
+      case 'order':
+        $sql = "
+          SELECT f.name, REPLACE(f.title,'\\\',''), g.order as title
+          FROM " . self::$fields_table . " f
+          INNER JOIN " . self::$groups_table . " g ON f.group = g.name
+          " . $where . "
+          ORDER BY g.order, f.order";
+        break;
+      default:
+        $sql = "
+          SELECT f.name, REPLACE(f.title,'\\\','') as title
+          FROM " . self::$fields_table . " f
+          " . $where . "
+          ORDER BY f." . (is_admin() ? 'admin_column' : 'display_column');
+    }
 
     $result = $wpdb->get_results($sql, ARRAY_N);
 
-    // get the 2nd dimension of the array
+    // construct an array of this form: name => title
     $return = array();
     foreach ($result as $item)
       $return[$item[1]] = $item[0];
@@ -705,8 +911,37 @@ class Participants_Db {
     return $return;
   }
 
-  // get a subset of field names; this function only works for boolean qualifiers
-  private function get_subset($subset) {
+  /**
+   * get the names of all the sortable fields
+   * 
+   * this checks the "sortable" column and collects the list of sortable columns
+   * from those columns set to display. Optionally, a list of fields to include
+   * can be supplied with an array. This allows fields that are not displayed to
+   * be included.
+   * 
+   * @param array  $fields array of field names defining the fields listed for the 
+   *                       purpose of overriding the default selection
+   * @param string $sort   sorting method to use, can be 'order' which uses the
+   *                       defined group/field order, 'column' which uses the
+   *                       current display column order or 'alpha' which sorts the
+   *                       list alphabetially; defaults to 'column'
+   * @param return array
+   */
+  public static function get_sortables($fields = false, $sort = 'column') {
+
+    return self::get_field_list('sortable', $fields, $sort);
+  }
+
+  /**
+   * gets a subset of field names
+   *
+   * this function only works for boolean qualifiers or "column order" columns where
+   * any number greater than 0 indicates the field is to be displayed in a column
+   *
+   * @param string the name of the qualifier to use to select a set of field names
+   * @return array an indexed array of field names
+   */
+  private static function get_subset($subset) {
 
     global $wpdb;
 
@@ -726,75 +961,57 @@ class Participants_Db {
   }
 
   /**
-   * gets the column and column order for participant listing
-   * returns a sorted array, omitting any non-displyed columns
-   *
-   * @param string $set selects the set of columns to get:
-   *                    admin or display (frontend)
-   *
-   * @return array of column names, ordered and indexed by the set order
-   */
-  public function get_list_display_columns($set = 'admin_column') {
-
-    global $wpdb;
-
-    $sql = "
-      SELECT `name`,`" . $set . "`
-      FROM " . self::$fields_table . "
-      WHERE `" . $set . "` > 0";
-
-    $columns = $wpdb->get_results($sql, ARRAY_A);
-
-    $column_set = array();
-    foreach ($columns as $column) {
-
-      $column_set[$column[$set]] = $column['name'];
-    }
-
-    //if ( $set == 'admin_column' && self::$plugin_settings->get_option( 'show_pid' ) ) $column_set[0] = 'private_id';
-
-    ksort($column_set);
-
-    //error_log( __METHOD__.' columns='.print_r( $column_set, true));
-
-    return $column_set;
-  }
-
-  /**
-   * gets an associative array of all main database column names and types
+   * gets a single column object
    * 
-   * columns in this database remain even after they've been deleted from the fields database, so we 
-   * don't use the results of this func for anything that only uses active columns
+   * @param string $name the column name
+   * @return object
    */
-  public static function get_columns() {
-
+  public static function get_column($name) {
+    
     global $wpdb;
-
-    $sql = "SHOW COLUMNS FROM " . self::$participants_table;
-
-    return $wpdb->get_results($sql, ARRAY_A);
+    
+    $sql = 'SELECT * 
+		        FROM ' . self::$fields_table . ' f
+            WHERE f.name = %s
+            LIMIT 1';
+    
+    return $wpdb->get_row($wpdb->prepare($sql, $name));
   }
 
   /**
    * checks a string against active columns to validate input
+   * 
+   * @var string $string the name to test
    */
-  public function is_column($string) {
+  public static function is_column($string) {
 
     global $wpdb;
 
-    $sql = "SELECT f.name 
-		        FROM " . self::$fields_table . " f";
+    $sql = 'SELECT COUNT(*)
+		        FROM ' . self::$fields_table . ' f
+            WHERE f.name = %s';
 
-    $columns_info = $wpdb->get_results($sql, ARRAY_N);
+    $count = $wpdb->get_var($wpdb->prepare($sql,trim($string)));
 
-    $columns = array();
+    return $count > 0;
+  }
 
-    foreach ($columns_info as $column_data) {
+  /**
+   * checks a string against defined groups to validate a group name
+   * 
+   * @var string $string the name to test
+   */
+  public static function is_group($string) {
 
-      $columns[] = $column_data[0];
-    }
+    global $wpdb;
 
-    return in_array($string, $columns);
+    $sql = 'SELECT COUNT(*)
+		        FROM ' . self::$groups_table . ' g
+            WHERE g.name = %s';
+
+    $count = $wpdb->get_var($wpdb->prepare($sql,trim($string)));
+
+    return $count > 0;
   }
 
   /**
@@ -836,16 +1053,24 @@ class Participants_Db {
 
       case 'frontend':
 
-        $where = 'WHERE g.display = 1 AND v.readonly = 0';
+        $where = 'WHERE g.display = 1 AND v.form_element <> "captcha"';
         break;
 
       case 'readonly':
 
         $where = is_admin() ? 'WHERE v.group = "internal"' : 'WHERE v.group = "internal" OR v.readonly = 1';
         break;
+      
+      case 'backend':
+
+        $where = 'WHERE v.name NOT IN ( "id", "captcha" ) ';
+        if (!current_user_can('manage_options')) {
+          // don't show non-displaying groups to non-admin users
+          $where .= 'AND g.admin = 0';
+        }
+        break;
 
       case 'new':
-      case 'backend':
       default:
 
         $where = 'WHERE v.name NOT IN ( "id", "captcha" ) ';
@@ -859,11 +1084,15 @@ class Participants_Db {
   /**
    * builds an object of all participant values structured by groups and columns
    *
-   * this function is DEPRICATED in favor of using the Shortcode class to render
+   * TODO: this function is DEPRICATED in favor of using the Shortcode class to render
    * shortcode output, but we have to leave it in here for the moment because
    * there may be modified templates using this function still in use
+   * 
+   * @param string $id the id number of the record
+   * @param array $exclude an array of fields to ecplude
+   * @return object containing all the field and their values, ordered by groups
    */
-  public function single_record_fields($id, $exclude = '') {
+  public static function single_record_fields($id, $exclude = '') {
 
     global $wpdb;
 
@@ -907,193 +1136,20 @@ class Participants_Db {
   }
 
   /**
-   * prepares a field value for display
-   *
-   * @param string $value        the raw value of the field
-   * @param string $form_element the form element type of the field
-   * @param bool   $html         if true, format fields with html; false: plain text only
-   * @return string
-   */
-  public function prep_field_for_display($value, $form_element, $html = true) {
-
-    switch ($form_element) :
-
-      case 'image-upload' :
-
-        $image = new PDb_Image(array('filename' => $value));
-
-        if ($html)
-          $return = $image->get_image_html();
-
-        elseif ($image->file_exists)
-          $return = $image->get_image_file();
-
-        else
-          $return = $value;
-
-        break;
-
-      case 'date' :
-
-        $return = empty($value) ? '' : date_i18n(get_option('date_format'), self::parse_date($value));
-        break;
-
-      case 'multi-checkbox' :
-      case 'multi-select-other' :
-        
-        $multivalues = self::unserialize_array($value);
-        if ( is_array($multivalues) and empty( $multivalues['other'] ) ) unset($multivalues['other']);
-
-        $return = implode(', ', (array) $multivalues);
-        break;
-
-      case 'link' :
-
-        $linkdata = self::unserialize_array($value);
-
-        if (!is_array($linkdata)) {
-
-          $return = '';
-          break;
-        }
-
-        if (empty($linkdata[1]))
-          $linkdata[1] = str_replace('http://', '', $linkdata[0]);
-
-        if ($html)
-          $return = vsprintf(( empty($linkdata[0]) ? '%1$s%2$s' : '<a href="%1$s">%2$s</a>'), $linkdata);
-        else
-          $return = $linkdata[0];
-        break;
-
-      case 'text-line' :
-
-        if (self::$plugin_options['make_links'] and $html) {
-
-          $return = self::make_link($value);
-          break;
-        } else {
-
-          $return = $value;
-          break;
-        }
-        
-      case 'text-area':
-      case 'textarea':
-        
-        $return = sprintf('<span class="textarea">%s</span>',$value );
-        break;
-      case 'rich-text':
-        
-        $return = sprintf('<span class="textarea richtext">%s</span>',(self::$plugin_options['enable_wpautop'] ? wpautop($value) : $value ) );
-        break;
-      default :
-
-        $return = $value;
-
-    endswitch;
-
-    return $return;
-  }
-
-  /**
-   * prepares a field value for display after a form has been unsuccessfully submitted
-   *
-   * @param string $name    the name of the field
-   * @param string $default the default value of the field
-   * @param array  $post    the post array
-   * @return string
-   */
-  public function prepare_field_value($name, $default, $post) {
-
-    if (isset($post[$name])) {
-
-      if (is_array($post[$name]))
-        return $post[$name];
-
-      else
-        return esc_html(stripslashes($post[$name]));
-    } else
-      return $default;
-  }
-
-  /**
-   * checks for the existence of an image file
-   *
-   * checks both absolute path and path relative to image location setting
-   *
-   * DEPRICATED this is handled in the PDb_Image class
-   *
-   * @return bool true if file exists
-   */
-  public function image_exists($filename) {
-
-
-
-    if (!file_exists($filename)) {
-
-      $filename = get_bloginfo('wpurl') . '/' . self::$plugin_options['image_upload_location'] . basename($filename);
-    }
-
-
-
-    //error_log( __METHOD__.' '.$filename.' is file:'. (is_file( $filename ) ?'yes':'no').' file_exists:'.(file_exists( $filename ) ? 'yes' : 'no' ).' imagesize:'.(getimagesize( $filename )?'yes':'no') ) ;
-
-    if (file_exists($filename))
-      return true;
-
-    else
-      return false;
-  }
-
-  /**
-   * returns a path to the defined image location
-   *
-   * this func is superceded by the PDb_Image class methods
-   *
-   * can also deal with a path saved before 1.3.2 which included the whole path
-   *
-   * @return the file url if valid; if the file can't be found returns the
-   *         supplied filename
-   */
-  public function get_image_uri($filename) {
-
-    if (!file_exists($filename)) {
-
-      $filename = get_bloginfo('wpurl') . '/' . self::$plugin_options['image_upload_location'] . basename($filename);
-    }
-
-    return $filename;
-  }
-
-  // returns the number of participant records
-  // can also be used to get the count of any other table
-  public function get_num_records($table = false) {
-
-    global $wpdb;
-
-    if (!$table)
-      $table = self::$participants_table;
-
-    return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM %s", $table));
-  }
-
-  /**
    * processes a form submit
    *
    * this processes all record form submissions front-end and back-
    * 
-   * can either add new record or edit existing record
-   * new record begins with the default values
-   *
-   * @param array  $post           the array of new values
+   * @global object $wpdb
+   * @param array  $post           the array of new values (typically the $_POST array)
    * @param string $action         the db action to be performed: insert or update
    * @param mixed  $participant_id the id of the record to update. If it is false, it creates
    *                               a new record, if true, it creates or updates the default record.
    *
-   * @return int the ID of the record created or updated
+   * @return unknown int ID of the record created or updated, bool false if 
+   *                 submission does not validate
    */
-  public function process_form($post, $action, $participant_id = false) {
+  public static function process_form($post, $action, $participant_id = false) {
 
     global $wpdb;
 
@@ -1104,32 +1160,30 @@ class Participants_Db {
         if (UPLOAD_ERR_NO_FILE == $attributes['error'])
           continue;
 
-        // place the path to the file in the field value
         $filepath = self::_handle_file_upload($fieldname, $attributes);
 
         if (false !== $filepath) {
 
+          // place the path to the file in the field value
           $post[$fieldname] = $filepath;
-
-          // make sure the old value isn't there to override the new one
-          unset($_POST[$fieldname]);
+          
+          $_POST[$fieldname] = basename($filepath);
+          
         }
       }
     }
-
-    $options = get_option(self::$participants_db_options);
 
     /*
      * checks for a record with a matching field so we can exercise the
      * duplicate record preference
      */
-    if ($action == 'insert' and $options['unique_email'] !== 0) {
+    if ($action == 'insert' and self::$plugin_options['unique_email'] !== 0) {
 
-      $match_field = $options['unique_field'];
+      $match_field = self::$plugin_options['unique_field'];
 
       if (isset($post[$match_field]) && !empty($post[$match_field]) && self::field_value_exists($post[$match_field], $match_field)) {
 
-        switch ($options['unique_email']) {
+        switch (self::$plugin_options['unique_email']) {
 
           case 1:
 
@@ -1141,6 +1195,9 @@ class Participants_Db {
             // get the first one
             if (is_array($participant_id))
               $participant_id = current($participant_id);
+            
+            // mark the record as not sent so the private link will be resent
+            PDb_Signup::update_sent_status($participant_id, false);
             // set the update mode
             $action = 'update';
 
@@ -1155,29 +1212,30 @@ class Participants_Db {
             // go on validating the rest of the form
             break;
         }
-      } elseif ( $options['unique_email'] == 1 and 'id' == strtolower($match_field) and isset($post[$match_field]) ) {
+      } elseif ( self::$plugin_options['unique_email'] == 1 and 'id' == strtolower($match_field) and isset($post[$match_field]) ) {
         /*
          * if the "OVERWRITE" option is set to "id" and the record contains an id, use it to create the record
          */
         $participant_id = intval($post[$match_field]);
         if ( 0 !== $participant_id ) {
           $action = 'insert';
+          // mark the record as not sent so the private link will be resent
+          PDb_Signup::update_sent_status($participant_id, false);
         } else $participant_id = false;
       }
     }
-
     // set the insert status value
     self::$insert_status = $action;
 
     switch ($action) {
 
       case 'update':
-        $sql = 'UPDATE ';
+        $sql = 'UPDATE ' . self::$participants_table . ' SET date_updated = NOW(), ';
         $where = " WHERE id = " . $participant_id;
         break;
 
       case 'insert':
-        $sql = 'INSERT INTO ';
+        $sql = 'INSERT INTO ' . self::$participants_table . ' SET date_recorded = NOW(), date_updated = NOW(), ';
         $where = '';
         break;
 
@@ -1185,10 +1243,7 @@ class Participants_Db {
         return false;
     }
 
-    $sql .= self::$participants_table . " SET date_updated = NOW(), ";
-
     $new_values = array();
-    $new_value = false;
     $columns = array();
 
     // determine the set of columns to process
@@ -1209,7 +1264,7 @@ class Participants_Db {
 
         self::$validation_errors->validate(( isset($post[$column_atts->name]) ? $post[$column_atts->name] : ''), $column_atts, $post);
       }
-
+      $new_value = false;
       // we can process individual submit values here
       switch ($column_atts->name) {
 
@@ -1217,8 +1272,17 @@ class Participants_Db {
           $new_value = $participant_id;
           break;
         
-        case 'date_updated':
         case 'date_recorded':
+          
+          if ($action == 'insert' ) {
+            $new_value = false;
+          } else {
+            $post_date = isset($post['date_recorded']) ? self::parse_date($post['date_recorded']) : false;
+            $new_value = $post_date !== false ? date('Y-m-d H:i:s', $post_date) : false ;
+          }
+          break;
+
+        case 'date_updated':
         case 'last_accessed':
           $new_value = false;
           break;
@@ -1229,92 +1293,144 @@ class Participants_Db {
 
         default :
 
-          // replace null value with the default if defined
-          if (NULL === @$post[$column_atts->name]) {
-
-            $new_value = empty($column_atts->default) ? false : $column_atts->default;
-            $post[$column_atts->name] = $new_value;
+          /*
+           * NOTE: not sure why we were doing this, there doesn't seem to be a need 
+           * to put in a default value here; it will be supplied with the form and 
+           * if the user wants to keep the default value they can leave it in, or 
+           * they can replace it or blank it out: this code doesn't allow that, so 
+           * we've replaced it with a simple continue in the case of an unsubmitted 
+           * value.
+           */
+          // replace unsubmitted fields with the default if defined
+//          if (!empty($column_atts->default)) {
+//            
+//              if (
+//                      (!isset($post[$column_atts->name]) or (isset($post[$column_atts->name]) and empty($post[$column_atts->name]))) and $column_atts->form_element != 'hidden' and $action == 'insert'
+//              ) {
+//            $new_value = $column_atts->default;
+//            $post[$column_atts->name] = $new_value;
+//              }
+//          } elseif (!isset($post[$column_atts->name])) {
+//            continue;
+//          }
+          if (!isset($post[$column_atts->name])) {
+            continue;
           }
+          
+          switch ($column_atts->form_element) {
 
-          if (in_array($column_atts->form_element, array('multi-checkbox', 'multi-select-other'))) {
+            case 'multi-checkbox':
+            case 'multi-select-other':
+              /* match the items in the comma-separated list against the preset
+               * values of the multi-select. Any extra values are placed in an
+               * 'other' array element
+               */
+              if (isset($post[$column_atts->name])) {
+              if (is_array($post[$column_atts->name])) {
 
-            /* match the items in the comma-separated list against the preset
-             * values of the multi-select. Any extra values are placed in an
-             * 'other' array element
-             */
-            if (is_array($post[$column_atts->name])) {
+                $value_array = $post[$column_atts->name];
+                
+                //error_log(__METHOD__.' incoming values:'.print_r($value_array,1));
+                
+              } else {
 
-              $value_array = $post[$column_atts->name];
-            } else {
+                // build the value array from the string form used in CSV files
+                $value_array = array();
+                $incoming_value = preg_split('#([ ]*,[ ]*)#', trim($post[$column_atts->name]));
+                $field_values = self::unserialize_array($column_atts->values);
+                
+                foreach ($incoming_value as $v) {
 
-              // build the value array from the string form used in CSV files
-              $value_array = array();
-              $incoming_value = preg_split('#([ ]*,[ ]*)#', trim($post[$column_atts->name]));
-              $field_values = self::unserialize_array($column_atts->values);
+                  if (in_array($v, $field_values)) {
 
-              foreach ($incoming_value as $v) {
+                    $value_array[] = $v;
+                  } else {
 
-                if (in_array($v, $field_values)) {
-
-                  $value_array[] = $v;
-                } else {
-
-                  $value_array['other'][] = $v;
+                    $value_array['other'][] = $v;
+                  }
                 }
+
+                if (isset($value_array['other']) && is_array($value_array['other']))
+                  $value_array['other'] = implode(',', $value_array['other']);
               }
+              } else $value_array = array();
 
-              if (isset($value_array['other']) && is_array($value_array['other'])) $value_array['other'] = implode(',', $value_array['other']);
-            }
+              $new_value = self::_prepare_array_mysql($value_array);
+              break;
 
-            $new_value = self::_prepare_array_mysql($value_array);
-          } elseif ('link' == $column_atts->form_element) {
+            case 'link':
+              /* translate the link markdown used in CSV files to the array format used in the database
+               */
 
-            /* translate the link markdown used in CSV files to the array format used in the database
-             */
+              if (!is_array($post[$column_atts->name])) {
 
-            if (!is_array($post[$column_atts->name])) {
+                $new_value = self::_prepare_array_mysql(self::get_link_array($post[$column_atts->name]));
+              } else {
 
-              $new_value = self::_prepare_array_mysql(self::get_link_array($post[$column_atts->name]));
-            } else {
-              
-              $new_value = self::_prepare_array_mysql($post[$column_atts->name]);
-            }
-          } elseif ('rich-text' == $column_atts->form_element) {
-            
-            global $allowedposttags;
-            $new_value = wp_kses(stripslashes($post[$column_atts->name]), $allowedposttags);
-          } elseif ('date' == $column_atts->form_element) {
+                $new_value = self::_prepare_array_mysql($post[$column_atts->name]);
+              }
+              break;
 
-            $date = self::parse_date($post[$column_atts->name], $column_atts);
+            case 'rich-text':
+              global $allowedposttags;
+              $new_value = wp_kses(stripslashes($post[$column_atts->name]), $allowedposttags);
+              break;
 
-            $new_value = $date ? $date : NULL;
-          } elseif ('captcha' == $column_atts->form_element) {
-            
-            $new_value = false;
-          } elseif ('password' == $column_atts->form_element) {
+            case 'date':
+              $date = false;
+              if (isset($post[$column_atts->name]))
+                $date = self::parse_date($post[$column_atts->name], $column_atts, true);
 
-            if (!empty($post[$column_atts->name]))
-              $new_value = wp_hash_password(trim($post[$column_atts->name]));
-            else
+              $new_value = $date ? $date : false;
+              break;
+
+            case 'captcha':
               $new_value = false;
-          } elseif (!self::backend_user() && $column_atts->readonly != '0') {
+              break;
 
-            $new_value = false;
-          } elseif (is_array($post[$column_atts->name])) {
+            case 'password':
+              if (!empty($post[$column_atts->name])) {
+                $new_value = wp_hash_password(trim($post[$column_atts->name]));
+              } else {
+                $new_value = false;
+              }
+              break;
+              
+            case 'image-upload':
+            case 'file-upload':
+              
+              if (isset($_POST[$column_atts->name . '-deletefile']) and $_POST[$column_atts->name . '-deletefile'] === 'delete') {
+                if (self::$plugin_options['file_delete'] == 1 or is_admin() ) {
+                  error_log(__METHOD__.' attempting to delete:'.$post[$column_atts->name]);
+                  self::delete_file($post[$column_atts->name]);
+                }
+                unset($_POST[$column_atts->name]);
+                $post[$column_atts->name] = '';
+              }
+              $new_value = self::_prepare_string_mysql(trim($post[$column_atts->name]));
+              break;
 
-            $new_value = self::_prepare_array_mysql($post[$column_atts->name]);
-          } else {
+            default:
+              if (!self::backend_user() && $column_atts->readonly != '0') {
 
-            $new_value = self::_prepare_string_mysql(trim($post[$column_atts->name]));
-          }
-      }
+                $new_value = false;
+              } elseif (is_array($post[$column_atts->name])) {
+
+                $new_value = self::_prepare_array_mysql($post[$column_atts->name]);
+              } else {
+
+                $new_value = self::_prepare_string_mysql(trim($post[$column_atts->name]));
+              }
+          } // switch column_atts->form_element
+      }  // swtich column_atts->name 
 
       // add the column and value to the sql
       if (false !== $new_value) {
 
         // insert a true NULL if the field is NULL
-        if (NULL !== $new_value)
+        if (NULL !== $new_value) {
           $new_values[] = $new_value;
+        }
         $columns[] = "`" . $column_atts->name . "` = " . ( NULL === $new_value ? "NULL" : "%s" );
       }
 
@@ -1346,9 +1462,19 @@ class Participants_Db {
       // get the new record id for the return
       $participant_id = $wpdb->insert_id;
 
+      /* 
+       * is this record a new one created in the admin? This also applies to CSV 
+       * imported new records
+       */
+      if (is_admin()) {
       // if in the admin hang on to the id of the last record for an hour
-      if ( is_admin() ) set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 1));
+        set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 1));
+        // set the "email sent" flag for this id
+        set_transient(self::$prefix . 'signup-email-sent', array($participant_id => true));
+      }
     }
+
+    self::set_admin_message(($action == 'insert' ? self::$i18n['added'] : self::$i18n['updated']),'updated');
 
     return $participant_id;
   }
@@ -1356,27 +1482,29 @@ class Participants_Db {
   /**
    * parses the markdown string used to store the values for a link form element
    *
+   * will also accept a bare URL
+   *
    * @param string $markdown_string
    * @return array URL, linktext
    */
-  public function get_link_array($markdown_string) {
+  public static function get_link_array($markdown_string) {
 
     if (preg_match('#^<([^>]+)>$#', trim($markdown_string), $matches)) {
       return array($matches[1], '');
     } elseif (preg_match('#^\[([^\]]+)\]\(([^\)]+)\)$#', trim($markdown_string), $matches)) {
       return array($matches[2], $matches[1]);
+    } else return array((filter_var($markdown_string, FILTER_VALIDATE_URL) ? $markdown_string : ''), '');
     }
-    return array('', '');
-  }
 
   /**
    * gets the default set of values
    *
+   * @global object $wpdb
    * @return associative array
    */
-  public function get_default_record() {
+  public static function get_default_record() {
 
-    $sql = 'SELECT f.name,f.default 
+    $sql = 'SELECT f.name,f.default,f.form_element 
             FROM ' . self::$fields_table . ' f
             WHERE f.group != "internal"';
 
@@ -1386,8 +1514,11 @@ class Participants_Db {
 
     $default_record = array();
 
-    foreach ($result as $column)
-      $default_record[$column->name] = $column->default;
+    foreach ($result as $column) {
+
+      if ($column->form_element != 'hidden') $default_record[$column->name] = $column->default;
+      
+    }
 
     // get the id of the last record stored
     $prev_record_id = get_transient(self::$last_record);
@@ -1409,11 +1540,12 @@ class Participants_Db {
         }
       }
     }
+    
     // fill in some convenience values
     global $current_user;
 
     if ( is_object( $current_user ) ) $default_record['by'] = $current_user->display_name;
-    $default_record['when'] = date_i18n(get_option('date_format'));
+    $default_record['when'] = date_i18n(self::$date_format);
     $default_record['private_id'] = self::generate_pid();
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
     $default_record['date_updated'] = date('Y-m-d H:i:s');
@@ -1424,13 +1556,14 @@ class Participants_Db {
   /**
    * gets a participant record object with its id
    *
+   * @ver 1.5 added $wpdb->prepare
    *
+   * @global object $wpdb
    * @param  string $id the record ID; returns default record if omitted
-   * 
-   * @return array associative array of the record; false if no record matching
-   *               the ID was found 
+   * @return unknown associative array of the record; false if no record matching
+   *                 the ID was found 
    */
-  public function get_participant($id = false) {
+  public static function get_participant($id = false) {
 
     if (false === $id)
       return self::get_default_record();
@@ -1441,9 +1574,11 @@ class Participants_Db {
 
     global $wpdb;
 
-    $sql = "SELECT * FROM " . self::$participants_table . " WHERE `id` = '" . $id . "'";
+    $sql = "SELECT * FROM " . self::$participants_table . " p WHERE p.id = %s";
 
-    return $wpdb->get_row($sql, ARRAY_A);
+    $result = $wpdb->get_row($wpdb->prepare($sql, $id), ARRAY_A);
+    
+    return array_merge($result, array('id' => $id));
   }
 
   /**
@@ -1454,12 +1589,21 @@ class Participants_Db {
    * @return int the record ID
    *
    */
-  public function get_participant_id($pid) {
+  public static function get_participant_id($pid) {
 
     return self::_get_participant_id_by_term('private_id', $pid);
   }
 
-  public function get_record_id_by_term($term, $id) {
+  /**
+   * finds the ID of a record given the value of one of it's fields. 
+   * 
+   * Returns the first of multiple matches
+   * 
+   * @param string $term
+   * @param mixed $id
+   * @return int
+   */
+  public static function get_record_id_by_term($term, $id) {
 
     return self::_get_participant_id_by_term($term, $id);
   }
@@ -1470,16 +1614,19 @@ class Participants_Db {
    * given an identifier, returns the id of the record identified. If there is
    * more than one record with the given term, returns the first one.
    *
+   * @global object $wpdb
    * @param string $term the column to match
    * @param string $value the value to search for
+   * @param bool   $single if true, return only one ID
    *
    * @return unknown returns integer if one match, array of integers if multiple matches, false if no match
    */
-  private function _get_participant_id_by_term($term, $value) {
+  private static function _get_participant_id_by_term($term, $value, $single = false) {
 
     global $wpdb;
 
-    $result = $wpdb->get_results($wpdb->prepare("SELECT `id` FROM " . self::$participants_table . " WHERE `$term` = %s", $value), ARRAY_A);
+    $sql = 'SELECT p.id FROM ' . self::$participants_table . ' p WHERE p.' . $term . ' = %s';
+    $result = $wpdb->get_results($wpdb->prepare($sql, $value), ARRAY_A);
 
     if (!is_array($result))
       return false;
@@ -1491,7 +1638,7 @@ class Participants_Db {
       $output[] = $row['id'];
     }
 
-    return count($output) > 1 ? $output : current($output);
+    return count($output) > 1 && ! $single ? $output : current($output);
   }
 
   /**
@@ -1503,7 +1650,7 @@ class Participants_Db {
    *
    * @return string unique alphanumeric ID
    */
-  public function generate_pid() {
+  public static function generate_pid() {
 
     $pid = '';
 
@@ -1523,14 +1670,16 @@ class Participants_Db {
   /**
    * tests for existence of record in main db
    *
+   * @global object $wpdb
    * @param string $id the identifier to test
    * @param string $field the db field to test the $id value against
+   * @return bool true if a record mathing the criterion exists
    */
-  private function _id_exists($id, $field = 'id') {
+  private static function _id_exists($id, $field = 'id') {
 
     global $wpdb;
 
-    $id_exists = $wpdb->get_var("SELECT COUNT(*) FROM " . self::$participants_table . " WHERE `" . $field . "` = '" . $id . "'");
+    $id_exists = $wpdb->get_var($wpdb->prepare("SELECT EXISTS( SELECT 1 FROM " . self::$participants_table . " p WHERE p." . $field . " = '%s' LIMIT 1 )", $id));
 
     if (NULL !== $id_exists)
       return $id_exists < 1 ? false : true;
@@ -1541,14 +1690,41 @@ class Participants_Db {
   }
 
   /**
+   * returns the next valid record id
+   * 
+   * the next id can be the next higher or lower. This function will wrap, so it 
+   * always returns a valid id.
+   * 
+   * @global object $wpdb
+   * @param string $id the current id
+   * @param bool   $increment true for next higher, false for next lower
+   * @return string the next valid id
+   */
+  public static function next_id($id, $increment = true) {
+    global $wpdb;
+    $max = $wpdb->get_var('SELECT MAX(p.id) FROM ' . self::$participants_table . ' p');
+    $id = (int)$id;
+    $inc = $increment ? 1 : -1;
+    $id = $id + $inc;
+    while (!self::_id_exists($id)) {
+      $id = $id + $inc;
+      if ($id > $max) $id = 1;
+      elseif ($id < 1) $id = $max;
+    }
+    return $id;
+  }
+
+  /**
    * tests for the presence of an email address in the records
    *
    * @param string $email the email address to search for
    * @return boolean true if email is found
    */
-  public function email_exists($email) {
-
-    return self::_id_exists($email, 'email');
+  public static function email_exists($email) {
+    
+    if (!empty(Participants_Db::$plugin_options['primary_email_address_field'])) {
+      return self::_id_exists($email, Participants_Db::$plugin_options['primary_email_address_field']);
+    } else return false;
   }
 
   /**
@@ -1558,72 +1734,50 @@ class Participants_Db {
    * @param string $field the field to test
    * @return bool true if match exists (only checks for the first one)
    */
-  public function field_value_exists($value, $field) {
+  public static function field_value_exists($value, $field) {
 
     return self::_id_exists($value, $field);
   }
 
-  /*
-   * prepares an array for storage in the database
-   *
-   * @param array $array
-   * @return string prepped array in serialized form or empty if no data
-   */
-
-  private function _prepare_array_mysql($array) {
-
-    if (!is_array($array))
-      return self::_prepare_string_mysql($array);
-
-    $prepped_array = array();
-    
-    $empty = true;
-
-    foreach ($array as $key => $value) {
-
-      if ( ! empty($value) ) $empty = false;
-      $prepped_array[$key] = self::_prepare_string_mysql($value);
-    }
-
-    return $empty ? '' : serialize($prepped_array);
-  }
-
   /**
-   * prepares a string for storage
-   *
-   * gets the string ready by getting rid of slashes and converting quotes and
-   * other undesirables to HTML entities
+   * prepares a field for display 
    * 
-   * @param string $string the string to prepare
-   */
-  private function _prepare_string_mysql($string) {
-
-    return htmlspecialchars(stripslashes($string), ENT_QUOTES, 'utf-8');
-  }
-
-  /**
-   * unserialize if necessary
+   * displays an array as a series of comma-separated strings
    * 
-   * @param string $string the string to unserialize; does nothing if it is not 
-   *                       a serialization
+   * @param string $string
+   * @return string the prepared string
    */
-  public function unserialize_array($string) {
-
-    // is_serialized is a WordPress utility function
-    return is_serialized($string) ? unserialize($string) : $string;
-  }
-
-  // prepare a field for display
-  // displays an array as a series of comma-separated strings
-  public function prepare_value($string) {
+  public static function prepare_value($string) {
 
     $value = self::unserialize_array($string);
+    
+    if (is_array($value) && PDb_FormElement::is_assoc($value)) {
+      /*
+       * here, we create a string representation of an associative array, using 
+       * :: to denote a name=>value pair
+       */
+      $temp = array();
+      foreach ($value as $k => $v) {
+        if (is_int($k)) {
+          $temp[] = $v;
+        } else {
+          $temp[] = $k . '::' . $v;
+        }
+      }
+      return implode(', ',$temp);
+    }
 
     return is_array($value) ? implode(', ', $value) : stripslashes($value);
   }
 
-  // adds a blank field type record
-  public function add_blank_field($atts) {
+  /**
+   * adds a blank field type record
+   * 
+   * @global object $wpdb
+   * @param array $atts
+   * @return boolean 
+   */
+  public static function add_blank_field($atts) {
 
     global $wpdb;
     $wpdb->hide_errors();
@@ -1653,7 +1807,14 @@ class Participants_Db {
     }
   }
 
-  private function _add_db_column($atts) {
+  /**
+   * adds a new column (field) to the databse
+   * 
+   * @global object $wpdb
+   * @param array $atts a set of attributrs to define the new columns
+   * @retun bool success of the operation
+   */
+  private static function _add_db_column($atts) {
 
     global $wpdb;
 
@@ -1664,38 +1825,58 @@ class Participants_Db {
     return $wpdb->query($sql);
   }
 
-  // returns a MYSQL datatype appropriate to the form element type
-  public function set_datatype($element) {
+  /**
+   * returns a MYSQL datatype appropriate to the form element type
+   * 
+   * @param string $element the name of the element type
+   * @return string the name of the MySQL datatype
+   */
+  public static function set_datatype($element) {
 
     switch ($element) {
+      
+      case 'timestamp':
+        $datatype = 'TIMESTAMP';
+        break;
+      
+      case 'date':
+      case 'text-line':
+        $datatype = 'TINYTEXT';
+        break;
 
+      case 'checkbox':
+      case 'radio':
       case 'multi-select':
       case 'multi-checkbox':
       case 'text-area':
       case 'rich-text':
-        $datatype = 'TEXT';
-        break;
-
-      case 'date':
-      case 'checkbox':
-      case 'radio':
       case 'dropdown':
-      case 'text-line':
       default :
-        $datatype = 'TINYTEXT';
+        $datatype = 'TEXT';
+
     }
 
     return $datatype;
   }
 
-  // processes any POST requests for the submitted edit page
+  /**
+   * processes any POST requests
+   * 
+   * this is called on the 'init' hook
+   * 
+   * @global object $wpdb
+   * @return null
+   */
   public static function process_page_request() {
-
-    $options = get_option(self::$participants_db_options);
 
     // only process POST arrays from this plugin's pages
     if (!isset($_POST['subsource']) or $_POST['subsource'] != self::PLUGIN_NAME or !isset($_POST['action']))
-      return NULL;
+      return;
+
+    // add a filter to check the submission before anything is done with it
+    $check = true;
+    self::set_filter('check_submission', $check);
+    if ($check === false) return;
 
     // error_log( __METHOD__.' post:'.print_r( $_POST, true ) );
 
@@ -1706,64 +1887,94 @@ class Participants_Db {
      * 
      * we don't validate in the admin, they will be allowed to leave required field unfilled
      */
-    if (!is_object(self::$validation_errors) and ! is_admin())
-      self::$validation_errors = new FormValidation();
+    if (!is_object(self::$validation_errors) and (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) or $_POST['action'] == 'signup'))
+      self::$validation_errors = new PDb_FormValidation();
 
     switch ($_POST['action']) :
 
       case 'update':
       case 'insert':
+    
+        /*
+         * set the raw post array filters. We pass in the $_POST array, expecting 
+         * a possibly altered copy of it to be returned
+         */
+        $post_data = self::set_filter('before_submit_' . ($_POST['action'] == 'insert' ? 'add' : 'update'), $_POST);
 
         $id = isset($_POST['id']) ? $_POST['id'] : ( isset($_GET['id']) ? $_GET['id'] : false );
 
-        $participant_id = self::process_form($_POST, $_POST['action'], $id);
+        $participant_id = self::process_form($post_data, $_POST['action'], $id);
 
         if (false === $participant_id) {
 
           // we have errors; go back to form and show errors
           return;
         }
+        
+        /*
+         * set the stored record hook.
+         */
+        $wp_hook = self::$prefix . 'after_submit_' . ($_POST['action'] == 'insert' ? 'add' : 'update');
+        do_action($wp_hook,self::get_participant($participant_id));
 
         // if we are submitting from the frontend, we're done
         if (!is_admin()) {
 
-          if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error('', $options['record_updated_message']);
+          if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error('', self::$plugin_options['record_updated_message']);
 
-          if ($options['send_record_update_notify_email']) {
+          if (self::$plugin_options['send_record_update_notify_email']) {
 
             $sent = wp_mail(
-                    $options['email_signup_notify_addresses'],
-                    self::proc_tags($options['record_update_email_subject'], $participant_id, 'all'),
-                    self::proc_tags($options['record_update_email_body'], $participant_id, 'all'),
+                    self::$plugin_options['email_signup_notify_addresses'],
+                    self::proc_tags(self::$plugin_options['record_update_email_subject'], $participant_id, 'all'),
+                    self::proc_tags(self::$plugin_options['record_update_email_body'], $participant_id, 'all'),
                     self::$email_headers
             );
+          }
+          /*
+           * if the "thanks page" is defined as another page, save the ID in a session variable and move to that page.
+           */
+          if (isset($post_data['thanks_page']) && $post_data['thanks_page'] != $_SERVER['REQUEST_URI']) {
+          
+            $_SESSION['pdbid'] = $post_data['id'];
+
+            wp_redirect($post_data['thanks_page']); // self::add_uri_conjunction($post_data['thanks_page']) . 'pdbid=' . $post_data['id']
+            
+            exit;
           }
 
           return;
         }
 
         // redirect according to which submit button was used
-        switch ($_POST['submit']) {
+        switch ($_POST['submit_button']) {
 
-          case 'Apply' :
-            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant&id=' . $participant_id);
-            exit;
+          case self::$i18n['apply'] :
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant&id=' . $participant_id;
+            break;
 
-          case 'Next' :
-            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant');
-            exit;
+          case self::$i18n['next'] :
+            $get_id = $_POST['action'] == 'update' ? '&id=' . self::next_id($participant_id) : '';
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant' . $get_id;
+            break;
 
-          case 'Submit' :
+          case self::$i18n['previous'] :
+            $get_id = $_POST['action'] == 'update' ? '&id=' . self::next_id($participant_id, false) : '';
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-edit_participant' . $get_id;
+            break;
+
+          case self::$i18n['submit'] :
           default :
-            wp_redirect(get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id);
-            exit;
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id;
 
         }
-        break;
+        wp_redirect($redirect);
+        exit;
 
       case 'output CSV':
 
         $header_row = array();
+        $title_row = array();
         $data = array();
         $filename = isset($_POST['filename']) ? $_POST['filename'] : '';
 
@@ -1795,9 +2006,12 @@ class Participants_Db {
 
               $import_columns .= sprintf('`%s`,', $column->name);
               $header_row[] = $column->name;
+              $title_row[] = $column->title;
             }
 
             $data['header'] = $header_row;
+
+            if (isset($_POST['include_csv_titles'])) $data[] = $title_row;
 
             $query = str_replace('*', ' ' . trim($import_columns, ',') . ' ', rawurldecode($_POST['query']));
 
@@ -1830,25 +2044,26 @@ class Participants_Db {
 
         return $data;
 
+      case 'retrieve' :
+
+        self::_process_retrieval();
+        return;
+
       case 'signup' :
 
-        /* if someone signs up with an email that already exists, we update that
-         * record rather than let them create a new record. This gives us a method
-         * for dealing with people who have lost their access link, they just sign
-         * up again with the same email, and their access link will be emailed to
-         * them. This is handled by the Participants_Db::process_form method.
-         */
-
         $_POST['private_id'] = self::generate_pid();
+        
+        // route the $_POST data through a callback if defined
+        $post_data = self::set_filter('before_submit_signup', $_POST);
 
         // only go to the thanks page if we have no errors
-        $_POST['id'] = self::process_form($_POST, 'insert');
+        $post_data['id'] = self::process_form($post_data, 'insert');
 
-        if (false !== $_POST['id']) {
+        if (false !== $post_data['id']) {
+          
+          $_SESSION['pdbid'] = $post_data['id'];
 
-          $conj = false !== strpos($_POST['thanks_page'], '?') ? '&' : '?';
-
-          wp_redirect($_POST['thanks_page'] . $conj . 'id=' . $_POST['id']);
+          wp_redirect($post_data['thanks_page']); // self::add_uri_conjunction($post_data['thanks_page']) . 'pdbid=' . $post_data['id']
 
           exit;
         }
@@ -1857,13 +2072,79 @@ class Participants_Db {
 
     endswitch; // $_POST['action']
   }
+  
+   /**
+   * tests a private link retrieval submission and send the link or sets an error
+   * 
+   * @return null
+   */
+  private static function _process_retrieval()
+  {
 
-  // returns boolean to question of whether the user is authorized to see / edit 
-  // administrative fields
-  public function backend_user() {
+    /*
+     * we check a transient based on the user's IP; if the user tries more than 3 
+     * times per day to get a private ID, they are blocked for 24 hours
+     */
+    $transient = self::$prefix . 'retrieve-count-' . str_replace('.', '', $_SERVER['REMOTE_ADDR']);
+    $count = get_transient($transient);
+    if ($count > 0 and $count <= 3) {
 
-    // contributor and above
-    return current_user_can('edit_posts') ? true : false;
+// ok, they have a few more tries...
+    } elseif ($count > 3) {
+
+// too many tries, come back tomorrow
+      error_log('Participants Database Plugin: IP blocked for too many retrieval attempts in 24-hour period: ' . $_SERVER['REMOTE_ADDR']);
+      return;
+    } else {
+
+// first time through...
+      $count = 0;
+    }
+    $count++;
+    set_transient($transient, $count, (60 * 60 * 24));
+
+    $column = self::get_column(self::$plugin_options['retrieve_link_identifier']);
+
+    if (!isset($_POST[$column->name]) || empty($_POST[$column->name])) {
+      self::$validation_errors->add_error($column->name, 'empty');
+      return;
+    }
+// a value was submitted, try to find a record with it
+    $participant_id = self::_get_participant_id_by_term($column->name, $_POST[$column->name], true);
+
+    if ($participant_id === false) {
+      self::$validation_errors->add_error($column->name, 'identifier');
+      return;
+    } else {
+      $participant_values = self::get_participant($participant_id);
+    }
+    if (!empty(Participants_Db::$plugin_options['primary_email_address_field'])) {
+      $sent = wp_mail( 
+              $participant_values[Participants_Db::$plugin_options['primary_email_address_field']], 
+              self::proc_tags(self::$plugin_options['retrieve_link_email_subject'], $participant_id), 
+              self::proc_tags(self::$plugin_options['retrieve_link_email_body'], $participant_id), 
+              self::$email_headers
+              );
+
+      if (false === $sent)
+        error_log(__METHOD__ . ' sending returned false');
+    } else {
+        error_log(__METHOD__ . ' primary email address field undefined');
+    }
+    
+    if (self::$plugin_options['send_retrieve_link_notify_email'] != 0) {
+      
+    $sent = wp_mail( 
+            self::$plugin_options['email_signup_notify_addresses'], 
+            self::proc_tags(self::$plugin_options['retrieve_link_notify_subject'], $participant_id, 'all'), 
+            self::proc_tags(self::$plugin_options['retrieve_link_notify_body'], $participant_id, 'all'), 
+            self::$email_headers
+            );
+    }
+
+//self::$validation_errors->add_error('', 'success');
+    $_POST['action'] = 'success';
+    return;
   }
 
   /**
@@ -1871,7 +2152,7 @@ class Participants_Db {
    *
    * @return array
    */
-  public function get_readonly() {
+  public static function get_readonly() {
 
     $fields = array();
 
@@ -1881,107 +2162,17 @@ class Participants_Db {
     return $fields;
   }
 
-  // returns the title attribute of a column
-  public function column_title($column) {
+  /**
+   * returns the title attribute of a column
+   * 
+   * @param string $column
+   * @return string
+   */
+  public static function column_title($column) {
 
     $field = self::get_field_atts($column, 'title');
 
     return $field->title;
-  }
-
-  /**
-   * returns a select state for a form field
-   *
-   * @param string $element_value the set value of the element_value that we compare against
-   * @param string $new_value     the selected value of the field
-   *                              if $element_value is an array, we check if $new_value is in it
-   * @param string $attribute     the keyword for the select state of the form element
-   * @param bool   $state         inverts the logic of the array value match: true = looking for a match; 
-   *                              false = looking for no match
-   *
-   * @return string the select attribute for an option, radio or checkbox field
-   */
-  public function set_selected($element_value, $new_value, $attribute = 'selected', $state = true) {
-
-    $pattern = ' %1$s="%1$s" ';
-
-    if (
-            ( is_array($element_value) && ( $state === in_array($new_value, $element_value) ) )
-            ||
-            $element_value == $new_value
-    ) {
-
-      return sprintf($pattern, $attribute);
-    } else
-      return '';
-  }
-
-  /**
-   * displays an edit field for a field attribute
-   * this is used by the manage_fields script
-   * 
-   * @param string $field name of the field
-   * @return array contains parameters to use in instantiating the FormElement object
-   */
-  public function get_edit_field_type($field) {
-
-    switch ($field) :
-
-      // small integer fields
-      case 'id':
-        return array('type' => 'hidden');
-
-      case 'order':
-        return array('type' => 'drag-sort');
-
-      case 'admin_column':
-      case 'display_column':
-        return array('type' => 'text', 'size' => '2');
-
-      // all the booleans
-      case 'persistent':
-      case 'sortable':
-      case 'CSV':
-      case 'signup':
-      case 'readonly':
-        return array('type' => 'checkbox', 'options' => array(1, 0));
-
-      // field names can't be edited
-      case 'name':
-        return array('type' => 'text', 'attributes' => array('readonly' => 'readonly'));
-
-      // all the text-area fields
-      case 'values':
-      case 'help_text':
-        return array('type' => 'text-area');
-
-      // drop-down fields
-      case 'form_element':
-        // populate the dropdown with the available field types from the FormElement class
-        return array('type' => 'dropdown', 'options' => FormElement::$element_types);
-
-      case 'validation':
-        return array(
-            'type' => 'dropdown-other',
-            'options' => array(
-                __('Not Required', 'participants-database') => 'no',
-                __('Required', 'participants-database') => 'yes',
-                'CAPTCHA' => 'captcha',
-            ),
-            'attributes' => array('other' => 'regex/match'),
-        );
-
-      case 'group':
-        // these options are defined on the "settings" page
-        return array('type' => 'dropdown', 'options' => self::get_groups('name', 'internal'));
-
-      case 'link':
-
-      case 'title':
-      default:
-        return array('type' => 'text');
-
-    endswitch;
   }
 
   /**
@@ -1991,7 +2182,7 @@ class Participants_Db {
    *
    * @return array of record arrays
    */
-  private function _prepare_CSV_rows($raw_array) {
+  private static function _prepare_CSV_rows($raw_array) {
 
     $output = array();
 
@@ -2010,7 +2201,7 @@ class Participants_Db {
    *
    * @return array with all the serialized arrays in human-readable form
    */
-  private function _prepare_CSV_row($raw_array) {
+  private static function _prepare_CSV_row($raw_array) {
 
     $output = array();
 
@@ -2029,7 +2220,7 @@ class Participants_Db {
 
           if (!empty($value) && is_numeric($value)) {
 
-            $value = date(get_option('date_format'), $value);
+            $value = date(self::$date_format, $value);
           }
           break;
 
@@ -2065,8 +2256,12 @@ class Participants_Db {
             $value = implode(', ', unserialize($value));
       }
 
-      // decode HTML entities
-      $output[$key] = html_entity_decode($value, ENT_QUOTES, "utf-8");
+      /*
+       * decode HTML entities and convert line breaks to <br>, then pass to a filter 
+       * for processing beforebeing added to the output array
+       */
+      $output_value = Participants_Db::set_filter('csv_export_value', html_entity_decode(str_replace(array("\n","\r"), '<br />', stripslashes($value)), ENT_QUOTES, "UTF-8"), $column);
+      $output[$key] = $output_value;
 
       $column = next($columns);
     }
@@ -2075,8 +2270,11 @@ class Participants_Db {
   }
 
   /**
-   * outputs a link in specified format
+   * creates an anchor element with clickable link and href
+   *
+   * this is simply an interface to the xnau_FormElement function of the same name
    * 
+   * @static
    * @param string $link the URI
    * @param string $linktext the clickable text (optional)
    * @param string $template the format of the link (optional)
@@ -2084,109 +2282,83 @@ class Participants_Db {
    *
    * @return string HTML or HTML-escaped string (if it's not a link)
    */
-  public function make_link($link, $linktext = '', $template = false, $get = false) {
+  public static function make_link($link, $linktext = '', $template = false, $get = false) {
 
-    // clean up the provided link string
-    $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($link))));
+    $field = new stdClass();
 
-    if (filter_var($URI, FILTER_VALIDATE_URL)) {
+    $field->value = $link;
+    $field->default = $linktext;
 
-      // convert the get array to a get string and add it to the URI
-      if (is_array($get)) {
+    return PDb_FormElement::make_link($field, $template, $get);
 
-        $URI .= false !== strpos($URI, '?') ? '&' : '?';
-
-        $URI .= http_build_query($get);
       }
-    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL)) {
-
-      // in admin, emails are plaintext
-      if (is_admin())
-        return esc_html($link);
-
-      if (self::$plugin_options['email_protect']) {
-
-        // the email gets displayed in plaintext if javascript is disabled; a clickable link if enabled
-        list( $URI, $linktext ) = explode('@', $URI, 2);
-        $template = '<a class="obfuscate" rel=\'{"name":"%1$s","domain":"%2$s"}\'>%1$s AT %2$s</a>';
-      } else {
-
-        $linktext = empty($linktext) ? $link : $linktext;
-        $URI = 'mailto:' . $URI;
-      }
-    } else
-      return esc_html($link); // if it is neither URL nor email address
-
-
       
-    // default template for links
-    $linktemplate = $template === false ? '<a href="%1$s" >%2$s</a>' : $template;
-
-    $linktext = empty($linktext) ? str_replace(array('http://', 'https://'), '', $URI) : $linktext;
-
-    //construct the link
-    return sprintf($linktemplate, $URI, esc_html($linktext));
+  /**
+   * provides an AJAX loading spinner element
+   */
+  public static function get_loading_spinner() {
+    return '<span class="ajax-loading"><img src="' . plugins_url( 'ui/ajax-loader.gif' , __FILE__ ) . '" /></span>';
   }
 
   /**
-   * handles file uploads
-   * 
-   * @param string $name the name of the surrent field
+   * handles a file upload
+   *
+   * @param string $name the name of the current field
    * @param array  $file the $_FILES array element corresponding to one file
    *
-   * return string the path to the uploaded file or false if error
+   * @return string the path to the uploaded file or false if error
    */
-  private function _handle_file_upload($name, $file) {
+  private static function _handle_file_upload($name, $file)
+  {
 
-    $options = get_option(self::$participants_db_options);
-    
     $field_atts = self::get_field_atts($name);
     $type = 'image-upload' == $field_atts->form_element ? 'image' : 'file';
-    
-    //error_log(__METHOD__.' type:'.$type.' name:'.$name);
+    $delete = (bool)(isset($_REQUEST[$name . '-deletefile']) and $_REQUEST[$name . '-deletefile'] == 'delete');
 
-    if ( !is_dir( Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) ) ) {
+    // attempt to create the target directory if it does not exist
+    if (!is_dir(xnau_Image_Handler::concatenate_directory_path(ABSPATH, self::$plugin_options['image_upload_location']))) {
 
-      if (false === self::_make_uploads_dir($options['image_upload_location']))
+      if (false === self::_make_uploads_dir(self::$plugin_options['image_upload_location'])) {
         return false;
+      }
     }
 
-    if (!is_uploaded_file($file['tmp_name'])) {
+    if (!is_uploaded_file(realpath($file['tmp_name']))) {
 
       self::_show_validation_error(__('There is something wrong with the file you tried to upload. Try another.', 'participants-database'), $name);
 
       return false;
     }
-    
+
     /* get the allowed file types and test the uploaded file for an allowed file 
      * extension
      */
-    $extensions = empty($field_atts->values) ? $options['allowed_file_types'] : implode(',', self::unserialize_array($field_atts->values));
-    $test = preg_match('#^(.+)\.('.implode('|',array_map('trim',explode(',',$extensions))).')$#',$file['name'],$matches);
-    
-    error_log(__METHOD__.' ext:'.$extensions.' test:'. $test.' matches:'.print_r($matches,1));
-    
-    if ( 0 === $test ) {
-      
-      if ( $type == 'image' )
-        self::_show_validation_error( sprintf(__('For "%s", you may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'), $field_atts->title ), $name);
+    $extensions = empty($field_atts->values) ? self::$plugin_options['allowed_file_types'] : implode(',', self::unserialize_array($field_atts->values));
+    $test = preg_match('#^(.+)\.(' . implode('|', array_map('trim', explode(',', $extensions))) . ')$#', $file['name'], $matches);
+
+    //error_log(__METHOD__.' ext:'.$extensions.' test:'. $test.' matches:'.print_r($matches,1));
+
+    if (0 === $test) {
+
+      if ($type == 'image' && empty($field_atts->values))
+        self::_show_validation_error(sprintf(__('For "%s", you may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'), $field_atts->title), $name);
       else
-        self::_show_validation_error( sprintf(__('The file selected for "%s" must be one of these types: %s. ', 'participants-database'), $field_atts->title, $extensions), $name);
+        self::_show_validation_error(sprintf(__('The file selected for "%s" must be one of these types: %s. ', 'participants-database'), $field_atts->title, preg_replace('#(,)(?=[^,])#U',', ',$extensions)), $name);
 
       return false;
     } else {
-      
+
       // validate and construct the new filename using only the allowed file extension
-      $new_filename = preg_replace(array('#\.#', "/\s+/", "/[^-\.\w]+/"), array("-", "_", ""), $matches[1] ) . '.' . $matches[2];
+      $new_filename = preg_replace(array('#\.#', "/\s+/", "/[^-\.\w]+/"), array("-", "_", ""), $matches[1]) . '.' . $matches[2];
       // now make sure the name is unique by adding an index if needed
       $index = 1;
-      while ( file_exists(Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename) ) {
+      while (file_exists(xnau_Image_Handler::concatenate_directory_path(ABSPATH, self::$plugin_options['image_upload_location']) . $new_filename)) {
         $filename_parts = pathinfo($new_filename);
-        $new_filename = preg_replace(array('#_[0-9]+$#'),array(''),$filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
+        $new_filename = preg_replace(array('#_[0-9]+$#'), array(''), $filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
         $index++;
       }
     }
-    
+
     /*
      * we perform a validity check on the image files, this also makes sure only 
      * images are uploaded in image upload fields and only non-images are uploaded 
@@ -2196,23 +2368,19 @@ class Participants_Db {
     $valid_image = in_array($fileinfo[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WBMP));
 
     if ( $type == 'image' and !$valid_image ) {
-      
+
       self::_show_validation_error( sprintf(__('For "%s", you may only upload image files like JPEGs, GIFs or PNGs.', 'participants-database'), $field_atts->title ), $name);
       return false;
-    } elseif ( $type == 'file' and $valid_image ) {
-      
-      self::_show_validation_error(__('The file you tried to upload is not of an allowed type.', 'participants-database'),$name);
-      return false;
     }
 
-    if ($file['size'] > $options['image_upload_limit'] * 1024) {
+    if ($file['size'] > self::$plugin_options['image_upload_limit'] * 1024) {
 
-      self::_show_validation_error(sprintf(__('The file you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), $options['image_upload_limit']),$name);
+      self::_show_validation_error(sprintf(__('The file you tried to upload is too large. The file must be smaller than %sK.', 'participants-database'), self::$plugin_options['image_upload_limit']),$name);
 
       return false;
     }
 
-    if (false === move_uploaded_file($file['tmp_name'], Image_Handler::concatenate_directory_path( ABSPATH, $options['image_upload_location'] ) . $new_filename)) {
+    if (false === move_uploaded_file($file['tmp_name'], xnau_Image_Handler::concatenate_directory_path( ABSPATH, self::$plugin_options['image_upload_location'] ) . $new_filename)) {
 
       self::_show_validation_error(__('The file could not be saved.', 'participants-database'));
 
@@ -2232,8 +2400,10 @@ class Participants_Db {
    * attempt to create the uploads directory
    *
    * sets an error if it fails
+   * 
+   * @param string $dir the name of the new directory
    */
-  public function _make_uploads_dir($dir) {
+  public static function _make_uploads_dir($dir) {
 
     $savedmask = umask(0);
 
@@ -2258,27 +2428,23 @@ class Participants_Db {
    * @param string $PID private id value
    * @return string private record URI
    */
-  public function get_record_link($PID) {
-
-    $options = get_option(self::$participants_db_options);
+  public static function get_record_link($PID) {
 
     // if the setting is not yet set, don't try to build a link
-    if (!isset($options['registration_page']) || empty($options['registration_page']))
+    if (!isset(self::$plugin_options['registration_page']) || empty(self::$plugin_options['registration_page']))
       return '';
 
     // if the setting was made in previous versions and is a slug, convert it to a post ID
-    if (!is_numeric($options['registration_page'])) {
+    if (!is_numeric(self::$plugin_options['registration_page'])) {
 
-      $options['registration_page'] = self::get_id_by_slug($options['registration_page']);
+      self::$plugin_options['registration_page'] = self::get_id_by_slug(self::$plugin_options['registration_page']);
 
-      update_option(self::$participants_db_options, $options);
+      update_option(self::$participants_db_options, self::$plugin_options);
     }
 
-    $page_link = get_permalink($options['registration_page']);
+    $page_link = get_permalink(self::$plugin_options['registration_page']);
 
-    $delimiter = false !== strpos($page_link, '?') ? '&' : '?';
-
-    return $page_link . $delimiter . 'pid=' . $PID;
+    return self::add_uri_conjunction($page_link) . 'pid=' . $PID;
   }
   
   /**
@@ -2290,7 +2456,7 @@ class Participants_Db {
    * @param int $id the id of the new record
    * @return string the HREF for the record edit link
    */
-  public function get_admin_record_link($id) {
+  public static function get_admin_record_link($id) {
     
     $path = 'admin.php?page=participants-database-edit_participant&action=edit&id='.$id;
     
@@ -2302,7 +2468,7 @@ class Participants_Db {
    *
    * this is to provide backwards-compatibility with previous versions that used a page-slug to point to the [pdb_record] page.
    */
-  public function get_id_by_slug($page_slug) {
+  public static function get_id_by_slug($page_slug) {
 
     $page = get_page_by_path($page_slug);
 
@@ -2322,7 +2488,7 @@ class Participants_Db {
    * @param  string  $mode           the column subset to use
    * @return string                  text with the tags replaced by the data
    */
-  public function proc_tags($text, $participant_id, $mode = 'frontend') {
+  public static function proc_tags($text, $participant_id, $mode = 'frontend') {
 
     $participant = self::get_participant($participant_id);
 
@@ -2330,21 +2496,23 @@ class Participants_Db {
     $values = array();
 
     foreach (self::get_column_atts($mode) as $column) {
+      
+      $column->module = 'main';
+      
+      $column->value = $participant[$column->name];
 
       $tags[] = '[' . $column->name . ']';
 
-      $values[] = self::prep_field_for_display($participant[$column->name], $column->form_element);
+      $values[] = PDb_FormElement::get_field_value_display($column, false);
     }
-
-    $options = get_option(self::$participants_db_options);
 
     // add the "record_link" tag
     $tags[] = '[record_link]';
-    $values[] = $options['registration_page'];
+    $values[] = Participants_Db::get_record_link($participant['private_id']);
 
     // add the date tag
     $tags[] = '[date]';
-    $values[] = date_i18n(get_option('date_format'), self::parse_date());
+    $values[] = date_i18n(self::$date_format, self::parse_date());
     
     // add the admin record link tag
     $tags[] = '[admin_record_link]';
@@ -2365,22 +2533,16 @@ class Participants_Db {
   }
 
   /**
-   * makes a title legal to use in anchor tag
-   */
-  public function make_anchor($title) {
-
-    return str_replace(' ', '', preg_replace('#^[0-9]*#', '', strtolower($title)));
-  }
-
-  /**
-   * called by the wp_ajax_nopriv_pdb_list_filter action
+   * prints the list with filtering parameters applied 
    *
-   * this happens when a user submits a search or sort on a record list
+   * called by the wp_ajax_nopriv_pdb_list_filter action: this happens when a 
+   * user submits a search or sort on a record list
    *
+   * @return null
    */
-  public function pdb_list_filter() {
+  public static function pdb_list_filter() {
 
-    if (!wp_verify_nonce($_POST['filterNonce'], 'pdb-list-filter-nonce'))
+    if (!wp_verify_nonce($_POST['filterNonce'], self::$prefix . 'list-filter-nonce'))
       die('nonce check failed');
 
     global $post;
@@ -2388,40 +2550,111 @@ class Participants_Db {
     if (!is_object($post))
       $post = get_post($_POST['postID']);
     
-    // grab the shortcode out of the page content
-    preg_match( '#(?<!\[)\[pdb_list([^\]]*)\]#', $post->post_content, $matches );
-    // put the attributes array together
-    $atts = shortcode_parse_atts(trim($matches[1]));
+    /* 
+     * get the attributes array; these values were saved by the Shortcode class 
+     * when it was instantiated
+     */
+    $atts = $_SESSION[self::$prefix . 'shortcode_atts_list'];
+    
+    
     // add the AJAX filtering flag
     $atts['filtering'] = 1;
+    $atts['module'] = 'list';
+    
     // output the filtered shortcode content
     header("Content-Type:	text/html");
-    echo PDb_List::print_record( $atts );
-
+    echo PDb_List::get_list( $atts );
     exit;
+  }
+  
+  /**
+   * supplied for backwards compatibility
+   * 
+   * the original func has been superceded, but this will allow the old func to be used
+   * 
+   * @var string $value
+   * @var string $form_element
+   * @return string
+   */
+  public static function prep_field_for_display( $value, $form_element ){
+    $field = (object) array(
+        'value' => $value,
+        'form_element' => $form_element,
+        'module' => 'single', // probably not correct, but this is the generic option
+    );
+    return PDb_FormElement::get_field_value_display($field);
   }
 
   /**
    * parses a date string into UNIX timestamp
    *
+   * if "strict dates" is set, this function uses the DateTime or IntlDateFormatter 
+   * class to parse the string according to a specific format. If it is not, we 
+   * use the conventional strtotime() function, with the enhancement that if the 
+   * non-American style format is used with slashes "d/m/Y" the string is prepared 
+   * so strtotime can parse it correctly  
+   *
    * @param string $string      the string to parse; if not given, defaults to now
    * @param object $column_atts the column object; used to identify the field for
    *                            user feedback
-   * @return int  UNIX timestamp or false if parse fails
+   * @param bool   $zero_time   if set, zero the time portion of the date so it 
+   *                            won't interfere with date comparisons
+   * @return int|bool UNIX timestamp or false if parse fails
    */
-  public function parse_date($string = false, $column = '') {
+  public static function parse_date($string = false, $column = '', $zero_time = false) {
 
-    // return the now() timestamp
     if (false === $string)
-      return time();
+      return false;
 
-    // it's already a timestamp; or something that looks like a timestamp but wouldn't parse anyway
-    if (preg_match('#^[0-9-]+$#', $string) > 0)
+    $string = Participants_Db::set_filter('parse_date', $string, $column);
+
+    // it's already a timestamp
+    if (self::is_valid_timestamp($string)) {
+      //if (WP_DEBUG and is_object($column)) error_log(__METHOD__.' tried to parse timestamp from '. $column->name);
       return $string;
+    }
+    
+    $date = false;
+    // if it is a default zero timestamp, treat it as "no date"
+    if ($string == '0000-00-00 00:00:00') return false;
 
-    if (self::$plugin_options['strict_dates'] and function_exists('date_create_from_format') and ( is_object($column) and $column->group != 'internal' ) ) {
+    /*
+     * we have two options to parse a date string into a timestamp: the 
+     * IntlDateFormatter class or the DateTime class. The IntlDateFormatter 
+     * class can parse localized text dates, but it seems commonly unavailable, 
+     * at least on English-speaking servers. The DateTime class is widely 
+     * available, but can't parse non-English text dates. It can parse numeric 
+     * date representations, so if the intl module is not available, we try to 
+     * use DateTime. If that is not available, we use strtotime with the added trick 
+     * of swapping out the separators if they are slashes so slashed European 
+     * notation can be correctly parsed
+     */
+    $mode = 'none';
+    $timestamp = ((is_object($column) && $column->form_element == 'timestamp') || preg_match('#^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$#', $string) == 1) ? true : false;
+    if (self::$plugin_options['strict_dates'] == 1 and is_object($column) and !$timestamp ) {
+      
+      if (class_exists('IntlDateFormatter')) {
+        
+        $mode = 'Intl';
 
-      $date = date_create_from_format(get_option('date_format'), $string);
+        $DateFormat = new IntlDateFormatter( WPLANG, IntlDateFormatter::LONG, IntlDateFormatter::NONE, NULL, NULL, Participants_Db::get_ICU_date_format(self::$date_format) );
+
+        //error_log(__METHOD__.' format object:'.print_r($DateFormat,1));
+        $timestamp = $DateFormat->parse($string);
+
+        $the_Date = new DateTime();
+        $the_Date->setTimestamp($timestamp);
+        
+      } else if (class_exists('DateTime')) {
+        
+        $mode = 'DateTime';
+
+        $the_Date = DateTime::createFromFormat(self::$date_format, $string);
+        
+      }
+      
+
+      //error_log(__METHOD__.' date:'.print_r($the_Date,1));
 
       if (is_array(date_get_last_errors()) && !empty($string)) {
 
@@ -2429,7 +2662,7 @@ class Participants_Db {
 
         if ($errors['warning_count'] > 0 || $errors['error_count'] > 0) {
 
-          $date = false;
+          $the_Date = false;
 
           if (is_object(self::$validation_errors) and is_object($column)) {
 
@@ -2438,83 +2671,72 @@ class Participants_Db {
         }
       }
 
-      // if we have a valid date, convert to timestamp
-      if ($date)
-        $date = date_format($date, 'U');
-    } else {
-
+      /*
+       * if we have a valid date, convert to timestamp
+       */
+      if ($the_Date) {
+        /*
+         * zero the time so date equality comparisons can be made
+         */
+        if ($zero_time) $the_Date->setTime(0,0);
+        $date = $the_Date->format('U');
+      }
+    }
+      
+//      ob_start();
+//      var_dump($date);
+//      error_log(__METHOD__.' date value:'.ob_get_clean().' mode:'.$mode);
+    
+    /*
+     * if we haven't got a timestamp, parse the date the regular way
+     */
+    if ( $date === false or ! self::is_valid_timestamp($date) ){
+      
+      $mode= 'strtotime';
+      
+      if (is_object($column) && $column->form_element == 'date') {
+        /*
+         * deal with the common special case of non-American-style numeric date with slashes
+         */
+        if (false !== strpos($string,'/') ) {
+          $date_parts = explode('/',self::$date_format);
+          $day_index = array_search('d',$date_parts) !== false ? array_search('d',$date_parts) : array_search('j',$date_parts);
+          $month_index = array_search('m',$date_parts) !== false ? array_search('m',$date_parts) : array_search('n',$date_parts);
+          if ( $day_index !== false && $month_index !== false && $day_index < $month_index ) {
+            $string = str_replace('/','-',$string);
+          }
+        };
+      } elseif (is_object($column) && $column->form_element == 'timestamp') {
+        if ($zero_time) {
+          /*
+           * we need to zero the time, we first try to do it using the DateTime class
+           */
+          $the_Date = new DateTime($string);
+          if (is_object($the_Date)) {
+            $the_Date->setTime(0, 0);
+            $string = $the_Date->format(self::$date_format);
+          } else {
+            /*
+           * remove the time portion of the timestamp
+           */
+          $string = preg_replace('# [0-9]{2}:[0-9]{2}:[0-9]{2}$#', '', $string);
+          $string .= ' 00:00 -0';
+        }
+      }
+      }
+      /*
+       * Most of the time, the default PHP timezone is the current setting, but 
+       * experience has shown it's necessary to reset it for the conversion to make 
+       * sure. We also must assume that the database server and PHP server are on 
+       * the same TZ.
+       */
+      date_default_timezone_set(ini_get('date.timezone'));
       $date = strtotime($string);
     }
+    
+    //if (WP_DEBUG) error_log(__METHOD__.' mode: ' . $mode . ' timestamp:' . $date);
 
     return $date;
-  }
-
-  /**
-   * returns the PHP version as a float
-   *
-   */
-  function php_version() {
-
-    $numbers = explode('.', phpversion());
-
-    return (float) ( $numbers[0] + ( $numbers[1] / 10 ) );
-  }
-
-  /**
-   * translates the current date format option string to a jQuery UI date format string
-   *
-   */
-  function get_jqueryUI_date_format($PHP_date_format = '') {
-
-    $dateString = empty($PHP_date_format) ? get_option('date_format') : $PHP_date_format;
-
-    $pattern = array(
-        //day
-        'd', //day of the month
-        'j', //3 letter name of the day
-        'l', //full name of the day
-        'z', //day of the year
-        //month
-        'F', //Month name full
-        'M', //Month name short
-        'n', //numeric month no leading zeros
-        'm', //numeric month leading zeros
-        //year
-        'Y', //full numeric year
-        'y'  //numeric year: 2 digit
-    );
-    $replace = array(
-        'dd', 'd', 'DD', 'o',
-        'MM', 'M', 'm', 'mm',
-        'yy', 'y'
-    );
-    foreach ($pattern as &$p) {
-      $p = '/' . $p . '/';
-    }
-    return preg_replace($pattern, $replace, $dateString);
-  }
-  
-  /**
-   * sets an admin area error message
-   * 
-   * @param string $message the message to be dislayed
-   * @param string $type the type of message: 'updated' (yellow) or 'error' (red)
-   */
-  public function set_admin_message($message, $type='error'){
-    self::$admin_message = $message;
-    self::$admin_message_type = $type;
-  }
-  
-  /**
-   * sets the admin message
-   */
-  public function admin_message() {
-    if (!empty(self::$admin_message)){
-      printf ('<div class="%s">
-       <p>%s</p>
-    </div>', self::$admin_message_type, self::$admin_message);
-      //self::$admin_message = '';
-    }
   }
   
   /**
@@ -2523,19 +2745,49 @@ class Participants_Db {
    * @param string $error the message to show
    * @param string $name the field on which the error was called
    */
-  private function _show_validation_error( $error, $name = '' ) {
-    if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error($name, $error );
+  private static function _show_validation_error( $error, $name = '', $overwrite = true ) {
+    error_log(__METHOD__.' error set: '.$error.' on: '.$name.' obj? '.( is_object(self::$validation_errors)? 'yes' : 'no' ));
+    if (is_object(self::$validation_errors)) self::$validation_errors->add_error($name, $error, $overwrite);
     else self::set_admin_message($error);
+  }
+  
+  /**
+   * sets up a few internationalization words
+   */
+  private static function _set_i18n() {
+    
+    self::$i18n = array(
+        'submit' => __('Submit','participants-database'),
+        'apply' => __('Apply','participants-database'),
+        'next' => __('Next','participants-database'),
+        'previous' => __('Previous','participants-database'),
+        'updated' => __('The record has been updated.','participants-database'),
+        'added' => __('The new record has been added.','participants-database'),
+    );
   }
 
   /**
-   * displays a credit footer for the plugin
+   * prints an admin page heading
    *
-   * @return string HTML
+   * @param text $text text to show if not the title of the plugin
    */
-  public function plugin_footer() {
+  public static function admin_page_heading($text = false) {
+    
+    $text = $text ? $text : self::$plugin_title;
     ?>
-    <div id="PDb_footer" class="widefat">
+    <div class="icon32" id="icon-users"></div><h2><?php echo $text ?></h2>
+    <?php
+    self::admin_message();
+  }
+
+  /**
+   * prints a credit footer for the plugin
+   *
+   * @return null
+   */
+  public static function plugin_footer() {
+    ?>
+    <div id="PDb_footer" class="widefat redfade">
       <div class="section">
         <h4><?php echo self::$plugin_title, ' ', self::$plugin_version ?><br /><?php _e('WordPress Plugin', 'participants-database') ?></h4>
         <p><em><?php _e('Helping organizations manage their volunteers, members and participants.', 'participants-database') ?></em></p>
@@ -2553,6 +2805,8 @@ class Participants_Db {
 
   /**
    * parses the text header to extract plugin info
+   * 
+   * @param string $key the name of the field to get
    */
   private static function _get_plugin_data($key = 'Name') {
 
@@ -2599,25 +2853,169 @@ class Participants_Db {
     }
     return $links;
   }
+    
+  /**
+   * prints a plugin update message
+   * 
+   * this is seen in the plugins list
+   * 
+   * @param array $plugin_data
+   * @param object $r
+   * @return string $output
+   */
+  public static function plugin_update_message($plugin_data, $r)
+  {
 
+    $upgrade_notice = self::get_update_message_text();
+
+    $upgrade_notice = preg_replace('#(==?[^=]+==?)#', '', $upgrade_notice);
+
+    $upgrade_notice = preg_replace('#(\*\*([^*]+)\*\*)#', '<span style="color:#BC0B0B">\2</span>', $upgrade_notice);
+
+    $response = $r;
+    $response->name = Participants_Db::$plugin_title;
+    $response->requires = '3.4';
+    $response->tested = '3.7';
+    $response->version = $plugin_data['Version'];
+    $response->homepage = $plugin_data['PluginURI'];
+    
+    // we got all that info, but really we just need to print the message we got from the readme
+    
+    echo wpautop($upgrade_notice);
+  }
+  /**
+   * gets the update message text
+   * 
+   * @return string
+   */
+  public static function get_update_message_text()
+  {
+    // readme contents
+    $data = file_get_contents(plugins_url('readme.txt', __FILE__));
+
+    // assuming you've got a Changelog section
+    // @example == Changelog ==
+    $upgrade_notice = stristr($data, '== Upgrade Notice ==');
+
+    // assuming you've got a Screenshots section
+    // @example == Screenshots ==
+    $upgrade_notice = stristr($upgrade_notice, '== Using the Plugin ==', true);
+    return $upgrade_notice;
+  }
+  /**
+   * creates the update notice for this version
+   * 
+   * @param object $response
+   * @return object
+   */
+  public static function check_for_plugin_update($checkdata)
+  {
+
+    if (empty($checkdata->checked)) {
+      return $checkdata;
+    }
+
+    // readme contents
+    $data = file_get_contents('http://plugins.svn.wordpress.org/participants-database/trunk/readme.txt?format=txt');
+    $plugin_path = plugin_basename(__FILE__);
+    $plugin_data = get_plugin_data(__FILE__);
+    
+    $upgrade_notice = self::get_update_message_text();
+    
+    $upgrade_notice = preg_replace('#(==?[^=]+==?)#', '', $upgrade_notice);
+    
+    $response = (object) array(
+                'slug' => self::PLUGIN_NAME,
+                'new_version' => '1.5', 
+                'requires' => '3.4',  
+                'tested' => '3.7',
+                'upgrade_notice' => $upgrade_notice,
+                'package' => 'https://downloads.wordpress.org/plugin/participants-database.1.4.9.4.zip',
+                'url' => 'http://wordpress.org/plugins/participants-database/',
+    );
+    
+    $checkdata->response[$plugin_path] = $response;
+
+    //error_log(__METHOD__ . ' data returned:' . print_r($checkdata->response, 1));
+
+    return $checkdata;
+  }
+  /**
+   * creates the update notice for this version
+   * 
+   * @param boolean $false
+   * @param array $action
+   * @param object $arg
+   * @return bool|object
+   */
+  public static function plugin_update_info($false, $action, $arg)
+  {
+
+    error_log(__METHOD__.' called with: '.print_r($arg,1));
+    
+    if ($arg->slug !== self::PLUGIN_NAME) return false;
+
+    // readme contents
+    $data = file_get_contents('http://plugins.svn.wordpress.org/participants-database/trunk/readme.txt?format=txt');
+    $plugin_path = plugin_basename(__FILE__);
+    $plugin_data = get_plugin_data(__FILE__);
+    
+    // assuming you've got a Changelog section
+    // @example == Changelog ==
+    $changelog = stristr($data, '== Upgrade Notice ==');
+
+    // assuming you've got a Screenshots section
+    // @example == Screenshots ==
+    $changelog = stristr($changelog, '== Using the Plugin ==', true);
+    
+    $response = (object) array(
+                'slug' => self::PLUGIN_NAME,
+                'new_version' => '1.5',
+                'upgrade_notice' => self::get_update_message_text(),
+                'package' => 'https://downloads.wordpress.org/plugin/participants-database.1.4.9.4.zip',
+                'url' => 'http://wordpress.org/plugins/participants-database/',
+    );
+
+    $response->name = Participants_Db::$plugin_title;
+    $response->requires = '3.4';
+    $response->tested = '3.7';
+    $response->version = $plugin_data['Version'];
+    $response->homepage = $plugin_data['PluginURI'];
+    $response->sections = array(
+        'description' => '<h3>New Features Included in this Update:</h3>',
+        'changelog' => wpautop($changelog),
+    );
+
+    //error_log(__METHOD__ . ' data returned:' . print_r($response, 1));
+
+    return $response;
+  }
 }
 
 // class
 
+
 /**
  * performs the class autoload
- *
+ * 
  * @param string $class the name of the class to be loaded
  */
 function PDb_class_loader($class) {
 
-  $class_file = plugin_dir_path(__FILE__) . 'classes/' . $class . '.class.php';
+  if (!class_exists($class)) {
 
-  if (is_file($class_file)) {
+    $class_file = plugin_dir_path(__FILE__) . 'classes/' . $class . '.class.php';
+    
+    //error_log( __FUNCTION__. ' attempting to load: '.$class_file );
 
-    //error_log( __FUNCTION__. ' class loaded: '.$class_file );
+    if (is_file($class_file)) {
 
-    require_once $class_file;
+      //error_log( __FUNCTION__. ' class loaded: '.$class_file );
+
+      require_once $class_file;
+    }
   }
 }
+//
+Participants_Db::initialize();
 ?>

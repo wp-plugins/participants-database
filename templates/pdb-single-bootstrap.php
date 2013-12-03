@@ -16,7 +16,7 @@ $exclude = array();
 	
   <?php while ( $this->have_groups() ) : $this->the_group(); ?>
   
-  <section id="<?php echo Participants_Db::$css_prefix.$this->group->name?>" style="overflow:auto">
+  <section id="<?php echo Participants_Db::$prefix.$this->group->name?>" style="overflow:auto">
   
     <?php $this->group->print_title( '<h2>', '</h2>' ) ?>
     
@@ -32,7 +32,7 @@ $exclude = array();
       
       ?>
     
-    <dl class="dl-horizontal <?php echo Participants_Db::$css_prefix.$this->field->name ?>">
+    <dl class="dl-horizontal <?php echo Participants_Db::$prefix.$this->field->name ?>">
       
       <dt class="<?php echo $this->field->name.' '.$empty_class?>"><?php $this->field->print_label() ?></dt>
       

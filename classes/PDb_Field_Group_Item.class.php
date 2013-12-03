@@ -12,7 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Template_Item class
  */
-class Field_Group_Item extends Template_Item {
+class PDb_Field_Group_Item extends PDb_Template_Item {
   
   // properties
   
@@ -61,7 +61,7 @@ class Field_Group_Item extends Template_Item {
     // 'signup_show_group_descriptions' for signup
     $optionname = $this->module == 'signup' ? 'signup_show_group_descriptions' :'show_group_descriptions';
     
-    if ( $this->options[$optionname] and ! empty( $this->description ) ) {
+    if ( Participants_Db::$plugin_options[$optionname] and ! empty( $this->description ) ) {
       
       $output = $start_tag.$this->prepare_display_value( $this->description ).$end_tag;
       
@@ -79,7 +79,7 @@ class Field_Group_Item extends Template_Item {
    */
   public function printing_title() {
     
-    return (bool) $this->options['signup_show_group_descriptions'] and ! empty( $this->title );
+    return (bool) Participants_Db::$plugin_options['signup_show_group_descriptions'] and ! empty( $this->title );
   }
   
   /**

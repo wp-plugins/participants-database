@@ -6,29 +6,22 @@
 
  class PDb_Single extends PDb_Shortcode {
   
-	// a string identifier for the class
-  var $module = 'single';
-  
-  // class for the wrapper
-  var $wrap_class = 'pdb-single';
-  
-  // methods
-  
   /**
    * initializes the record edit object
    */
-  public function __construct( $params ) {
+  public function __construct( $shortcode_atts ) {
     
 		
 		// define shortcode-specific attributes to use
 		$add_atts = array(
-                      'id' => '',
-                      'class' => $this->wrap_class,
-                      'term' => 'id' ,
-                      );
+        'module' => 'single',
+        'id' => '',
+        'class' => $this->wrap_class,
+        'term' => 'id',
+    );
     
     // run the parent class initialization to set up the parent methods 
-    parent::__construct( $this, $params, $add_atts );
+    parent::__construct($shortcode_atts, $add_atts);
     
     /*
      * determine the ID of the record to show
@@ -91,7 +84,7 @@
 	 */
 	public static function print_record( $params ) {
 		
-		if ( ! isset( self::$instance ) ) self::$instance = new PDb_Single( $params );
+		self::$instance = new PDb_Single( $params );
 		
 		return self::$instance->output;
 		

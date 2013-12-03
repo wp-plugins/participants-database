@@ -1,6 +1,7 @@
 // participants-database admin support scripts
 jQuery(document).ready( function($) {
   $('input[placeholder], textarea[placeholder]').placeholder();
+  $('.participants_db .ui-tabs-nav li').append($('<span class="mask"/>'));
 });
 /*!
  *  jQuery version compare plugin

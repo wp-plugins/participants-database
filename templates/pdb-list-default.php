@@ -26,20 +26,18 @@
   $this->show_search_sort_form();
 
   /* LIST DISPLAY */
+  /* 
+   * NOTE: the container for the list itself (excluding search and pagination 
+   * controls) must have a class of "list-container" for AJAX search/sort to 
+   * function
+   */
 ?>
-  <?php /*
-   * IMPORTANT: the list container must have an id="pdb-list" in order for the
-	 * AJAX-enabled search to work.
-   */ ?>
-  <table class="wp-list-table widefat fixed pages" id="pdb-list" cellspacing="0" >
+  <table class="wp-list-table widefat fixed pages list-container" cellspacing="0" >
 
-    <?php // print the count if enabled in the shortcode
-		if ( $display_count ) : ?>
-    <caption>
-      Total Records Found: <?php echo $record_count ?>, showing <?php echo $records_per_page ?> per page
-    </caption>
-    <?php endif ?>
-
+    <?php 
+    // print the count if enabled in the shortcode
+		$this->print_list_count($wrap_tag = false); 
+    ?>
     <?php if ( $record_count > 0 ) : // print only if there are records to show ?>
 
       <thead>
@@ -73,7 +71,7 @@
 
       <tbody>
         <tr>
-          <td>No Records Found</td>
+          <td><?php if ($this->is_search_result === true)  echo Participants_Db::$plugin_options['no_records_message'] ?></td>
         </tr>
       </tbody>
 

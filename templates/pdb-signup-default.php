@@ -18,24 +18,20 @@
  * around, but leave all the parts between the <> brackets as they are.
  *
  */
-
  ?>
- 
-<!-- template:<?php echo basename( __FILE__ ); // this is only to show which template is in use ?> -->
 <div class="wrap <?php echo $this->wrap_class ?>" >
 
   <?php // output any validation errors
   $this->print_errors(); ?>
 
-  <?php $this->print_form_head(); // this must be included before any fields are output ?>
+  <?php $this->print_form_head(); // this must be included before any fields are output. hidden fields may be added here as an array argument to the function ?>
 
     <table class="form-table pdb-signup">
-
-      <tbody>
 
       <?php while ( $this->have_groups() ) : $this->the_group(); ?>
 
         <?php if ( $this->group->printing_title() ) : // are we printing group titles and descriptions? ?>
+      <tbody class="field-group field-group-<?php echo $this->group->name ?>">
         <tr class="signup-group">
           <td colspan="2">
         
@@ -44,6 +40,8 @@
 
           </td>
         </tr>
+        <?php else : ?>
+      <tbody class="field-group">
         <?php endif; // end group title/description row ?>
 
         <?php while ( $this->have_fields() ) : $this->the_field(); ?>
@@ -64,19 +62,21 @@
 
         </tr>
   
-        <?php endwhile; // fields
+        <?php endwhile; // fields ?>
+        
+        </tbody><tbody class="field-group field-group-submit">
 
-      endwhile; // groups ?>
+      <?php endwhile; // groups ?>
       
-        <?php /*if ( $captcha = $this->_add_captcha( $this->captcha_type ) ) : ?>
         <tr>
-          <td colspan="2" class="pdb-captcha"><?php echo $captcha?></td>
-        </tr>
-        <?php endif */?>
-        <tr>
-          <td colspan="2" class="submit-buttons">
+          <td class="submit-buttons">
             
            <?php $this->print_submit_button('button-primary'); // you can specify a class for the button ?>
+            
+          </td>
+          <td class="submit-buttons">
+            
+           <?php $this->print_retrieve_link(); // this only prints if enabled in the settings ?>
            
           </td>
         </tr>

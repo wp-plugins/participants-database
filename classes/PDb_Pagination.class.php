@@ -116,8 +116,8 @@ class PDb_Pagination {
                 'add_variables' => '',
             )));
     $this->setPage($page);
-    $this->setSize($size);
     $this->setTotalRecords($total_records);
+    $this->setSize($size);
     $this->setLink($link,$add_variables);
     $this->filtering = $filtering;
     $this->set_wrappers();
@@ -198,7 +198,10 @@ class PDb_Pagination {
    * @param integer $size
    */
   function setSize($size) {
-    $this->size = 0 + $size;
+    $this->size = intval($size);
+    if ($this->size < 1) {
+      $this->size = $this->total_records;
+    }
   }
 
   /**
@@ -217,10 +220,9 @@ class PDb_Pagination {
    */
   function setLink($url, $add_variables) {
     
-    $delimiter = '';
     if ( ! empty($add_variables) )
-      $delimiter = false !== strpos($url,'?') ? '&' : '?';
-    $this->link = $url.$delimiter.$add_variables;
+      $conj = false !== strpos($url,'?') ? '&' : '?';
+    $this->link = $url . $conj . $add_variables;
   }
 
   /**
@@ -229,7 +231,7 @@ class PDb_Pagination {
   public function set_wrappers($wrappers = array()) {
 
     $defaults = array(
-        'wrap_class' => 'pagination',
+        'wrap_class' => 'pagination ' . Participants_Db::$prefix . 'pagination',
         'wrap_tag' => 'div',
         'all_button_wrap_tag' => 'ul',
         'button_wrap_tag' => 'li',
@@ -308,7 +310,7 @@ class PDb_Pagination {
     $totalItems = $this->total_records;
     $perPage = $this->size;
     $currentPage = $this->page;
-    $link = urldecode($this->link);
+    $link = $this->link;
     extract($this->wrappers);
 
     $totalPages = floor($totalItems / $perPage);
@@ -316,6 +318,8 @@ class PDb_Pagination {
 
     if ($totalPages < 1 || $totalPages == 1) {
       return null;
+    } elseif ($totalPages > 5) {
+      $this->first_last = true;
     }
 
     $output = '';
@@ -344,12 +348,13 @@ class PDb_Pagination {
 
     // add the first page link
     if ($this->first_last) {
+//      
       $output .= sprintf(
-              ($loopStart != 1 ? $disabled_pattern : $button_pattern), 
-              $this->_sprintf($link, 1), 
-              ($loopStart != 1 ? $this->disabled_class : 'firstpage'), 
-              __('First', 'participants-database')
-      );
+          ($currentPage > 1 ? $button_pattern : $disabled_pattern),
+          $this->_sprintf($link, 1),
+          ($currentPage > 1 ? 'firstpage' : $this->disabled_class),
+          __('First', 'participants-database')
+);
     }
 
     // add the previous page link
@@ -369,7 +374,6 @@ class PDb_Pagination {
               $i
       );
     }
-
     $output .= sprintf(
             ($currentPage < $totalPages ? $button_pattern : $disabled_pattern), 
             $this->_sprintf($link, $currentPage + 1), 
@@ -379,21 +383,23 @@ class PDb_Pagination {
 
     if ($this->first_last) {
 
+//      
+      
       $output .= sprintf(
-              ($loopEnd != $totalPages ? $disabled_pattern : $button_pattern), 
-              $this->_sprintf($link, $totalPages), 
-              ($loopEnd != $totalPages ? 'lastpage' : $this->disabled_class), 
-              __('Last', 'participants-database')
-      );
+          ($currentPage < $totalPages ? $button_pattern : $disabled_pattern),
+          $this->_sprintf($link, $totalPages),
+          ($currentPage < $totalPages ? 'lastpage' : $this->disabled_class),
+          __('Last', 'participants-database')
+);
     }
 
-    return str_replace(',','%2C',sprintf(
+    return sprintf(
             '<%1$s class="%2$s"><%3$s>%4$s</%3$s></%1$s>', 
             $wrap_tag, 
             $wrap_class, 
             $all_button_wrap_tag, 
-            str_replace('%2C',',',$output)
-    ));
+            $output
+    );
   }
   
   /**
@@ -401,13 +407,16 @@ class PDb_Pagination {
    * 
    * we need this because URL-encoded values use the % sign, which confuses sprintf
    * 
+   * TODO: make a sprintf-like function that iterates through multiple placeholders
+   * 
    * @param string $link
    * @param int $pagenum
    * @return string
    */
   private function _sprintf($link,$pagenum) {
     
-    return str_replace(',','%2C',sprintf(str_replace('%2C',',',$link),$pagenum));
+    return str_replace('%1$s', $pagenum, $link);
+    
   }
 
 }

@@ -13,7 +13,7 @@
  * @depends    Participants_Db class, CSV_Import
  *
  */
-class PDb_CSV_Import extends CSV_Import {
+class PDb_CSV_Import extends xnau_CSV_Import {
   
   function __construct( $file_field_name ) {
     
@@ -47,6 +47,18 @@ class PDb_CSV_Import extends CSV_Import {
     // check for the target directory; attept to create if it doesn't exist
     return is_dir( $this->root_path.$this->upload_directory ) ? true : Participants_Db::_make_uploads_dir( $this->upload_directory ) ;
     
+  }
+  
+  /**
+   * applies conditioning and escaping to the incoming value, also allows for a filter callback
+   * 
+   * @global object $wpdb
+   * @param type $value
+   * @return string
+   */
+  function process_value($value) {
+    global $wpdb;
+    return Participants_Db::set_filter('csv_import_value', $wpdb->escape($this->_enclosure_trim($value, '', $this->CSV->enclosure)));
   }
   
   function store_record( $post ) {

@@ -12,21 +12,16 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Template_Item class
  */
-class Record_Item extends Template_Item {
-  
-  // properties
-  
-  // holds the field objects
-  var $fields;
-  
-  // methods
+class PDb_Record_Item extends PDb_Template_Item {
   
   /**
    * instantiates a field group object
    *
    * @param object a object with all the field group's properties
    */
-  public function __construct( $fields, $id ) {
+  public function __construct( $fields, $id, $module = 'none' ) {
+    
+    $this->module = $module;
     
     // set up the common properties
     parent::__construct( $fields );
@@ -39,6 +34,8 @@ class Record_Item extends Template_Item {
     $this->fields = (array) $fields;
     
     $this->record_id = $id;
+    
+    $this->values = Participants_Db::get_participant($id);
     
   }
   
