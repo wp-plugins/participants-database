@@ -89,7 +89,7 @@ if (isset($_POST['action'])) {
           if (isset($row['group']) && $row['group'] != 'internal') {
             $sql = "SHOW FIELDS FROM " . Participants_Db::$participants_table . " WHERE field = '" . $row['name'] . "'";
             $field_info = $wpdb->get_results($sql);
-            $new_type = strtolower(Participants_Db::set_datatype($row['form_element']));
+            $new_type = PDb_FormElement::get_datatype($row['form_element']);
             $current_type = current($field_info)->Type;
             if ($new_type != $current_type and !($new_type == 'tinytext' and $current_type == 'text')) {
 

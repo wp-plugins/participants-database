@@ -143,7 +143,7 @@ class PDb_Init
 
           if ( ! isset( $defaults['form_element'] ) ) $defaults['form_element'] = 'text-line';
 
-            $datatype = Participants_Db::set_datatype( $defaults['form_element'] );
+            $datatype = PDb_FormElement::get_datatype( $defaults['form_element'] );
 
             $sql .= '`'.$name.'` '.$datatype.' NULL, ';
 
@@ -583,6 +583,33 @@ class PDb_Init
         }
         $sql = "UPDATE ".Participants_Db::$groups_table." g SET g.admin = '1' WHERE g.name ='internal'";
         $wpdb->query( $sql );
+      }
+      if ('0.7' == get_option(Participants_Db::$db_version_option)) {
+        /*
+         * changes all date fields' datatype to BIGINT unless the user has modified the datatype
+         */
+        $sql = 'SELECT f.name FROM ' . Participants_Db::$fields_table . ' f INNER JOIN INFORMATION_SCHEMA.COLUMNS AS c ON TABLE_NAME = "' . Participants_Db::$participants_table . '" AND c.column_name = f.name AND data_type = "TINYTEXT" WHERE f.form_element = "date"';
+
+        $results = $wpdb->get_results($sql, ARRAY_A);
+        $fields = array();
+        foreach ($results as $result) {
+          $fields[] = $result['name'];
+        }
+
+        if (count($fields) === 0) {
+          
+          // nothing to change, update the version number
+          update_option(Participants_Db::$db_version_option, '0.8');
+          
+        } else {
+          
+					$sql = 'ALTER TABLE ' . Participants_Db::$participants_table . ' MODIFY `' . implode('` BIGINT, MODIFY `', $fields) . '` BIGINT';
+
+					if (false !== $wpdb->query($sql)) {
+						// set the version number this step brings the db to
+						update_option(Participants_Db::$db_version_option, '0.8');
+					}
+				}
       }
       
       error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );

@@ -1478,6 +1478,43 @@ abstract class xnau_FormElement {
   }
   
   /**
+   * returns a MYSQL datatype appropriate to the form element type
+   * 
+   * @param string $element the name of the element type
+   * @return string the name of the MySQL datatype
+   */
+  public static function get_datatype($element) {
+
+    switch ($element) {
+      
+      case 'timestamp':
+        $datatype = 'TIMESTAMP';
+        break;
+      
+      case 'date':
+        $datatype = 'BIGINT';
+        break;
+      
+      case 'text-line':
+        $datatype = 'TINYTEXT';
+        break;
+
+      case 'checkbox':
+      case 'radio':
+      case 'multi-select':
+      case 'multi-checkbox':
+      case 'text-area':
+      case 'rich-text':
+      case 'dropdown':
+      default :
+        $datatype = 'TEXT';
+
+    }
+
+    return $datatype;
+  }
+  
+  /**
    * sets the array of available form element types
    * 
    * merges in an array in the config file, this allowing new types to be registered, 

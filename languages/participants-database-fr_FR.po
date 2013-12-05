@@ -8,10 +8,12 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2013-02-04 21:00+0100\n"
+"PO-Revision-Date: 2013-12-04 09:58-1000\n"
 "Last-Translator: Dominique Chapelle <dominique.chapelle@gmail.com>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: fr_FR\n"
+"X-Generator: Poedit 1.6\n"
 
 #: classes/xnau_CSV_Import.class.php:58
 msgid "The file %s has been uploaded."
@@ -1447,7 +1449,6 @@ msgstr ""
 "lavaleur du champ, mais pas la modifier. Le champ est éditable en admin "
 "seulement."
 
-#. #-#-#-#-#  plugin.pot (Participants Database 1.4.9.2)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: participants-database.php:243
 msgid "Participants Database"
@@ -2133,7 +2134,7 @@ msgstr ""
 
 #: edit_participant.php:108
 msgid "read only"
-msgstr ""
+msgstr "read only"
 
 #: edit_participant.php:228
 msgid "<strong>Previous:</strong> save and move to previous record"

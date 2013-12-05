@@ -76,7 +76,7 @@ class Participants_Db extends PDb_Base {
    * 
    * @var string current Db version
    */
-  public static $db_version = '0.7';
+  public static $db_version = '0.8';
   /**
    * name of the WP option where the current db version is stored
    * @var string
@@ -1818,45 +1818,11 @@ class Participants_Db extends PDb_Base {
 
     global $wpdb;
 
-    $datatype = self::set_datatype($atts['form_element']);
+    $datatype = PDb_FormElement::get_datatype($atts['form_element']);
 
     $sql = 'ALTER TABLE `' . self::$participants_table . '` ADD `' . $atts['name'] . '` ' . $datatype . ' NULL';
 
     return $wpdb->query($sql);
-  }
-
-  /**
-   * returns a MYSQL datatype appropriate to the form element type
-   * 
-   * @param string $element the name of the element type
-   * @return string the name of the MySQL datatype
-   */
-  public static function set_datatype($element) {
-
-    switch ($element) {
-      
-      case 'timestamp':
-        $datatype = 'TIMESTAMP';
-        break;
-      
-      case 'date':
-      case 'text-line':
-        $datatype = 'TINYTEXT';
-        break;
-
-      case 'checkbox':
-      case 'radio':
-      case 'multi-select':
-      case 'multi-checkbox':
-      case 'text-area':
-      case 'rich-text':
-      case 'dropdown':
-      default :
-        $datatype = 'TEXT';
-
-    }
-
-    return $datatype;
   }
 
   /**

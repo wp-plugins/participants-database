@@ -7,7 +7,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5
+ * @version    Release: 1.5.1
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -94,6 +94,8 @@ class PDb_FormElement extends xnau_FormElement {
    */
   public static function print_hidden_fields( $fields, $print = true ) {
     
+    $output = array();
+    
     $atts = array( 'type' => 'hidden');
     
     foreach ( $fields as $k => $v ) {
@@ -101,10 +103,12 @@ class PDb_FormElement extends xnau_FormElement {
       $atts['name'] = $k;
       $atts['value'] = $v;
       
-      if ( $print ) echo self::_HTML( $atts );
-			else return self::_HTML( $atts );
+      $output[] = self::_HTML( $atts );
       
     }
+    
+    if ( $print ) echo implode(PHP_EOL, $output);
+		else return implode(PHP_EOL, $output);
     
   }
   

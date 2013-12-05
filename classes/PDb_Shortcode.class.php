@@ -1186,22 +1186,25 @@ abstract class PDb_Shortcode {
   /**
    * tests a value for emptiness
    *
-   * needed primarliy because we can have arrays of empty elements which will
-   * not test empty using PHP's empty() function. Also, a zero is non-empty.
+   * returns true for empty strings, array, objects or null value...everything else 
+   * is considered not empty.
    *
    * @param mixed $value the value to test
    * @return bool
    */
   protected function _empty($value) {
 
+    if (!isset($value))
+    	return true;
+
     // if it is an array or object, collapse it
-    if (is_object($value)) {
-      $value = get_object_vars($value);
-    }
+    if (is_object($value))
+    	$value = get_object_vars($value);
+    
     if (is_array($value))
       $value = implode('', $value);
 
-    return empty($value) or (empty($value) && $value !== 0);
+    return $value === '';
   }
   
 
