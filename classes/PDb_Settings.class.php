@@ -1161,7 +1161,10 @@ class PDb_Settings extends xnau_Plugin_Settings {
     // add any custom roles
     if (count($roles) > 0) {
       foreach($roles as $role) {
+        $new_caps = '';
+        if (is_array($role['capabilities'])) {
         $new_caps = array_diff(array_keys($role['capabilities']), $caps);
+        }
         if (!empty($new_caps)) {
           // we grab the first unique capability and use it to typify the role
           $role_select[$role['name']] = current($new_caps);

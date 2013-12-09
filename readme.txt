@@ -238,6 +238,7 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 ** BETA RELEASE **
 first round of bug fixes:
+
 * frontend record edit submissions going to admin
 * list_limit cannot be set to override pagination
 * restored legacy public method Participants_Db::get_image_url()

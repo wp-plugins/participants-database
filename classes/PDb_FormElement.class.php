@@ -265,7 +265,7 @@ class PDb_FormElement extends xnau_FormElement {
         break;
       case 'rich-text':
         
-        $return = sprintf('<span class="textarea richtext">%s</span>',(Participants_Db::$plugin_options['enable_wpautop'] ? wpautop($field->value) : $field->value ) );
+        $return = sprintf('<span class="textarea richtext">%s</span>', Participants_Db::process_rich_text($field->value));
         break;
       default :
 

@@ -121,8 +121,8 @@ class PDb_List extends PDb_Shortcode {
         'list_limit' => $this->page_list_limit,
         'class' => 'participants-database',
         'filter' => '',
-        'orderby' => 'date_updated',
-        'order' => 'asc',
+        'orderby' => Participants_Db::$plugin_options['list_default_sort'],
+        'order' => Participants_Db::$plugin_options['list_default_sort_order'],
         'fields' => '',
         'single_record_link' =>'',
         'display_count' => Participants_Db::$plugin_options['show_count'],
@@ -836,10 +836,10 @@ class PDb_List extends PDb_Shortcode {
     $output = array();
     
     $ref = 'update';
-    if ($target === false && !empty($this->shortcode_atts['action']) && $this->module == 'search') {
-      $target = get_permalink($this->shortcode_atts['action']);
+    if ($target === false && !empty($this->shortcode_atts['target_page']) && $this->module == 'search') {
+      $target = get_permalink($this->shortcode_atts['target_page']);
       if (empty($target)) {
-        if ($actionpage = get_page_by_path($this->shortcode_atts['action'])) {
+        if ($actionpage = get_page_by_path($this->shortcode_atts['target_page'])) {
           $target = get_permalink($actionpage->ID);
         }
       }
@@ -854,10 +854,14 @@ class PDb_List extends PDb_Shortcode {
     $class_att = $class ? 'class="' . $class . '"' : '';
     
     $output[] = '<form method="post" class="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
-    $output[] = '<input type="hidden" name="action" value="pdb_list_filter">';
-    $output[] = '<input type="hidden" name="pagelink" class="searchsortformtop" value="' . $this->prepare_page_link($_SERVER['REQUEST_URI']) . '">';
-    $output[] = '<input type="hidden" name="sortstring" value="' . $this->filter['sortstring'] . '">';
-    $output[] = '<input type="hidden" name="orderstring" value="' . $this->filter['orderstring'] . '">';
+    $hidden_fields = array(
+        'action' => 'pdb_list_filter',
+        'instance_index' => $this->shortcode_atts['target_instance'],
+        'pagelink' => $this->prepare_page_link($_SERVER['REQUEST_URI']),
+        'sortstring' => $this->filter['sortstring'],
+        'orderstring' => $this->filter['orderstring'],
+    );
+    $output[] = PDb_FormElement::print_hidden_fields($hidden_fields, false);
 
     if ($print)
       echo $this->output_HTML($output);

@@ -37,7 +37,7 @@ spl_autoload_register('PDb_class_loader');
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011 - 2013 7th Veil, LLC
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GPL2
- * @version    Release: 1.5
+ * @version    Release: 1.5.3
  * 
  */
 class Participants_Db extends PDb_Base {
@@ -1482,18 +1482,23 @@ class Participants_Db extends PDb_Base {
   /**
    * parses the markdown string used to store the values for a link form element
    *
-   * will also accept a bare URL
+   * will also accept a bare URL. If the supplied string or URL does not validate 
+   * as an URL, return the string
    *
    * @param string $markdown_string
    * @return array URL, linktext
    */
-  public static function get_link_array($markdown_string) {
+  public static function get_link_array($markdown_string)
+  {
 
     if (preg_match('#^<([^>]+)>$#', trim($markdown_string), $matches)) {
       return array($matches[1], '');
     } elseif (preg_match('#^\[([^\]]+)\]\(([^\)]+)\)$#', trim($markdown_string), $matches)) {
-      return array($matches[2], $matches[1]);
-    } else return array((filter_var($markdown_string, FILTER_VALIDATE_URL) ? $markdown_string : ''), '');
+      $url = filter_var($matches[2], FILTER_VALIDATE_URL) ? $matches[2] : '';
+	  return array($url, $matches[1]);
+    }
+    else
+      return filter_var($markdown_string, FILTER_VALIDATE_URL) ? array($markdown_string, '') : array('',$markdown_string);
     }
 
   /**
@@ -1853,8 +1858,9 @@ class Participants_Db extends PDb_Base {
      * 
      * we don't validate in the admin, they will be allowed to leave required field unfilled
      */
-    if (!is_object(self::$validation_errors) and (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) or $_POST['action'] == 'signup'))
+    if (!is_object(self::$validation_errors) and (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) or $_POST['action'] == 'signup')) {
       self::$validation_errors = new PDb_FormValidation();
+    }
 
     switch ($_POST['action']) :
 
@@ -1886,7 +1892,13 @@ class Participants_Db extends PDb_Base {
         // if we are submitting from the frontend, we're done
         if (!is_admin()) {
 
-          if ( is_object(self::$validation_errors) ) self::$validation_errors->add_error('', self::$plugin_options['record_updated_message']);
+          /*
+           * if the user is an admin, the validation object won't be instantiated, 
+           * so we do that here so the feedback message can be shown.
+           */
+          if (!is_object(self::$validation_errors)) self::$validation_errors = new PDb_FormValidation();
+            
+          self::$validation_errors->add_error('', self::$plugin_options['record_updated_message']);
 
           if (self::$plugin_options['send_record_update_notify_email']) {
 
@@ -2085,10 +2097,11 @@ class Participants_Db extends PDb_Base {
       $participant_values = self::get_participant($participant_id);
     }
     if (!empty(Participants_Db::$plugin_options['primary_email_address_field'])) {
+      $body = self::proc_tags(self::$plugin_options['retrieve_link_email_body'], $participant_id);
       $sent = wp_mail( 
               $participant_values[Participants_Db::$plugin_options['primary_email_address_field']], 
               self::proc_tags(self::$plugin_options['retrieve_link_email_subject'], $participant_id), 
-              self::proc_tags(self::$plugin_options['retrieve_link_email_body'], $participant_id), 
+              (Participants_Db::$plugin_options['html_email'] ? self::process_rich_text($body) : $body), 
               self::$email_headers
               );
 
@@ -2100,10 +2113,11 @@ class Participants_Db extends PDb_Base {
     
     if (self::$plugin_options['send_retrieve_link_notify_email'] != 0) {
       
+      $body = self::proc_tags(self::$plugin_options['retrieve_link_notify_body'], $participant_id);
     $sent = wp_mail( 
             self::$plugin_options['email_signup_notify_addresses'], 
             self::proc_tags(self::$plugin_options['retrieve_link_notify_subject'], $participant_id, 'all'), 
-            self::proc_tags(self::$plugin_options['retrieve_link_notify_body'], $participant_id, 'all'), 
+              (Participants_Db::$plugin_options['html_email'] ? self::process_rich_text($body) : $body),
             self::$email_headers
             );
     }
@@ -2111,6 +2125,18 @@ class Participants_Db extends PDb_Base {
 //self::$validation_errors->add_error('', 'success');
     $_POST['action'] = 'success';
     return;
+  }
+
+  /**
+   * processes a rich text string
+   * 
+   * runs it through wpautop if selected in the settings
+   * 
+   * @param string $input
+   * @return string
+   */
+  public static function process_rich_text($string) {
+    return Participants_Db::$plugin_options['enable_wpautop'] ? apply_filters('the_content', $string) : $string; // wpautop($string)
   }
 
   /**
@@ -2520,7 +2546,9 @@ class Participants_Db extends PDb_Base {
      * get the attributes array; these values were saved by the Shortcode class 
      * when it was instantiated
      */
-    $atts = $_SESSION[self::$prefix . 'shortcode_atts_list'];
+    $atts = isset($_SESSION[self::$prefix . 'shortcode_atts']['list'][$_POST['instance_index']]) ? 
+            $_SESSION[self::$prefix . 'shortcode_atts']['list'][$_POST['instance_index']] : 
+            current($_SESSION[self::$prefix . 'shortcode_atts']['list']);
     
     
     // add the AJAX filtering flag

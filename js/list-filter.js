@@ -11,13 +11,10 @@ jQuery(document).ready(function($) {
   "use strict";
 
   // this is for backwards compatibility, but it certainly won't work if there are two lists on a page using the old HTML
-  if ($('#pdb-list').length) {
-    $('#pdb-list').addClass('list-container').removeAttr('id');
-  }
-  if ($('#sort_filter_form').length) {
-    $('#sort_filter_form').addClass('sort_filter_form').removeAttr('id');
-  }
-  if (typeof PDb_ajax.prefix === 'undefined') PDb_ajax.prefix = 'pdb-';
+  idFix($('.wrap.pdb-list'));
+
+  if (typeof PDb_ajax.prefix === 'undefined')
+    PDb_ajax.prefix = 'pdb-';
   var
           isError,
           errormsg = $('.pdb-searchform .pdb-error'),
@@ -41,8 +38,7 @@ jQuery(document).ready(function($) {
       var
               submitButton = event.target,
               search_field_error = $(this).closest('.' + PDb_ajax.prefix + 'searchform').find('.search_field_error'),
-              value_error = $(this).closest('.' + PDb_ajax.prefix + 'searchform').find('.value_error'),
-              container = $(this).closest('.wrap.pdb-list');
+              value_error = $(this).closest('.' + PDb_ajax.prefix + 'searchform').find('.value_error');
       //container.data('target', 'container').find('.list-container');
       submission.submit = submitButton.value;
       if (submitButton.value === PDb_ajax.i18n.search) {
@@ -70,7 +66,10 @@ jQuery(document).ready(function($) {
           submission[this.name] = escape($(this).val());
         });
         //console.log(submission);
-        var spinner = $(PDb_ajax.loading_indicator);
+        var
+                target_instance = $('.pdb-list.pdb-instance-' + submission.instance_index),
+                container = target_instance.length ? target_instance : $('.pdb-list').first(),
+                spinner = $(PDb_ajax.loading_indicator);
         $.ajax({
           type: "POST",
           url: PDb_ajax.ajaxurl,
@@ -80,14 +79,17 @@ jQuery(document).ready(function($) {
           },
           success: function(html, status) {
             var newContent = $(html);
-            var pagination = newContent.find('.pagination');
-            container.find('.list-container').replaceWith(newContent.find('.list-container'));
+            idFix(newContent);
+            var
+                    pagination = newContent.find('.pagination'),
+                    replaceContent = newContent.find('.list-container').length ? newContent.find('.list-container') : newContent;
+            container.find('.list-container').replaceWith(replaceContent);
             if ($('.pagination').length) {
               container.find('.pagination').replaceWith(pagination);
             } else {
               container.find('.list-container').after(pagination);
             }
-            container.find('.ajax-loading').remove();
+              $(submitButton).parent().find('.ajax-loading').remove();
           },
           error: function(jqXHR, status, errorThrown) {
             console.log('Participants Database JS error status:' + status + ' error:' + errorThrown);
@@ -115,5 +117,9 @@ jQuery(document).ready(function($) {
     errormsg.hide();
     errormsg.children().hide();
     isError = false;
+  }
+  function idFix(content) {
+    content.find('#pdb-list').addClass('list-container').removeAttr('id');
+    content.find('#sort_filter_form').addClass('sort_filter_form').removeAttr('id');
   }
 });

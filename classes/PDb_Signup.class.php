@@ -303,7 +303,9 @@ class PDb_Signup extends PDb_Shortcode {
       return NULL;
 
     $this->_mail(
-            $this->participant_values[$email_field], $this->_proc_tags($this->receipt_subject), $this->_proc_tags($this->receipt_body)
+            $this->participant_values[$email_field], 
+            $this->_proc_tags($this->receipt_subject), 
+            Participants_Db::process_rich_text($this->_proc_tags($this->receipt_body))
     );
   }
 
