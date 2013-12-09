@@ -587,21 +587,37 @@ class Participants_Db extends PDb_Base {
   /**
    * shows the frontend edit screen called by the [pdb_record] shortcode
    *
+   *
    * the ID of the record to show for editing can be provided one of three ways: 
    *    $_GET['pid'] (private link), 
-   *    $atts['id'] (in the sortcode), or 
+   *    $atts['id'](deprecated) or $atts['record_id'] (in the sortcode), or 
    *    $_SESSION['pdbid'] (directly from the signup form)
+   * 
    * 
    * @param array $atts array of attributes drawn from the shortcode
    * @return string the HTML of the record edit form
    */
-  public static function print_record_edit_form($atts) {
+  public static function print_record_edit_form($atts)
+  {
+    $record_id = false;
+    // get the pid from the get string if given (for backwards compatibility)
+    if (isset($_GET['pid'])) {
+      $record_id = self::get_participant_id($_GET['pid']);
+    }
+    // get the id from the SESSION array; this overrides the GET string
+    if (isset($_SESSION['pdbid'])) {
+      $record_id = self::get_record_id_by_term('id', $_SESSION['pdbid']);
+    }
 
-    $atts['id'] = isset($_GET['pid']) ? 
-            self::get_participant_id($_GET['pid']) : 
-              ( isset($atts['id']) ? $atts['id'] : 
-                (isset($_SESSION['pdbid']) ? $_SESSION['pdbid'] : 
-                  false) );
+    if ($record_id === false && (isset($atts['id']) || isset($atts['record_id']))) {
+      if (isset($atts['id']) & !isset($atts['record_id'])) {
+        $atts['record_id'] = $atts['id'];
+        unset($atts['id']);
+       }
+       $record_id = self::get_record_id_by_term('id', $atts['record_id']);
+    }
+
+    $atts['record_id'] = $record_id;
 
     return PDb_Record::print_form($atts);
   }
@@ -647,7 +663,7 @@ class Participants_Db extends PDb_Base {
   public static function print_total($params) {
     
     $params['module'] = 'total';
-    $params['list_limit'] = 999999999;
+    $params['list_limit'] = -1;
 
     return PDb_List::get_list($params);
   }
@@ -685,6 +701,13 @@ class Participants_Db extends PDb_Base {
    * @return string the output HTML
    */
   public static function print_single_record($params) {
+
+    // alias the 'id' attribute for backwards compatibility
+    if (isset($params['id']) & !isset($params['record_id'])) {
+      $params['record_id'] = $params['id'];
+      unset($params['id']);
+    }
+    $params['record_id'] = self::get_record_id_by_term('id', $params['record_id']);
 
     return PDb_Single::print_record($params);
   }
@@ -1591,7 +1614,7 @@ class Participants_Db extends PDb_Base {
    *
    * @param string $pid the private ID for a record
    * 
-   * @return int the record ID
+   * @return int|bool the record ID or false
    *
    */
   public static function get_participant_id($pid) {
@@ -1606,7 +1629,7 @@ class Participants_Db extends PDb_Base {
    * 
    * @param string $term
    * @param mixed $id
-   * @return int
+   * @return int|bool false if no valid id found
    */
   public static function get_record_id_by_term($term, $id, $single = true) {
 
@@ -1624,7 +1647,7 @@ class Participants_Db extends PDb_Base {
    * @param string $value the value to search for
    * @param bool   $single if true, return only one ID
    *
-   * @return unknown returns integer if one match, array of integers if multiple matches, false if no match
+   * @return int|bool returns integer if one match, array of integers if multiple matches, false if no match
    */
   private static function _get_participant_id_by_term($term, $value, $single = true) {
 
@@ -2325,7 +2348,7 @@ class Participants_Db extends PDb_Base {
      * extension
      */
     $extensions = empty($field_atts->values) ? self::$plugin_options['allowed_file_types'] : implode(',', self::unserialize_array($field_atts->values));
-    $test = preg_match('#^(.+)\.(' . implode('|', array_map('trim', explode(',', $extensions))) . ')$#', $file['name'], $matches);
+    $test = preg_match('#^(.+)\.(' . implode('|', array_map('trim', explode(',', strtolower($extensions)))) . ')$#', strtolower($file['name']), $matches);
 
     //error_log(__METHOD__.' ext:'.$extensions.' test:'. $test.' matches:'.print_r($matches,1));
 

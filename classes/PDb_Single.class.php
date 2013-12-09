@@ -15,7 +15,6 @@
 		// define shortcode-specific attributes to use
 		$add_atts = array(
         'module' => 'single',
-        'id' => '',
         'class' => $this->wrap_class,
         'term' => 'id',
     );
@@ -30,8 +29,8 @@
      * the 'term' value, which defaults to 'id'
      *
      */
-    if ( isset( $this->shortcode_atts['id'] ) and ! empty( $this->shortcode_atts['id'] ) ) {
-      $id = $this->shortcode_atts['id'];
+    if ( $this->shortcode_atts['record_id'] !== false ) {
+      $id = $this->shortcode_atts['record_id'];
     } else $id = 0;
 		// override the shortcode att if the value is in the URI
     if ( isset( $_GET['pdb'] ) ) {
