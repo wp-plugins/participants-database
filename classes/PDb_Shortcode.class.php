@@ -169,6 +169,9 @@ abstract class PDb_Shortcode {
 
     $this->prefix = Participants_Db::$prefix;
 
+    // increment the index each time this class is instantiated
+    Participants_Db::$instance_index++;
+
     $this->shortcode_defaults = array(
         'title' => '',
         'class' => '',
@@ -176,6 +179,8 @@ abstract class PDb_Shortcode {
         'fields' => '',
         'groups' => '',
         'action' => '',
+        'target_instance' => Participants_Db::$instance_index,
+        'target_page' => '',
     );
     
     // error_log(__METHOD__.' incoming shorcode atts:'.print_r($shortcode_atts,1));
@@ -186,10 +191,7 @@ abstract class PDb_Shortcode {
     $this->module = $this->shortcode_atts['module'];
     
     // save the shotcode attributes to the session array
-    $_SESSION[$this->prefix . 'shortcode_atts_' . $this->module] = $this->shortcode_atts;
-
-    // increment the index each time this class is instantiated
-    Participants_Db::$instance_index++;
+    $_SESSION[$this->prefix . 'shortcode_atts'][$this->module][Participants_Db::$instance_index] = $this->shortcode_atts;
 
     $this->wrap_class = $this->prefix . $this->module . ' ' . $this->prefix . 'instance-' . Participants_Db::$instance_index;
 
@@ -1062,7 +1064,8 @@ abstract class PDb_Shortcode {
         'action' => $this->module,
         'subsource' => Participants_Db::PLUGIN_NAME,
         'shortcode_page' => $uri_components['path'],
-        'thanks_page' => $this->submission_page
+        'thanks_page' => $this->submission_page,
+            'instance_index' => Participants_Db::$instance_index,
     );
     if (!$this->_empty($hidden)) {
       $hidden_fields = $hidden + $default_hidden_fields;
