@@ -234,6 +234,20 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.2 =
+
+** BETA RELEASE **
+second round of bug fixes:
+
+* absolute image URIs will now display correctly
+* frontend list sort preferences are now heeded
+* 'the_content' filter applied to rich text if enabled in settings
+* improved link field data handling on import, doesn't require valid URL
+* missing results on AJAX search bug fixed
+* values of zero no longer considered empty
+* date fields now stored as BINGINT datatype so it can be sorted correctly
+* language files recompiled to correctly show selectors in the manage database fields page
+
 = 1.5.1 =
 
 ** BETA RELEASE **
@@ -438,9 +452,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5 =
+= 1.5.3 =
 **BETA RELEASE**
-Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions or test in development site before updating.
+Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions or test in development site before updating. 1.5.3 is the second bugfix subversion. With 1.5.4 we will drop out of beta.
 
 == Using the Plugin ==
 
