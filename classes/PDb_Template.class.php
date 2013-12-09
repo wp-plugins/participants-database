@@ -119,7 +119,6 @@ class PDb_Template {
   public function print_with_link($name, $href) {
     if (is_object($this->fields->{$name}) && !empty($href)) {
       $this->_set_link($name, $href);
-      error_log(__METHOD__.' field:'.print_r($this->fields,1));
       $this->_print($name);
     }
   }

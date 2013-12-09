@@ -1424,7 +1424,6 @@ class Participants_Db extends PDb_Base {
               
               if (isset($_POST[$column_atts->name . '-deletefile']) and $_POST[$column_atts->name . '-deletefile'] === 'delete') {
                 if (self::$plugin_options['file_delete'] == 1 or is_admin() ) {
-                  error_log(__METHOD__.' attempting to delete:'.$post[$column_atts->name]);
                   self::delete_file($post[$column_atts->name]);
                 }
                 unset($_POST[$column_atts->name]);
@@ -2762,7 +2761,6 @@ class Participants_Db extends PDb_Base {
    * @param string $name the field on which the error was called
    */
   private static function _show_validation_error( $error, $name = '', $overwrite = true ) {
-    error_log(__METHOD__.' error set: '.$error.' on: '.$name.' obj? '.( is_object(self::$validation_errors)? 'yes' : 'no' ));
     if (is_object(self::$validation_errors)) self::$validation_errors->add_error($name, $error, $overwrite);
     else self::set_admin_message($error);
   }
@@ -2966,8 +2964,6 @@ class Participants_Db extends PDb_Base {
    */
   public static function plugin_update_info($false, $action, $arg)
   {
-
-    error_log(__METHOD__.' called with: '.print_r($arg,1));
     
     if ($arg->slug !== self::PLUGIN_NAME) return false;
 
@@ -3021,12 +3017,8 @@ function PDb_class_loader($class) {
   if (!class_exists($class)) {
 
     $class_file = plugin_dir_path(__FILE__) . 'classes/' . $class . '.class.php';
-    
-    //error_log( __FUNCTION__. ' attempting to load: '.$class_file );
 
     if (is_file($class_file)) {
-
-      //error_log( __FUNCTION__. ' class loaded: '.$class_file );
 
       require_once $class_file;
     }
