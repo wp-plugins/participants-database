@@ -831,6 +831,8 @@ class PDb_List extends PDb_Shortcode {
    */
   public function search_sort_form_top($target = false, $class = false, $print = true) {
 
+    if (!empty($this->shortcode_atts['action']) && empty($this->shorcode_atts['target_page']) ) $this->shorcode_atts['target_page'] = $this->shortcode_atts['action'];
+
     global $post;
 
     $output = array();
