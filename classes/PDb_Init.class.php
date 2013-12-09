@@ -612,7 +612,7 @@ class PDb_Init
 				}
       }
       
-      error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );
+      if (WP_DEBUG) error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );
       
     }
     

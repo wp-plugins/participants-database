@@ -181,6 +181,7 @@ abstract class PDb_Shortcode {
         'action' => '',
         'target_instance' => Participants_Db::$instance_index,
         'target_page' => '',
+        'record_id' => false,
     );
     
     // error_log(__METHOD__.' incoming shorcode atts:'.print_r($shortcode_atts,1));

@@ -20,7 +20,6 @@ class PDb_Record extends PDb_Shortcode {
     // define shortcode-specific attributes to use
     $add_atts = array(
         'module' => 'record',
-        'id' => false,
         'class' => 'edit-participant ' . $this->wrap_class,
     );
 
@@ -30,12 +29,12 @@ class PDb_Record extends PDb_Shortcode {
     // set the action URI for the form
     $this->_set_submission_page();
 
-    if (false === $this->shortcode_atts['id']) {
+    if (false === $this->shortcode_atts['record_id']) {
 
       $this->_not_found();
     } else {
 
-      $this->participant_id = $this->shortcode_atts['id'];
+      $this->participant_id = $this->shortcode_atts['record_id'];
 
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
 

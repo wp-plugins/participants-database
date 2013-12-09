@@ -313,10 +313,10 @@ class PDb_Pagination {
     $link = $this->link;
     extract($this->wrappers);
 
-    $totalPages = floor($totalItems / $perPage);
-    $totalPages += ($totalItems % $perPage != 0) ? 1 : 0;
+    $totalPages = $perPage > 0 ? floor($totalItems / $perPage) : 0;
+    $totalPages += $perPage > 0 ? ($totalItems % $perPage != 0 ? 1 : 0) : 0;
 
-    if ($totalPages < 1 || $totalPages == 1) {
+    if ($totalPages <= 1) {
       return null;
     } elseif ($totalPages > 5) {
       $this->first_last = true;
