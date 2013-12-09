@@ -452,9 +452,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.3 =
+= 1.5.2 =
 **BETA RELEASE**
-Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions or test in development site before updating. 1.5.3 is the second bugfix subversion. With 1.5.4 we will drop out of beta.
+Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions or test in development site before updating. 1.5.2 is the second bugfix subversion. With 1.5.3 we will drop out of beta.
 
 == Using the Plugin ==
 
