@@ -223,12 +223,16 @@ abstract class PDb_Shortcode {
 
     ob_start();
     
-    echo '<!-- template: ' . $this->template_basename($this->template) . ' -->';
+    if (in_array($this->module, array('signup','single','record','list','search'))) {
+			echo '<!-- template: ' . $this->template_basename($this->template) . ' -->';
+    }
 
     // this will be included in the subclass context
     $this->_include_template();
     
-    echo '<!-- end template: ' . $this->template_basename($this->template) . ' -->';
+    if (in_array($this->module, array('signup','single','record','list','search'))) {
+			echo '<!-- end template: ' . $this->template_basename($this->template) . ' -->';
+    }
 
     $this->output = ob_get_clean();
   }
