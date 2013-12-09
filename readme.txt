@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.4
 Tested up to: 3.7
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 License: GPLv2
 
 Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
@@ -247,6 +247,7 @@ second round of bug fixes:
 * values of zero no longer considered empty
 * date fields now stored as BINGINT datatype so it can be sorted correctly
 * language files recompiled to correctly show selectors in the manage database fields page
+* zero-division bug in Pagination fixed
 
 = 1.5.1 =
 
