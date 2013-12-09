@@ -37,37 +37,19 @@
     if ( isset( $_GET['pdb'] ) ) {
       $id = $_GET['pdb'];
     }
-    $matched_ids = Participants_Db::get_record_id_by_term( $this->shortcode_atts['term'], $id );
+    $record_id = Participants_Db::get_record_id_by_term( $this->shortcode_atts['term'], $id );
     
-    if ( false === $matched_ids ) {
+    if ( false === $record_id ) {
       
       $this->_not_found();
       
     } else {
       
-      /*
-       * at this point, we have either a single value or an array of values. We
-       * test each one for a valid record and display the record if found
-       */
-      foreach ( (array) $matched_ids as $id ) {
-      
-        $this->participant_values = Participants_Db::get_participant( $id );
-    
-        if ( false === $this->participant_values ) {
-          
-          $this->_not_found();
-          
-        } else {
-              
-          $this->participant_id = $id;
-      
+      $this->participant_values = Participants_Db::get_participant( $record_id );
+      $this->participant_id = $record_id;
           $this->_setup_iteration();
-          
           $this->_print_from_template();
           
-        }
-        
-      }
     
     }
     

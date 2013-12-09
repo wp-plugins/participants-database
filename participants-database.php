@@ -1608,9 +1608,9 @@ class Participants_Db extends PDb_Base {
    * @param mixed $id
    * @return int
    */
-  public static function get_record_id_by_term($term, $id) {
+  public static function get_record_id_by_term($term, $id, $single = true) {
 
-    return self::_get_participant_id_by_term($term, $id);
+    return self::_get_participant_id_by_term($term, $id, $single);
   }
 
   /**
@@ -1626,24 +1626,23 @@ class Participants_Db extends PDb_Base {
    *
    * @return unknown returns integer if one match, array of integers if multiple matches, false if no match
    */
-  private static function _get_participant_id_by_term($term, $value, $single = false) {
+  private static function _get_participant_id_by_term($term, $value, $single = true) {
 
     global $wpdb;
 
     $sql = 'SELECT p.id FROM ' . self::$participants_table . ' p WHERE p.' . $term . ' = %s';
-    $result = $wpdb->get_results($wpdb->prepare($sql, $value), ARRAY_A);
+    $result = $wpdb->get_results($wpdb->prepare($sql, $value), ARRAY_N);
 
     if (!is_array($result))
       return false;
 
     $output = array();
 
-    foreach ($result as $row) {
-
-      $output[] = $row['id'];
+    foreach($result as $id) {
+      $output[] = current($id);
     }
 
-    return count($output) > 1 && ! $single ? $output : current($output);
+    return $single ? current($output) : $output;
   }
 
   /**
@@ -2088,7 +2087,7 @@ class Participants_Db extends PDb_Base {
       return;
     }
 // a value was submitted, try to find a record with it
-    $participant_id = self::_get_participant_id_by_term($column->name, $_POST[$column->name], true);
+    $participant_id = self::_get_participant_id_by_term($column->name, $_POST[$column->name]);
 
     if ($participant_id === false) {
       self::$validation_errors->add_error($column->name, 'identifier');
