@@ -317,7 +317,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'type' => 'dropdown',
             'help_text' => __('when a signup is submitted or CSV record is imported, this field is checked for a duplicate', 'participants-database'),
             'options' => array_merge($this->_get_display_columns(), array('Record ID' => 'id')),
-            'value' => $this->_get_email_column(),
+            'value' => 'email',
         )
     );
     $this->plugin_settings[] = array(
@@ -516,7 +516,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'type' => 'dropdown',
             'help_text' => __('The field used to identify the user&#39;s account. This must be a unique identifier for the record', 'participants-database'),
             'options' => $this->_get_identifier_columns(false),
-            'value' => $this->_get_email_column(),
+            'value' => 'email',
         )
     );
    
@@ -1115,20 +1115,6 @@ class PDb_Settings extends xnau_Plugin_Settings {
     }
 
     return $columnlist;
-  }
-
-  /**
-   * this attempts to find the email column and return it's title=>value
-   *
-   * @return array or empty string
-   */
-  private function _get_email_column() {
-
-    $field = array_search('email', $this->_get_identifier_columns());
-    if ($field)
-      return array($field => 'email');
-    else
-      return '';
   }
 
   private function _get_sort_columns() {

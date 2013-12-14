@@ -350,7 +350,7 @@ class Participants_Db extends PDb_Base {
     // get the plugin options array
     if (!is_array(self::$plugin_options)) {
 
-      self::$plugin_options = array_merge(self::$Settings->get_default_options(), get_option(self::$participants_db_options));
+      self::$plugin_options = array_merge(self::$Settings->get_default_options(), (array) get_option(self::$participants_db_options));
     }
     /*
      * set the plugin date display format: if "strict dates" is enabled, use the 
@@ -2590,7 +2590,7 @@ class Participants_Db extends PDb_Base {
      * get the attributes array; these values were saved in the session array by 
      * the Shortcode class when it was instantiated
      */
-    $shortcode_atts = self::$session(self::$prefix . 'shortcode_atts');
+    $shortcode_atts = self::$session->get(self::$prefix . 'shortcode_atts');
     $atts = $shortcode_atts['list'][$_POST['instance_index']] !== false ? 
             $shortcode_atts['list'][$_POST['instance_index']] : 
             current($shortcode_atts['list']);

@@ -161,7 +161,7 @@ class PDb_CAPTCHA {
     } else {
       /* generate the math question. We try to make it a simple arithmetic problem
        */
-      Participants_Db::$session->set('captcha_vars', '');
+      Participants_Db::$session->set('captcha_result', '');
       $o = array_rand($operators);
       switch ($o){
         case '&times;':
@@ -253,7 +253,7 @@ class PDb_CAPTCHA {
    * @return bool true if last captcha validation was successful
    */
   public static function last_challenge_met() {
-    return isset($_SESSION['captcha_result']) ? $_SESSION['captcha_result'] == 'valid' : false ;
+    return Participants_Db::$session->get('captcha_result') ? Participants_Db::$session->get('captcha_result') == 'valid' : false ;
   }
   /**
    * returns a random alphanumeric
