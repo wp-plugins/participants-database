@@ -109,10 +109,10 @@ class PDb_Signup extends PDb_Shortcode {
 
     if ((isset($_GET['m']) && $_GET['m'] == 'r') || $shortcode_atts['module'] == 'retrieve') {
       $shortcode_atts['module'] = 'retrieve';
-    } elseif (isset($_SESSION['pdbid'])) { // this will be true after a successful submission
+    } elseif (Participants_Db::$session->get('pdbid')) { // this will be true after a successful submission
 
-      $this->participant_id = $_SESSION['pdbid'];
-      unset($_SESSION['pdbid']); // clear the ID from the SESSION array
+      $this->participant_id = Participants_Db::$session->get('pdbid');
+      Participants_Db::$session->set('pdbid', false);
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
       if ($this->participant_values) {
         // check the notification sent status of the record
@@ -299,8 +299,10 @@ class PDb_Signup extends PDb_Shortcode {
     
     $email_field = Participants_Db::$plugin_options['primary_email_address_field'];
 
-    if (!isset($this->participant_values[$email_field]) || empty($this->participant_values[$email_field]))
+    if (!isset($this->participant_values[$email_field]) || empty($this->participant_values[$email_field])) {
+      error_log(__METHOD__.' no valid email address was found, mail could not be sent.');
       return NULL;
+    }
 
     $this->_mail(
             $this->participant_values[$email_field], 
@@ -361,12 +363,12 @@ message:
     $this->current_body = $body;
 
     if ($this->options['html_email'])
-      //add_action('phpmailer_init', array($this, 'set_alt_body'));
+      add_action('phpmailer_init', array($this, 'set_alt_body'));
 
     $sent = wp_mail($recipients, $subject, $body, $this->email_header);
 
     if (false === $sent)
-      error_log(__METHOD__ . ' sending returned false');
+      error_log(__METHOD__ . ' sending failed for: ' . $recipients);
   }
 
   /**

@@ -192,7 +192,7 @@ abstract class PDb_Shortcode {
     $this->module = $this->shortcode_atts['module'];
     
     // save the shotcode attributes to the session array
-    $_SESSION[$this->prefix . 'shortcode_atts'][$this->module][Participants_Db::$instance_index] = $this->shortcode_atts;
+    Participants_Db::$session->set($this->prefix . 'shortcode_atts', array( $this->module => array( Participants_Db::$instance_index => $this->shortcode_atts)));
 
     $this->wrap_class = $this->prefix . $this->module . ' ' . $this->prefix . 'instance-' . Participants_Db::$instance_index;
 

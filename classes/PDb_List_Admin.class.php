@@ -404,7 +404,7 @@ class PDb_List_Admin {
 
       function armDelbutton(state) {
         var delbutton = document.getElementById('delete_button');
-        delbutton.setAttribute('class', state ? 'armed' : 'unarmed');
+        delbutton.setAttribute('class', state ? delbutton.getAttribute('class').replace('unarmed', 'armed') : delbutton.getAttribute('class').replace('armed', 'unarmed'));
         delbutton.disabled = state ? false : true;
       }
 
@@ -480,8 +480,8 @@ class PDb_List_Admin {
     PDb_FormElement::print_element($element);
     ?>
             <input id="participant_search_term" type="text" name="value" value="<?php echo @self::$filter['value'] ?>">
-            <input name="submit-button" type="submit" value="<?php echo self::$i18n['filter'] ?>">
-            <input name="submit-button" type="submit" value="<?php echo self::$i18n['clear'] ?>">
+            <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['filter'] ?>">
+            <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['clear'] ?>">
           </fieldset>
 
           <fieldset class="widefat inline-controls">
@@ -506,7 +506,7 @@ class PDb_List_Admin {
             );
             PDb_FormElement::print_element($element);
             ?>
-            <input name="submit-button" type="submit" value="<?php echo self::$i18n['sort'] ?>">
+            <input class="button button-default"  name="submit-button" type="submit" value="<?php echo self::$i18n['sort'] ?>">
           </fieldset>
         </form>
       </div><?php
@@ -523,7 +523,7 @@ class PDb_List_Admin {
         <input type="hidden" id="select_count" value="0" />
         <fieldset class="widefat inline-controls">
           <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
-          <span style="padding-right:20px" ><input type="submit" name="submit-button" value="<?php echo self::$i18n['delete_checked'] ?>" onClick="return delete_confirm();" id="delete_button"  ></span>
+          <span style="padding-right:20px" ><input type="submit" name="submit-button" class="button button-default" value="<?php echo self::$i18n['delete_checked'] ?>" onClick="return delete_confirm();" id="delete_button"  ></span>
           <?php endif ?>
             <?php
             $list_limit = PDb_FormElement::get_element(array(
@@ -538,7 +538,7 @@ class PDb_List_Admin {
                     )
             ?>
           <?php printf(__('Show %s items per page.', 'participants-database'), $list_limit) ?>
-      <?php PDb_FormElement::print_element(array('type' => 'submit', 'name' => 'submit-button', 'value' => self::$i18n['change'])) ?>
+      <?php PDb_FormElement::print_element(array('type' => 'submit', 'name' => 'submit-button', 'class' => 'button button-default', 'value' => self::$i18n['change'])) ?>
           
         </fieldset>
 
@@ -780,12 +780,12 @@ class PDb_List_Admin {
           $suggested_filename = Participants_Db::PLUGIN_NAME . '-' . $date_string . '.csv';
           $namelength = round(strlen($suggested_filename) * 0.9);
           ?>
-          <p class="inline-controls">
+          <fieldset class="inline-controls">
     <?php _e('File Name', 'participants-database') ?>:
             <input type="text" name="filename" value="<?php echo $suggested_filename ?>" size="<?php echo $namelength ?>" />
             <input type="submit" name="submit-button" value="<?php _e('Download CSV for this list', 'participants-database') ?>" />
             <label for="include_csv_titles"><input type="checkbox" name="include_csv_titles" value="1"><?php _e('Include field titles', 'participants-database') ?></label>
-          </p>
+          </fieldset>
           <p>
       <?php _e('This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages. The fields included in the export are defined in the "CSV" column on the Manage Database Fields page.', 'participants-database') ?>
           </p>

@@ -8,11 +8,15 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
   background-color:#f6f6f6;
 }
 .participants_db input[type='text'] {
-  width: 100%;
+  width: 99%;
   max-width: 400px;
 }
 .participants_db input.add_field {
   width: 250px;
+}
+.manage-fields.widefat td,
+.manage-fields.widefat th {
+    padding: 8px 5px;
 }
 .participants_db option[value='none'],
 .participants_db option[value='other'] {
@@ -50,6 +54,7 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
 }
 #PDb_footer {
   display: inline-block;
+  background-color: rgb( 255,255,255);
   padding:7px;
   width:auto;
   overflow:auto;
@@ -173,6 +178,7 @@ body[class*='participants-database'] .text-block p,
 body[class*='participants-database'] .text-block li {
   line-height: 1.2;
 }
+/* now using WP defaults
 .participants_db input[type="submit"] {
   background-color:#ffffff;
   border: 1px solid #AAAAAA;
@@ -185,6 +191,7 @@ body[class*='participants-database'] .text-block li {
 .participants_db input:hover[type="submit"] {
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.1) inset;
 }
+*/
 .participants_db input.button-primary {
   padding:0 10px 1px;
 }
@@ -262,7 +269,7 @@ th.vertical-title  {
   width:25px;
 }
 th.vertical-title.number-column {
-  width: 43px;
+  width: 3em;
 }
 th.form_element {
   width:150px;
@@ -271,7 +278,7 @@ th.validation, th.title, th.default, th.group, th.name {
   width:8%;
 }
 #internal th.name, #internal th.title {
-  width:100%;
+  width:auto;
 }
 #internal table.manage-fields {
   width: 360px;
@@ -376,9 +383,13 @@ a.dragger {
 }
 .mask {
   position: absolute;
-  background-color: white;
+  background-color: rgb(241, 241, 241);
   display: block;
   z-index: 1000;
+}
+.branch-3-7 .mask,
+.branch-3-6 .mask  {
+  background-color: white;
 }
 .ui-tabs-nav .mask {
   left: 1px;
@@ -419,9 +430,12 @@ a.dragger {
   width: auto;
 }
 .participants_db .ui-tabs-nav .ui-state-default a {
+  background-color: rgba(0,0,0,0.1);
+ text-shadow: none;
+  padding-bottom: 4px;
 }
 .participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active a {
-  background-color: #ffffff;
+  background-color: rgba(0,0,0,0);
   padding-bottom: 6px;
 }
 .participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active .mask {
@@ -429,7 +443,7 @@ a.dragger {
 }
 .participants_db .ui-tabs-nav li a {
   padding: 4px 20px 6px;
-  font-weight: bold;
+  font-weight: normal;
 }
 .participants_db .ui-tabs-nav li a {
   line-height: 1.4;

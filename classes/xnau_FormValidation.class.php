@@ -365,7 +365,7 @@ class xnau_FormValidation {
   {
     if (is_array($string))
       return self::_is_empty_array($string);
-    return $string == '' or 0 !== preg_match('/^(\W+|\s+)$/', $string);
+    return $string === '';
   }
 
   /**

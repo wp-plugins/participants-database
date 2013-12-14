@@ -212,6 +212,13 @@ class Participants_Db extends PDb_Base {
   public static $search_set = false;
 
   /**
+   * holds the WP session object
+   * 
+   * @var object
+   */
+  public static $session;
+  
+  /**
    * initializes the static class
    * 
    * sets up the class autoloading, configuration values, hooks, filters and shortcodes
@@ -239,6 +246,8 @@ class Participants_Db extends PDb_Base {
 
     self::$last_record = self::$prefix . 'last_record';
     self::$css_prefix = self::$prefix;
+
+    self::$session = new PDb_Session();
 
     // install/deactivate and uninstall methods are handled by the PDB_Init class
     register_activation_hook(__FILE__, array('PDb_Init', 'on_activate'));
@@ -331,10 +340,17 @@ class Participants_Db extends PDb_Base {
     if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
       PDb_Init::on_update();
 
-    // get the plugin options array
-    if (!isset(self::$plugin_options)) {
+    /*
+     * instantiate the settings class; this only sets up the settings definitions, 
+     * the WP Settings API may not be available at this point, so we register the 
+     * settings on the 'admin_menu' hook
+     */
+    self::$Settings = new PDb_Settings();
 
-      self::$plugin_options = get_option(self::$participants_db_options);
+    // get the plugin options array
+    if (!is_array(self::$plugin_options)) {
+
+      self::$plugin_options = array_merge(self::$Settings->get_default_options(), get_option(self::$participants_db_options));
     }
     /*
      * set the plugin date display format: if "strict dates" is enabled, use the 
@@ -352,13 +368,6 @@ class Participants_Db extends PDb_Base {
             "From: " . self::$plugin_options['receipt_from_name'] . " <" . self::$plugin_options['receipt_from_address'] . ">\n" .
             "Content-Type: " . $type . "\n";
 
-    /*
-     * instantiate the settings class; this only sets up the settings definitions, 
-     * the WP Settings API may not be available at this point, so we register the 
-     * settings on the 'admin_menu' hook
-     */
-    self::$Settings = new PDb_Settings();
-
     // this processes form submits before any output so that redirects can be used
     self::process_page_request();
   }
@@ -373,11 +382,10 @@ class Participants_Db extends PDb_Base {
     /*
      * intialize the plugin settings for the plugin settings pages
      */
-    if (is_object(self::$Settings)) {
-      self::$Settings->initialize();
-    } else {
+    if (!is_object(self::$Settings)) {
     self::$Settings = new PDb_Settings();
     }
+    self::$Settings->initialize();
 
     // define the plugin admin menu pages
     add_menu_page(
@@ -433,7 +441,7 @@ class Participants_Db extends PDb_Base {
     );
 
     add_submenu_page(
-            'participants-database', 
+            self::PLUGIN_NAME, 
             __('Setup Guide', 'participants-database'), 
             __('Setup Guide', 'participants-database'), 
             'manage_options', 
@@ -591,7 +599,7 @@ class Participants_Db extends PDb_Base {
    * the ID of the record to show for editing can be provided one of three ways: 
    *    $_GET['pid'] (private link), 
    *    $atts['id'](deprecated) or $atts['record_id'] (in the sortcode), or 
-   *    $_SESSION['pdbid'] (directly from the signup form)
+   *    self::$session->get('pdbid') (directly from the signup form)
    * 
    * 
    * @param array $atts array of attributes drawn from the shortcode
@@ -605,8 +613,8 @@ class Participants_Db extends PDb_Base {
       $record_id = self::get_participant_id($_GET['pid']);
     }
     // get the id from the SESSION array; this overrides the GET string
-    if (isset($_SESSION['pdbid'])) {
-      $record_id = self::get_record_id_by_term('id', $_SESSION['pdbid']);
+    if (self::$session->get('pdbid')) {
+      $record_id = self::get_record_id_by_term('id', self::$session->get('pdbid'));
     }
 
     if ($record_id === false && (isset($atts['id']) || isset($atts['record_id']))) {
@@ -1206,6 +1214,9 @@ class Participants_Db extends PDb_Base {
 
       if (isset($post[$match_field]) && !empty($post[$match_field]) && self::field_value_exists($post[$match_field], $match_field)) {
 
+        /*
+         * we have found a match
+         */
         switch (self::$plugin_options['unique_email']) {
 
           case 1:
@@ -1889,6 +1900,11 @@ class Participants_Db extends PDb_Base {
       case 'insert':
     
         /*
+         * we are here for one of these cases:
+         *   a) we're adding a new record in the admin
+         *   b) a user is updating their record on the frontend
+         *   c) an admin is updating a record
+         *
          * set the raw post array filters. We pass in the $_POST array, expecting 
          * a possibly altered copy of it to be returned
          */
@@ -1910,7 +1926,10 @@ class Participants_Db extends PDb_Base {
         $wp_hook = self::$prefix . 'after_submit_' . ($_POST['action'] == 'insert' ? 'add' : 'update');
         do_action($wp_hook,self::get_participant($participant_id));
 
-        // if we are submitting from the frontend, we're done
+        /*
+         * if we are submitting from the frontend, set the feedback message and 
+         * send the update notification
+         */
         if (!is_admin()) {
 
           /*
@@ -1935,7 +1954,7 @@ class Participants_Db extends PDb_Base {
            */
           if (isset($post_data['thanks_page']) && $post_data['thanks_page'] != $_SERVER['REQUEST_URI']) {
           
-            $_SESSION['pdbid'] = $post_data['id'];
+            self::$session->set('pdbid', $post_data['id']);
 
             wp_redirect($post_data['thanks_page']); // self::add_uri_conjunction($post_data['thanks_page']) . 'pdbid=' . $post_data['id']
             
@@ -2060,9 +2079,9 @@ class Participants_Db extends PDb_Base {
 
         if (false !== $post_data['id']) {
           
-          $_SESSION['pdbid'] = $post_data['id'];
+          self::$session->set('pdbid', $post_data['id']);
 
-          wp_redirect($post_data['thanks_page']); // self::add_uri_conjunction($post_data['thanks_page']) . 'pdbid=' . $post_data['id']
+          wp_redirect($post_data['thanks_page']);
 
           exit;
         }
@@ -2111,6 +2130,10 @@ class Participants_Db extends PDb_Base {
 // a value was submitted, try to find a record with it
     $participant_id = self::_get_participant_id_by_term($column->name, $_POST[$column->name]);
 
+    
+    if (!is_object(self::$validation_errors)) {
+      self::$validation_errors = new PDb_FormValidation();
+    }
     if ($participant_id === false) {
       self::$validation_errors->add_error($column->name, 'identifier');
       return;
@@ -2564,12 +2587,13 @@ class Participants_Db extends PDb_Base {
       $post = get_post($_POST['postID']);
     
     /* 
-     * get the attributes array; these values were saved by the Shortcode class 
-     * when it was instantiated
+     * get the attributes array; these values were saved in the session array by 
+     * the Shortcode class when it was instantiated
      */
-    $atts = isset($_SESSION[self::$prefix . 'shortcode_atts']['list'][$_POST['instance_index']]) ? 
-            $_SESSION[self::$prefix . 'shortcode_atts']['list'][$_POST['instance_index']] : 
-            current($_SESSION[self::$prefix . 'shortcode_atts']['list']);
+    $shortcode_atts = self::$session(self::$prefix . 'shortcode_atts');
+    $atts = $shortcode_atts['list'][$_POST['instance_index']] !== false ? 
+            $shortcode_atts['list'][$_POST['instance_index']] : 
+            current($shortcode_atts['list']);
     
     
     // add the AJAX filtering flag
@@ -2745,7 +2769,7 @@ class Participants_Db extends PDb_Base {
        * sure. We also must assume that the database server and PHP server are on 
        * the same TZ.
        */
-      date_default_timezone_set(ini_get('date.timezone'));
+      date_default_timezone_set(date_default_timezone_get()); // ini_get('date.timezone')
       $date = strtotime($string);
     }
     

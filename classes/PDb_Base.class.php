@@ -442,22 +442,22 @@ var2: '.$var2);
   public static function set_admin_message($message, $type = 'error')
   {
     if (is_admin()) {
-			$_SESSION['admin_message'] = array($message, $type);
+			Participants_Db::$session->set('admin_message', array($message, $type));
 			Participants_Db::$admin_message = $message;
 			Participants_Db::$admin_message_type = $type;
 		}
   }
 
   /**
-   * sets the admin message
+   * prints the admin message
    */
   public static function admin_message()
   {
-    if (isset($_SESSION['admin_message'])) {
-      list(Participants_Db::$admin_message, Participants_Db::$admin_message_type) = $_SESSION['admin_message'];
+    if (Participants_Db::$session->get('admin_message')) {
+      list(Participants_Db::$admin_message, Participants_Db::$admin_message_type) = Participants_Db::$session->get('admin_message');
       if (!empty(Participants_Db::$admin_message)) {
         printf('<div class="%s"><p>%s</p></div>', Participants_Db::$admin_message_type, Participants_Db::$admin_message);
-        unset($_SESSION['admin_message']);
+        Participants_Db::$session->set('admin_message', '');
       }
     }
   }

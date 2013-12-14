@@ -225,10 +225,10 @@ if ($participant_values) :
           <tr>
             <th><h3><?php _e('Save the Record', 'participants-database') ?></h3></th>
           <td class="submit-buttons">
-            <?php if (isset($_GET['id'])) : ?><input class="button-secondary button-leftarrow" type="submit" value="<?php echo self::$i18n['previous'] ?>" name="submit_button"><?php endif ?>
-            <input class="button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit_button">
-            <input class="button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit_button">
-            <input class="button-secondary button-rightarrow" type="submit" value="<?php echo self::$i18n['next'] ?>" name="submit_button">
+            <?php if (isset($_GET['id'])) : ?><input class="button button-default button-leftarrow" type="submit" value="<?php echo self::$i18n['previous'] ?>" name="submit_button"><?php endif ?>
+            <input class="button button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit_button">
+            <input class="button button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit_button">
+            <input class="button button-default button-rightarrow" type="submit" value="<?php echo self::$i18n['next'] ?>" name="submit_button">
           </td>
           </tr>
           <tr>
@@ -242,7 +242,7 @@ if ($participant_values) :
           <tr>
             <th><h3><?php echo $options['save_changes_label'] ?></h3></th>
           <td class="submit-buttons">
-            <input class="button-primary pdb-submit" type="submit" value="<?php echo $options['save_changes_button'] ?>" name="save">
+            <input class="button button-primary pdb-submit" type="submit" value="<?php echo $options['save_changes_button'] ?>" name="save">
             <input name="submit_button" type="hidden" value="<?php echo self::$i18n['apply'] ?>">
           </td>
           </tr>

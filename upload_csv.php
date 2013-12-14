@@ -44,7 +44,7 @@ $CSV_import = new PDb_CSV_Import('csv_file_upload');
             </table>
             <p><?php printf(__('This means your spreadsheet needs to have %s columns, and the heading in each of those columns needs to match exactly the names above. If there is no data for a particular column, you can include it and leave it blank, or leave it out entirely. The order of the columns doesn&#39;t matter.', 'participants-database'), $CSV_import->column_count) ?></p>
             <p><?php _e('If the imported CSV file has a different column set, that column set will be imported and used. If a column name does not match a defined column in the database, the data from that column will be discarded', 'participants-database') ?></p>
-            <p><input type="submit" value="<?php _e('Get Blank CSV File', 'participants-database') ?>" style="float:left;margin:0 5px 5px 0" /><?php _e('You can download this file, then open it in Open Office, Excel or Google Docs.', 'participants-database') ?></p>
+            <p><input class="button button-default" type="submit" value="<?php _e('Get Blank CSV File', 'participants-database') ?>" style="float:left;margin:0 5px 5px 0" /><?php _e('You can download this file, then open it in Open Office, Excel or Google Docs.', 'participants-database') ?></p>
           </div>
         </div>
       </form>
@@ -81,7 +81,7 @@ $CSV_import = new PDb_CSV_Import('csv_file_upload');
 
             <?php /* _e( 'Enclosure Character', 'participants-database' ) ?> (&#39; or &quot;) <input name="eclosure" value="'" type="text" /><br /><?php */ ?>
             <?php _e('Choose .csv file to import:', 'participants-database') ?> <input name="uploadedfile" type="file" /><br />
-            <input type="submit" class="button-primary" value="<?php _e('Upload File', 'participants-database') ?>" />
+            <input type="submit" class="button button-primary" value="<?php _e('Upload File', 'participants-database') ?>" />
           </form>
         </div>
       </div>

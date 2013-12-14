@@ -269,7 +269,7 @@ foreach ($groups as $group) {
                   'value' => $PDb_i18n['add field'],
                   'name' => 'action',
                   'attributes' => array(
-                      'class' => 'add_field_button',
+                      'class' => 'button button-default',
                       'onclick' => 'return false;'
                   )
                       )
@@ -410,7 +410,7 @@ foreach ($groups as $group) {
                 'type' => 'submit',
                 'name' => 'action',
                 'value' => $PDb_i18n['update fields'],
-                'class' => 'button-primary'
+                'class' => 'button button-primary'
                     )
             );
             ?>
@@ -554,7 +554,7 @@ foreach ($groups as $group) {
               'type' => 'submit',
               'name' => 'submit-button',
               'value' => $PDb_i18n['update groups'],
-              'class' => 'button-primary'
+              'class' => 'button button-primary'
                   )
           );
           ?>

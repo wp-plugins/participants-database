@@ -50,6 +50,21 @@ class PDb_Settings extends xnau_Plugin_Settings {
   }
 
   /**
+   * get all options w/defaults
+   * 
+   * this is used to overload the options
+   * 
+   * @return array name => defualt
+   */
+  public function get_default_options() {
+    $defaults = array();
+    foreach($this->plugin_settings as $setting) {
+      $defaults[$setting['name']] = isset($setting['options']['value']) ? $setting['options']['value'] : '';
+    }
+    return $defaults;
+  }
+
+  /**
    * defines the individual settings for the plugin
    *
    * @return null
@@ -500,7 +515,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'options' => array(
             'type' => 'dropdown',
             'help_text' => __('The field used to identify the user&#39;s account. This must be a unique identifier for the record', 'participants-database'),
-            'options' => $this->_get_identifier_columns(),
+            'options' => $this->_get_identifier_columns(false),
             'value' => $this->_get_email_column(),
         )
     );
@@ -1079,7 +1094,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
   }
 
   /**
-   * this provides a set of field to select from
+   * this provides a set of fields to select from
    * 
    * @param bool $null if true include a null value
    * @global object $wpdb

@@ -157,11 +157,11 @@ class PDb_CAPTCHA {
      * if the last CAPTCHA submission was correct, we display it again
      */
     if ($this->last_challenge_met() && !empty($this->value)) {
-      extract($_SESSION['captcha_vars']);
+      extract(Participants_Db::$session->get('captcha_vars'));
     } else {
       /* generate the math question. We try to make it a simple arithmetic problem
        */
-      unset($_SESSION['captcha_result']);
+      Participants_Db::$session->set('captcha_vars', '');
       $o = array_rand($operators);
       switch ($o){
         case '&times;':
@@ -176,7 +176,7 @@ class PDb_CAPTCHA {
           $a = rand( 1, 10 );
           $b = rand( 1, 10 );
       }
-      $_SESSION['captcha_vars'] = compact('a', 'o', 'b');
+      Participants_Db::$session->set('captcha_vars', compact('a', 'o', 'b'));
     }
     $prompt_string = $a .' <span class="' . Participants_Db::$prefix . 'operator">' . $o . '</span> ' . $b . ' <span class="' . Participants_Db::$prefix . 'operator">=</span> ?';
     $this->HTML = '<span class="math-captcha">' . $prompt_string . '</span>';

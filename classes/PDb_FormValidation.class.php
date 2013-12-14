@@ -202,7 +202,7 @@ class PDb_FormValidation extends xnau_FormValidation {
      * the result of a captcha validation are stored in a session variable
      */
     if (strtolower($validation) === 'captcha' || $field->form_element == 'captcha')
-      $_SESSION['captcha_result'] = $valid;
+      Participants_Db::$session->set('captcha_result', $valid);
 
     if (false) {
       error_log(__METHOD__ . '

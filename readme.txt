@@ -2,7 +2,7 @@
 Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
-Requires at least: 3.4
+Requires at least: 3.6
 Tested up to: 3.7
 Stable tag: 1.5.2
 License: GPLv2
@@ -92,6 +92,8 @@ This plugin is fully compliant with WordPress Internationalization standards and
 * Russian: Konstantin Bashevoy [Полиатлон России](http://polyathlon-russia.com/base)
 
 * Slovak: Branco Radenovich [WebHostingGeeks.com](http://webhostinggeeks.com/blog/)
+
+* Norwegian: Anders Kleppe
 
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
