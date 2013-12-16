@@ -19,7 +19,14 @@
 #toplevel_page_participants-database img {
 	visibility:hidden;
 }
-/* add the "people" dashicon */
+/* add "people" icon */
 #adminmenu #toplevel_page_participants-database div.wp-menu-image:before  {
   content: "\f307";
+}
+#the-list .xnau-contribute {
+  vertical-align: middle;
+}
+#the-list .icon-xnau-glyph {
+  vertical-align: middle;
+  font-size: 130%;
 }

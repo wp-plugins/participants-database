@@ -43,9 +43,11 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
 .pagination {
   margin-bottom: 20px;
 }
-.redfade {
+.branch-3-7 .redfade,
+.branch-3-6 .redfade {
   box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
   border-color: rgba(197, 99, 59, 0.5);
+  background-color: rgb( 255,255,255);
 }
 [class*="pdb-"] p,
 .multicheckbox,
@@ -54,10 +56,17 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
 }
 #PDb_footer {
   display: inline-block;
-  background-color: rgb( 255,255,255);
+  background-color: rgba(245, 156, 0, 0.1);
+  border-color: rgba(245, 156, 0, 0.4);
   padding:7px;
   width:auto;
   overflow:auto;
+}
+#PDb_footer .icon-xnau-glyph {
+  font-size: 275%;
+  margin-right: 0.5ex;
+  float: left;
+  background-color: #ffffff;
 }
 fieldset.widefat {
   width:100%;
@@ -77,6 +86,16 @@ fieldset.widefat.inline-controls label {
   width:280px;
   float:left;
   margin:0 18px;
+}
+#PDb_footer .section a {
+  color: #925700;
+}
+#PDb_footer .section a:hover {
+  color: rgba(245, 156, 0, 1);
+}
+h4 .lowast {
+  position: relative;
+  top: -3px;
 }
 input[readonly] {
   border:none;
@@ -467,9 +486,6 @@ a.dragger {
 }
 .participants_db .ui-tabs-nav li a:hover {
   color: #000000;
-}
-.participants_db .ui-tabs-nav li.utility.ui-state-active a {
-  background: #ffffff;
 }
 .participants_db .ui-tabs-nav li.ui-tabs-selected a, 
 .participants_db .ui-tabs-nav li.ui-state-active a,

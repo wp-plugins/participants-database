@@ -434,7 +434,7 @@ foreach ($groups as $group) {
               'value' => $PDb_i18n['add group'],
               'name' => 'action',
               'attributes' => array(
-                  'class' => 'add_field_button',
+                  'class' => 'button button-default',
                   'onclick' => 'return false;'
               )
                   )

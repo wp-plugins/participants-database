@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5.2
+  Version: 1.5.3
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -507,11 +507,14 @@ class Participants_Db extends PDb_Base {
       wp_enqueue_script(self::$prefix.'manage_fields');
     }
 
+    
+    wp_register_style('pdb-utility', plugins_url('/css/xnau-utility.css', __FILE__));
     wp_register_style('pdb-global-admin', plugins_url('/css/PDb-admin-global.css', __FILE__), false, false);
     wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
     wp_register_style('pdb-admin', plugins_url('/css/PDb-admin.css', __FILE__));
 
     wp_enqueue_style('pdb-global-admin');
+    wp_enqueue_style('pdb-utility');
 
     // only incude these stylesheets on the plugin admin pages
     if (false !== stripos($hook, 'participants-database')) {
@@ -2825,13 +2828,13 @@ class Participants_Db extends PDb_Base {
    */
   public static function plugin_footer() {
     ?>
-    <div id="PDb_footer" class="widefat redfade">
+    <div id="PDb_footer" class="widefat redfade postbox">
       <div class="section">
         <h4><?php echo self::$plugin_title, ' ', self::$plugin_version ?><br /><?php _e('WordPress Plugin', 'participants-database') ?></h4>
         <p><em><?php _e('Helping organizations manage their volunteers, members and participants.', 'participants-database') ?></em></p>
       </div>
       <div class="section">
-        <h4><a href="http://xnau.com"><img src="<?php bloginfo('wpurl') ?>/wp-content/plugins/<?php echo self::PLUGIN_NAME ?>/ui/xnau-square-60.png" style="float:left;width:50px;height:auto;margin-right:10px" /></a><?php _e('Developed by', 'participants-database') ?><br /><a href="http://xnau.com">xn&lowast;au webdesign</a></h4>
+        <h4><a href="http://xnau.com"><span class="icon-xnau-glyph"></span></a><?php _e('Developed by', 'participants-database') ?><br /><a href="http://xnau.com">xn<span class="lowast">&lowast;</span>au webdesign</a></h4>
         <p><?php _e('Suggestions or crticisms of this plugin? I&#39;d love to hear them: email ', 'participants-database') ?><a href="mailto:support@xnau.com">support@xnau.com.</a>
       </div>
       <div class="section">
@@ -2885,9 +2888,9 @@ class Participants_Db extends PDb_Base {
     
       //error_log( ' meta links: '.print_r( $links,1 ));
       
-      $links[1] = str_replace('Roland Barker','xn&lowast;au webdesign',$links[1]);
+      $links[1] = str_replace('Roland Barker','<span class="icon-xnau-glyph"></span> xn&lowast;au webdesign',$links[1]);
       $links[] = '<a href="http://wordpress.org/support/view/plugin-reviews/participants-database">Submit a rating or review</a>';
-      $links[] = '<span style="color:#6B4001;">Free tech support and continued development relies on your support: <a class="button" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P5TNMURN5JBZA">contribute</a></span>';
+      $links[] = '<span style="color:#6B4001;">Free tech support and continued development relies on your support: <a class="button xnau-contribute" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P5TNMURN5JBZA">contribute</a></span>';
     }
     return $links;
   }

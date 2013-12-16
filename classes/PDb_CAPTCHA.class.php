@@ -161,7 +161,7 @@ class PDb_CAPTCHA {
     } else {
       /* generate the math question. We try to make it a simple arithmetic problem
        */
-      Participants_Db::$session->set('captcha_result', '');
+      Participants_Db::$session->clear('captcha_result');
       $o = array_rand($operators);
       switch ($o){
         case '&times;':

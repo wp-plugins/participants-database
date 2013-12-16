@@ -142,6 +142,18 @@ class PDb_Session {
 
 		return $this->session[ $key ];
 	}
+  /**
+   * clears a session variable
+   * 
+   * @param string $name the name of the variable to get
+   * @return null
+   */
+  public function clear($name) {
+    
+    $this->set($name, false);
+
+	}
 }
+
 
 ?>

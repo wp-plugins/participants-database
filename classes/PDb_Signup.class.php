@@ -112,7 +112,9 @@ class PDb_Signup extends PDb_Shortcode {
     } elseif (Participants_Db::$session->get('pdbid')) { // this will be true after a successful submission
 
       $this->participant_id = Participants_Db::$session->get('pdbid');
-      Participants_Db::$session->set('pdbid', false);
+      Participants_Db::$session->clear('pdbid');
+      Participants_Db::$session->clear('captcha_vars');
+      Participants_Db::$session->clear('captcha_result');
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
       if ($this->participant_values) {
         // check the notification sent status of the record

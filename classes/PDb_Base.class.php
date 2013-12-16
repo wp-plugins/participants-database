@@ -457,7 +457,7 @@ var2: '.$var2);
       list(Participants_Db::$admin_message, Participants_Db::$admin_message_type) = Participants_Db::$session->get('admin_message');
       if (!empty(Participants_Db::$admin_message)) {
         printf('<div class="%s"><p>%s</p></div>', Participants_Db::$admin_message_type, Participants_Db::$admin_message);
-        Participants_Db::$session->set('admin_message', '');
+        Participants_Db::$session->clear('admin_message');
       }
     }
   }

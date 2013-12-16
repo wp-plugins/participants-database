@@ -147,12 +147,12 @@ class PDb_FormValidation extends xnau_FormValidation {
           $regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
           break;
 
-        case ( 'captcha' == strtolower($validation) ) :
+        case ( 'captcha' == strtolower($field->validation) ) :
 
           $field->value = isset($field->value[1]) ? $field->value[1] : '';
 
           // grab the value and the validation key
-          list($info, $value) = (isset($this->post_array[$validation][1]) ? $this->post_array[$validation] : array($this->post_array[$validation][0], $field->value));
+          list($info, $value) = (isset($this->post_array[$field->name][1]) ? $this->post_array[$field->name] : array($this->post_array[$field->name][0], $field->value));
           $info = json_decode(urldecode($info));
 
           /* 
@@ -187,7 +187,7 @@ class PDb_FormValidation extends xnau_FormValidation {
         
       } elseif ($regex !== false && preg_match($regex, $field->value) == 0) {
         
-        $field->error_type = $validation == 'captcha' ? 'captcha' : 'invalid';
+        $field->error_type = $field->validation == 'captcha' ? 'captcha' : 'invalid';
         
       }
     }
