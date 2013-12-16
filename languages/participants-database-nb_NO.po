@@ -1,12 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Participants Database 1.5 beta 5 nb_NO 1.01\n"
+"Project-Id-Version: Participants Database 1.5 beta 5 nb_NO 1.1 WP3.8 "
+"compatible\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/participants-database\n"
 "POT-Creation-Date: 2013-11-27 00:32:23+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2013-12-14 01:11+0100\n"
+"PO-Revision-Date: 2013-12-16 08:01+0100\n"
 "Last-Translator: Anders Kleppe <anders.kleppe@alumni.nhh.no>\n"
 "Language-Team: \n"
 "Language: nb_NO\n"
@@ -30,7 +31,7 @@ msgstr "Tekstboks"
 
 #: classes/PDb_FormElement.class.php:428
 msgid "Rich Text"
-msgstr "Rik tekst"
+msgstr "Rik-tekst"
 
 #: classes/PDb_FormElement.class.php:429
 msgid "Checkbox"
@@ -78,7 +79,7 @@ msgstr "Filopplastingsfelt"
 
 #: classes/PDb_FormElement.class.php:440
 msgid "Hidden Field"
-msgstr "Skjult Felt"
+msgstr "Skjult felt"
 
 #: classes/PDb_FormElement.class.php:441
 msgid "Password Field"
@@ -128,7 +129,7 @@ msgstr "Synkende"
 #: classes/PDb_List.class.php:1380 classes/PDb_List_Admin.class.php:850
 msgctxt "submit button label"
 msgid "Delete Checked"
-msgstr "Slett Merkede Elementer"
+msgstr "Slett merkede elementer"
 
 #: classes/PDb_List.class.php:1381 classes/PDb_List_Admin.class.php:851
 msgctxt "submit button label"
@@ -175,7 +176,7 @@ msgstr "Vil du virkelig slette de valgte postene?"
 #: classes/PDb_List_Admin.class.php:423 participants-database.php:392
 #: participants-database.php:393
 msgid "List Participants"
-msgstr "Liste over Medlemmer"
+msgstr "Liste over deltakere"
 
 #: classes/PDb_List_Admin.class.php:424
 msgid "%s record found, sorted by:"
@@ -294,7 +295,7 @@ msgstr "Visningsinnstillinger"
 
 #: classes/PDb_Settings.class.php:22
 msgid "Resend Link Settings"
-msgstr "Sende Ny Lenk"
+msgstr "Send ny lenk"
 
 #: classes/PDb_Settings.class.php:23
 msgid "Advanced Settings"
@@ -343,18 +344,18 @@ msgid ""
 "blog/wordpress/firebug-wordpress-css/\">Use Firebug for Editing WordPress "
 "Themes.</a></p>"
 msgstr ""
-"Bruk CSS regler for å designe hvordan programtillegget vises på nettsiden.</"
+"Bruk CSS regler for å designe hvordan utvidelsen vises på nettsiden.</"
 "h4><p>Hvis du ikke kjenner til CSS, kan du komme i gang ved å se denne "
 "innføringen (på engelsk): <a href=\"http://www.ostraining.com/blog/wordpress/"
 "firebug-wordpress-css/\">Use Firebug for Editing WordPress Themes.</a></p>"
 
 #: classes/PDb_Settings.class.php:42
 msgid "Save Plugin Settings"
-msgstr "Lagre Innstillingene for Programtillegget"
+msgstr "Lagre innstillingene for utvidelsen"
 
 #: classes/PDb_Settings.class.php:67
 msgid "File Upload Location"
-msgstr "Filplassering for Opplasting av Filer"
+msgstr "Filsti for opplasting av filer"
 
 #: classes/PDb_Settings.class.php:71
 msgid ""
@@ -365,12 +366,12 @@ msgid ""
 msgstr ""
 "Dette definerer hvor de opplastede filer vil plasseres i forhold til "
 "WordPressroten. Standardplasseringen er '/wp-content/uploads/participants-"
-"database'<br /> Ikke legg den i programtilleggsmappen (plugin-mappen), "
-"bilder og filer kan bli slettet når programtillegget oppdateres."
+"database'<br /> Ikke legg den i mapen til utvidelsen (plugin-mappen), bilder "
+"og filer kan bli slettet når utvidelsen oppdateres."
 
 #: classes/PDb_Settings.class.php:78
 msgid "File Upload Limit"
-msgstr "Filopplasting Maksimal Størrelse"
+msgstr "Maksimal størrelse på opplasting av filer"
 
 #: classes/PDb_Settings.class.php:82
 msgid "the maximum allowed file size (in kilobytes) for an uploaded file"
@@ -403,7 +404,7 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:111
 msgid "Link Image to Fullsize"
-msgstr "Lenk Bilde til Bildet i Full Størrelse"
+msgstr "Lenk bilde til et bildet i full størrelse."
 
 #: classes/PDb_Settings.class.php:116
 msgid ""
@@ -411,7 +412,7 @@ msgid ""
 "\"lightbox\" plugins."
 msgstr ""
 "Plasser en lenke til bildet i full størrelse på bildet. Denne lenken vil "
-"virke med de fleste \"lightbox\" programtillegg."
+"virke med de fleste \"lightbox\" utvidelser."
 
 #: classes/PDb_Settings.class.php:124
 msgid "Allow File Delete"
@@ -423,11 +424,11 @@ msgid ""
 "deleted from a record by a user"
 msgstr ""
 "Hvis avkrysset, tillater denne funksjonen opplastede filer og bilder å bli "
-"slettet fra databasen når en bruker sletter filer/bilder i en oppføring/post"
+"slettet fra databasen når en bruker sletter filer/bilder i en post."
 
 #: classes/PDb_Settings.class.php:137
 msgid "Make Links Clickable"
-msgstr "Lag Lenker Klikkbare"
+msgstr "Lag lenker klikkbare"
 
 #: classes/PDb_Settings.class.php:142
 msgid ""
@@ -447,7 +448,7 @@ msgstr "Beskytt e-postadresser i tekstfeltet med Javaskript."
 
 #: classes/PDb_Settings.class.php:163
 msgid "Missing Field Error Message"
-msgstr "Feilmelding for Manglende Felt"
+msgstr "Feilmelding for manglende felt"
 
 #: classes/PDb_Settings.class.php:167
 msgid ""
@@ -463,7 +464,7 @@ msgstr "%s feltet er påkrevd."
 
 #: classes/PDb_Settings.class.php:174
 msgid "Invalid Field Error Message"
-msgstr "Feilmelding for Ugyldig Felt"
+msgstr "Feilmelding for ugyldig felt"
 
 #: classes/PDb_Settings.class.php:178
 msgid ""
@@ -477,7 +478,7 @@ msgstr "%s feltet ser ut til å være ugyldig."
 
 #: classes/PDb_Settings.class.php:185
 msgid "Non-Matching Field Error Message"
-msgstr "Feilmelding for Ikke Samsvarende Felt"
+msgstr "Feilmelding for felt som ikke samsvarer"
 
 #: classes/PDb_Settings.class.php:189
 msgid ""
@@ -495,12 +496,13 @@ msgstr "%s feltet må samsvare med %s feltet."
 
 #: classes/PDb_Settings.class.php:197
 msgid "Failed CAPTCHA Message"
-msgstr "Feil CAPTCHA Melding"
+msgstr "Feilmelding CAPTCHA"
 
 #: classes/PDb_Settings.class.php:201
 msgid "the message shown when the CAPTCHA (verify human) test failed"
 msgstr ""
-"Meldingen vises når CAPTCHA-testen (verifiserer om et menneske) mislyktes."
+"Meldingen vises når CAPTCHA-testen (verifiserer om et menneske har lagt inn "
+"informasjonen) mislyktes."
 
 #: classes/PDb_Settings.class.php:202
 msgid "Pleast try the %s question again."
@@ -508,7 +510,7 @@ msgstr "Prøv %s spørsmålet på nytt."
 
 #: classes/PDb_Settings.class.php:208
 msgid "Field Error Style"
-msgstr "Feil: Feltstil"
+msgstr "Feilmelding feltstil"
 
 #: classes/PDb_Settings.class.php:212
 msgid ""
@@ -520,7 +522,7 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:219
 msgid "Mark Required Fields"
-msgstr "Marker Obligatoriske Felt"
+msgstr "Marker påkrevde felt"
 
 #: classes/PDb_Settings.class.php:224
 msgid "mark the title of required fields?"
@@ -528,7 +530,7 @@ msgstr "Marker tittelen på påkrevde felt?"
 
 #: classes/PDb_Settings.class.php:232
 msgid "Required Field Marker"
-msgstr "Påkrevd Feltmerke"
+msgstr "Påkrevd feltmerke"
 
 #: classes/PDb_Settings.class.php:236
 msgid ""
@@ -540,7 +542,7 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:261
 msgid "Signup Button Text"
-msgstr "Registreringsknapp Tekst"
+msgstr "Tekst på registreringsknap"
 
 #: classes/PDb_Settings.class.php:265
 msgid "text shown on the button to sign up"
@@ -549,11 +551,11 @@ msgstr "Teksten som vises på knappen for registrering."
 #: classes/PDb_Settings.class.php:266
 msgctxt "the text on a button to submit a signup form"
 msgid "Sign Up"
-msgstr "Bli Medlem"
+msgstr "Bli medlem"
 
 #: classes/PDb_Settings.class.php:272
 msgid "Signup Thanks Page"
-msgstr "Registrering Takkeside"
+msgstr "Registrering takkeside"
 
 #: classes/PDb_Settings.class.php:276
 msgid ""
@@ -570,7 +572,7 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:285
 msgid "Show Field Groups"
-msgstr "Vis Feltgrupper"
+msgstr "Vis feltgrupper"
 
 #: classes/PDb_Settings.class.php:290
 msgid "Show groups and group descriptions in the signup form."
@@ -578,7 +580,7 @@ msgstr "Vis grupper og gruppebeskrivelser i registreringsskjemaet."
 
 #: classes/PDb_Settings.class.php:298
 msgid "Duplicate Record Check Field"
-msgstr "Duplikat Sjekk Felt for Post"
+msgstr "Duplikat sjekkfelt for post"
 
 #: classes/PDb_Settings.class.php:303
 msgid ""
@@ -590,7 +592,7 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:310
 msgid "Duplicate Record Preference"
-msgstr "Duplikat Innstillinger for Post"
+msgstr "Duplikat Innstillinger for duplikatsjekk av post"
 
 #: classes/PDb_Settings.class.php:315
 msgid ""
@@ -614,7 +616,7 @@ msgstr "Vis en valideringsfeilmelding."
 
 #: classes/PDb_Settings.class.php:328
 msgid "Duplicate Record Error Message"
-msgstr "Duplikat Feilmelding for Post"
+msgstr "Feilmelding for duplikat post"
 
 #: classes/PDb_Settings.class.php:332
 msgid ""
@@ -632,15 +634,15 @@ msgstr "En post med det %s eksisterer allerede. Velg et annet."
 
 #: classes/PDb_Settings.class.php:339
 msgid "Send Signup Response Email"
-msgstr "Send E-postsvar etter Registrering"
+msgstr "Send e-postsvar etter registrering"
 
 #: classes/PDb_Settings.class.php:343
 msgid "Send a receipt email to people who sign up"
-msgstr "Send kvittering på e-post til brukere som registrerer seg"
+msgstr "Send kvittering på e-post til brukere som registrerer seg."
 
 #: classes/PDb_Settings.class.php:351
 msgid "Signup Email From Address"
-msgstr "Registrering E-post fra Adresse"
+msgstr "Registrering e-post fra adresse"
 
 #: classes/PDb_Settings.class.php:355
 msgid ""
@@ -655,15 +657,15 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:362
 msgid "Signup Email From Name"
-msgstr "Send E-post fra Navn"
+msgstr "Send e-post fra navn"
 
 #: classes/PDb_Settings.class.php:366
 msgid "the \"From\" name on signup receipt emails."
-msgstr " \"Fra\" adressen på e-post med registreringskvitteringer."
+msgstr " Navnet i \"Fra\"-feltet på e-post med registreringskvitteringer."
 
 #: classes/PDb_Settings.class.php:373
 msgid "Signup Response Email Subject"
-msgstr "Kvittering E-post Emne"
+msgstr "Emne for e-postkvittering"
 
 #: classes/PDb_Settings.class.php:377
 msgid ""
@@ -679,7 +681,7 @@ msgstr "Du har registrert deg på %s"
 
 #: classes/PDb_Settings.class.php:384
 msgid "Signup Response Email"
-msgstr "Registrerings E-postsvar"
+msgstr "E-post takketekst etter registrering"
 
 #: classes/PDb_Settings.class.php:388
 msgid ""
@@ -690,9 +692,9 @@ msgid ""
 "including hidden fields."
 msgstr ""
 "Meldingsteksten i e-posten en besøkende får når de registrerer seg. Den "
-"inneholder en lenk ([record_link]) tilbake til posten sin, slik at de kan "
+"inneholder en lenk [record_link] tilbake til posten sin, slik at de kan "
 "fylle den ut. Meldingsteksten kan inneholde HTML og/eller plassholdere: "
-"[first_name]. [etternavn], [e-post], [record_link]. Du kan bare bruke "
+"[first_name], [last_name], [email], [record_link]. Du kan bare bruke "
 "plassholdere for felt som er til stede i registreringsskjemaet, inkludert "
 "skjulte felt."
 
@@ -711,7 +713,7 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:396
 msgid "Signup Thanks Message"
-msgstr "Registrerings Takkemelding"
+msgstr "Takkemelding etter registrering"
 
 #: classes/PDb_Settings.class.php:400
 msgid ""
@@ -719,7 +721,7 @@ msgid ""
 "Can include HTML and placeholders (see above)"
 msgstr ""
 "Merknad som skal vises på nettsiden etter at noen har sendt inn et "
-"registreringsskjema. Kan inkludere HTML og plassholdere (se ovenfor)"
+"registreringsskjema. Kan inkludere HTML og plassholdere (se ovenfor)."
 
 #: classes/PDb_Settings.class.php:401
 msgid ""
@@ -728,14 +730,14 @@ msgid ""
 "information or update your information by visiting the link provided in the "
 "email.</p>"
 msgstr ""
-"<p>Tusen takk for at du registrerte deg [first_name]!</p><p>Du vil motta en "
+"<p>Tusen takk for at du registrerte deg [first_name].</p><p>Du vil motta en "
 "bekreftelse på e-post om kort tid. Du kan oppdatere informasjonen, eller "
 "gjøre registreringen helt ferdig senere ved å fylle inn mer informasjon ved "
 "å følge lenken som er vedlagt i e-posten.</p>"
 
 #: classes/PDb_Settings.class.php:407
 msgid "Send Signup Notification Email"
-msgstr "Send E-postvarsel etter Registrering"
+msgstr "Send e-postvarsel etter registrering"
 
 #: classes/PDb_Settings.class.php:412
 msgid "Send an email notification that a signup has occurred."
@@ -743,20 +745,20 @@ msgstr "Send et e-postvarsel om at en bruker har registrert seg."
 
 #: classes/PDb_Settings.class.php:421
 msgid "Signup Notification Recipients"
-msgstr "Mottakere Registreringsbeskjed"
+msgstr "Mottakere av registreringsbekreftelse"
 
 #: classes/PDb_Settings.class.php:425
 msgid "comma-separated list of email addresses to send signup notifications to"
-msgstr "Kommaseparert liste over e-postadresser å sende påminnelser til"
+msgstr "Kommaseparert liste over e-postadresser som sendes påminnelser til"
 
 #: classes/PDb_Settings.class.php:432
 msgid "Signup Notification Email Subject"
-msgstr "Mottakere Registreringsbeskjed E-postemne"
+msgstr "E-postemne til mottakere av registreringsbekreftelse "
 
 #: classes/PDb_Settings.class.php:436 classes/PDb_Settings.class.php:550
 msgid ""
 "subject of the notification email; placeholder tags can be used (see above)"
-msgstr "emne i e-posten. Plassholdermerke kan brukes (se ovenfor)"
+msgstr "Emne i e-posten. Plassholdermerke kan brukes (se ovenfor)."
 
 #. translators: the %s will be the name of the website
 #: classes/PDb_Settings.class.php:438
@@ -765,7 +767,7 @@ msgstr "Ny registrering på %s"
 
 #: classes/PDb_Settings.class.php:444
 msgid "Signup Notification Email"
-msgstr "E-post Registreringsbeskjed "
+msgstr "Tekst i admin e-post"
 
 #: classes/PDb_Settings.class.php:448
 msgid ""
@@ -781,13 +783,13 @@ msgid ""
 "[last_name]</li><li>Email: [email]</li></ul><p>Edit this new record here: <a "
 "href=\"[admin_record_link]\">[admin_record_link]</a></p>"
 msgstr ""
-"<p> En ny innmelding har blitt registrert</p><ul><li>Navn: [first_name] "
-"[last_name]</li><li>E-post: [email]</li></ul><p> Rediger den nye postenher: "
+"<p> En ny innmelding har blitt registrert.</p><ul><li>Navn: [first_name] "
+"[last_name]</li><li>E-post: [email]</li></ul><p> Rediger den nye posten her: "
 "<a href=\"[admin_record_link]\">[admin_record_link]</a></p>"
 
 #: classes/PDb_Settings.class.php:461
 msgid "Enable Lost Private Link"
-msgstr "Aktiver Tapt Privat Lenke"
+msgstr "Aktiver tapt privat lenke"
 
 #: classes/PDb_Settings.class.php:466
 msgid ""
@@ -799,52 +801,49 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:474
 msgid "Lost Private Link Text"
-msgstr "Tapt Privat Lenk Tekst"
+msgstr "Tekst for tapt privat lenk"
 
 #: classes/PDb_Settings.class.php:478
 msgid "clickable text shown in the signup form"
-msgstr "klikkbar tekst vist i registreringsskjemaet"
+msgstr "Klikkbar tekst vist i registreringsskjemaet."
 
 #: classes/PDb_Settings.class.php:479 templates/pdb-signup-bootstrap.php:56
-msgid "Forget your private link? Click here to have it emailed to you."
-msgstr ""
-"Har du glemt din private lenk? Klikk her for å få den tilsendt på e-post."
-
 #: classes/PDb_Settings.class.php:484
 msgid "Lost Private Link Page"
-msgstr "Tapt Privat Lenk Side"
+msgstr "Side for tapt privat lenk"
 
 #: classes/PDb_Settings.class.php:489
 msgid "send people to this page to request their private link."
-msgstr "send brukere til denne siden for å la dem be om den private lenken."
+msgstr ""
+"Send brukere til denne siden for å la dem be om sin private lenk på nytt."
 
 #: classes/PDb_Settings.class.php:498
 msgid "Lost Private Link ID Field"
-msgstr "Tapt Privat Lenk ID-felt"
+msgstr "Tapt privat lenk ID-felt"
 
 #: classes/PDb_Settings.class.php:502
 msgid ""
 "The field used to identify the user&#39;s account. This must be a unique "
 "identifier for the record"
 msgstr ""
-"Feltet som brukes for å identifisere brukerens konto. Dette må være et felt "
-"med en unik identifikator for posten."
+"Feltet brukes for å identifisere brukerens konto. Dette må være et felt med "
+"en unik identifikator for posten."
 
 #: classes/PDb_Settings.class.php:510
 msgid "Lost Private Link Email Subject"
-msgstr "Tapt Privat Lenk E-postemne "
+msgstr "Emnefelt for tapt privat lenk E-post"
 
 #: classes/PDb_Settings.class.php:514
 msgid "subject line for the lost private link email"
-msgstr "emnelinje i e-post for tapt privat lenk"
+msgstr "Emnefeltet i e-post for tapt privat lenk."
 
 #: classes/PDb_Settings.class.php:515
 msgid "Here is your private link on %s"
-msgstr "Her er din private lenk på %s"
+msgstr "Her er din private lenke på %s."
 
 #: classes/PDb_Settings.class.php:521
 msgid "Lost Private Link Email"
-msgstr "Tapt Lenk E-post"
+msgstr "Tapt lenke e-post"
 
 #: classes/PDb_Settings.class.php:525
 msgid "Body of the email sent when a lost private link is requested."
@@ -859,7 +858,7 @@ msgstr "Her er den private lenken du har bedt om fra %s:"
 
 #: classes/PDb_Settings.class.php:533
 msgid "Send Lost Private Link Notification Email"
-msgstr "E-post Tapt Lenk"
+msgstr "Send e-postvarsel om tapt privat lenke."
 
 #: classes/PDb_Settings.class.php:538
 msgid ""
@@ -871,7 +870,7 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:546
 msgid "Lost Private Link Notification Email Subject"
-msgstr "Emne E-post Tapt Lenk "
+msgstr "Emne e-post for tapt lenk "
 
 #. translators: the %s will be the name of the website
 #: classes/PDb_Settings.class.php:552
@@ -880,23 +879,23 @@ msgstr "Det er blitt bedt om en tapt privat lenke på %s"
 
 #: classes/PDb_Settings.class.php:558
 msgid "Lost Private Link Notification Email"
-msgstr "E-post Tapt Privat Lenk "
+msgstr "E-postvarsel om tapt privat lenke"
 
 #: classes/PDb_Settings.class.php:562
 msgid "notification email body"
-msgstr "e-postvarsel meldingstekst"
+msgstr "Meldingsteksten i e-postvarselet."
 
 #: classes/PDb_Settings.class.php:563
 msgid ""
 "<p>A lost private link has been requested by:</p><ul><li>Name: [first_name] "
 "[last_name]</li><li>Email: [email]</li></ul>"
 msgstr ""
-"<p>En tapt privat lenk er bedt om å sendes på nytt av:</p><ul><li>Navn: "
-"[first_name] [last_name]</li><li>E-post: [email]</li></ul>"
+"<p>En tapt privat lenk er blitt bedt om å sendes på nytt til:</"
+"p><ul><li>Navn: [first_name] [last_name]</li><li>E-post: [email]</li></ul>"
 
 #: classes/PDb_Settings.class.php:569
 msgid "Retrieve Private Link Error Message"
-msgstr "Feilmelding Privatlenk "
+msgstr "Feilmelding for registrering av tapt privat lenke."
 
 #: classes/PDb_Settings.class.php:573
 msgid ""
@@ -904,7 +903,7 @@ msgid ""
 "found"
 msgstr ""
 "Melding som vises når en oppføring som samsvarer med lenkeidentifikatoren "
-"ikke blir funnet"
+"ikke blir funnet."
 
 #: classes/PDb_Settings.class.php:574
 msgid "A record matching that %s cannot be found."
@@ -919,12 +918,12 @@ msgid ""
 "The page where your participant record ([pdb_record] shortcode) is "
 "displayed. You can use a Post ID for posts and custom post types."
 msgstr ""
-"Siden der brukerlisten  ([pdb_record] kodesnarveien) vises. Du kan bruke en "
-"Post-ID for innlegg/sider og tilpassede innlegg/sider."
+"Siden der deltakerlisten ([pdb_record] kodesnarveien) vises. Du kan bruke en "
+"Post-ID for sider og tilpassede innlegg."
 
 #: classes/PDb_Settings.class.php:599
 msgid "Show Group Descriptions"
-msgstr "Vis Gruppebeskrivelser"
+msgstr "Vis gruppebeskrivelser"
 
 #: classes/PDb_Settings.class.php:604
 msgid "Show the group description under each group title in the record form."
@@ -932,23 +931,23 @@ msgstr "Vis gruppebeskrivelsen under hver gruppetittel i postskjemaet."
 
 #: classes/PDb_Settings.class.php:612
 msgid "Save Changes Label"
-msgstr "Lagre Endring Etikett"
+msgstr "Lagre endring for etikett"
 
 #: classes/PDb_Settings.class.php:617
 msgid "label for the save changes button on the record form"
-msgstr "etikett for 'lagre endringer' knapp i post-/oppføringsskjema"
+msgstr "Etikett for 'Lagre endringer' knapp i postskjema"
 
 #: classes/PDb_Settings.class.php:618
 msgid "Save Your Changes"
-msgstr "Lagre Endringer"
+msgstr "Lagre endringer"
 
 #: classes/PDb_Settings.class.php:624
 msgid "Save Button Text"
-msgstr "Lagre Knappteksten"
+msgstr "Lagre teksten til knappen"
 
 #: classes/PDb_Settings.class.php:629
 msgid "text on the \"save\" button"
-msgstr "teksten på lagreknappen \"save\""
+msgstr "Teksten på lagreknappen \"Lagre\"."
 
 #: classes/PDb_Settings.class.php:630
 msgctxt "a label for a button to save a form"
@@ -957,26 +956,26 @@ msgstr "Lagre"
 
 #: classes/PDb_Settings.class.php:636
 msgid "Record Updated Message"
-msgstr "Melding om Oppdatert Post"
+msgstr "Melding om oppdatert post"
 
 #: classes/PDb_Settings.class.php:640
 msgid "the message shown when a record form has been successfully submitted"
-msgstr "denne meldingen vises når en gyldig registrering er sendt"
+msgstr "Denne meldingen vises når en gyldig registrering er sendt."
 
 #: classes/PDb_Settings.class.php:641
 msgid "Your information has been updated"
-msgstr "Informasjonen har blitt oppdatert"
+msgstr "Informasjonen din er oppdatert"
 
 #: classes/PDb_Settings.class.php:647
 msgid "Record Not Found Error Message"
-msgstr "Oppføring Ikke Funnet Feilmelding"
+msgstr "Feilmelding for post ikke funnet"
 
 #: classes/PDb_Settings.class.php:651
 msgid ""
 "message to show if the record page was accessed without a valid identifier. "
 "Leave this empty if you want nothing at all to show."
 msgstr ""
-"melding for å vise om siden med poster ble vist uten en gyldig "
+"Melding for å vise om siden med poster ble vist uten en gyldig "
 "identifikator. La dette stå tomt hvis du ikke vil vise noe."
 
 #: classes/PDb_Settings.class.php:652
@@ -985,7 +984,7 @@ msgstr "Ingen post ble funnet."
 
 #: classes/PDb_Settings.class.php:658
 msgid "Send Record Form Update Notification Email"
-msgstr "Send E-postvarsel etter Oppdatering av Post"
+msgstr "Send e-postvarsel etter oppdatering av post"
 
 #: classes/PDb_Settings.class.php:663
 msgid ""
@@ -999,14 +998,14 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:671
 msgid "Record Update Email Subject"
-msgstr "E-postemne for Oppdatert Post"
+msgstr "E-postemne for oppdatert post"
 
 #: classes/PDb_Settings.class.php:675
 msgid ""
 "subject line for the record update notification email; placeholders can be "
 "used."
 msgstr ""
-"emnelinje for e-post med registreringskvittering for oppdatert post. "
+"Emnelinje for e-post med registreringskvittering for oppdatert post. "
 "Plassholdermerke kan brukes."
 
 #: classes/PDb_Settings.class.php:676
@@ -1015,7 +1014,7 @@ msgstr "En post har akkurat blitt oppdatert på %s"
 
 #: classes/PDb_Settings.class.php:682
 msgid "Record Update Notification Email"
-msgstr "E-postvarsling om Oppdatering av Post"
+msgstr "E-postvarsling om oppdatering av post"
 
 #. translators: [date] and [admin_record_link] must not be translated, they
 #. must be used literally. The rest of the words enclosed in brackets can be
@@ -1051,27 +1050,27 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:701
 msgid "Records per Page"
-msgstr "Oppføringer per Side"
+msgstr "Oppføringer per side"
 
 #: classes/PDb_Settings.class.php:705
 msgid "the number of records to show on each page"
-msgstr "antall poster som vises per side"
+msgstr "Antall poster som vises per side."
 
 #: classes/PDb_Settings.class.php:713
 msgid "Single Record Link Field"
-msgstr "Enkelt Post Lenkefelt"
+msgstr "Lenk til enkeltpost"
 
 #: classes/PDb_Settings.class.php:718
 msgid ""
 "select the field on which to put a link to the [pdb_single] shortcode. Leave "
 "blank or set to \"none\" for no link."
 msgstr ""
-"velg feltet hvor lenken til [pdb_single] kodesnarveien skal være. Om du ikke "
+"Velg feltet hvor lenken til [pdb_single] kodesnarveien skal være. Om du ikke "
 "skal ha noen lenke, la feltet være blankt (satt til \"none\")."
 
 #: classes/PDb_Settings.class.php:725
 msgid "Single Record Page"
-msgstr "Enkelt Post Side"
+msgstr "Enkeltpostside"
 
 #: classes/PDb_Settings.class.php:731
 msgid ""
@@ -1079,13 +1078,13 @@ msgid ""
 "assign a post or custom post type, select \"Post ID\" and enter the post ID "
 "in the \"other\" box."
 msgstr ""
-"Dette er siden der [pdb_single] kortkoden ligger Hvis du ønsker å tildele et "
-"innlegg/en side eller tilpasset innlegg/side (Custom Post Type), velger du "
-"\"Post ID\" og skriv innleggs-/side ID i \"annetboksen\"."
+"Dette er siden der [pdb_single] kodesnarveien ligger. Hvis du ønsker å "
+"tildele en side eller tilpasset innlegg (Custom Post Type), velger du \"Post "
+"ID\" og skriv innleggs-/side ID i \"annen\"-boksen."
 
 #: classes/PDb_Settings.class.php:738
 msgid "No Records Message"
-msgstr "Ingen Poster Eksisterer"
+msgstr "Melding for ingen poster funnet"
 
 #: classes/PDb_Settings.class.php:742
 msgid "Message shown when no records are found."
@@ -1093,7 +1092,7 @@ msgstr "Melding som vises når ingen poster blir funnet."
 
 #: classes/PDb_Settings.class.php:743
 msgid "No Records Found"
-msgstr "Ingen Poster Funnet"
+msgstr "Ingen poster funnet"
 
 #: classes/PDb_Settings.class.php:748
 msgid "Show Count"
@@ -1101,11 +1100,12 @@ msgstr "Vis antall"
 
 #: classes/PDb_Settings.class.php:753
 msgid "Show the list count on list displays. Can also be set in the shortcode."
-msgstr "Vis listetelleren på listeskjermen. Kan også settes i kodesnarveien."
+msgstr ""
+"Vis listetelleren på siden med listen. Kan også settes i kodesnarveien."
 
 #: classes/PDb_Settings.class.php:761
 msgid "List Count Template"
-msgstr "Vis Tellermalen"
+msgstr "Vis telleren"
 
 #: classes/PDb_Settings.class.php:765
 msgid ""
@@ -1115,7 +1115,7 @@ msgid ""
 msgstr ""
 "Mal for å vise antall poster i en liste. %1$s - totalt antall poster funnet, "
 "%2$s - antall poster som vises per side, %3$s - starter med postens nummer, "
-"%4$s - slutter med postens nummer, %5$s - nåværende sidetall"
+"%4$s - slutter med postens nummer, %5$s - nåværende sidetall."
 
 #: classes/PDb_Settings.class.php:766
 msgid "Total Records Found: %1$s, showing %2$s per page"
@@ -1123,41 +1123,41 @@ msgstr "Totalt antall poster funnet: %1$s. Viser %2$s per side"
 
 #: classes/PDb_Settings.class.php:776
 msgid "List Default Sort"
-msgstr "Vis Standard Sortering"
+msgstr "Vis standard sortering"
 
 #: classes/PDb_Settings.class.php:782
 msgid ""
 "The record list shown by the list shortcode will be sorted by this field by "
 "default. (Field must be checked \"sortable.\")"
 msgstr ""
-"Oppføringens liste vist av listen kortkode, vil bli sortert etter dette "
-"feltet som standard. (Feltet må aktiveres som \"sorterbart\")."
+"Listen som vises av kodesnarveien, vil bli sortert etter dette feltet som "
+"standard. (Feltet må aktiveres som \"sorterbart\")."
 
 #: classes/PDb_Settings.class.php:789
 msgid "List Default Sort Order"
-msgstr "Vis Sorteringsrekkefølge"
+msgstr "Vis sorteringsrekkefølge"
 
 #: classes/PDb_Settings.class.php:793
 msgid "Sets the default order of the records shown by the list shortcode."
 msgstr ""
-"Velger standard rekkefølge for hvordan poster vises av listen fra "
+"Velger standard rekkefølge for hvordan poster vises i listen fra "
 "kodesnarveien."
 
 #: classes/PDb_Settings.class.php:802
 msgid "Admin List Default Sort"
-msgstr "Adminliste Standardsortering"
+msgstr "Adminliste standardsortering"
 
 #: classes/PDb_Settings.class.php:808
 msgid ""
 "The record list shown in the admin section will be sorted by this field by "
 "default. (Field must be checked \"sortable.\")"
 msgstr ""
-"Oppføringens liste som vises i admin delen vil bli sortert etter dette "
-"feltet som standard. (Feltet må aktiveres som \"sorterbart.\")"
+"Listen som vises i admin delen vil bli sortert etter dette feltet som "
+"standard. (Feltet må aktiveres som \"sorterbart.\")"
 
 #: classes/PDb_Settings.class.php:815
 msgid "Admin List Default Sort Order"
-msgstr "Adminliste Standard Sortering"
+msgstr "Adminliste standard sorteringsrekkefølge"
 
 #: classes/PDb_Settings.class.php:819
 msgid "Sets the default order of the record list in the admin."
@@ -1165,19 +1165,20 @@ msgstr "Velger standard rekkefølge for poster i administrasjonspanelet."
 
 #: classes/PDb_Settings.class.php:827
 msgid "Show Image Thumbnails in Admin List"
-msgstr "Vis Miniatyrbilde i Adminlisten"
+msgstr "Vis miniatyrbilde i adminlisten"
 
 #: classes/PDb_Settings.class.php:846
 msgid "Use the Plugin CSS"
-msgstr "Bruk Programtilleggets CSS"
+msgstr "Bruk utvidelsens CSS"
 
 #: classes/PDb_Settings.class.php:851
 msgid "use the plugin's CSS to style the output of shortcodes"
-msgstr "bruk programtilleggets CSS for å designe resultatet av kortkodene"
+msgstr ""
+"Bruk utvidelsens CSS for å designe visningsresultatet av kodesnarveier."
 
 #: classes/PDb_Settings.class.php:859
 msgid "Use Rich Text Editor"
-msgstr "Bruk Rik Tekst editor"
+msgstr "Bruk rik-tekst editor"
 
 #: classes/PDb_Settings.class.php:864
 msgid ""
@@ -1185,15 +1186,15 @@ msgid ""
 "deselected, \"rich-text\" fields will appear as text-area fields. This does "
 "not affect admin users, who always have the use of the rich-text editor."
 msgstr ""
-"aktiver rik-tekst redigering på \"rik-tekst\" felt for brukerne av "
+"Aktiver rik-tekst redigering på \"rik-tekst\" felt for brukerne av "
 "nettstedstemaet. Hvis rik-tekst ikke er aktivert vil \"rik-tekst\" feltene "
 "vises som tekstområdefelt (flere linjer i feltet). Innstillingene har ingen "
 "effekt for administratorer siden de alltid bruker redigeringsprogram for rik-"
-"tekst. "
+"tekst."
 
 #: classes/PDb_Settings.class.php:872
 msgid "Use WordPress Auto Formatting"
-msgstr "Bruk WordPress Autoformattering"
+msgstr "Bruk WordPress autoformattering"
 
 #: classes/PDb_Settings.class.php:877
 msgid "Use WordPress&#39; auto formatting on rich text fields."
@@ -1201,11 +1202,11 @@ msgstr "Bruk WordPress autoformattering i rik-tekst felt."
 
 #: classes/PDb_Settings.class.php:885
 msgid "Primary Email Address Field"
-msgstr "Primær e-postadressefelt"
+msgstr "Primær e-post adressefelt"
 
 #: classes/PDb_Settings.class.php:890
 msgid "this field is the primary email address for the record"
-msgstr "dette feltet er den primære e-postadressen for denne oppføringen"
+msgstr "Dette feltet er den primære e-postadressen for denne oppføringen."
 
 #: classes/PDb_Settings.class.php:898
 msgid "Send HTML Email"
@@ -1216,13 +1217,12 @@ msgid ""
 "use rich text in plugin emails? If you turn this off, be sure to remove all "
 "HTML tags from the email body settings for the plugin."
 msgstr ""
-"bruk rik tekst i programtilleggets e-post? Om du slår rik tekst av, husk å "
-"fjerne alle HTML stikkord fra e-post tekstinnstillingene for "
-"programtillegget."
+"Bruk rik-tekst i utvidelsens e-post? Om du slår rik tekst av, husk å fjerne "
+"alle HTML stikkord fra e-post tekstinnstillingene for utvidelsen."
 
 #: classes/PDb_Settings.class.php:911
 msgid "Strict Date Format"
-msgstr "Eksakt Datoformat"
+msgstr "Eksakt datoformat"
 
 #: classes/PDb_Settings.class.php:916
 msgid ""
@@ -1233,18 +1233,18 @@ msgid ""
 "<strong>%s</strong> %s"
 msgstr ""
 "Dette tvinger dato inndata til å tolkes strengt i henhold til \"Inndata "
-"datoformat\"innstillingen. Du bør fortelle brukerne dine hvilket format du "
-"forventer dem å bruke. Dette gjelder også for datoverdier som brukes i "
-"[pdb_list] kortkodefiltre. Datoen med din nåværende innstilling ser slik ut: "
-"<strong>% s</strong>% s"
+"datoformat\" innstillingen. Du bør fortelle brukerne dine hvilket format du "
+"forventer de skal bruke. Dette gjelder også for datoverdier som brukes i "
+"[pdb_list] kodesnarveiens filtre. Datoen med din nåværende innstilling ser "
+"slik ut: <strong>%s</strong>%s."
 
 #: classes/PDb_Settings.class.php:916
 msgid "Your current PHP installation does not support this setting."
-msgstr "PHP installasjonen din støtter ikke denne innstillingen"
+msgstr "PHP installasjonen din støtter ikke denne innstillingen."
 
 #: classes/PDb_Settings.class.php:924
 msgid "Input Date Format"
-msgstr "Inndata Datoformat"
+msgstr "Inndata datoformat"
 
 #: classes/PDb_Settings.class.php:929
 msgid ""
@@ -1252,13 +1252,13 @@ msgid ""
 "\" is enabled. You should use this for all localized (non-American English) "
 "date formats."
 msgstr ""
-"datoformat strenger for alle programtilleggets dato inndata når \"Strengt "
-"datoformat\" er aktivert. Du bør bruke dette for alle lokaliserte "
-"(ikke amerikansk-engelsk) datoformater."
+"Datoformatstrenger for alle utvidelsens dato inndata når \"Strengt datoformat"
+"\" er aktivert. Du bør bruke dette for alle lokaliserte (ikke amerikansk-"
+"engelsk) datoformater."
 
 #: classes/PDb_Settings.class.php:936
 msgid "Show Timestamp Time"
-msgstr "Vis Tidsstempel Tid"
+msgstr "Vis tidsstempel"
 
 #: classes/PDb_Settings.class.php:941
 msgid "Show time with timestamp dates"
@@ -1266,29 +1266,21 @@ msgstr "Vis tid som tidsstempel datoer"
 
 #: classes/PDb_Settings.class.php:949
 msgid "Record Edit Access Level"
-msgstr "Adgangsnivå for å Redigere Oppføring"
+msgstr "Adgangsnivå for å redigere poster"
 
 #: classes/PDb_Settings.class.php:953
 msgid "sets the user access level for adding, editing and listing records."
 msgstr ""
-"velger brukertilgangsnivået for å legge til, endre og liste opp oversikt "
+"Velger brukertilgangsnivået for å legge til, endre og liste opp oversikt "
 "over poster."
 
 #: classes/PDb_Settings.class.php:961
 msgid "Plugin Admin Access Level"
-msgstr "Programtilleggets Administrator Tilgangsnivå"
+msgstr "Utvidelsens admin tilgangsnivå"
 
-#: classes/PDb_Settings.class.php:965
-msgid ""
-"sets the user access level for fields management, plugin settings, deleting "
-"records and CSV operations."
-msgstr ""
-"velger brukertilgangsnivået for feltadministrasjon, "
-"programtilleggsinnstillinger, slette poster og CSV filoperasjoner."
-
-#: classes/PDb_Settings.class.php:973
+#: classes/PDb_Settings.class.php:965 classes/PDb_Settings.class.php:973
 msgid "Strict User Searching"
-msgstr "Eksakt Bruker Søk"
+msgstr "Eksakt brukersøk"
 
 #: classes/PDb_Settings.class.php:978
 msgid ""
@@ -1303,7 +1295,7 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:985
 msgid "Enable AJAX Search Functionality"
-msgstr "Aktiver AJAX Søke Funksjoner"
+msgstr "Aktiver AJAX søkefunksjoner"
 
 #: classes/PDb_Settings.class.php:990
 msgid ""
@@ -1317,24 +1309,24 @@ msgstr ""
 
 #: classes/PDb_Settings.class.php:1003
 msgid "Custom Plugin Stylesheet"
-msgstr "Tilpasset Stilsett"
+msgstr "Tilpasset stilsett"
 
 #: classes/PDb_Settings.class.php:1008
 msgid ""
 "use this to add your own styles or override styles applied to the output of "
 "all plugin shortcodes"
 msgstr ""
-"bruk dette for å legge til din egen design, eller overstyre designstilen av "
-"programtilleggenes kortkode"
+"Bruk dette for å legge til din egen design, eller overstyre designstilen av "
+"utvidelsenes kodesnarveier."
 
 #: classes/PDb_Settings.class.php:1018
 msgid "Plugin Print Stylesheet"
-msgstr "Utskriftsstilsett"
+msgstr "Stilsett for utskrift"
 
 #: classes/PDb_Settings.class.php:1023
 msgid "use this to format the printed output of all plugin shortcodes"
 msgstr ""
-"bruk dette for å formatere utskriften av alle programtilleggenes kortkoder"
+"Bruk dette for å formatere utskriften av alle kodesnarveier i utvidelsen."
 
 #: classes/PDb_Settings.class.php:1040
 msgid "Same Page"
@@ -1381,24 +1373,24 @@ msgstr "Filen %s har blitt lastet opp."
 #: classes/xnau_CSV_Import.class.php:64
 msgid "%s record added"
 msgid_plural "%s records added"
-msgstr[0] "%s post lagt til"
-msgstr[1] "%s poster lagt til"
+msgstr[0] "%s post lagt til."
+msgstr[1] "%s poster lagt til."
 
 #: classes/xnau_CSV_Import.class.php:68
 msgid "%s matching record updated"
 msgid_plural "%s matching records updated"
-msgstr[0] "%s samsvarende post oppdatert"
-msgstr[1] "%s samsvarende poster oppdatert"
+msgstr[0] "%s samsvarende post oppdatert."
+msgstr[1] "%s samsvarende poster oppdatert."
 
 #: classes/xnau_CSV_Import.class.php:73
 msgid "%s duplicate record skipped"
 msgid_plural "%s duplicate records skipped"
-msgstr[0] "%s kopiert post hoppet over"
-msgstr[1] "%s kopierte poster hoppet over"
+msgstr[0] "%s kopiert post hoppet over."
+msgstr[1] "%s kopierte poster hoppet over."
 
 #: classes/xnau_CSV_Import.class.php:77
 msgid "Zero records imported"
-msgstr "Ingen poster importert"
+msgstr "Ingen poster importert."
 
 #: classes/xnau_CSV_Import.class.php:82
 msgid ""
@@ -1428,8 +1420,8 @@ msgstr "En feil oppstod når data ble forsøkt overført til databasen."
 msgid ""
 "Input file does not exist or path is incorrect.<br />Attempted to load: %s"
 msgstr ""
-"Inndatafilen eksisterer ikke, eller filstien stemmer ikke,<br/>Forsøk å "
-"laste: %s"
+"Inndatafilen eksisterer ikke, eller filstien stemmer ikke.<br/>Forsøk å "
+"laste: %s."
 
 #: classes/xnau_CSV_Import.class.php:188
 msgid ""
@@ -1441,7 +1433,7 @@ msgstr ""
 
 #: classes/xnau_CSV_Import.class.php:197
 msgid "Number of values does not match number of columns"
-msgstr "Antall verdier samsvarer ikke med antall kolonner"
+msgstr "Antall verdier samsvarer ikke med antall kolonner."
 
 #: classes/xnau_CSV_Import.class.php:298
 msgid "New columns imported from the CSV file."
@@ -1450,7 +1442,7 @@ msgstr "Nye kolonner importert fra CSV-filen."
 #: classes/xnau_FormElement.class.php:239
 msgctxt "indicates a write-in choice"
 msgid "other"
-msgstr "annet"
+msgstr "annen"
 
 #: classes/xnau_FormElement.class.php:240
 msgctxt "indicates the text to be clicked to go to another web page"
@@ -1459,11 +1451,11 @@ msgstr "Lenketekst"
 
 #: edit_participant.php:19
 msgid "Add New Participant Record"
-msgstr "Legg til Ny(tt) Medlem/Deltaker"
+msgstr "Legg til ny deltaker"
 
 #: edit_participant.php:24
 msgid "Edit Existing Participant Record"
-msgstr "Rediger Eksisterende Meldemsoppføring"
+msgstr "Rediger eksisterende deltakeroppføring"
 
 #: edit_participant.php:83
 msgctxt "abbreviation for \"identification\""
@@ -1485,7 +1477,7 @@ msgstr "skrivebeskyttet"
 
 #: edit_participant.php:226
 msgid "Save the Record"
-msgstr "Lagre Posten"
+msgstr "Lagre posten"
 
 #: edit_participant.php:236
 msgid ""
@@ -1493,32 +1485,31 @@ msgid ""
 "strong> save record and continue with same record<br><strong>Next:</strong> "
 "save record and then start a new one"
 msgstr ""
-"<strong>Lagre:</strong> lagre post/oppføring og returner til "
-"liste<br><strong>Legg til:</strong> lagre post/oppføring og fortsett med "
-"samme post/oppføring<br><strong>Neste:</strong> lagre post/oppføring og "
-"start med en ny post/oppføring"
+"<strong>Lagre:</strong> Lagre post og returner til liste.<br><strong>Legg "
+"til:</strong> Lagre post og fortsett med samme post.<br><strong>Neste:</"
+"strong> Lagre post og start med en ny post."
 
 #: edit_participant.php:238
 msgid "<strong>Previous:</strong> save and move to previous record"
-msgstr "<strong>Forrige:</strong> lagre og gå til forrige post/oppføring"
+msgstr "<strong>Forrige:</strong> Lagre og gå til forrige post."
 
 #. translators: these strings are used in logic matching, please test after
 #. translating in case special characters cause problems
 #: manage_fields.php:10
 msgid "Update Fields"
-msgstr "Oppdater Felt"
+msgstr "Oppdater felt"
 
 #: manage_fields.php:11
 msgid "Update Groups"
-msgstr "Oppdater Grupper"
+msgstr "Oppdater grupper"
 
 #: manage_fields.php:12
 msgid "Add Field"
-msgstr "Legg til Felt"
+msgstr "Legg til felt"
 
 #: manage_fields.php:13
 msgid "Add Group"
-msgstr "Legg til Gruppe"
+msgstr "Legg til gruppe"
 
 #: manage_fields.php:14
 msgid "new field title"
@@ -1526,7 +1517,7 @@ msgstr "ny felttittel"
 
 #: manage_fields.php:15
 msgid "new group title"
-msgstr "ny gruppetittel"
+msgstr "Ny gruppetittel"
 
 #: manage_fields.php:16
 msgctxt "column name"
@@ -1536,7 +1527,7 @@ msgstr "Sorter"
 #: manage_fields.php:17
 msgctxt "column name"
 msgid "Name"
-msgstr "Kolonnenavn"
+msgstr "Navn"
 
 #: manage_fields.php:18
 msgctxt "column name"
@@ -1576,7 +1567,7 @@ msgstr "Validering"
 #: manage_fields.php:25
 msgctxt "column name"
 msgid "Display Column"
-msgstr "Vis Kolonne"
+msgstr "Vis kolonne"
 
 #: manage_fields.php:26
 msgctxt "column name"
@@ -1635,7 +1626,7 @@ msgstr "Beskrivelse"
 
 #: manage_fields.php:154
 msgid "Cannot add a field with that name"
-msgstr "Kan ikke legge til et felt med det navnet"
+msgstr "Kan ikke legge til et felt med det navnet."
 
 #: manage_fields.php:154
 msgid "This name is reserved; please choose another. Reserved names are"
@@ -1644,7 +1635,7 @@ msgstr "Dette navnet er reservert. Velg et annet. Reserverte navn er"
 #: manage_fields.php:235 participants-database.php:410
 #: participants-database.php:411
 msgid "Manage Database Fields"
-msgstr "Administrere Databasefelt"
+msgstr "Database admin"
 
 #: manage_fields.php:245 manage_fields.php:253
 msgid "Field Groups"
@@ -1660,7 +1651,7 @@ msgstr "Felt"
 
 #: manage_fields.php:324
 msgid "No fields in this group"
-msgstr "Ingen felt i denne gruppen"
+msgstr "Ingen felt i denne gruppen."
 
 #: manage_fields.php:354 manage_fields.php:711
 msgid "field"
@@ -1668,7 +1659,7 @@ msgstr "felt"
 
 #: manage_fields.php:428
 msgid "Edit / Add / Remove Field Groups"
-msgstr "Rediger / Legg Til / Fjern Feltgrupper"
+msgstr "Rediger / Legg til / Fjern feltgrupper"
 
 #: manage_fields.php:459
 msgid "fields"
@@ -1688,7 +1679,7 @@ msgstr ""
 
 #: manage_fields.php:781
 msgid "Not Required"
-msgstr "Ikke Påkrevd"
+msgstr "Ikke påkrevd"
 
 #: manage_fields.php:782
 msgid "Required"
@@ -1700,11 +1691,11 @@ msgstr "E-post"
 
 #: manage_fields_help.php:4
 msgid "Manage Fields Help"
-msgstr "Hjelp for å Administrere Felt"
+msgstr "Hjelp for å administrere felt"
 
 #: manage_fields_help.php:6
 msgid "Defining Database Fields"
-msgstr "Definerer Databasefelt"
+msgstr "Definerer databasefelt"
 
 #: manage_fields_help.php:7
 msgid ""
@@ -1746,7 +1737,7 @@ msgid ""
 "this data field, that information will not be deleted from the database, but "
 "you will no longer be able to display or edit it."
 msgstr ""
-"Klikk på den røde \"X\"en for å slette et felt. Dersom det finnes "
+"Klikk på den røde \"X\"-en for å slette et felt. Dersom det finnes "
 "eksisterende poster med dette datafeltet, vil denne informasjonen ikke bli "
 "slettet fra databasen og du vil ikke lenger være i stand å vise eller "
 "redigere informasjonen."
@@ -1761,7 +1752,7 @@ msgid ""
 "for the change to take effect."
 msgstr ""
 "Klikk og dra for å endre rekkefølgen på feltene. Du må huske å klikke på "
-"'Oppdater' (\"Update\") for at endringene skal tre i kraft."
+"'Oppdater' for at endringene skal tre i kraft."
 
 #: manage_fields_help.php:13
 msgid "Title"
@@ -1797,8 +1788,8 @@ msgid ""
 "\"Field Groups\" tab."
 msgstr ""
 "Databasefeltene er organisert i grupper og du kan velge hvilken gruppe "
-"databasefeltet tilhører her. Du kan redigere gruppene under Felt Grupper "
-"\"Field Groups\" -kategorien."
+"databasefeltet tilhører her. Du kan redigere gruppene under Feltgrupper "
+"kategorien."
 
 #: manage_fields_help.php:19
 msgid "Help Text"
@@ -1844,12 +1835,12 @@ msgid ""
 "text-field or select/dropdown or select-other/dropdown-other. Be warned, "
 "it&#39;s safest to set this up before you start getting data for the field."
 msgstr ""
-"Under flervalgs nedtrekksmenyen er skjemaelementer du kan velge fra. Det er "
+"I flervalgs nedtrekksmenyen er skjemaelementer du kan velge fra. Det er "
 "egentlig best å unngå å endre dette når du har begynt å legge til poster i "
-"databasen ved hjelp av dette feltet . Uforutsigbare ting kan skje og selv om "
+"databasen ved hjelp av dette feltet. Uforutsigbare ting kan skje og selv om "
 "du ikke mister data, kan det bli mye rot! Når det er sagt, det <em>er</em> "
 "mulig å endre mellom lignende elementer, som tekst / tekstfelt eller velg / "
-"nedtrekksmeny eller velg-annen/nedtrekksmeny-annen. Vær advart, det er "
+"nedtrekksmeny eller velg-annen/nedtrekksmeny-annen. Vær advart: Det er "
 "tryggest å sette dette opp før du begynner å legge inn data i feltet."
 
 #: manage_fields_help.php:24
@@ -1921,10 +1912,10 @@ msgid ""
 "if you have multiple items with the same number (other than 0), only the "
 "last one with the number will appear."
 msgstr ""
-"Dette påvirker bare \"Deltakerlisten\"-siden av programtillegget På denne "
-"siden er postene i databasen oppført. Siden det ville være upraktisk å "
-"inkludere alle felt som en kolonne i denne listen, kan du velge hvilke felt "
-"som skal vises her. \"0 \" betyr ikke vis. Et tall angir i hvilken "
+"Dette påvirker bare \"Deltakerlisten\"-siden av utvidelsen. På denne siden "
+"er postene i databasen oppført. Siden det ville være upraktisk å inkludere "
+"alle felt som en kolonne i denne listen, kan du velge hvilke felt som skal "
+"vises her. \"0\" betyr at feltet ikke vises. Et tall angir i hvilken "
 "rekkefølge kolonnen vises. Du må sørge for at tallene gir mening, hvis du "
 "har flere elementer med samme tall (annet enn 0) vil bare den siste med det "
 "nummeret vises."
@@ -2008,8 +1999,8 @@ msgid ""
 "<strong>Readonly</strong> means that plugin users can see the value of the "
 "field, but cannot edit it. The field will be editable in the admin."
 msgstr ""
-"<strong>Skrivebeskyttet</strong> betyr at programtilleggets bruker kun kan "
-"lese verdien i feltet, men ikke redigere det. Feltet er redigerbart av "
+"<strong>Skrivebeskyttet</strong> betyr at utvidelsens bruker kun kan lese "
+"verdien i feltet, men ikke redigere det. Feltet er redigerbart av "
 "administrator."
 
 #. Plugin Name of the plugin/theme
@@ -2019,7 +2010,7 @@ msgstr "Deltakerdatabase"
 
 #: participants-database.php:401 participants-database.php:402
 msgid "Add Participant"
-msgstr "Legg til Medlem"
+msgstr "Legg til deltaker"
 
 #: participants-database.php:419 participants-database.php:420
 #: upload_csv.php:8
@@ -2032,7 +2023,7 @@ msgstr "Oppsettsveiviser"
 
 #: participants-database.php:446 participants-database.php:447
 msgid "Edit Record"
-msgstr "Rediger Post"
+msgstr "Rediger post"
 
 #. translators: don't translate the words in brackets {}
 #: participants-database.php:496
@@ -2041,7 +2032,7 @@ msgstr "Du må fjerne alle feltene fra gruppen (navn) før du sletter den."
 
 #: participants-database.php:497
 msgid "Delete the \"{name}\" {thing}?"
-msgstr "Slett \"{name}\" {thing}?"
+msgstr "Slett \"{name}\" {ting}?"
 
 #: participants-database.php:2310
 msgid ""
@@ -2096,7 +2087,7 @@ msgstr "Den nye oppføringen er lagt til."
 
 #: participants-database.php:2774
 msgid "WordPress Plugin"
-msgstr "WordPress Utvidelse"
+msgstr "WordPress utvidelse"
 
 #: participants-database.php:2775
 msgid ""
@@ -2111,8 +2102,8 @@ msgstr "Utviklet av"
 msgid ""
 "Suggestions or crticisms of this plugin? I&#39;d love to hear them: email "
 msgstr ""
-"Forslag eller kritikk av dette programtillegget? Jeg setter veldig stor pris "
-"på å høre dem: email"
+"Forslag eller kritikk av denne utvidelsen? Jeg setter veldig stor pris på å "
+"høre dem: email"
 
 #: participants-database.php:2782
 msgid ""
@@ -2121,14 +2112,14 @@ msgid ""
 "a %2$srating%3$s or review, or dropping something in the %1$stip jar.%3$s "
 "Thanks!"
 msgstr ""
-"Vennligst vurdere å bidra for fortsatt støtte og utvikling av denne "
-"programvaren ved å besøke %1$sdette programtilleggets side.%3$s  Gi "
-"programtillegget en%2$srangering, %3$s vurdering, eller dropp litt "
-"vekslepenger i%3$s tipskrukken. %3$s Tusen takk!"
+"Vennligst vurdere å bidra med fortsatt støtte og utvikling av denne "
+"programvaren ved å besøke %1$sdenne utvidelsens side.%3$s  Gi utvidelsen en "
+"%2$s rangering, %3$s vurdering, eller dropp litt vekslepenger i%3$s "
+"tipskrukken. %3$s Tusen takk!"
 
 #: templates/pdb-retrieve-default.php:10
 msgid "Request your Private Link"
-msgstr "Be om din Private Lenk"
+msgstr "Be om din private lenk"
 
 #: templates/pdb-retrieve-default.php:17
 msgid "Success: your private link has been emailed to you."
@@ -2177,7 +2168,7 @@ msgstr ""
 
 #: upload_csv.php:47
 msgid "Get Blank CSV File"
-msgstr "Hent Tom CSV-fil"
+msgstr "Hent tom CSV-fil"
 
 #: upload_csv.php:47
 msgid ""
@@ -2265,7 +2256,7 @@ msgstr "Velg .csv-fil å importere:"
 
 #: upload_csv.php:84
 msgid "Upload File"
-msgstr "Last Opp Fil"
+msgstr "Last opp fil"
 
 #. Plugin URI of the plugin/theme
 msgid "http://xnau.com/wordpress-plugins/participants-database"
@@ -2274,7 +2265,7 @@ msgstr "http://xnau.com/wordpress-plugins/participants-database"
 #. Description of the plugin/theme
 msgid "Plugin for managing a database of participants, members or volunteers"
 msgstr ""
-"Programtillegg for å administrere en database av deltakere, medlemmer, eller "
+"Utvidelse for å administrere en database av deltakere, medlemmer, eller "
 "frivillige"
 
 #. Author of the plugin/theme

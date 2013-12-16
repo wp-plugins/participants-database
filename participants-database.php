@@ -93,6 +93,11 @@ class Participants_Db extends PDb_Base {
    */
   public static $participants_db_options;
   /**
+   * name of the default settings option
+   * @var string
+   */
+  public static $default_options;
+  /**
    * plugin option values $name => $value
    * @var array
    */
@@ -238,6 +243,7 @@ class Participants_Db extends PDb_Base {
 
     // define some locations
     self::$participants_db_options = self::PLUGIN_NAME . '_options';
+    self::$default_options = self::$prefix . 'default_options';
     self::$plugin_page = self::PLUGIN_NAME;
     self::$plugin_path = dirname(__FILE__);
     self::$plugin_url = WP_PLUGIN_URL . '/' . self::PLUGIN_NAME;
@@ -323,9 +329,6 @@ class Participants_Db extends PDb_Base {
    */
   public static function init() {
     
-    $sessid = session_id();
-    if (empty($sessid)) session_start();
-
     load_plugin_textdomain('participants-database', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
     self::$plugin_title = __('Participants Database', 'participants-database');
@@ -337,8 +340,15 @@ class Participants_Db extends PDb_Base {
      * 
      * this is to allow for updates to occur in many different ways
      */
-    if ( false === get_option( Participants_Db::$db_version_option ) || get_option( Participants_Db::$db_version_option ) != Participants_Db::$db_version )
+    if ( false === get_option( self::$db_version_option ) || get_option( self::$db_version_option ) != self::$db_version )
       PDb_Init::on_update();
+
+    // get the plugin options array
+    if (!is_array(self::$plugin_options)) {
+      
+      $default_options = get_option(self::$default_options);
+      
+      if (!is_array($default_options)) {
 
     /*
      * instantiate the settings class; this only sets up the settings definitions, 
@@ -347,10 +357,12 @@ class Participants_Db extends PDb_Base {
      */
     self::$Settings = new PDb_Settings();
 
-    // get the plugin options array
-    if (!is_array(self::$plugin_options)) {
+        $default_options = self::$Settings->get_default_options();
 
-      self::$plugin_options = array_merge(self::$Settings->get_default_options(), (array) get_option(self::$participants_db_options));
+        add_option(self::$default_options, $default_options, '', false);
+      }
+
+      self::$plugin_options = array_merge($default_options, (array) get_option(self::$participants_db_options));
     }
     /*
      * set the plugin date display format: if "strict dates" is enabled, use the 
@@ -819,7 +831,8 @@ class Participants_Db extends PDb_Base {
    *
    * @param string $column comma-separated list of columns to get, defaults to all (*)
    * @param mixed $exclude single group to exclude or array of groups to exclude
-   * @return indexed array
+   * @return array returns an associative array column => value or indexed array 
+   *               if only one column is specified in the $column argument
    */
   public static function get_groups($column = '*', $exclude = false) {
 

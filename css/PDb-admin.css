@@ -402,7 +402,7 @@ a.dragger {
 }
 .mask {
   position: absolute;
-  background-color: rgb(241, 241, 241);
+  background-color: #F5F5F5;
   display: block;
   z-index: 1000;
 }

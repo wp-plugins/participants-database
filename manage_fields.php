@@ -208,9 +208,8 @@ if (isset($_POST['action'])) {
 
 // get the defined groups
 $groups = Participants_Db::get_groups('name');
-// remove the internal group
-//unset( $groups[ array_search( 'internal', $groups ) ] );
 $attribute_columns = array();
+$group_titles = array();
 
 // get an array with all the defined fields
 foreach ($groups as $group) {
@@ -223,6 +222,8 @@ foreach ($groups as $group) {
 
   // get an array of the field attributes
   $attribute_columns[$group] = $wpdb->get_col_info('name');
+
+  $group_titles[$group] = $wpdb->get_var('SELECT `title` FROM ' . Participants_Db::$groups_table . ' WHERE `name` = "' . $group . '"');
 
   // remove read-only fields
   foreach (array('id'/* ,'name' */) as $item) {
@@ -248,7 +249,7 @@ foreach ($groups as $group) {
       <?php
       $mask = '<span class="mask"></span>';
       foreach ($groups as $group) {
-        echo '<li><a href="#' . $group . '" id="tab_' . $group . '">' . ucwords(str_replace('_', ' ', $group)) . '</a>' . $mask . '</li>';
+        echo '<li><a href="#' . $group . '" id="tab_' . $group . '">' . $group_titles[$group] . '</a>' . $mask . '</li>';
       }
       echo '<li class="utility"><a href="#field_groups">' . __('Field Groups', 'participants-database') . '</a>' . $mask . '</li>';
       echo '<li class="utility"><a href="#help">' . __('Help', 'participants-database') . '</a>' . $mask . '</li>';

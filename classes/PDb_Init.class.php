@@ -691,10 +691,10 @@ class PDb_Init
 
       // define the default field groups
       self::$field_groups = array(
-                                  'main'      => 'Participant Info',
-                                  'personal'  => 'Personal Info',
-                                  'admin'     => 'Administrative Info',
-                                  'internal'  => 'Record Info',
+                                  'main'      => __('Participant Info', 'participants-database'),
+                                  'personal'  => __('Personal Info', 'participants-database'),
+                                  'admin'     => __('Administrative Info', 'participants-database'),
+                                  'internal'  => __('Record Info', 'participants-database'),
                                   );
 
       // fields for keeping track of records; not manually edited, but they can be displayed

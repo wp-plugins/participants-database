@@ -1,0 +1,26 @@
+﻿<h1>Deltakerdatabase</h1>
+<h2>Veiledning hurtigoppsett</h2>
+<h3>Standard oppsett</h3>
+<p>Det er flere innstillinger som bør stilles inn for å få flere av utvidelsens funksjonertil å fungere. Denne siden leder deg gjennom de første stegene for å få utvidelsen satt opp riktig og å virke på nettstedet ditt. 
+Det første du bør gjøre er å ha et generelt bilde over hvordan du vil at utvidelsen skal fungere, hvilken informasjon du trenger å samle inn og å lagre. Tenk også over hvordan brukerne dine vil se og samhandle med denne informasjonen.</p>
+<h3>Her er ett eksempel på hvordan du setter opp utvidelsen.</h3>
+<p>La oss si at du vil ha et registreringsskjema som samler en persons navn og e-postadresse. Når brukeren fyller ut og sender inn skjemaet, vil de bli tatt til en annen side og takket. En e-post vil bli sendt brukeren for å bekrefte registreringen og at de kan gå tilbake til sin registreringsside for å legge til mer data. En privat kobling til dette formålet blir automatisk oppgitt i e-posten.</p>
+<p>Samtidig får administratorer få et e-postvarsel om registreringen som gir dem en direkte lenk til den nye posten.</p>
+<h3>Her er et eksempel på hvordan du setter opp utvidelsen.</h3>
+<ol>
+<li>Plasser kodesnarveien "[pdb_signup]" på siden der du vil at påmeldingene skal vises.</li>
+<li>Gå til siden "Innstillinger" i utvidelsen og klikk på fanen "Registreringsskjema".</li>
+<li>Innstillingene for "takkesiden" settes til å peke til siden du vil sende brukerne etter at de har registrerer seg. Plasser kodesnarveien "[pdb_signup_thanks]" på den siden hvor det måtte passe.</li>
+<li>Når personen som registrerte seg klikker på lenken som er sendt dem på e-post, vil de gå til en side der de kan fylle ut resten av skjemaet med mer informasjon for sin post.</li>
+<li>Klikk på fanen "Registreringsskjema" og sett innstillingen "Registrering takkeside" til å peke til siden der du vil at brukerne skal sendes for å kunne redigere informasjonen sin. Plasser kodesnarveien [pdb_record] på denne siden. Kodesnarveien vil vise en tom side med mindre den er besøkt med den private koblingen til brukeren sendt i e-posten med kvitteringen for registrering.</li>
+</ol>
+<h3>Oppsett av side med deltakerliste og side med detaljer</h3>
+<p>Når noen besøker nettstedet, kan du vise dem en liste over personer som har registrert seg. Hvert navn på listen kan klikkes på for å ta brukeren til en detaljside som viser all offentlig informasjon i deres post. Dette er hvordan du setter det opp:</p>
+<ol>
+<li>Plasser "[pdb_list]" kodesnarveien på siden der du vil at listen over deltakere skal vises.</li>
+<li>På siden "Database admin" kan du sette hvilke felt som skal bli vist i listen og hvilken kolonne de vil være i. Dette er under feltet "Vis kolonne" i listeoverskriften. Gi hvert felt du vil vise et tall som bestemmer hvilken kolonne feltet vil vises i. Null betyr at feltet ikke vil vises i listen.</li>
+<li>På siden der du vil at poster med detaljer skal vises, plasserer du kodesnarveien "[pdb_single]". Denne siden vil ikke vise noe med mindre lenken med ID-koden blir brukt for å gå til siden. Her er et eksempel på hvordan lenken kan se ut: <pre>/deltakere/detalj?pid=27</pre></li>
+<li>På siden med utvidelsens Innstillinger (lenke i venstre kolonne), under fanen "Visningsinnstillinger", kan du sette "Lenk til enkeltpost" i det feltet du ønsker å ha en lenke til siden med detaljer for posten. Bruk f.eks. "[first_name]/fornavn" der du vil at lenken til detaljsiden skal være.</li>
+<li>Deretter setter du "Enkeltpostside" til å peke til siden der du legger inn kodesnarveien "[pdb_single]".</li>
+</ol>
+<p>Til slutt kan du gå til siden "Legg til deltaker" i adminpanelet og lage en testpost for å teste hvordan utvidelsen fungerer.</p>
