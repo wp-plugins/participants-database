@@ -806,9 +806,9 @@ class PDb_List_Admin {
       
       // print the "select all" header 
       ?>
-      <th scope="col" style="width:6em">
+      <th scope="col" style="width:5em">
         <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
-          <?php /* translators: uses the check symbol in a phrase that means "check all" */ printf('<span class="checkmark" >&#10004;</span> %s', __('all', 'participants-database')) ?>
+          <?php /* translators: uses the check symbol in a phrase that means "check all" */ printf('<span class="checkmark" >&#10004;</span>%s', __('all', 'participants-database')) ?>
         <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" >
         <?php endif ?>
       </th>
