@@ -2901,7 +2901,7 @@ class Participants_Db extends PDb_Base {
     
       //error_log( ' meta links: '.print_r( $links,1 ));
       
-      $links[1] = str_replace('Roland Barker','<span class="icon-xnau-glyph"></span> xn&lowast;au webdesign',$links[1]);
+      $links[1] = str_replace('Roland Barker','<span class="icon-xnau-glyph"></span> xn*au webdesign',$links[1]);
       $links[] = '<a href="http://wordpress.org/support/view/plugin-reviews/participants-database">Submit a rating or review</a>';
       $links[] = '<span style="color:#6B4001;">Free tech support and continued development relies on your support: <a class="button xnau-contribute" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P5TNMURN5JBZA">contribute</a></span>';
     }
