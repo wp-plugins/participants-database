@@ -285,3 +285,17 @@
 .pdb-error p, .pdb-message p {
   margin:0;
 }
+.glyphicon.glyphicon-sort:after {
+  content: "↕";
+  white-space: nowrap;
+}
+.glyphicon.glyphicon-remove:after {
+  color: #D64E07;
+  content: "☓";
+}
+.glyphicon.glyphicon-remove:hover:after {
+  color: white;
+}
+.glyphicon.glyphicon-remove:hover {
+  background-color: #D64E07;
+}

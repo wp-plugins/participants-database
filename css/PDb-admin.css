@@ -103,13 +103,16 @@ input[readonly] {
   width: 100%;
 }
 body[class*='participants-database'] a.delete {
-  display:block;
+/*  display:block;
   width:12px;
   height:26px;
-  background:url('../ui/delete.png') no-repeat center center;
+  background:url('../ui/delete.png') no-repeat center center;*/
 }
 body[class*='participants-database'] .form-table {
   margin-bottom:4em;
+}
+#manage_main_fields .glyphicon {
+  font-size: 140%;
 }
 .pdb-list .image-field-wrap img {
   height: 30px;
@@ -368,15 +371,26 @@ td.order {
   text-align: center;
 }
 a.dragger {
-  background-color: #EEEEEE;
-  border: 1px solid #DDDDDD;
-  border-radius: 2px 2px 2px 2px;
   cursor: move;
-  display: block;
-  letter-spacing: 0;
-  line-height: 15px;
-  padding: 3px 0;
-  margin-top : 2px;
+}
+.branch-3-7 .glyphicon.glyphicon-sort:after, 
+.branch-3-6 .glyphicon.glyphicon-sort:after {
+  content: "↕";
+}
+.branch-3-7 .glyphicon.glyphicon-remove:after, 
+.branch-3-6 .glyphicon.glyphicon-remove:after {
+  content: "☓";
+}
+.glyphicon {
+  font: 400 20px/1 dashicons;
+}
+.glyphicon.glyphicon-sort:after {
+  content: "\f156";
+  white-space: nowrap;
+}
+.glyphicon.glyphicon-remove:after {
+  color: #D64E07;
+  content: "\f158";
 }
 
 #message {
@@ -403,7 +417,7 @@ a.dragger {
 }
 .mask {
   position: absolute;
-  background-color: #F5F5F5;
+  background-color: #F0F0F0;
   display: block;
   z-index: 1000;
 }
@@ -413,8 +427,8 @@ a.dragger {
 }
 .ui-tabs-nav .mask {
   left: 1px;
-  bottom: -2px;
-  height: 3px;
+  bottom: -1px;
+  height: 1px;
   width: calc(100% - 6px);
   display: block;
   z-index: 900;
@@ -435,7 +449,7 @@ a.dragger {
   border: none;
   border-bottom: 1px solid #ccc;
   height: auto;
-  margin: 20px 0;
+  margin: 18px 0 20px;
   padding: 0;
   overflow: visible;
 }
@@ -445,9 +459,16 @@ a.dragger {
   border:none;
   display: inline-block;
   position: relative;
-  margin: 0;
+  margin: 1px 0 2px;
   height: auto;
   width: auto;
+}
+.participants_db .ui-tabs-nav li.ui-tabs-active.ui-state-active {
+  margin-bottom:0;
+}
+.branch-3-7 .participants_db .ui-tabs-nav li,
+.branch-3-6 .participants_db .ui-tabs-nav li {
+  margin: 1px 0 2px;
 }
 .participants_db .ui-tabs-nav .ui-state-default a {
   background-color: rgba(0,0,0,0.1);

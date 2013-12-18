@@ -23,6 +23,10 @@
 #adminmenu #toplevel_page_participants-database div.wp-menu-image:before  {
   content: "\f307";
 }
+.branch-3-7 #adminmenu #toplevel_page_participants-database div.wp-menu-image:before,
+.branch-3-6 #adminmenu #toplevel_page_participants-database div.wp-menu-image:before {
+  content: '';
+}
 #the-list .xnau-contribute {
   vertical-align: middle;
 }

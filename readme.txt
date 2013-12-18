@@ -3,7 +3,7 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
-Tested up to: 3.7
+Tested up to: 3.8.1
 Stable tag: 1.5.2
 License: GPLv2
 
@@ -236,6 +236,17 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.3 =
+** BETA RELEASE **
+
+* admin compatible with WP 3.8
+* plugin no longer relies on PHP sessions
+* better compatibility with international characters in form validation
+* fixed datetime bug with missing server timzone value
+* updated POT file, internationalization complete
+* added Norwegian translation
+* bug fixes
+
 = 1.5.2 =
 
 ** BETA RELEASE **
@@ -455,9 +466,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.2 =
+= 1.5.3 =
 **BETA RELEASE**
-Huge upgrade: a lot of code changes, lots of new features. Please backup before upgrading. Critical production sites may want to wait one or two subversions or test in development site before updating. 1.5.2 is the second bugfix subversion. With 1.5.3 we will drop out of beta.
+Largely compatibility upgrades with WP 3.8. Still in beta, with some new basic code: now works without PHP sessions, bug fixes. With 1.5.4 we will drop out of beta.
 
 == Using the Plugin ==
 
