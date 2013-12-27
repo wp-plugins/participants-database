@@ -69,12 +69,11 @@ class PDb_Session {
 		} else {
 
 			// Use WP_Session (default)
+      require_once plugin_dir_path(__FILE__) . 'wp-session.inc.php';
 
 			if ( ! defined( 'WP_SESSION_COOKIE' ) )
 				define( 'WP_SESSION_COOKIE', Participants_Db::$prefix . 'wp_session' );
 				
-      require_once plugin_dir_path(__FILE__) . 'wp-session.inc.php';
-
 		}
 
 		if ( empty( $this->session ) && ! $this->use_php_sessions ) {
@@ -92,10 +91,12 @@ class PDb_Session {
 	 */
 	public function init() {
 
-		if( $this->use_php_sessions )
+		if( $this->use_php_sessions ){
 			$this->session = isset( $_SESSION[$this->session_name] ) && is_array( $_SESSION[$this->session_name] ) ? $_SESSION[$this->session_name] : array();
-		else
+    } else {
+      
 			$this->session = WP_Session::get_instance();
+    }
 
 		return $this->session;
 	}

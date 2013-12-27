@@ -109,7 +109,7 @@ body[class*='participants-database'] a.delete {
   background:url('../ui/delete.png') no-repeat center center;*/
 }
 body[class*='participants-database'] .form-table {
-  margin-bottom:4em;
+/*  margin-bottom:4em;*/
 }
 #manage_main_fields .glyphicon {
   font-size: 140%;
@@ -125,6 +125,9 @@ body[class*='participants-database'] .form-table {
 .wp-list-table th, .wp-list-table td, .form-table th, .form-table td {
   vertical-align: top;
 }
+.participants_db .form-table tr:hover {
+  background-color: #F7F7F7;
+} 
 .participants_db input[type='text']+.helptext,
 .participants_db input[type='checkbox']+.helptext,
 .participants_db select+.helptext,
@@ -235,8 +238,11 @@ body[class*='participants-database'] .text-block li {
   position:relative;
   top:-5em;
 }
+.participants_db .pdb-list td > input[type="checkbox"] {
+  margin-top: -10px;
+}
 .edit-participant textarea, .participants_db textarea, .edit-participant select, .participants_db select, .participants_db input, .edit-participant input, .link-element label {
-  vertical-align: top;
+/*  vertical-align: top;*/
 }
 [class*="participants-database"] .wp-editor-wrap {
   max-width: 600px;
@@ -275,7 +281,13 @@ div.manage-fields-wrap {
   min-width:1100px;
 }
 .manage-fields thead > tr {
-  height:7em;
+  height:6.5em;
+}
+#internal .manage-fields thead > tr {
+  height:5.3em;
+}
+#field_groups .manage-fields thead > tr {
+  height:5em;
 }
 .manage-fields.widefat th {
   padding:0 0 0 10px;
@@ -381,8 +393,9 @@ a.dragger {
 .branch-3-6 .glyphicon.glyphicon-remove:after {
   content: "☓";
 }
-.glyphicon {
-  font: 400 20px/1 dashicons;
+.branch-3-7 .glyphicon.glyphicon-edit:after, 
+.branch-3-6 .glyphicon.glyphicon-edit:after {
+  content: "✎";
 }
 .glyphicon.glyphicon-sort:after {
   content: "\f156";
@@ -392,7 +405,20 @@ a.dragger {
   color: #D64E07;
   content: "\f158";
 }
-
+.glyphicon.glyphicon-edit:after {
+  content: "\f327";
+}
+.widefat.pdb-list .glyphicon {
+  line-height: 18px;
+  font-size: 18px;
+}
+.mirror {
+    display:block; 
+    -webkit-transform: matrix(-1, 0, 0, 1, 0, 0);
+    -moz-transform: matrix(-1, 0, 0, 1, 0, 0);
+    -o-transform: matrix(-1, 0, 0, 1, 0, 0);
+    transform: matrix(-1, 0, 0, 1, 0, 0);
+}
 #message {
   font-size: 16px;
 }
@@ -450,7 +476,7 @@ a.dragger {
   border-bottom: 1px solid #ccc;
   height: auto;
   margin: 18px 0 20px;
-  padding: 0;
+  padding: 0 10px;
   overflow: visible;
 }
 .participants_db .ui-tabs-nav li {
@@ -473,11 +499,11 @@ a.dragger {
 .participants_db .ui-tabs-nav .ui-state-default a {
   background-color: rgba(0,0,0,0.1);
  text-shadow: none;
-  padding-bottom: 4px;
+  padding-bottom: 9px;
 }
 .participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active a {
   background-color: rgba(0,0,0,0);
-  padding-bottom: 6px;
+  padding-bottom: 11px;
 }
 .participants_db .ui-tabs-nav .ui-tabs-active.ui-state-active .mask {
   visibility: visible;
@@ -498,16 +524,18 @@ a.dragger {
   background-color:#eeeeee;
   text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
   text-decoration: none;
-  -moz-border-radius: 5px 5px 0 0;
-  -webkit-border-top-left-radius: 5px;
-  -webkit-border-top-right-radius: 5px;
-  -khtml-border-top-left-radius: 5px;
-  -khtml-border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  -moz-border-radius: 2px 2px 0 0;
+  -webkit-border-top-left-radius: 2px;
+  -webkit-border-top-right-radius: 2px;
+  -khtml-border-top-left-radius: 2px;
+  -khtml-border-top-right-radius: 2px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
 }
 .participants_db .ui-tabs-nav li a:hover {
   color: #000000;
+  background-color: #F3F3F3;
+  
 }
 .participants_db .ui-tabs-nav li.ui-tabs-selected a, 
 .participants_db .ui-tabs-nav li.ui-state-active a,
@@ -533,6 +561,10 @@ a.dragger {
   font-size: 15px;
   font-weight: bold;
   margin: 1em 0;
+}
+.field-group-title {
+  width: 100%;
+  border-bottom: 2px solid #DDDDDD;
 }
 /* DIALOG BOXES */
 #dialog-overlay {

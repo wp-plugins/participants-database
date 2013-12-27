@@ -112,7 +112,7 @@ class PDb_Pagination {
                 'disabled_class' => 'disabled',
                 'filtering' => 0,
                 'anchor_wrap' => false,
-                'first_last' => false,
+                'first_last' => '',
                 'add_variables' => '',
             )));
     $this->setPage($page);
@@ -124,24 +124,19 @@ class PDb_Pagination {
     $this->set_anchor_wrap($anchor_wrap);
     $this->current_page_class = $current_page_class;
     $this->disabled_class = $disabled_class;
-    $this->first_last = $first_last; 
+    $this->first_last = empty($first_last) ? ($total_records/($size == 0 ? 1 : $size) > 5 ? true : false) : ($first_last == 'true' ? true : false); 
   }
 
   /**
-   * echoes the pagination links
+   * returns the pagination links
    *
    */
   public function links() {
-    echo $this->create_links();
+    return $this->create_links();
   }
-
-  /* alias of above func that doesn't output if an AJAX filtering refresh is happening */
 
   public function show() {
 
-    if ($this->filtering)
-      echo '%%%';
-    
     echo $this->create_links();
   }
 
@@ -342,27 +337,33 @@ class PDb_Pagination {
     }
 
     $button_pattern = '<' . $button_wrap_tag . ' class="%2$s"><a href="%1$s">%3$s</a></' . $button_wrap_tag . '>';
+    $glyph_pattern = '<' . $button_wrap_tag . ' class="%2$s"><a title="%3$s" href="%1$s"><span class="glyphicon glyphicon-%4$s"></span></a></' . $button_wrap_tag . '>';
     $disabled_pattern = $this->anchor_wrap ?
             '<' . $button_wrap_tag . ' class="%2$s"><a href="#">%3$s</a></' . $button_wrap_tag . '> ' :
             '<' . $button_wrap_tag . ' class="%2$s"><span>%3$s</span></' . $button_wrap_tag . '> ';
+    $disabled_glyph_pattern = $this->anchor_wrap ?
+            '<' . $button_wrap_tag . ' class="%2$s"><a title="%3$s" href="#"><span class="glyphicon glyphicon-%4$s"></span></a></' . $button_wrap_tag . '>' :
+            '<' . $button_wrap_tag . ' class="%2$s"><span><span title="%3$s" class="glyphicon glyphicon-%4$s"></span></span></' . $button_wrap_tag . '> ';
 
     // add the first page link
     if ($this->first_last) {
 //      
       $output .= sprintf(
-          ($currentPage > 1 ? $button_pattern : $disabled_pattern),
+          ($currentPage > 1 ? $glyph_pattern : $disabled_glyph_pattern),
           $this->_sprintf($link, 1),
           ($currentPage > 1 ? 'firstpage' : $this->disabled_class),
-          __('First', 'participants-database')
+          __('First', 'participants-database'),
+          'first-page'
 );
     }
 
     // add the previous page link
     $output .= sprintf(
-            ($currentPage > 1 ? $button_pattern : $disabled_pattern), 
+            ($currentPage > 1 ? $glyph_pattern : $disabled_glyph_pattern), 
             $this->_sprintf($link, $currentPage - 1), 
             ($currentPage > 1 ? 'nextpage' : $this->disabled_class), 
-            __('Previous', 'participants-database')
+            __('Previous', 'participants-database'),
+            'previous-page'
     );
 
     for ($i = $loopStart; $i <= $loopEnd; $i++) {
@@ -375,10 +376,11 @@ class PDb_Pagination {
       );
     }
     $output .= sprintf(
-            ($currentPage < $totalPages ? $button_pattern : $disabled_pattern), 
+            ($currentPage < $totalPages ? $glyph_pattern : $disabled_glyph_pattern), 
             $this->_sprintf($link, $currentPage + 1), 
             ($currentPage < $totalPages ? 'nextpage' : $this->disabled_class), 
-            __('Next', 'participants-database')
+            __('Next', 'participants-database'),
+            'next-page'
     );
 
     if ($this->first_last) {
@@ -386,10 +388,11 @@ class PDb_Pagination {
 //      
       
       $output .= sprintf(
-          ($currentPage < $totalPages ? $button_pattern : $disabled_pattern),
+          ($currentPage < $totalPages ? $glyph_pattern : $disabled_glyph_pattern),
           $this->_sprintf($link, $totalPages),
           ($currentPage < $totalPages ? 'lastpage' : $this->disabled_class),
-          __('Last', 'participants-database')
+          __('Last', 'participants-database'),
+          'last-page'
 );
     }
 

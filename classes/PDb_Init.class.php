@@ -220,6 +220,11 @@ class PDb_Init
 				error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
     }
 
+    /**
+     * deletes all plugin tables, options and transients
+     * 
+     * @global object $wpdb
+     */
     private function _uninstall()
     {
 
@@ -232,15 +237,16 @@ class PDb_Init
         // remove options
         delete_option( Participants_Db::$participants_db_options );
 				delete_option( Participants_Db::$db_version_option );
+        delete_option( Participants_Db::$default_options );
 
 				// clear transients
-        $sql = 'SELECT `option_name` FROM ' . $wpdb->prefix . 'options WHERE `option_name` LIKE "%' . Participants_Db::$prefix . '%" OR `option_name` LIKE "%' . PDb_List_Admin::$limit_cookie . '-%" OR `option_name` LIKE "%pdb%" OR `option_name` LIKE "%signup-email-sent%"';
+        delete_transient(Participants_Db::$last_record);
+        $sql = 'SELECT `option_name` FROM ' . $wpdb->prefix . 'options WHERE `option_name` LIKE "%' . Participants_Db::$prefix . 'retrieve-count-%" OR `option_name` LIKE "%' . PDb_List_Admin::$limit_cookie . '%" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'captcha_key" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'signup-email-sent" ';
         $transients = $wpdb->get_col($sql);
         foreach($transients as $name) {
-          delete_transient(Participants_Db::$prefix . $name);
+          delete_transient($name);
         }
         
-				
         error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
         
     }

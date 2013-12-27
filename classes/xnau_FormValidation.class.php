@@ -363,24 +363,11 @@ class xnau_FormValidation {
    */
   public static function is_empty($string)
   {
-    if (is_array($string))
-      return self::_is_empty_array($string);
-    return $string === '';
+    if (is_array($string)) {
+      //return self::_is_empty_array($string);
+      $string = implode('', $string);
   }
-
-  /**
-   * tests each element of an array for empty
-   *
-   * @param array $array the array to test
-   * @return bool true if any element tests true
-   */
-  protected function _is_empty_array($array)
-  {
-    foreach ($array as $element) {
-      if (!self::is_empty($element))
-        return false;
-    }
-    return true;
+    return $string === '';
   }
 
   /*

@@ -83,7 +83,8 @@ jQuery(document).ready(function($) {
             var
                     pagination = newContent.find('.pagination'),
                     replaceContent = newContent.find('.list-container').length ? newContent.find('.list-container') : newContent;
-            container.find('.list-container').replaceWith(replaceContent);
+            replaceContent.find('a.obfuscate[rel]').each(function() {xnau_email_obfuscate($(this));});
+            container.find('.list-container').replaceWith(replaceContent)
             if ($('.pagination').length) {
               container.find('.pagination').replaceWith(pagination);
             } else {

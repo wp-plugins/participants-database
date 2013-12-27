@@ -15,17 +15,21 @@
  *
  * @return int
  */
+if (!function_exists('wp_session_cache_expire')) {
 function wp_session_cache_expire() {
 	$wp_session = WP_Session::get_instance();
 
 	return $wp_session->cache_expiration();
 }
+}
 
 /**
  * Alias of wp_session_write_close()
  */
+if (!function_exists('wp_session_commit')) {
 function wp_session_commit() {
 	wp_session_write_close();
+}
 }
 
 /**
@@ -33,10 +37,12 @@ function wp_session_commit() {
  *
  * @param string $data
  */
+if (!function_exists('wp_session_decode')) {
 function wp_session_decode( $data ) {
 	$wp_session = WP_Session::get_instance();
 
 	return $wp_session->json_in( $data );
+}
 }
 
 /**
@@ -44,10 +50,12 @@ function wp_session_decode( $data ) {
  *
  * @return string
  */
+if (!function_exists('wp_session_encode')) {
 function wp_session_encode() {
 	$wp_session = WP_Session::get_instance();
 
 	return $wp_session->json_out();
+}
 }
 
 /**
@@ -57,12 +65,14 @@ function wp_session_encode() {
  *
  * @return bool
  */
+if (!function_exists('wp_session_regenerate_id')) {
 function wp_session_regenerate_id( $delete_old_session = false ) {
 	$wp_session = WP_Session::get_instance();
 
 	$wp_session->regenerate_id( $delete_old_session );
 
 	return true;
+}
 }
 
 /**
@@ -72,11 +82,13 @@ function wp_session_regenerate_id( $delete_old_session = false ) {
  *
  * @return bool
  */
+if (!function_exists('wp_session_start')) {
 function wp_session_start() {
 	$wp_session = WP_Session::get_instance();
 	do_action( 'wp_session_start' );
 
 	return $wp_session->session_started();
+}
 }
 add_action( 'plugins_loaded', 'wp_session_start' );
 
@@ -85,6 +97,7 @@ add_action( 'plugins_loaded', 'wp_session_start' );
  *
  * @return int
  */
+if (!function_exists('wp_session_status')) {
 function wp_session_status() {
 	$wp_session = WP_Session::get_instance();
 
@@ -94,24 +107,29 @@ function wp_session_status() {
 
 	return PHP_SESSION_NONE;
 }
+}
 
 /**
  * Unset all session variables.
  */
+if (!function_exists('wp_session_unset')) {
 function wp_session_unset() {
 	$wp_session = WP_Session::get_instance();
 
 	$wp_session->reset();
 }
+}
 
 /**
  * Write session data and end session
  */
+if (!function_exists('wp_session_write_close')) {
 function wp_session_write_close() {
 	$wp_session = WP_Session::get_instance();
 
 	$wp_session->write_data();
 	do_action( 'wp_session_commit' );
+}
 }
 add_action( 'shutdown', 'wp_session_write_close' );
 
@@ -122,6 +140,7 @@ add_action( 'shutdown', 'wp_session_write_close' );
  * This method should never be called directly and should instead be triggered as part
  * of a scheduled task or cron job.
  */
+if (!function_exists('wp_session_cleanup')) {
 function wp_session_cleanup() {
 	global $wpdb;
 
@@ -156,15 +175,18 @@ function wp_session_cleanup() {
 	// Allow other plugins to hook in to the garbage collection process.
 	do_action( 'wp_session_cleanup' );
 }
+}
 add_action( 'wp_session_garbage_collection', 'wp_session_cleanup' );
 
 /**
  * Register the garbage collector as a twice daily event.
  */
+if (!function_exists('wp_session_register_garbage_collection')) {
 function wp_session_register_garbage_collection() {
 	if ( ! wp_next_scheduled( 'wp_session_garbage_collection' ) ) {
 		wp_schedule_event( time(), 'twicedaily', 'wp_session_garbage_collection' );
 	}
+}
 }
 add_action( 'wp', 'wp_session_register_garbage_collection' );
 ?>

@@ -106,8 +106,8 @@ class PDb_List_Admin {
         'page' => isset($_GET[self::$list_page]) ? $_GET[self::$list_page] : '1',
         'size' => self::$page_list_limit,
         'total_records' => self::$num_records,
-        'wrap_tag' => '<div class="pagination"><label>' . _x('Page', 'noun; page number indicator', 'participants-database') . ':</label> ',
-        'wrap_tag_close' => '</div>',
+//        'wrap_tag' => '<div class="pdb-list"><div class="pagination"><label>' . _x('Page', 'noun; page number indicator', 'participants-database') . ':</label> ',
+//        'wrap_tag_close' => '</div></div>',
         'add_variables' => http_build_query(self::$filter) . '#pdb-list-admin',
     ));
 
@@ -128,7 +128,7 @@ class PDb_List_Admin {
     self::_main_table();
 
     // output the pagination controls
-    self::$pagination->links();
+    echo '<div class="pdb-list">' . self::$pagination->links() . '</div>';
 
     // print the CSV export form (admin users only)
     if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']))
@@ -205,6 +205,7 @@ class PDb_List_Admin {
 
           set_transient(self::$limit_cookie . '-' . $user_ID, self::$page_list_limit);
           //Participants_Db::$plugin_settings->update_option( 'list_limit', self::$page_list_limit );
+          $_GET[self::$list_page] = 1;
           break;
 
         default:
@@ -268,7 +269,8 @@ class PDb_List_Admin {
             }
             
             $value = Participants_Db::parse_date($value, $field_atts, false);
-            if ($value2) $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
+            if ($value2)
+              $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
             
             if ($value !== false) {
             
@@ -280,11 +282,11 @@ class PDb_List_Admin {
                   
               } else {
 
-                if ($operator == 'LIKE') $operator = '=';
+                if ($operator == 'LIKE')
+                  $operator = '=';
 
                 self::$list_query .= " WHERE " . $stored_date . " " . $operator . " DATE_ADD(FROM_UNIXTIME(0), interval " . mysql_real_escape_string($value) . " second) ";
               }
-
             }
               } elseif ($field_atts->form_element == 'date') { 
 
@@ -295,7 +297,8 @@ class PDb_List_Admin {
                 }
 
             $value = Participants_Db::parse_date($value, $field_atts, true);
-            if ($value2) $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
+            if ($value2)
+              $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
 
             if ($value !== false) {
               
@@ -415,14 +418,14 @@ class PDb_List_Admin {
       }
 
     </script>
-    <div  class="wrap pdb-list participants_db">
+    <div  class="wrap participants_db">
     <a id="pdb-list-admin" name="pdb-list-admin"></a>
       <?php Participants_Db::admin_page_heading() ?>
     <div id="poststuff">
       <div class="post-body">
-      <h2><?php _e('List Participants','participants-database') ?></h2>
-      <h4><?php printf(_n('%s record found, sorted by:', '%s records found, sorted by:', self::$num_records, 'participants-database'), "\n" . self::$num_records) ?> 
-    <?php echo Participants_Db::column_title(self::$filter['sortBy']) ?>.</h4>
+          <h2><?php _e('List Participants', 'participants-database') ?></h2>
+          <h3><?php printf(_n('%s record found, sorted by:', '%s records found, sorted by:', self::$num_records, 'participants-database'), "\n" . self::$num_records) ?> 
+          <?php echo Participants_Db::column_title(self::$filter['sortBy']) ?>.</h3>
     <?php
   }
 
@@ -439,7 +442,7 @@ class PDb_List_Admin {
       <div class="pdb-searchform">
         <form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" >
           <input type="hidden" name="action" value="sort">
-
+                  <table class="form-table"><tbody><tr><td>
           <fieldset class="widefat inline-controls">
             <legend><?php _e('Show only records with', 'participants-database') ?>:</legend>
         <?php
@@ -483,7 +486,7 @@ class PDb_List_Admin {
             <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['filter'] ?>">
             <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['clear'] ?>">
           </fieldset>
-
+                        </td></tr><tr><td>
           <fieldset class="widefat inline-controls">
             <legend><?php _e('Sort by', 'participants-database') ?>:</legend>
             <?php
@@ -508,6 +511,7 @@ class PDb_List_Admin {
             ?>
             <input class="button button-default"  name="submit-button" type="submit" value="<?php echo self::$i18n['sort'] ?>">
           </fieldset>
+                        </td></tr></tbody></table>
         </form>
       </div><?php
           }
@@ -515,12 +519,14 @@ class PDb_List_Admin {
           /**
            * prints the general list form controls for the admin lising: deleting and items-per-page selector
            */
-          private static function _general_list_form_top() {
+        private static function _general_list_form_top()
+  {
             ?>
 
       <form id="list_form"  method="post"  onKeyPress="return checkEnter(event)" >
             <?php PDb_FormElement::print_hidden_fields(array('action' => 'list_action')) ?>
         <input type="hidden" id="select_count" value="0" />
+                <table class="form-table"><tbody><tr><td>
         <fieldset class="widefat inline-controls">
           <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
           <span style="padding-right:20px" ><input type="submit" name="submit-button" class="button button-default" value="<?php echo self::$i18n['delete_checked'] ?>" onClick="return delete_confirm();" id="delete_button"  ></span>
@@ -541,7 +547,7 @@ class PDb_List_Admin {
       <?php PDb_FormElement::print_element(array('type' => 'submit', 'name' => 'submit-button', 'class' => 'button button-default', 'value' => self::$i18n['change'])) ?>
           
         </fieldset>
-
+              </td></tr></tbody>
         <?php
       }
 
@@ -605,10 +611,11 @@ class PDb_List_Admin {
                 <tr>
         <?php // print delete check  ?>
                   <td>
-                    <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>"><?php _e('Edit', 'participants-database') ?></a>
+                         <?php // _e('Edit', 'participants-database') ?>
                     <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
                       <input type="checkbox" name="pid[]" value="<?php echo $value['id'] ?>" onClick="addSelects(this.checked)">
                     <?php endif ?>
+                          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>"><span class="glyphicon glyphicon-edit"></span></a>
                   </td>
               <?php
               foreach (self::$display_columns as $column) {
@@ -806,10 +813,10 @@ class PDb_List_Admin {
       
       // print the "select all" header 
       ?>
-      <th scope="col" style="width:5em">
+    <th scope="col" style="width:3em">
         <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
-          <?php /* translators: uses the check symbol in a phrase that means "check all" */ printf('<span class="checkmark" >&#10004;</span>%s', __('all', 'participants-database')) ?>
-        <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" >
+      <?php /* translators: uses the check symbol in a phrase that means "check all"  printf('<span class="checkmark" >&#10004;</span>%s', __('all', 'participants-database'))s*/ ?>
+        <input type="checkbox" onClick="checkedAll('list_form');" name="checkall" id="checkall" ><span class="glyphicon glyphicon-edit" style="opacity: 0"></span>
         <?php endif ?>
       </th>
           <?php

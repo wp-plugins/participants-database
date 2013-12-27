@@ -209,7 +209,7 @@ class PDb_CAPTCHA {
    * 
    * @return null
    */
-  public function get_key() {
+  public static function get_key() {
     if (!$key = get_transient(Participants_Db::$prefix . 'captcha_key')) {
       set_transient(Participants_Db::$prefix . 'captcha_key', self::generate_key(), (60 * 60 * 24));
     }

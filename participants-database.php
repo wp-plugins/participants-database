@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5.3
+  Version: 1.5.4
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -162,7 +162,7 @@ class Participants_Db extends PDb_Base {
    * set if a shortcode is called on a page
    * @var bool
    */
-  public static $shortcode_present;
+  public static $shortcode_present = false;
   /**
    * status code for the last record processed
    * @var string
@@ -265,6 +265,10 @@ class Participants_Db extends PDb_Base {
 
     // set the WP hooks to finish setting up the plugin
     add_action('init',                  array(__CLASS__, 'init'));
+    add_action('wp',                    array(__CLASS__, 'post_check_shortcode'));
+    add_action('template_include',      array(__CLASS__, 'template_check_shortcode'));
+    add_filter('admin_body_class',      array(__CLASS__, 'add_admin_body_class'));
+    add_filter('body_class',            array(__CLASS__, 'add_body_class'));
     add_action('admin_menu',            array(__CLASS__, 'plugin_menu'));
     add_action('admin_init',            array(__CLASS__, 'admin_init'));
     add_action('wp_enqueue_scripts',    array(__CLASS__, 'include_scripts'));
@@ -544,13 +548,10 @@ class Participants_Db extends PDb_Base {
    */
   public static function include_scripts() {
 
-    // set the global shortcode flag
-    self::$shortcode_present = false;
-
-    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
+    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__), array( 'dashicons' ));
     wp_register_style('custom_plugin_css', plugins_url('/css/custom_css.php', __FILE__));
 
-    if (self::$plugin_options['use_plugin_css']) {
+    if (self::$plugin_options['use_plugin_css'] && self::$shortcode_present) {
 
       wp_enqueue_style('pdb-frontend');
       wp_enqueue_style('custom_plugin_css');
@@ -575,7 +576,7 @@ class Participants_Db extends PDb_Base {
    */
   public static function add_scripts() {
 
-    if (false !== self::$shortcode_present) {
+    if (self::$shortcode_present) {
       wp_enqueue_script('jquery');
       wp_enqueue_script(self::$prefix.'shortcode');
       wp_enqueue_script(self::$prefix.'jq-placeholder');
@@ -730,7 +731,9 @@ class Participants_Db extends PDb_Base {
       $params['record_id'] = $params['id'];
       unset($params['id']);
     }
+    if (isset($params['record_id'])) {
     $params['record_id'] = self::get_record_id_by_term('id', $params['record_id']);
+    }
 
     return PDb_Single::print_record($params);
   }
@@ -1110,7 +1113,7 @@ class Participants_Db extends PDb_Base {
       
       case 'backend':
 
-        $where = 'WHERE v.name NOT IN ( "id", "captcha" ) ';
+        $where = 'WHERE v.name <> "id" AND v.form_element <> "captcha"';
         if (!current_user_can('manage_options')) {
           // don't show non-displaying groups to non-admin users
           $where .= 'AND g.admin = 0';
@@ -2821,6 +2824,97 @@ class Participants_Db extends PDb_Base {
   }
 
   /**
+   * sets some custom body classes in the admin
+   * 
+   * @param array $classes
+   */
+  public static function add_admin_body_class($class) {
+    if (version_compare(get_bloginfo('version'), '3.8', '>=')) {
+      $class .= ' has-dashicons ';
+    }
+    return $class;
+  }
+  
+  /**
+   * sets some custom body classes
+   * 
+   * @param array $classes
+   */
+  public static function add_body_class($classes) {
+    if (version_compare(get_bloginfo('version'), '3.8', '>=')) {
+      $classes[] = 'has-dashicons';
+    }
+    if (Participants_Db::$shortcode_present) {
+      $classes[] = 'participants-database-shortcode';
+    }
+    return $classes;
+  }
+  
+/**
+ * Whether the passed content contains the specified shortcode
+ *
+ * modeled on the WP function of the same name
+ * 
+ * what's different here is that it will return true on a partial match so it can 
+ * be used to detect any of the plugin's shortcode
+ *
+ * @global array $shortcode_tags
+ * @param string $tag
+ * @return boolean
+ */
+  public static function has_shortcode($content = '', $tag) {
+    
+    preg_match_all('/' . get_shortcode_regex() . '/s', $content, $matches, PREG_SET_ORDER);
+    if (empty($matches))
+      return false;
+    foreach ($matches as $shortcode) {
+      if (false !== strpos($shortcode[0], $tag)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /**
+   * sets the shortcode present flag if a plugin shortcode is found in the post
+   * 
+   * runs on the 'wp' filter
+   * 
+   * @global object $post
+   * @return array $posts
+   */
+  public static function post_check_shortcode() {
+    global $post;
+    $tag = '[pdb_';
+    if (self::has_shortcode($post->post_content, $tag)) {
+      self::$shortcode_present = true;
+    }
+  }
+  /**
+   * checks a template for an embedded shortcode
+   * 
+   * runs on the 'template_include' filter
+   * 
+   * @param type $template name of the template file in use
+   * @param string $tag the shortcode string to search for
+   * @return bool true if a shortcode matching the tag is present in the template
+   */
+  public static function template_check_shortcode($template, $tag = '[pdb_')
+  {
+
+    if (file_exists($template)) {
+
+      $contents = file_get_contents($template);
+
+      if (self::has_shortcode($contents, $tag)) {
+
+        self::$shortcode_present = true;
+      }
+    }
+
+    return $template;
+  }
+
+  /**
    * prints an admin page heading
    *
    * @param text $text text to show if not the title of the plugin
@@ -2882,7 +2976,7 @@ class Participants_Db extends PDb_Base {
    * @return array
    */
   public static function add_plugin_action_links($links) {
-    return array_merge($links, array('settings' => '<a href="' . admin_url('admin.php?page=participants-database_settings_page') . '">Settings</a>'));
+    return array_merge($links, array('settings' => '<a href="' . admin_url('admin.php?page=participants-database_settings_page') . '">' . __('Settings', 'participants-database') . '</a>'));
   }
 
   /**

@@ -84,7 +84,7 @@ if ($participant_values) :
           }
           $section = $column->group
           ?>
-          <h3><?php echo $groups[$section]['title'] ?></h3>
+          <h3 class="field-group-title"><?php echo $groups[$section]['title'] ?></h3>
           <?php if ($options['show_group_descriptions']) echo '<p class="' . Participants_Db::$prefix . 'group-description">' . $groups[$section]['description'] . '</p>' ?>
           <table class="form-table">
             <?php
@@ -220,11 +220,11 @@ if ($participant_values) :
         endforeach;
         ?>
       </table>
+     <h3 class="field-group-title"><?php _e('Save the Record', 'participants-database') ?></h3>
       <table class="form-table">
   <?php if (is_admin()) : ?>
           <tr>
-            <th><h3><?php _e('Save the Record', 'participants-database') ?></h3></th>
-          <td class="submit-buttons">
+          <td colspan="2" class="submit-buttons">
             <?php if (isset($_GET['id'])) : ?><input class="button button-default button-leftarrow" type="submit" value="<?php echo self::$i18n['previous'] ?>" name="submit_button"><?php endif ?>
             <input class="button button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit_button">
             <input class="button button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit_button">

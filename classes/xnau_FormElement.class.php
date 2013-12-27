@@ -32,7 +32,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, 2012, 2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5
+ * @version    Release: 1.5.4
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -903,7 +903,7 @@ abstract class xnau_FormElement {
 		
 		$this->attributes['placeholder'] = $link_placeholder;
 		
-		$this->_addline( $this->_input_tag( 'text', $url, false ) );
+		$this->_addline( $this->_input_tag( 'url', $url, false ) );
 		
 		$this->attributes['placeholder'] = $linktext_placeholder;
 		
@@ -1019,7 +1019,16 @@ abstract class xnau_FormElement {
     if ( $value === false ) $value = $this->value;
     $size = $this->size ? ' size="'.$this->size.'" ' : '';
 
-    return '<input type="' . $type . '" name="' . $this->name . ( $this->group ? '[]' : '' ) . '"' . $size . ( false !== $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . '  value="' . $value . '" />';
+    if ($type == 'text' && isset($this->attributes['type'])) {
+      $this->attributes = array_merge(array('type'=>$type), (array)$this->attributes);
+    } else {
+      $this->attributes['type'] = $type;
+    }
+
+    $html = '<input name="' . $this->name . ( $this->group ? '[]' : '' ) . '"' . $size . ( false !== $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . '  value="' . $value . '" />';
+    // unset the type attribute so it doesn't carry over to the next element
+    unset($this->attributes['type']);
+    return $html;
 
   }
   

@@ -1,8 +1,14 @@
 /* stylesheet for participants-database plugin */
 
-.helptext {
+[class*="pdb-"] .helptext {
   display: inline-block;
   margin: 0 5px;
+}
+.glyphicon {
+  font: 400 20px/1 sans-serif;
+}
+.has-dashicons .glyphicon {
+  font: 400 20px/1 dashicons;
 }
 
 /* SIGNUP FORM */
@@ -27,6 +33,7 @@
   display: inline-block;
   margin-right: 12px
 }
+
 
 /* RECORD FORM */
 
@@ -85,7 +92,6 @@
 }
 .file-delete input[type=checkbox] {
 	float:none;
-  display: inline;
 }
 .pdb-upload input[type=file] {
   float:none;
@@ -150,7 +156,11 @@
 /*  line-height: 1.1;*/
   vertical-align: middle;
 }
-.pdb-list fieldset,
+.pdb-list .wp-list-table th,
+.pdb-list .wp-list-table td{
+  padding: 5px;
+}
+.pdb-list .pdb-searchform fieldset,
 .pdb-list table caption {
   margin: 1em 0;
 }
@@ -182,21 +192,34 @@
   margin:0;
   list-style:none;
 }
-.pdb-list .pagination li span,
+.pdb-list .pagination li {
+    margin: 0;
+}
+.pdb-list .pagination li>span,
 .pdb-list .pagination a {
   float:left;
-  margin: 0 3px;
-  padding: 1px 5px;
-  border: 1px solid #aaa;
+  margin: 0 -1px 0 0;
+  padding: 6px 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(204, 204, 204, 1) rgba(204, 204, 204, 0.25);
   border-radius: 2px;
+  background-color: #FAFAFA;
+}
+.pdb-list .pagination li.disabled span,
+.pdb-list .pagination li.currentpage span {
+  background-color: #F3F3F3;
+  color: #777777;
 }
 .pdb-list .pagination li:first-of-type span,
 .pdb-list .pagination li:first-of-type a {
   margin-left:0;
+  border-left-color: rgba(204, 204, 204, 1);
 }
 .pdb-list .pagination li:last-of-type span,
 .pdb-list .pagination li:last-of-type a {
   margin-right:0;
+  border-right-color: rgba(204, 204, 204, 1);
 }
 .pdb-list .pagination li.currentpage:first-child,
 .pdb-list .pagination li:first-child a {
@@ -212,6 +235,42 @@
 .pdb-list .pagination label {    
   float: left;
   margin: 8px 6px 0 0;
+}
+.pdb-list .pagination .glyphicon {
+  font-size: 80%;
+  line-height: inherit;
+  vertical-align: middle;
+}
+.wp-admin .pdb-list .pagination .glyphicon {
+  vertical-align: top;
+}
+.pdb-list .pagination .glyphicon.glyphicon-first-page:after {
+  content: "❬❬";
+}
+.pdb-list .pagination .glyphicon.glyphicon-previous-page:after {
+  content: "❬";
+}
+.pdb-list .pagination .glyphicon.glyphicon-next-page:after {
+  content: "❭";
+}
+.pdb-list .pagination .glyphicon.glyphicon-last-page:after {
+  content: "❭❭";
+}
+.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-first-page,
+.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-last-page {
+  letter-spacing: -0.5em;
+}
+.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-first-page:after {
+  content: "\f341\f341";
+}
+.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-previous-page:after {
+  content: "\f341";
+}
+.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-next-page:after {
+  content: "\f345";
+}
+.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-last-page:after {
+  content: "\f345\f345";
 }
 
 /* SINGLE */

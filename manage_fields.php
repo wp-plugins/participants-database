@@ -675,16 +675,16 @@ foreach ($groups as $group) {
    * prepares a string for storage in the database
    * 
    * @param string $value
-   * @param bool $slashes
+   * @param bool $single_encode if true, don't encode entities 
    * @return string
    */
-  function PDb_prep_value($value, $slashes = false)
+  function PDb_prep_value($value, $single_encode = false)
   {
 
-    if ($slashes)
-      return htmlentities(trim($value), ENT_QUOTES, "UTF-8", false);
+    if ($single_encode)
+      return htmlentities($value, ENT_COMPAT, "UTF-8", false); // htmlentities(trim(stripslashes(html_entity_decode ($value))), ENT_QUOTES, "UTF-8", false);
     else
-      return htmlentities(trim(stripslashes($value)), ENT_QUOTES, "UTF-8", false);
+      return htmlentities(trim(stripslashes($value)), ENT_QUOTES, "UTF-8", true);
   }
 
 // this rather kludgy function will do for now

@@ -1214,8 +1214,16 @@ class PDb_Settings extends xnau_Plugin_Settings {
     ?>
     <div class="wrap participants_db settings-class">
       <?php Participants_Db::admin_page_heading(Participants_Db::$plugin_title . ' ' . __('Settings', 'participants-database')) ?>
+      <?php settings_errors(); ?>
       <form action="options.php" method="post" >
         <div class="ui-tabs">
+          <?php /* ?>
+          <h2 class="nav-tab-wrapper">
+            <?php foreach ($this->sections as $id => $title)
+              printf('<a class="nav-tab" href="#%s">%s</a>', Participants_Db::make_anchor($id), $title);
+            ?>
+          </h2>
+          <?php */ ?>
           <ul class="ui-tabs-nav">
             <?php foreach ($this->sections as $id => $title)
               printf('<li><a href="#%s">%s</a></li>', Participants_Db::make_anchor($id), $title);
@@ -1292,6 +1300,12 @@ class PDb_Settings extends xnau_Plugin_Settings {
           else
             $settings[$name] = '';
           break;
+        case 'list_limit':
+        case 'image_upload_limit':
+          if (intval($value) < 1) {
+            add_settings_error( $name, $name, sprintf(__('Only numeric values can be used for the "%s" setting.', 'participants-database'), $this->get_option_title($name)), 'error' );
+            $settings[$name] = $this->get_default_value($name);
+          }
       }
     }
     return $settings;

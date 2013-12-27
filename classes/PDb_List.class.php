@@ -127,7 +127,6 @@ class PDb_List extends PDb_Shortcode {
         'single_record_link' =>'',
         'display_count' => Participants_Db::$plugin_options['show_count'],
         'template' => 'default',
-        'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
         'module' => 'list',
         'action' => '',
         'suppress' => '',
@@ -212,7 +211,7 @@ class PDb_List extends PDb_Shortcode {
 
     // set some local variables for use in the template
     $filter_mode = $this->_sort_filter_mode();
-    $display_count = isset($this->shortcode_atts['display_count']) ? ($this->shortcode_atts['display_count'] == 'true' or $this->shortcode_atts['display_count'] == '1') : Participants_Db::$plugin_options['show_count'] == '1';
+    $display_count = isset($this->shortcode_atts['display_count']) ? ($this->shortcode_atts['display_count'] == 'true' or $this->shortcode_atts['display_count'] == '1') : false;
     $record_count = $this->num_records;
     $records = $this->records;
     $fields = $this->display_columns;
@@ -362,7 +361,7 @@ class PDb_List extends PDb_Shortcode {
      * were brought in from the $_POST or $_GET. The processed values are kept in the 
      * filter property
      */
-    $this->filter = array_merge($default_values, $_POST, $_GET);
+    $this->filter = array_merge($default_values, $_POST, (array) $_GET);
     
     // prevent list page value from carrying over to next query
     unset($this->filter[$this->list_page]);
@@ -831,6 +830,8 @@ class PDb_List extends PDb_Shortcode {
    */
   public function search_sort_form_top($target = false, $class = false, $print = true) {
 
+    $this->shortcode_atts['target_page'] = trim($this->shortcode_atts['target_page']);
+
     if (!empty($this->shortcode_atts['action']) && empty($this->shorcode_atts['target_page']) ) $this->shorcode_atts['target_page'] = $this->shortcode_atts['action'];
 
     global $post;
@@ -839,19 +840,13 @@ class PDb_List extends PDb_Shortcode {
     
     $ref = 'update';
     if ($target === false && !empty($this->shortcode_atts['target_page']) && $this->module == 'search') {
-      $target = get_permalink($this->shortcode_atts['target_page']);
-      if (empty($target)) {
-        if ($actionpage = get_page_by_path($this->shortcode_atts['target_page'])) {
-          $target = get_permalink($actionpage->ID);
-        }
+      $target = Participants_Db::find_permalink($this->shortcode_atts['target_page']);
       }
-      if ($target) $ref = 'remote';
+    if ($target) {
+      $ref = 'remote';
     }
     
     $action = $target !== false ? $target : get_permalink($post->ID)  . '#' . $this->list_anchor;
-//    ob_start();
-//    var_dump($target);
-//    error_log(__METHOD__.' shortcode atts:'.print_r($this->shortcode_atts,1).' target:'.  ob_get_clean());
     
     $class_att = $class ? 'class="' . $class . '"' : '';
     

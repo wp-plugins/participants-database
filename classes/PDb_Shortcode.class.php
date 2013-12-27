@@ -15,6 +15,14 @@
  *  instantiating Field_Group and Field objects for the display loop
  *  converting dynamic value notation to the value it represents
  *  perfoming a field key replace on blocks of text for emails and user feedback
+ * 
+ * @package    WordPress
+ * @subpackage Participants Database Plugin
+ * @author     Roland Barker <webdesign@xnau.com>
+ * @copyright  2013 xnau webdesign
+ * @license    GPL2
+ * @version    1.5.4
+ * @link       http://xnau.com/wordpress-plugins/
  *
  */
 
@@ -182,6 +190,7 @@ abstract class PDb_Shortcode {
         'target_instance' => Participants_Db::$instance_index,
         'target_page' => '',
         'record_id' => false,
+        'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
     );
     
     // error_log(__METHOD__.' incoming shorcode atts:'.print_r($shortcode_atts,1));
@@ -191,8 +200,15 @@ abstract class PDb_Shortcode {
     
     $this->module = $this->shortcode_atts['module'];
     
-    // save the shotcode attributes to the session array
+    /* 
+     * save the shotcode attributes to the session array
+     * 
+     * skip this if doing AJAX because it would just store the default values, not 
+     * the actual values from the shortcode 
+     */
+    if ($this->shortcode_atts['filtering'] != 1) {
     Participants_Db::$session->set($this->prefix . 'shortcode_atts', array( $this->module => array( Participants_Db::$instance_index => $this->shortcode_atts)));
+    }
 
     $this->wrap_class = $this->prefix . $this->module . ' ' . $this->prefix . 'instance-' . Participants_Db::$instance_index;
 
@@ -674,7 +690,7 @@ abstract class PDb_Shortcode {
         if (Participants_Db::is_group($item))
           $list[] = trim($item);
       }
-      if (count($list) === 0) continue;
+      if (count($list) !== 0) {
       /*
        * get a list of all defined groups
        */
@@ -687,6 +703,7 @@ abstract class PDb_Shortcode {
           $return[] = current($group);
         }
       }
+    }
     }
     if (count($return) === 0) {
 
@@ -1172,8 +1189,9 @@ abstract class PDb_Shortcode {
   protected function _set_submission_page() {
 
     if (!empty($this->shortcode_atts['action'])) {
-      $this->submission_page = $this->shortcode_atts['action'];
-    } else {
+      $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
+    }
+    if (!$this->submission_page) {
     $this->submission_page = $_SERVER['REQUEST_URI'];
   }
   }

@@ -236,13 +236,24 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.4 =
+
+* more visual compatibility tweaks with 3.8 WP admin redesign, dashicons
+* bug fixes
+* plugin classes are now only included on pages with plugin shortcodes
+* settings page feedback messages working
+* fixed possible class/function collision with other plugins using WP_Session
+* now compatible with HTML5 form element types
+* bulletproofing, collision avoidance
+
+
 = 1.5.3 =
 ** BETA RELEASE **
 
 * admin compatible with WP 3.8
 * plugin no longer relies on PHP sessions
 * better compatibility with international characters in form validation
-* fixed datetime bug with missing server timzone value
+* fixed datetime bug with missing server timezone value
 * updated POT file, internationalization complete
 * added Norwegian translation
 * bug fixes
@@ -466,9 +477,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.3 =
+= 1.5.4 =
 **BETA RELEASE**
-Largely compatibility upgrades with WP 3.8. Still in beta, with some new basic code: now works without PHP sessions, bug fixes. With 1.5.4 we will drop out of beta.
+Bugfixes, API enhancements, bulletproofing.
 
 == Using the Plugin ==
 

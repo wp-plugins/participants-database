@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011 xnau webdesign
  * @license    GPL2
- * @version    0.5
+ * @version    0.6
  * @link       http://xnau.com/wordpress-plugins/
  */
 
@@ -110,6 +110,33 @@ class PDb_Base {
     $return['relation'] = $relation;
     
     return $return;
+  }
+  
+  /**
+   * provides a permalink given a page name, path or ID
+   * 
+   * this allows a permalink to be found for a page name, relative path or post ID. 
+   * If an absolute path is provided, the path is returned unchanged.
+   * 
+   * @param string|int $page the term indicating the page to get a permalink for
+   * @global object $wpdb
+   * @return string|bool the permalink or false if it fails
+   */
+  public static function find_permalink($page) {
+    $permalink = false;
+    $id = false;
+    if (filter_var($page, FILTER_VALIDATE_URL)) {
+      $permalink = $page;
+    } elseif (preg_match('#^[0-9]+$#', $page)) {
+      $id = $page;
+    } elseif ($post = get_page_by_path($page)) {
+      $id = $post->ID;
+    } else {
+      global $wpdb;
+      $id = $wpdb->get_var( $wpdb->prepare( "SELECT p.ID FROM $wpdb->posts p WHERE p.post_name = '%s' AND p.post_status = 'publish'", trim($page, '/ ') ) );
+    }
+    if ($id) $permalink = get_permalink($id);
+    return $permalink;
   }
   
   /*
@@ -224,16 +251,16 @@ class PDb_Base {
       $var1 = $args[2];
       $var2 = isset($args[3]) ? $args[3] : '';
     }
-    if (WP_DEBUG) {
-      ob_start();
-      var_dump($term);
-      $dump = ob_get_clean();
-      error_log(__METHOD__.' applying filter "'.$tag.'" to
-      
-term: '. $dump .'
-var1: '.$var1.'
-var2: '.$var2);
-    }
+//    if (WP_DEBUG) {
+//      ob_start();
+//      var_dump($term);
+//      $dump = ob_get_clean();
+//      error_log(__METHOD__.' applying filter "'.$tag.'" to
+//      
+//term: '. $dump .'
+//var1: '.$var1.'
+//var2: '.$var2);
+//    }
     return apply_filters($tag, $term, $var1, $var2);
   }
 

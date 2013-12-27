@@ -82,7 +82,7 @@ class xnau_Plugin_Settings {
     register_setting(
         $this->WP_setting,
         $this->WP_setting,
-        array( $this->plugin_class, 'validate'));
+        array( $this, 'validate'));
 
   }
 	
@@ -188,6 +188,8 @@ class xnau_Plugin_Settings {
    * @return null
    */
   protected function show_settings_form() {
+    
+    settings_errors();
     ?>
       <form action="options.php" method="post">
         <?php
@@ -243,6 +245,22 @@ class xnau_Plugin_Settings {
         return $setting['options']['value'];
       }
     }
+    return null;
+  }
+
+  /**
+   * gets an option title
+   * 
+   * @param string $name name of the setting
+   * @return string|null the title if defined
+   */
+  public function get_option_title($name) {
+    foreach($this->plugin_settings as $setting) {
+      if ($setting['name'] == $name) {
+        return $setting['title'];
+      }
+    }
+    return null;
   }
   
   /**

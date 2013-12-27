@@ -226,7 +226,7 @@ class PDb_Signup extends PDb_Shortcode {
 
     if (!empty($this->shortcode_atts['action'])) {
 
-      $this->submission_page = $this->shortcode_atts['action'];
+      $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
     } elseif (isset($this->options['signup_thanks_page']) and $this->options['signup_thanks_page'] != 'none') {
 
       $this->submission_page = get_permalink($this->options['signup_thanks_page']);

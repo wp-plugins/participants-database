@@ -7,7 +7,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.1
+ * @version    Release: 1.5.4
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -269,7 +269,7 @@ class PDb_FormElement extends xnau_FormElement {
         break;
       default :
 
-        $return = $field->value;
+        $return = self::make_link($field);
 
       endswitch;
     }
@@ -346,9 +346,12 @@ class PDb_FormElement extends xnau_FormElement {
    */
   public static function make_link($field, $template = false, $get = false) {
   
+    // AJAX requests are not really from the admin
+    $in_admin = is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX);
 
-    // clean up the provided link string
+    // clean up the provided string
     $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($field->value))));
+    // use the default value if present for the link text
     $linktext = empty($field->value) ? $field->default : $field->value;
 
     if (isset($field->link) and !empty($field->link)) {
@@ -366,10 +369,10 @@ class PDb_FormElement extends xnau_FormElement {
     } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && Participants_Db::$plugin_options['make_links']) {
 
       // in admin, emails are plaintext
-      if (is_admin())
+      if ($in_admin)
         return esc_html($field->value);
 
-      if (Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email && ! is_admin()) {
+      if (Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email && ! $in_admin) {
 
         // the email gets displayed in plaintext if javascript is disabled; a clickable link if enabled
         list( $URI, $linktext ) = explode('@', $URI, 2);

@@ -17,7 +17,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    0.2
+ * @version    0.3
  * @link       http://xnau.com/wordpress-plugins/
  */
 class PDb_Template {
@@ -47,10 +47,28 @@ class PDb_Template {
    * @param array $values
    */
   var $values;
-  
+  /**
+   * permalink to the record edit page
+   * 
+   * @var string 
+   */
+  var $edit_page;
+  /**
+   * permalink to the single record page
+   *
+   * @var string
+   */
+  var $detail_page;
+  /**
+   * this class is instantiated with the module class
+   * 
+   * @param type $object
+   */
   function __construct(&$object)
   {
     $this->_setup_fields($object);
+    $this->set_edit_page(Participants_Db::$plugin_options['registration_page']);
+    $this->set_detail_page(Participants_Db::$plugin_options['single_record_page']);
   }
   
   /**
@@ -129,7 +147,7 @@ class PDb_Template {
    * @param string $name name of the field to check
    */
   public function has_content($name) {
-    return !empty($this->fields->{$name}->value);
+    return $this->fields->{$name}->value !== '';
   }
   
   /**
@@ -159,8 +177,8 @@ class PDb_Template {
    * 
    * @return string the URL
    */
-  public function get_edit_link() {
-    $edit_page = get_permalink(Participants_Db::$plugin_options['registration_page']);
+  public function get_edit_link($page = '') {
+    $edit_page = empty($page) ? $this->edit_page : Participants_Db::find_permalink($page);
     return $edit_page . (strpos($edit_page, '?') !== false ? '&' : '?') . 'pid=' . $this->get_value('private_id');
   }
   
@@ -169,8 +187,8 @@ class PDb_Template {
    * 
    * @return string the URL
    */
-  public function get_detail_link() {
-    $detail_page = get_permalink(Participants_Db::$plugin_options['single_record_page']);
+  public function get_detail_link($page = '') {
+    $detail_page = empty($page) ? $this->detail_page : Participants_Db::find_permalink($page);
     return $detail_page . (strpos($detail_page, '?') !== false ? '&' : '?') . 'pdb=' . $this->get_value('id');
   }
   /**
@@ -219,8 +237,9 @@ class PDb_Template {
         $this->values = $object->record->values;
         foreach($object->record->values as $name => $value) {
           $this->fields->{$name} = Participants_Db::get_column($name);
+          $this->fields->{$name}->module = $object->module;
           $this->fields->{$name}->value = $value;
-          $this->fields->{$name}->value = PDb_FormElement::get_field_value_display($this->fields->{$name});
+          //$this->fields->{$name}->value = PDb_FormElement::get_field_value_display($this->fields->{$name});
         }
         reset($object->record->values);
         break;
@@ -228,16 +247,45 @@ class PDb_Template {
       case 'PDb_Single':
       case 'PDb_Record':
       default:
+        if (!isset($object->record)) {
+          error_log(__METHOD__.' cannot instantiate ' . __CLASS__ . ' object. Class must be instantiated with full module object.');
+          break;
+        }
         $this->record = $object->record;
         $this->values = $object->participant_values;
         foreach($this->values as $name => $value) {
+          if (Participants_Db::is_column($name)) {
           $this->fields->{$name} = Participants_Db::get_column($name);
+          $this->fields->{$name}->module = $object->module;
           $this->fields->{$name}->value = $value;
-          $this->fields->{$name}->value = PDb_FormElement::get_field_value_display($this->fields->{$name});
+          //$this->fields->{$name}->value = PDb_FormElement::get_field_value_display($this->fields->{$name});
+          } else {
+            unset($this->values[$name]);
+          }
         }
         break;
     }
     //unset($this->record->options);
+  }
+  /**
+   * gets a permalink for a page or post for editing a record
+   * 
+   * it is assumed the [pdb_record] shortcode is on that page
+   * 
+   * @param string|int $page the page slug, path or ID
+   */
+  public function set_edit_page($page) {
+    $this->edit_page = Participants_Db::find_permalink($page);
+  }
+  /**
+   * gets a permalink for a page or post for displaying a record
+   * 
+   * it is assumed the [pdb_single] shortcode is on that page
+   * 
+   * @param string|int $page the page slug, path or ID
+   */
+  public function set_detail_page($page) {
+    $this->detail_page = Participants_Db::find_permalink($page);
   }
   
   /**
