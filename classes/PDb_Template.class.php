@@ -91,6 +91,18 @@ class PDb_Template {
    * 
    * @param string $name name of the field to print
    */
+  public function print_field($name) {
+    $this->_print($name);
+  }
+  
+  /**
+   * 
+   * prints a formatted field value
+   * 
+   * alias for print_field()
+   * 
+   * @param string $name name of the field to print
+   */
   public function print_value($name) {
     $this->_print($name);
   }
