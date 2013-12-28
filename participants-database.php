@@ -1341,7 +1341,7 @@ class Participants_Db extends PDb_Base {
           break;
 
         case 'private_id':
-          $new_value = empty($post['private_id']) ? self::generate_pid() : $post['private_id'];
+          $new_value = $action == 'insert' ? self::generate_pid() : false;
           break;
 
         default :
