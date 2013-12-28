@@ -309,7 +309,7 @@ class Participants_Db extends PDb_Base {
     {
         $plugin_path = plugin_basename( __FILE__ );
         $hook = "in_plugin_update_message-" . $plugin_path;
-        add_action( $hook, array(__CLASS__, 'plugin_update_message'), 20, 2 );
+        //add_action( $hook, array(__CLASS__, 'plugin_update_message'), 20, 2 );
     }
         }
 
