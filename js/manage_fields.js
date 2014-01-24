@@ -11,14 +11,16 @@ jQuery(document).ready(function($){
 
   // flag the row as changed
   $('#fields-tabs table.manage-fields input, #fields-tabs table.manage-fields textarea').bind('keyup',function(el) {
-    var matches = $(this).attr('name').match(/row_(\d+)\[/);
-    $('#status_'+matches[1]).attr('value','changed');
+    set_changed_flag(this);
   });
 	// flag the row as changed
   $('#fields-tabs table.manage-fields select, #fields-tabs table.manage-fields input[type=checkbox]').change(function(el) {
-    var matches = $(this).attr('name').match(/row_(\d+)\[/);
-    $('#status_'+matches[1]).attr('value','changed');
+    set_changed_flag(this);
   });
+  function set_changed_flag(el) {
+    var matches = $(el).closest('tr').attr('id').match(/(\d+)/);
+    $('#status_'+matches[1]).attr('value','changed');
+  }
 
   // defeat return key submit behavior
   $("#fields-tabs form").bind("keypress", function(e) {

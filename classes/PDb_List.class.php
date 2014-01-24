@@ -139,9 +139,12 @@ class PDb_List extends PDb_Shortcode {
 
     $this->registration_page_url = get_bloginfo('url') . '/' . ( isset(Participants_Db::$plugin_options['registration_page']) ? Participants_Db::$plugin_options['registration_page'] : '' );
 
-    $this->sortables = Participants_Db::get_sortables(Participants_Db::get_sortables() + $this->display_columns); // Participants_Db::get_sortables() + 
-    
-    //error_log(__METHOD__.' sortables:'.print_r($this->sortables,1).' disp cols:'.print_r($this->display_columns,1));
+    /*
+     * set the initial sortable field list; this is the set of all fields that are 
+     * both marked "sortable" and currently displayed in the list
+     */
+    $this->sortables = Participants_Db::get_sortables();
+//    $this->sortables = Participants_Db::get_sortables(Participants_Db::get_sortables() + $this->display_columns);
 
     $this->_setup_i18n();
     
@@ -361,7 +364,15 @@ class PDb_List extends PDb_Shortcode {
      * were brought in from the $_POST or $_GET. The processed values are kept in the 
      * filter property
      */
-    $this->filter = array_merge($default_values, $_POST, (array) $_GET);
+    if (isset($_POST['action']) && $_POST['action'] == 'pdb_list_filter') {
+      $this->filter = shortcode_atts($default_values, $_POST);
+    } elseif (isset($_GET['operator']) && !empty($_GET['operator'])) {
+      $this->filter = shortcode_atts($default_values, $_GET);
+    } else {
+      $this->filter = $default_values;
+    }
+    
+    
     
     // prevent list page value from carrying over to next query
     unset($this->filter[$this->list_page]);
@@ -403,8 +414,8 @@ class PDb_List extends PDb_Shortcode {
       $this->is_search_result = false;
     } elseif (
             !empty($this->filter['value']) &&
-            'none' != $this->filter['search_field'] &&
-            in_array($this->filter['search_field'], $this->searchable_columns())
+            'none' != $this->filter['search_field'] /* &&
+            in_array($this->filter['search_field'], $this->searchable_columns())*/
     ) {
       
       $this->is_search_result = true;

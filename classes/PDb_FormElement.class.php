@@ -124,7 +124,7 @@ class PDb_FormElement extends xnau_FormElement {
     /*
      * if the filter is defined, we pass the object to an external function with 
      * a filter handle that includes the name of the custom form element. The 
-     * external func is expected to fill the output property
+     * filter callback is expected to fill the output property
      */
     Participants_Db::set_filter('form_element_build_' . $this->type, $this);
 
@@ -220,11 +220,18 @@ class PDb_FormElement extends xnau_FormElement {
       case 'multi-checkbox' :
       case 'multi-select-other' :
         
-        
+        /*
+         * these elements are stored as serialized arrays of values, the data is displayed 
+         * a comma-separated string of the values, using the value titles if defined
+         */
         $multivalues = Participants_Db::unserialize_array($field->value);
-        if ( is_array($multivalues) and empty( $multivalues['other'] ) ) unset($multivalues['other']);
-
-        $return = implode(', ', (array) $multivalues);
+        // remove empty elements and convert to string for display
+        $multivalues = array_filter((array)$multivalues, array( __CLASS__, 'is_displayable'));
+        $titles = array();
+        foreach($multivalues as $value) {
+          $titles[] = self::get_value_title($value, $field->name);
+        }
+        $return = implode(', ', $titles);
         break;
 
       case 'link' :
@@ -250,6 +257,7 @@ class PDb_FormElement extends xnau_FormElement {
 
         if ($html) {
 
+          $field->value = self::get_value_title($field->value, $field->name);
           $return = self::make_link($field);
           break;
         } else {
@@ -263,12 +271,15 @@ class PDb_FormElement extends xnau_FormElement {
         
         $return = sprintf('<span class="textarea">%s</span>',$field->value );
         break;
+      
       case 'rich-text':
         
         $return = sprintf('<span class="textarea richtext">%s</span>', Participants_Db::process_rich_text($field->value));
         break;
+      
       default :
 
+        $field->value = self::get_value_title($field->value, $field->name);
         $return = self::make_link($field);
 
       endswitch;
@@ -321,7 +332,7 @@ class PDb_FormElement extends xnau_FormElement {
 
     // add the delete checkbox if there is a file defined
     if (!empty($this->value))
-      $this->_addline('<span class="file-delete" ><label><input type="checkbox" value="delete" name="' . $this->name . '-deletefile">' . __('delete', 'participants-database') . '</label></span>');
+      $this->_addline('<span class="file-delete" ><label><input type="checkbox" value="delete" name="' . $this->name . '-deletefile" ' . $this->_attributes () . '>' . __('delete', 'participants-database') . '</label></span>');
     
     $this->_addline('</div>');
   }
@@ -425,6 +436,52 @@ class PDb_FormElement extends xnau_FormElement {
   
   }
  
+  /**
+   * get the title that corresponds to a value from a value series
+   * 
+   * this func grabs the value and matches it to a title from a list of values set 
+   * for a particular field
+   * 
+   * if there is no title defined, or if the values is stored as a simple string, 
+   * the value is returned unchanged
+   * 
+   * @global object $wpdb
+   * @param string $value
+   * @param string $fieldname
+   * @return string the title matching the value
+   */
+  public static function get_value_title($value, $fieldname)
+  {
+    global $wpdb;
+    $sql = 'SELECT f.values FROM ' . Participants_Db::$fields_table . ' AS f WHERE f.name = "%s"';
+    $options_array = maybe_unserialize($wpdb->get_var($wpdb->prepare($sql, $fieldname)));
+
+    if (is_array($options_array)) {
+      foreach ($options_array as $index => $option_value) {
+        if (!is_string($index) or $index == 'other') {
+          // we use the stored value
+        } elseif ($option_value == $value) {
+          // grab the option title
+          return $index;
+        }
+      }
+    }
+    return $value;
+  }
+  
+  /**
+   * tests for a displayble value
+   * 
+   * this is used as a callback for a array_filter function
+   * 
+   * @param string|int $string the test subject
+   * @return bool true if is non-empty string or integer
+   */
+  public static function is_displayable($string) {
+    
+    return is_string($string) && $string !== '';
+  }
+ 
   /*
    * static function for assembling the types array
    */
@@ -447,6 +504,7 @@ class PDb_FormElement extends xnau_FormElement {
          'hidden'             => __('Hidden Field', 'participants-database'), 
          'password'           => __('Password Field', 'participants-database'), 
          'captcha'            => __('CAPTCHA', 'participants-database'),
+         'placeholder'        => __('Placeholder', 'participants-database'),
 //         'timestamp'          => __('Timestamp', 'participants-database'),
          );
     /*

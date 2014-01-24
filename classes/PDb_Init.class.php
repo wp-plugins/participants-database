@@ -87,10 +87,10 @@ class PDb_Init
         $sql = 'CREATE TABLE '.Participants_Db::$fields_table.' (
           `id` INT(3) NOT NULL AUTO_INCREMENT,
           `order` INT(3) NOT NULL DEFAULT 0,
-          `name` VARCHAR(30) NOT NULL,
+          `name` VARCHAR(64) NOT NULL,
           `title` TINYTEXT NOT NULL,
           `default` TINYTEXT NULL,
-          `group` VARCHAR(30) NOT NULL,
+          `group` VARCHAR(64) NOT NULL,
           `help_text` TEXT NULL,
           `form_element` TINYTEXT NULL,
           `values` LONGTEXT NULL,
@@ -119,7 +119,7 @@ class PDb_Init
           `display` BOOLEAN DEFAULT 1,
           `admin` BOOLEAN NOT NULL DEFAULT 0,
           `title` TINYTEXT NOT NULL,
-          `name` VARCHAR(30) NOT NULL,
+          `name` VARCHAR(64) NOT NULL,
           `description` TEXT NULL,
           UNIQUE KEY ( `name` ),
           PRIMARY KEY ( `id` )
@@ -241,7 +241,7 @@ class PDb_Init
 
 				// clear transients
         delete_transient(Participants_Db::$last_record);
-        $sql = 'SELECT `option_name` FROM ' . $wpdb->prefix . 'options WHERE `option_name` LIKE "%' . Participants_Db::$prefix . 'retrieve-count-%" OR `option_name` LIKE "%' . PDb_List_Admin::$limit_cookie . '%" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'captcha_key" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'signup-email-sent" ';
+        $sql = 'SELECT `option_name` FROM ' . $wpdb->prefix . 'options WHERE `option_name` LIKE "%' . Participants_Db::$prefix . 'retrieve-count-%" OR `option_name` LIKE "%' . PDb_List_Admin::$user_settings . '%" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'captcha_key" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'signup-email-sent" ';
         $transients = $wpdb->get_col($sql);
         foreach($transients as $name) {
           delete_transient($name);
@@ -259,7 +259,7 @@ class PDb_Init
       global $wpdb;
       
       // determine the actual version status of the database
-      self::_set_database_real_version();
+      self::set_database_real_version();
       
       if (WP_DEBUG) error_log('participants database db version determined to be: '.get_option( Participants_Db::$db_version_option ) );
       
@@ -594,7 +594,7 @@ class PDb_Init
         /*
          * changes all date fields' datatype to BIGINT unless the user has modified the datatype
          */
-        $sql = 'SELECT f.name FROM ' . Participants_Db::$fields_table . ' f INNER JOIN INFORMATION_SCHEMA.COLUMNS AS c ON TABLE_NAME = "' . Participants_Db::$participants_table . '" AND c.column_name = f.name AND data_type = "TINYTEXT" WHERE f.form_element = "date"';
+        $sql = 'SELECT f.name FROM ' . Participants_Db::$fields_table . ' f INNER JOIN INFORMATION_SCHEMA.COLUMNS AS c ON TABLE_NAME = "' . Participants_Db::$participants_table . '" AND c.column_name = f.name COLLATE utf8_general_ci AND data_type = "TINYTEXT" WHERE f.form_element = "date"';
 
         $results = $wpdb->get_results($sql, ARRAY_A);
         $fields = array();
@@ -617,6 +617,22 @@ class PDb_Init
 					}
 				}
       }
+      if ('0.8' == get_option(Participants_Db::$db_version_option)) {
+        /*
+         * all field and group names need more staorage space, changing the datatype to VARCHAR(64)
+         */
+        $sql = "ALTER TABLE ".Participants_Db::$fields_table." MODIFY `name` VARCHAR(64) NOT NULL, MODIFY `group` VARCHAR(64) NOT NULL";
+
+        if ( false !== $wpdb->query( $sql ) ) {
+
+          $sql = "ALTER TABLE ".Participants_Db::$groups_table." MODIFY `name` VARCHAR(64) NOT NULL";
+
+          if ( false !== $wpdb->query( $sql ) ) {
+            // set the version number this step brings the db to
+            update_option( Participants_Db::$db_version_option, '0.9' );
+          }
+        }
+      }
       
       if (WP_DEBUG) error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );
       
@@ -633,7 +649,14 @@ class PDb_Init
      * @global object $wpdb
      * @return null
      */
-    private function _set_database_real_version() {
+    private static function set_database_real_version() {
+      
+      /* don't bother if the value is set, we only do this if the db version can't 
+       * be determined
+       */
+      if (get_option(Participants_Db::$db_version_option)) {
+        return;
+      }
 
       global $wpdb;
 
@@ -684,6 +707,12 @@ class PDb_Init
       $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$groups_table . ' LIKE "admin"');
       if (!empty($column_test))
         update_option(Participants_Db::$db_version_option, '0.7');
+      else return;
+      
+      // check for version 0.9
+      $column_test = $wpdb->get_results('SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = "' . Participants_Db::$fields_table . '" AND COLUMN_NAME = "name"');
+      if ( $column_test[0]->CHARACTER_MAXIMUM_LENGTH == '64')
+        update_option(Participants_Db::$db_version_option, '0.9');
       else return;
       
   }

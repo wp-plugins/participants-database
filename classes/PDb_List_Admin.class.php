@@ -34,7 +34,7 @@ class PDb_List_Admin {
   // name of the list anchor element
   static $list_anchor = 'participants-list';
   // name of the list limit transient
-  static $limit_cookie = 'admin-list-limit';
+  static $user_settings = 'admin-user-settings';
   // the number of records after filtering
   static $num_records;
   // all the records are held in this array
@@ -61,9 +61,12 @@ class PDb_List_Admin {
 
     get_currentuserinfo();
 
-    // set the list limit value
-    self::$limit_cookie = Participants_Db::$prefix . self::$limit_cookie;
+    // set up the user settings transient
+    global $user_ID;
+    self::$user_settings = Participants_Db::$prefix . self::$user_settings . '-' . $user_ID;
+    
     self::set_list_limit();
+    self::set_list_sort();
 
     self::$registration_page_url = get_bloginfo('url') . '/' . ( isset(self::$options['registration_page']) ? self::$options['registration_page'] : '' );
 
@@ -203,7 +206,7 @@ class PDb_List_Admin {
 
           global $user_ID;
 
-          set_transient(self::$limit_cookie . '-' . $user_ID, self::$page_list_limit);
+          set_transient(self::$user_settings, self::$page_list_limit);
           //Participants_Db::$plugin_settings->update_option( 'list_limit', self::$page_list_limit );
           $_GET[self::$list_page] = 1;
           break;
@@ -447,7 +450,7 @@ class PDb_List_Admin {
             <legend><?php _e('Show only records with', 'participants-database') ?>:</legend>
         <?php
         //build the list of columns available for filtering
-        $filter_columns = array('(' . __('show all', 'participants-database') . ')' => 'none');
+        $filter_columns = array();
         foreach (Participants_db::get_column_atts('backend') as $column) {
 
           if (in_array($column->name, array('id', 'private_id')))
@@ -460,7 +463,7 @@ class PDb_List_Admin {
             'type' => 'dropdown',
             'name' => 'search_field',
             'value' => self::$filter['search_field'],
-            'options' => $filter_columns,
+            'options' => array('(' . __('show all', 'participants-database') . ')' => 'none') + $filter_columns,
         );
         PDb_FormElement::print_element($element);
         ?>
@@ -831,20 +834,77 @@ class PDb_List_Admin {
 
         /**
          * sets the admin list limit value
-         * 
-         * @global int $user_ID
          */
         private static function set_list_limit() {
 
-          global $user_ID;
-
           $limit_value = self::$options['list_limit'];
-          if ($transient = get_transient(self::$limit_cookie . '-' . $user_ID))
-            $limit_value = $transient;
-          if (isset($_POST['list_limit']) && is_numeric($_POST['list_limit']) && $_POST['list_limit'] > 0)
+          if ($setting = self::get_admin_user_setting('list_limit')) {
+            $limit_value = $setting;
+          }
+          if (isset($_POST['list_limit']) && is_numeric($_POST['list_limit']) && $_POST['list_limit'] > 0) {
             $limit_value = $_POST['list_limit'];
+          }
           self::$page_list_limit = $limit_value;
-          set_transient(self::$limit_cookie . '-' . $user_ID, $limit_value);
+          self::set_admin_user_setting('list_limit', $limit_value);
+        }
+        /**
+         * sets the admin list limit value
+         */
+        private static function set_list_sort() {
+
+          $sort_by = self::$options['admin_default_sort'];
+          $sort_order = self::$options['admin_default_sort_order'];
+          
+          error_log(__METHOD__.'seting: '.self::$user_settings.' sort: '.self::$options['admin_default_sort'].' order: '.self::$options['admin_default_sort_order']);
+          
+          if ($setting = self::get_admin_user_setting('sort_by')) {
+            $sort_by = $setting;
+          }
+          if ($setting = self::get_admin_user_setting('sort_order')) {
+            $sort_order = $setting;
+          }
+          
+          $sort_order = isset($_POST['ascdesc']) ? $_POST['ascdesc'] : $sort_order;
+          $sort_by = isset($_POST['sortBy']) ? $_POST['sortBy'] : $sort_by;
+          
+          self::$options['admin_default_sort'] = $sort_by;
+          self::$options['admin_default_sort_order'] = $sort_order;
+          
+          error_log(__METHOD__.' sort: '.self::$options['admin_default_sort'].' order: '.self::$options['admin_default_sort_order']);
+          
+          self::set_admin_user_setting('sort_by', $sort_by);
+          self::set_admin_user_setting('sort_order', $sort_order);
+        }
+        /**
+         * gets a user setting
+         * 
+         * @param string $name name of the setting to get
+         * @return string|bool the setting value or false if not found
+         */
+        public static function get_admin_user_setting($name) {
+          
+          $setting = false;
+          if ($settings = get_transient(self::$user_settings)) {
+            $setting = isset($settings[$name]) ? $settings[$name] : false;
+          }
+          return $setting;
+        }
+        /**
+         * sets a user setting
+         * 
+         * @param string $name
+         * @param string|int $value the setting value
+         * @return null
+         */
+        public static function set_admin_user_setting($name, $value) {
+          
+          $settings = array();
+          $saved_settings = get_transient(self::$user_settings);
+          if (is_array($saved_settings)) {
+            $settings = $saved_settings;
+          }
+          $settings[$name] = $value;
+          set_transient(self::$user_settings, $settings);
         }
 
         /**

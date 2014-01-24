@@ -196,7 +196,7 @@ class xnau_FormValidation {
   {
 
     if (!empty($this->error_CSS))
-      return '<style type="text/css">' . implode(', ', $this->error_CSS) . '{ ' . $this->error_style . ' }</style>';
+      return '<style type="text/css">' . implode(",\r", $this->error_CSS) . '{ ' . $this->error_style . ' }</style>';
     else
       return '';
   }

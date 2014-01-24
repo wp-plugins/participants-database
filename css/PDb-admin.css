@@ -11,6 +11,14 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
   width: 99%;
   max-width: 400px;
 }
+td.focused {
+  position: relative;
+}
+input.focused {
+  position:absolute;
+  margin-top:-1em;
+  z-index: 200;
+}
 .participants_db input.add_field {
   width: 250px;
 }
@@ -101,6 +109,9 @@ input[readonly] {
   border:none;
   background:none transparent;
   width: 100%;
+}
+input.focused[readonly] {
+  background-color: #ffffff;
 }
 body[class*='participants-database'] a.delete {
 /*  display:block;
@@ -326,15 +337,20 @@ th.validation, th.title, th.default, th.group, th.name {
   padding: 5px 0 0 0;
 }
 .manage-fields th.vertical-title span {
-  writing-mode:tb-rl;
+/*  writing-mode:vertical-rl;*/
   transform: rotate(90deg);
   transform-origin: left bottom;
+  
   -moz-transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
   -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  
   -moz-transform-origin: left bottom;
   -webkit-transform-origin: left bottom;
   -o-transform-origin: left bottom;
+  -ms-transform-origin: left bottom;
+  
   display: inline-block;
   height: auto;
   left: 0.6em;
@@ -344,6 +360,9 @@ th.validation, th.title, th.default, th.group, th.name {
   white-space: nowrap;
   width: auto;
   word-wrap: normal;
+}
+.ie8 .manage-fields th.vertical-title span {
+  top:0;
 }
 .manage-field-groups th.vertical-title span {
   top: -1em;

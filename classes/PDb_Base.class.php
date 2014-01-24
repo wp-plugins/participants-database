@@ -158,9 +158,9 @@ class PDb_Base {
 
     foreach ($array as $key => $value) {
 
-      if (!empty($value))
+      if ($value !== '')
         $empty = false;
-      $prepped_array[$key] = Participants_Db::_prepare_string_mysql($value);
+      $prepped_array[$key] = Participants_Db::_prepare_string_mysql((string)$value);
     }
 
     return $empty ? '' : serialize($prepped_array);
@@ -258,7 +258,9 @@ class PDb_Base {
 //      error_log(__METHOD__.' applying filter "'.$tag.'" to
 //      
 //term: '. $dump .'
-//var1: '.$var1.'
+//arg count: '.count($args). '
+//args: '. print_r($args,1) . '
+//var1: '.print_r($var1,1).'
 //var2: '.$var2);
 //    }
     return apply_filters($tag, $term, $var1, $var2);
@@ -274,8 +276,11 @@ class PDb_Base {
    */
   public static function delete_file($filename)
   {
-    chdir(ABSPATH . Participants_Db::$plugin_options['image_upload_location']);
-    return unlink(basename($filename));
+    $current_dir = getcwd(); // save the cirrent dir
+    chdir(ABSPATH . Participants_Db::$plugin_options['image_upload_location']); // set the plugin uploads dir
+    $result = unlink(basename($filename)); // delete the file
+    chdir($current_dir); // change back to the previous directory
+    return $result;
   }
 
   /**
@@ -489,6 +494,97 @@ class PDb_Base {
     }
   }
 
+/**
+ * check a string for a shortcode
+ *
+ * modeled on the WP function of the same name
+ * 
+ * what's different here is that it will return true on a partial match so it can 
+ * be used to detect any of the plugin's shortcode. Generally, we just check for 
+ * the common prefix
+ *
+ * @global array $shortcode_tags
+ * @param string $tag
+ * @return boolean
+ */
+  public static function has_shortcode($content = '', $tag = '[pdb_') {
+    
+    // get all shortcodes
+    preg_match_all('/' . get_shortcode_regex() . '/s', $content, $matches, PREG_SET_ORDER);
+    // none found
+    if (empty($matches))
+      return false;
+    // check each one for a plugin shortcode
+    foreach ($matches as $shortcode) {
+      if (false !== strpos($shortcode[0], $tag)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /**
+   * sets the shortcode present flag if a plugin shortcode is found in the post
+   * 
+   * runs on the 'wp' filter
+   * 
+   * @global object $post
+   * @return array $posts
+   */
+  public static function post_check_shortcode() {
+    global $post;
+    if (is_object($post) && self::has_shortcode($post->post_content)) {
+      self::$shortcode_present = true;
+    }
+  }
+  /**
+   * checks a template for an embedded shortcode
+   * 
+   * runs on the 'template_include' filter
+   * 
+   * @param type $template name of the template file in use
+   * @param string $tag the shortcode string to search for
+   * @return bool true if a shortcode matching the tag is present in the template
+   */
+  public static function template_check_shortcode($template)
+  {
+
+    if (file_exists($template)) {
+
+      $contents = file_get_contents($template);
+
+      if (self::has_shortcode($contents)) {
+
+        self::$shortcode_present = true;
+      }
+    }
+
+    return $template;
+  }
+  /**
+   * provides an array of field indices corresponding, given a list of field names
+   * 
+   * or vice versa
+   * 
+   * @param array $fieldnames the array of field names
+   * @param bool  $indices if true returns array of indices, if flase returns array of fieldnames
+   * @return array an array of integers
+   */
+  public static function get_field_indices($fieldnames, $indices = true) {
+    global $wpdb;
+    $sql = 'SELECT f.' . ($indices ? 'id' : 'name') . ' FROM ' . Participants_Db::$fields_table . ' f WHERE f.' . ($indices ? 'name' : 'id') . ' IN ("' . implode('","',$fieldnames) . '") ORDER BY FIELD("' . implode('","',$fieldnames) . '")';
+    return $wpdb->get_col($sql);
+  }
+
+  /**
+   * provides a list of field names, given a list of indices
+   * 
+   * @param array $ids of integer ids
+   * @return array of field names
+   * 
+   */
+  public static function get_indexed_names($ids) {
+    return self::get_field_indices($ids, false);
+  }
 }
 
 ?>

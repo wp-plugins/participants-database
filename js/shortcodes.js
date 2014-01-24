@@ -1,7 +1,7 @@
 /*
  * Participants Database Plugin
  * 
- * version: 0.6
+ * version: 0.7
  * 
  * xnau webdesign xnau.com
  * 
@@ -13,6 +13,7 @@
  *    form element placeholders
  */
 jQuery(document).ready(function($) {
+  // prevent double submissions
   var pdbform = $('input.pdb-submit').closest("form");
   pdbform.submit(function(e) {
     if ($(this).hasClass('pdb-disabled')) {
@@ -22,7 +23,8 @@ jQuery(document).ready(function($) {
     $(this).addClass('pdb-disabled');
     return true;
   });
-  $('.list-container a.obfuscate[rel]').each(function() {
+   // place email obfuscation
+  $('a.obfuscate[rel]').each(function() {
     xnau_email_obfuscate($(this));
   });
   });
@@ -33,7 +35,12 @@ jQuery(document).ready(function($) {
  * @returns null
  */
 function xnau_email_obfuscate(el) {
-  var address = jQuery.parseJSON(el.attr('rel'));
+  var address;
+  try {
+    address = jQuery.parseJSON(el.attr('rel'));
+  } catch (e) {
+    return;
+  }
   var link = ''.concat(address.name, '@', address.domain);
   el.attr('href', 'mailto:' + link).html(link).addClass('obfuscated');
 }

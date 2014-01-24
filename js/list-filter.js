@@ -60,10 +60,10 @@ jQuery(document).ready(function($) {
       }
       if (!isError) {
         filterform.find('input:not(input[type="submit"],input[type="radio"]), select').each(function() {
-          submission[this.name] = escape($(this).val());
+          submission[this.name] = encodeURI($(this).val());
         });
         filterform.find('input[type="radio"]:checked').each(function() {
-          submission[this.name] = escape($(this).val());
+          submission[this.name] = encodeURI($(this).val());
         });
         //console.log(submission);
         var

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHP class for printing HTML form elements
  *
@@ -173,9 +174,8 @@ abstract class xnau_FormElement {
   var $prefix = 'form-element';
   
   /**
-   * name of the instantiating module
    * 
-   * @var string
+   * @var string name of the instantiating module
    */
   var $module;
   
@@ -244,11 +244,10 @@ abstract class xnau_FormElement {
     
     // transfers the class attribute if it's set in the attributes array
     // it's possible for class names to be in either/both places, this collects them onto one place
-    if ( isset( $this->attributes['class'] ) ) {
+    if (isset($this->attributes['class'])) {
       
-      $this->classes .= ' '.$this->attributes['class'];
-      unset( $this->attributes['class'] );
-      
+      $this->classes .= ' ' . $this->attributes['class'];
+      unset($this->attributes['class']);
     }
     
     $this->indent = $params['indent'];
@@ -694,11 +693,14 @@ abstract class xnau_FormElement {
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
 
-    if ( $other ) {
-      $this->_addline( '<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
+    if ($other) {
+      $this->_addline('<div class="dropdown-other-control-group" name="' . $this->name . '" rel="' . $otherlabel . '">');
+      $this->add_class('otherselect');
+      $this->_addline('<select name="' . $this->name . '" ' . $this->_attributes() . ' >');
+      //$this->_addline('<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >');
     } else {
       $id = isset($this->attributes['id']) ? $this->attributes['id'] : $js_prefix . '_select';
-      $this->_addline( '<select id="' . $id . '" name="' . $this->name . '" ' . $this->_attributes() . ' >' );
+      $this->_addline('<select id="' . $id . '" name="' . $this->name . '" ' . $this->_attributes() . ' >');
     }
 
     $this->indent++;
@@ -708,51 +710,17 @@ abstract class xnau_FormElement {
      */
     $this->_set_null_select();
     
-    $this->_add_option_series();
+    $this->_add_option_series($other ? $otherlabel : false);
     
-    // add the "other" option
-    if ( $other ) $this->_addline( '<option ' . ( ! empty( $this->value ) ? $this->_set_selected( $this->options, $this->value, 'selected', false ) : '' ) . ' value="other" >'.$otherlabel.'</option>' );
+    $this->_addline('</select>', -1);
     
-    $this->_addline( '</select>', -1 );
-    
-    if ( $other ) :
+    if ( $other ) {
     
     // build the text input element
-    $this->_addline( '<input type="text" id="' . $js_prefix . '_other" name="' . $this->name . '" value="' . ( empty( $this->value ) ? '('.$otherlabel.')' : $this->value ) . '" onClick="' . $js_prefix . 'SetOther()" >' );
-    
-    
-    // put in the javascript
-    $this->_addline( '
-<script type="text/javascript">
-  function '.$js_prefix.'SelectOther() {
-    var otherfield=document.getElementById("' . $js_prefix . '_other");
-    var otherselect=document.getElementById("' . $js_prefix . '_otherselect");
-    if ( otherselect.options[otherselect.selectedIndex].text=="'.$otherlabel.'" ) {
-      otherfield.name="'. $this->name . '";
-      otherselect.name="temp";
-      otherfield.select();
-    } else {
-      otherselect.name="'. $this->name . '";
-      otherfield.name="temp";
-      otherfield.value=otherselect.options[otherselect.selectedIndex].text==""?"('.$otherlabel.')":"";
+      $is_other = $this->_set_selected( $this->options, $this->value, 'selected', false ) !== '';
+      $this->_addline('<input type="text" class="otherfield" name="' . $this->name . '" value="' . ( $is_other ? $this->value : '' ) . '" ' . $this->_attributes() . ' >');
+      $this->_addline('</div>');
     }
-  }
-  function '.$js_prefix.'SetOther() {
-    var otherfield=document.getElementById("' . $js_prefix . '_other");
-    var otherselect=document.getElementById("'.$js_prefix.'_otherselect");
-    otherselect.options[otherselect.selectedIndex].removeAttribute("selected");
-    otherselect.selectedIndex=otherselect.length-1;
-    otherselect.options[otherselect.length-1].setAttribute("selected","selected");
-    otherfield.name="'. $this->name . '";
-    otherselect.name="temp";
-    return true;
-  }
-  window.onload='.$js_prefix.'SelectOther();
-</script>
-');
-    
-    endif;
-    
   }
 
   /**
@@ -778,10 +746,9 @@ abstract class xnau_FormElement {
     $this->_addline( '<div class="multicheckbox"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . '>' );
     $this->indent++;
 
-    $this->_add_checkbox_series();
+    $this->_add_checkbox_series('checkbox');
 
-    $this->_addline( '</div>', -1 );
-
+    $this->_addline('</div>', -1);
   }
   
   /**
@@ -800,74 +767,47 @@ abstract class xnau_FormElement {
       if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
     }
     
-    // determine the label for the other field
-    if ( isset( $this->attributes['other'] ) ) {
+    /*
+     * determine the label for the other field: start with the default value, then 
+     * in the field definition, the finally the string if set in the template via 
+     * the attributes array
+     */
+    $otherlabel = $this->i18n['other'];
+    if ($i = array_search('other', $this->options)) {
+      $otherlabel = array_search('other',$this->options);
+      unset($this->options[$otherlabel]);
+    }
+    if (isset($this->attributes['other'])) {
       $otherlabel = $this->attributes['other'];
-      unset( $this->attributes['other'] );
-    } else $otherlabel = $this->i18n['other'];
+      unset($this->attributes['other']);
+    }
     
     // make a unique prefix for the function
-    $js_prefix = $this->_prep_js_string($this->name)/*.'_'*/;
-    
-    $this->attributes['onChange'] = $js_prefix.'SelectOther(this)';
+    $js_prefix = $this->_prep_js_string($this->name)/* .'_' */;
     
     // put it in a conatiner
-    $this->_addline( '<div class="selectother"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . '>' );
+    $this->_addline('<div class="selectother ' . $type . '-other-control-group"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . ' name="' . $this->name . '">');
     $this->indent++;
     
-    $type == 'checkbox' ? $this->_add_checkbox_series() : $this->_add_radio_series();
+    $type == 'checkbox' ? $this->_add_checkbox_series($otherlabel) : $this->_add_radio_series($otherlabel);
     
-    // add the "other" option
-    $options = $this->options;
-    $options[] = '';
-		
-		//error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
-    $this->_addline( '<label for="'.$this->name.'">' );
-    $this->_addline( '<input type="'.$type.'" id="' . $this->name . '_otherselect" name="'.$this->name . ( $type == 'checkbox' ? '[]' : '' ) . '"  value="'.$otherlabel.'" ' . $this->_set_selected( $options, ( $type == 'checkbox' ? $this->value['other'] : $this->value ), 'checked', false ).' ' . $this->_attributes() . ' />', 1 );
-    $this->_addline( $otherlabel.':' );
-    $this->_addline( '</label>', -1 );
-    
-    // build the text input element
-
-    $this->_addline( '<input type="text" id="' . $this->name . '_other" name="' . $this->name . ( $type == 'checkbox' ? '[other]' : '' ) . '" value="' . ( $type == 'checkbox' ? $this->value['other'] : ( ! in_array( $this->value, $options ) ? $this->value : '' ) ) . '" onClick="' . $js_prefix . 'SetOther()" >' );
-    
+    // add the text input element
+    $this->attributes['class'] =  'otherfield';
+    $value = $type == 'checkbox' ? $this->value['other'] : (!in_array($this->value, $this->options) ? $this->value : '' );
+    $name = $value === '' ? 'temp' : $this->name . ($type == 'checkbox' ? '[other]' : '');
+    $this->_addline('<input type="text" id="' . $this->name . '_other" name="' . $name . '" value="' . $value . '" ' . $this->_attributes() . ' >');
     
     // close the container
-    $this->_addline( '</div>', -1 );
-    
-    // put in the javascript
-    $this->_addline( '
-<script type="text/javascript">
-  function '.$js_prefix.'SelectOther(el) {
-    var otherfield=document.getElementById("'.$js_prefix.'_other");
-    var otherselect=document.getElementById("'.$js_prefix.'_otherselect");
-    if ( otherselect.checked ) {
-      otherfield.name="'. $this->name . ( $type == 'checkbox' ? '[other]' : '' ) . '";
-      otherselect.name = "'. ( $type == 'checkbox' ? 'temp' : $this->name ) . '";
-      otherfield.select();
-    } else {
-      otherfield.name="temp";
-      otherselect.name = "'. ( $type == 'checkbox' ? 'other' : $this->name ) . '";
-      otherfield.value=""; 
-    }
-  }
-  function '.$js_prefix.'SetOther() {
-    document.getElementById("'.$js_prefix.'_otherselect").checked=true;
-    '.$js_prefix.'SelectOther();
-  }
-  window.onload='.$js_prefix.'SelectOther();
-</script>
-');
-
+    $this->_addline('</div>', -1);
   }
   
   /**
    * builds a multi-select/other form element
    */
-  protected function _select_other_multi() {
+  protected function _select_other_multi()
+  {
     
-    $this->_select_other( 'checkbox' );
-    
+    $this->_select_other('checkbox');
   }
 	
 	/**
@@ -1014,13 +954,14 @@ abstract class xnau_FormElement {
    * @return string
    *
    */
-  protected function _input_tag( $type='text', $value = false, $select = false ) {
+  protected function _input_tag($type = 'text', $value = false, $select = false)
+  {
 
     if ( $value === false ) $value = $this->value;
     $size = $this->size ? ' size="'.$this->size.'" ' : '';
 
     if ($type == 'text' && isset($this->attributes['type'])) {
-      $this->attributes = array_merge(array('type'=>$type), (array)$this->attributes);
+      $this->attributes = array_merge(array('type' => $type), (array) $this->attributes);
     } else {
       $this->attributes['type'] = $type;
     }
@@ -1033,18 +974,20 @@ abstract class xnau_FormElement {
   }
   
   /**
-   * builds a checkbox series
+   * builds a checkbox or radio input series
    *
    * @param string $type sets the type of input series, defaults to checkbox
+   * @param string|bool if string, add an "other" option with this label
    */
-  protected function _add_checkbox_series( $type = 'checkbox' ) {
+  protected function _add_input_series($type = 'checkbox', $otherlabel = false)
+  {
     
     // checkboxes are grouped, radios are not
     $this->group = $type == 'checkbox' ? true : false;
 		
 		$class = '';
-		if ( ! empty( $this->classes ) ) {
-			$class = 'class="'.$this->classes.'"';
+    if (!empty($this->classes)) {
+      $class = 'class="' . $this->classes . '"';
 			$this->classes = '';
 			}
     
@@ -1058,10 +1001,31 @@ abstract class xnau_FormElement {
        
     foreach ($this->_make_assoc($this->options) as $option_key => $option_value) {
       
+      if (($option_value === false or $option_value === 'false' or $option_value === 'optgroup') and !empty($option_key)) {
+        /*
+         * this is where we would implement some kind of grouping for display purposes
+         */
+      } else {
       $this->attributes['id'] = $this->legal_name($this->name . '-' . strtolower($option_value));
       $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
       $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
       $this->_addline($option_key . '</label>');
+    }
+    }
+    if ($otherlabel) {
+      $this->attributes['class'] =  'otherselect';
+      $this->_addline('<label ' . $class . ' for="' . $this->name . '_otherselect">');
+      $this->_addline(sprintf('<input type="%s" id="%s_otherselect" name="%s"  value="%s" %s %s />', 
+              $type, 
+              $this->name, 
+              $type == 'checkbox' ? 'temp' : $this->name, 
+              $otherlabel, 
+              $this->_set_selected($this->options, ( $type == 'checkbox' ? $this->value['other'] : $this->value), 'checked', false), 
+              $this->_attributes()
+              ), 1);
+      //$this->_addline('<input type="' . $type . '" id="' . $this->name . '_otherselect" name="' . ($type == 'checkbox' ? 'temp' : $this->name) . '"  value="' . $otherlabel . '" ' . $this->_set_selected($this->options, ( $type == 'checkbox' ? $this->value['other'] : $this->value), 'checked', false) . ' ' . $this->_attributes() . ' />', 1);
+      $this->_addline($otherlabel . ':');
+      $this->_addline('</label>', -1);
     }
     
     $this->_addline('</span>');
@@ -1069,11 +1033,24 @@ abstract class xnau_FormElement {
   
   /**
    * adds a series of radio buttons
+   * 
+   * @param string|bool if string, add an "other" option with this label
    */
-  protected function _add_radio_series() {
+  protected function _add_checkbox_series($otherlabel = false)
+  {
+
+    $this->_add_input_series('checkbox', $otherlabel);
+  }
     
-    $this->_add_checkbox_series( 'radio' );
+  /**
+   * adds a series of radio buttons
+   * 
+   * @param string|bool if string, add an "other" option with this label
+   */
+  protected function _add_radio_series($otherlabel = false)
+  {
     
+    $this->_add_input_series('radio', $otherlabel);
   }
   
   /**
@@ -1081,21 +1058,27 @@ abstract class xnau_FormElement {
    * 
    * if an element in the options array has a value of bool false, it will open an 
    * optgroup using the key as the group 
+   * 
+   * @var string|bool label of the "other" option if any
    */
-  protected function _add_option_series() {
+  protected function _add_option_series($otherlabel = false)
+  {
     
-    foreach ( $this->_make_assoc( $this->options ) as $key => $value ) {
+    foreach ($this->_make_assoc($this->options) as $key => $value) {
       
-      if (($value === false or $value === 'false') and !empty($key)) {
-        $this->_add_options_divider ($key);
+      if (($value === false or $value === 'false' or $value === 'optgroup') and !empty($key)) {
+        $this->_add_options_divider($key);
+      } elseif($value == 'other') {
+        $otherlabel = $key;
       } elseif (!empty($value) or $value === 0) {
-        $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . stripslashes($key) . '</option>', -1 );
+        $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . stripslashes($key) . '</option>', -1);
       }
-
     }
+    // add the "other" option
+    if ( $otherlabel !== false ) $this->_addline( '<option ' . ( $this->value !== '' ? $this->_set_selected( $this->options, $this->value, 'selected', false ) : '' ) . ' value="other" >'.$otherlabel.'</option>' );
     
     if ($this->inside) {
-       $this->_addline ('</optgroup>');
+      $this->_addline('</optgroup>');
        $this->inside = false;
     }
     
@@ -1320,25 +1303,27 @@ abstract class xnau_FormElement {
    * 
    * If $this->options['null_select'] has a string value, it will be used as the 
    * display value for the null option. 
-   * If $this->options['null_select'] is true or the field value is empty, a blank 
-   * unselected null option will be added. 
+   * If $this->options['null_select'] is blank, a blank unselected null option will 
+   * be added. 
    * If $this->options['null_select'] is false no null state option will be added.
+   * If the value is empty and no null select is defined, a blank one will be added
    * 
    * @return null
    */
   protected function _set_null_select() {
     
-    $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : true;
+    $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : false;
     // remove the null_select from the options array
-    if (isset($this->options['null_select'])) unset($this->options['null_select']);
+    if (isset($this->options['null_select']))
+      unset($this->options['null_select']);
     /*
      * the null select option is added if it is not canceled by a null select value 
      * of false or 'false'
      */
-    if (($null_select !== false and $null_select !== 'false')) {
-      $value = is_string($null_select) ? $null_select : '';
-      $selected = empty($this->value) ? $this->_set_selected( true, true, 'selected' ) : '';
-      $this->_addline( '<option value="" ' . $selected . '  >' . $value  . '</option>' );
+    $null_select_label = is_string($null_select) ? $null_select : '';
+    if (($null_select !== false and $null_select !== 'false') || $this->value === '') {
+      $selected = $this->value === '' ? $this->_set_selected(true, true, 'selected') : '';
+      $this->_addline('<option value="" ' . $selected . '  >' . $null_select_label . '</option>');
     }
     
   }
@@ -1370,18 +1355,17 @@ abstract class xnau_FormElement {
 	 * @param string  $element_value   the value of one select of a multi-select
 	 * @param array   $new_value_array the array of stored or inputted values
 	 * @param string  $attribute       the name of the "selected" attribute for the element
-	 * @param boolean $state           true to check for a match or false for a non-match
+   * @param bool    $state           true to check for a match or false for a non-match
 	 * @return string                  the attribute string for the element
 	 */
-  protected function _set_multi_selected($element_value, $new_value_array, $attribute = 'selected', $state = true) {
+  protected function _set_multi_selected($element_value, $new_value_array, $attribute = 'selected', $state = true)
+  {
 		
     $prepped_new_value_array = $this->_prep_comp_array($new_value_array);
 		
 		$prepped_string = $this->_prep_comp_string($element_value);
 		
-//    if (WP_DEBUG) error_log( __METHOD__.' checking value:'.$prepped_string.'('.$element_value.')'.' against:'.print_r($prepped_new_value_array,true).' state:'.( in_array( $prepped_string, $prepped_new_value_array)?'true':'false').' setting: '.$attribute );
-			
-    if (!empty($prepped_string) && $state === in_array($prepped_string, $prepped_new_value_array))
+    if ($state === in_array($prepped_string, $prepped_new_value_array))
       return sprintf(' %1$s="%1$s" ', $attribute);
     else
       return '';
@@ -1390,10 +1374,10 @@ abstract class xnau_FormElement {
   /**
    * tests the type of an array, returns true if associative
    */
-  public static function is_assoc($array) {
+  public static function is_assoc($array)
+  {
 		
-    return ( is_array($array) && ( count($array)==0 || 0 !== count( array_diff_key( $array, array_keys( array_keys( $array ) ) ) ) ) );
-		
+    return ( is_array($array) && ( count($array) == 0 || 0 !== count(array_diff_key($array, array_keys(array_keys($array)))) ) );
   }
   
   /**

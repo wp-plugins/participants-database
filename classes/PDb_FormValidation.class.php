@@ -185,9 +185,15 @@ class PDb_FormValidation extends xnau_FormValidation {
         
         if ($field->value != $test_value) $field->error_type = 'nonmatching';
         
-      } elseif ($regex !== false && preg_match($regex, $field->value) == 0) {
+      } elseif ($regex !== false) {
         
+        $test_result = preg_match($regex, $field->value);
+        
+        if ($test_result === 0) {
         $field->error_type = $field->validation == 'captcha' ? 'captcha' : 'invalid';
+        } elseif ($test_result === false) {
+          error_log(__METHOD__.' captcha regex error with regex: "' . $regex . '"');
+        }
         
       }
     }
@@ -262,8 +268,7 @@ class PDb_FormValidation extends xnau_FormValidation {
           $element = false;
       }
 
-      if ($element)
-        $this->error_CSS[] = $element . '[name="' . $field_atts->name . '"]';
+      $this->error_CSS[] = '[class*="'. Participants_Db::$prefix . '"] [name="' . $field_atts->name . '"]';
 
       if (isset($this->error_messages[$error])) {
         $error_messages[] = $error == 'nonmatching' ? sprintf($this->error_messages[$error], $field_atts->title, Participants_Db::column_title($field_atts->validation)) : sprintf($this->error_messages[$error], $field_atts->title);

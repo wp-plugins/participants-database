@@ -66,7 +66,7 @@ if ($participant_values) :
       PDb_FormElement::print_hidden_fields($hidden);
 
       // get the columns and output form
-      $readonly_columns = Participants_Db::get_readonly();
+      $readonly_columns = Participants_Db::get_readonly_fields();
       foreach (Participants_db::get_column_atts('backend') as $column) :
 
         $id_line = '';
@@ -92,7 +92,7 @@ if ($participant_values) :
           echo $id_line;
           ?>
 
-          <tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) ?>">
+          <tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) . ' ' . $column->name . '-field' ?>">
             <?php
             $column_title = str_replace(array('"',"'"), array('&quot;','&#39;'), stripslashes($column->title));
             if ($options['mark_required_fields'] && $column->validation != 'no') {
@@ -104,7 +104,10 @@ if ($participant_values) :
             if ($column->form_element == 'hidden') {
               $add_title = sprintf(' (%s)', __('hidden', 'participants-database'));
             } elseif (in_array($column->name, $readonly_columns) or $column->form_element == 'timestamp') {
+              $attributes['class'] = 'readonly-field';
+              if (!current_user_can(Participants_Db::$plugin_options['record_edit_capability'])) {
               $attributes['readonly'] = 'readonly';
+              }
               $add_title = sprintf(' (%s)', __('read only', 'participants-database'));
             }
             ?>
@@ -145,18 +148,16 @@ if ($participant_values) :
 
                 switch ($column->form_element) {
                   
-                  case 'timestamp':
+//                  case 'timestamp':
                   case 'date':
 
                     /*
                      * if it's not a timestamp, format it for display; if it is a
                      * timestamp, it will be formatted by the xnau_FormElement class
                      */
-                    if (!empty($column->value) and !Participants_Db::is_valid_timestamp($column->value)) {
+                    if (!empty($column->value)) {
                       //$column->value = xnau_FormElement::get_field_value_display($column);
                       $column->value = Participants_Db::parse_date($column->value);
-                      
-                      if (!Participants_Db::is_valid_timestamp($column->value)) $column->value = false;
                     }
 
                     break;
@@ -189,7 +190,9 @@ if ($participant_values) :
               if ('rich-text' == $column->form_element) {
 
                 wp_editor(
-                        $column->value, preg_replace('#[0-9_-]#', '', Participants_Db::$prefix . $column->name), array(
+                        $column->value, 
+                        preg_replace('#[0-9_-]#', '', Participants_Db::$prefix . $column->name), 
+                        array(
                     'media_buttons' => false,
                     'textarea_name' => $column->name,
                     'editor_class' => $field_class,
@@ -197,8 +200,7 @@ if ($participant_values) :
                 );
               } else {
 
-                PDb_FormElement::print_element(
-                        array(
+                $params = array(
                             'type' => $column->form_element,
                             'value' => $column->value,
                             'name' => $column->name,
@@ -206,8 +208,8 @@ if ($participant_values) :
                             'class' => $field_class,
                             'attributes' => $attributes,
                             'module' => 'admin-edit',
-                        )
                 );
+                PDb_FormElement::print_element($params);
               }
 
               if (!empty($column->help_text)) :

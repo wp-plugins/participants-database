@@ -44,8 +44,8 @@
 .participants_db input,
 .edit-participant input,
 .link-element label {
-  margin-right:2px;
-  vertical-align: middle;
+  margin: 0 2px 0 0;
+/*  vertical-align: middle;*/
 }
 .participants_db .inline-controls input[type='checkbox'],
 .participants_db .inline-controls input[type='radio'] {
@@ -146,7 +146,9 @@
     float: left;
     margin-right: 10px;
 }
-
+.dropdown-other input[name=temp] {
+/*  display:none;*/
+}
 /* LIST */
 
 .wp-list-table th,
@@ -185,18 +187,23 @@
 }
 
 /* pagination */
-.pdb-list .pagination {
+.pdb-list .pagination,
+.pdb-pagination {
   overflow:auto;
 }
-.pdb-list .pagination ul {
+.pdb-list .pagination ul,
+.pdb-pagination ul {
   margin:0;
   list-style:none;
 }
-.pdb-list .pagination li {
+.pdb-list .pagination li,
+.pdb-pagination li {
     margin: 0;
 }
 .pdb-list .pagination li>span,
-.pdb-list .pagination a {
+.pdb-pagination li>span,
+.pdb-list .pagination a,
+.pdb-pagination a {
   float:left;
   margin: 0 -1px 0 0;
   padding: 6px 10px;
@@ -207,36 +214,49 @@
   background-color: #FAFAFA;
 }
 .pdb-list .pagination li.disabled span,
-.pdb-list .pagination li.currentpage span {
+.pdb-pagination li.disabled span,
+.pdb-list .pagination li.currentpage span,
+.pdb-pagination li.currentpage span {
   background-color: #F3F3F3;
   color: #777777;
 }
 .pdb-list .pagination li:first-of-type span,
-.pdb-list .pagination li:first-of-type a {
+.pdb-pagination li:first-of-type span,
+.pdb-list .pagination li:first-of-type a,
+.pdb-pagination li:first-of-type a  {
   margin-left:0;
   border-left-color: rgba(204, 204, 204, 1);
 }
 .pdb-list .pagination li:last-of-type span,
-.pdb-list .pagination li:last-of-type a {
+.pdb-pagination  li:last-of-type span,
+.pdb-list .pagination li:last-of-type a,
+.pdb-pagination li:last-of-type a  {
   margin-right:0;
   border-right-color: rgba(204, 204, 204, 1);
 }
 .pdb-list .pagination li.currentpage:first-child,
-.pdb-list .pagination li:first-child a {
+.pdb-pagination  li.currentpage:first-child,
+.pdb-list .pagination li:first-child a,
+.pdb-pagination li:first-child a {
   margin-left:0;
 }
-.pdb-list .pagination a {
+.pdb-list .pagination a,
+.pdb-pagination a  {
   text-decoration:none;
 }
 .pdb-list .pagination a:hover,
-.pdb-list .pagination li.currentpage {
+.pdb-pagination a:hover,
+.pdb-list .pagination li.currentpage,
+.pdb-pagination li.currentpage  {
   background-color: #cccccc;
 }
-.pdb-list .pagination label {    
+.pdb-list .pagination label,
+.pdb-pagination label  {    
   float: left;
   margin: 8px 6px 0 0;
 }
-.pdb-list .pagination .glyphicon {
+.pdb-list .pagination .glyphicon,
+.pdb-pagination .glyphicon  {
   font-size: 80%;
   line-height: inherit;
   vertical-align: middle;
@@ -244,32 +264,32 @@
 .wp-admin .pdb-list .pagination .glyphicon {
   vertical-align: top;
 }
-.pdb-list .pagination .glyphicon.glyphicon-first-page:after {
+.pagination .glyphicon.glyphicon-first-page:after {
   content: "❬❬";
 }
-.pdb-list .pagination .glyphicon.glyphicon-previous-page:after {
+.pagination .glyphicon.glyphicon-previous-page:after {
   content: "❬";
 }
-.pdb-list .pagination .glyphicon.glyphicon-next-page:after {
+.pagination .glyphicon.glyphicon-next-page:after {
   content: "❭";
 }
-.pdb-list .pagination .glyphicon.glyphicon-last-page:after {
+.pagination .glyphicon.glyphicon-last-page:after {
   content: "❭❭";
 }
-.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-first-page,
-.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-last-page {
+.has-dashicons .pagination .glyphicon.glyphicon-first-page,
+.has-dashicons .pagination .glyphicon.glyphicon-last-page {
   letter-spacing: -0.5em;
 }
-.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-first-page:after {
+.has-dashicons .pagination .glyphicon.glyphicon-first-page:after {
   content: "\f341\f341";
 }
-.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-previous-page:after {
+.has-dashicons .pagination .glyphicon.glyphicon-previous-page:after {
   content: "\f341";
 }
-.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-next-page:after {
+.has-dashicons .pagination .glyphicon.glyphicon-next-page:after {
   content: "\f345";
 }
-.has-dashicons .pdb-list .pagination .glyphicon.glyphicon-last-page:after {
+.has-dashicons .pagination .glyphicon.glyphicon-last-page:after {
   content: "\f345\f345";
 }
 

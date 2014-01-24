@@ -331,7 +331,7 @@ this is a more detailed template showing how the parts of the display can be cus
 																		 'current_page_class'=>'currentpage',
 																		 'wrappers' => array(
 																												'wrap_tag' => 'div',
-																												'wrap_class' => 'pagination',
+																												'wrap_class' => '',
 																												'all_button_wrap_tag' => 'ul',
 																												'button_wrap_tag' => 'li',
 																												)

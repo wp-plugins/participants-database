@@ -201,7 +201,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'group' => 'pdb-main',
         'options' => array(
             'type' => 'text',
-            'help_text' => __("the message shown when a field's value does match the value of another field. The first %s will show the name of the field, the second will show the name of the filed it must match.", 'participants-database'),
+            'help_text' => __("the message shown when a field's value does match the value of another field. The first %s will show the name of the field, the second will show the name of the field it must match.", 'participants-database'),
             'value' => __('The %s field must match the %s field.', 'participants-database'),
         )
     );
@@ -1086,7 +1086,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     foreach ($columns as $column) {
 
-      if (in_array($column->form_element, array('text-line', 'image-upload', 'checkbox')))
+      if (in_array($column->form_element, array('text-line', 'image-upload', 'checkbox', 'placeholder')))
         $columnlist[$column->title] = $column->name;
     }
 
