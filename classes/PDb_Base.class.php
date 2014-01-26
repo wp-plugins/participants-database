@@ -14,6 +14,11 @@
 
 class PDb_Base {
   /**
+   * set if a shortcode is called on a page
+   * @var bool
+   */
+  public static $shortcode_present = false;
+  /**
    * parses a list shortcode filter string into an array
    * 
    * this creates an array that makes it easy to manipulate and interact with the 
@@ -158,9 +163,9 @@ class PDb_Base {
 
     foreach ($array as $key => $value) {
 
-      if (!empty($value))
+      if ($value !== '')
         $empty = false;
-      $prepped_array[$key] = Participants_Db::_prepare_string_mysql($value);
+      $prepped_array[$key] = Participants_Db::_prepare_string_mysql((string)$value);
     }
 
     return $empty ? '' : serialize($prepped_array);
@@ -258,7 +263,9 @@ class PDb_Base {
 //      error_log(__METHOD__.' applying filter "'.$tag.'" to
 //      
 //term: '. $dump .'
-//var1: '.$var1.'
+//arg count: '.count($args). '
+//args: '. print_r($args,1) . '
+//var1: '.print_r($var1,1).'
 //var2: '.$var2);
 //    }
     return apply_filters($tag, $term, $var1, $var2);
@@ -489,6 +496,40 @@ class PDb_Base {
     }
   }
 
+ /**
+   * provides an array of field indices corresponding, given a list of field names
+   * 
+   * or vice versa
+   * 
+   * @param array $fieldnames the array of field names
+   * @param bool  $indices if true returns array of indices, if flase returns array of fieldnames
+   * @return array an array of integers
+   */
+  public static function get_field_indices($fieldnames, $indices = true) {
+    global $wpdb;
+    $sql = 'SELECT f.' . ($indices ? 'id' : 'name') . ' FROM ' . Participants_Db::$fields_table . ' f WHERE f.' . ($indices ? 'name' : 'id') . ' IN ("' . implode('","',$fieldnames) . '") ORDER BY FIELD("' . implode('","',$fieldnames) . '")';
+    return $wpdb->get_col($sql);
+  }
+
+  /**
+   * provides a list of field names, given a list of indices
+   * 
+   * @param array $ids of integer ids
+   * @return array of field names
+   * 
+   */
+  public static function get_indexed_names($ids) {
+    return self::get_field_indices($ids, false);
+  }
+  /**
+   * gets a list of column names from a dot-separated string of ids
+   * 
+   * @param string $ids the string of ids
+   * @return array of field names
+   */
+  public static function get_shortcode_columns($ids) {
+    return self::get_field_indices(explode('.',$ids), false);
+  }
 }
 
 ?>

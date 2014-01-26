@@ -1328,17 +1328,17 @@ abstract class xnau_FormElement {
    */
   protected function _set_null_select() {
     
-    $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : true;
+    $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : false;
     // remove the null_select from the options array
     if (isset($this->options['null_select'])) unset($this->options['null_select']);
     /*
      * the null select option is added if it is not canceled by a null select value 
      * of false or 'false'
      */
-    if (($null_select !== false and $null_select !== 'false')) {
-      $value = is_string($null_select) ? $null_select : '';
-      $selected = empty($this->value) ? $this->_set_selected( true, true, 'selected' ) : '';
-      $this->_addline( '<option value="" ' . $selected . '  >' . $value  . '</option>' );
+    $null_select_label = is_string($null_select) ? $null_select : '';
+    if (($null_select !== false and $null_select !== 'false') || $this->value === '') {
+      $selected = $this->value === '' ? $this->_set_selected(true, true, 'selected') : '';
+      $this->_addline('<option value="" ' . $selected . '  >' . $null_select_label . '</option>');
     }
     
   }
@@ -1370,7 +1370,7 @@ abstract class xnau_FormElement {
 	 * @param string  $element_value   the value of one select of a multi-select
 	 * @param array   $new_value_array the array of stored or inputted values
 	 * @param string  $attribute       the name of the "selected" attribute for the element
-	 * @param boolean $state           true to check for a match or false for a non-match
+   * @param bool    $state           true to check for a match or false for a non-match
 	 * @return string                  the attribute string for the element
 	 */
   protected function _set_multi_selected($element_value, $new_value_array, $attribute = 'selected', $state = true) {
@@ -1379,9 +1379,7 @@ abstract class xnau_FormElement {
 		
 		$prepped_string = $this->_prep_comp_string($element_value);
 		
-//    if (WP_DEBUG) error_log( __METHOD__.' checking value:'.$prepped_string.'('.$element_value.')'.' against:'.print_r($prepped_new_value_array,true).' state:'.( in_array( $prepped_string, $prepped_new_value_array)?'true':'false').' setting: '.$attribute );
-			
-    if (!empty($prepped_string) && $state === in_array($prepped_string, $prepped_new_value_array))
+    if ($state === in_array($prepped_string, $prepped_new_value_array))
       return sprintf(' %1$s="%1$s" ', $attribute);
     else
       return '';

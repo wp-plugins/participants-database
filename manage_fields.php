@@ -2,7 +2,7 @@
 /*
  * add / edit / delete fields and field groups and their attributes
  * 
- * ver. 1.5
+ * ver. 1.5.4.1
  */
 /* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
 global $PDb_i18n;
@@ -223,7 +223,9 @@ foreach ($groups as $group) {
   // get an array of the field attributes
   $attribute_columns[$group] = $wpdb->get_col_info('name');
 
-  $group_titles[$group] = $wpdb->get_var('SELECT `title` FROM ' . Participants_Db::$groups_table . ' WHERE `name` = "' . $group . '"');
+  $group_title = $wpdb->get_var('SELECT `title` FROM ' . Participants_Db::$groups_table . ' WHERE `name` = "' . $group . '"');
+  $group_titles[$group] = empty($group_title) ? ucwords(str_replace('_', ' ', $group)) : $group_title;
+
 
   // remove read-only fields
   foreach (array('id'/* ,'name' */) as $item) {
@@ -260,7 +262,7 @@ foreach ($groups as $group) {
       ?>
       <div id="<?php echo $group ?>" class="manage-fields-wrap" >
         <form id="manage_<?php echo $group ?>_fields" method="post" autocomplete="off">
-          <h3><?php echo ucwords(str_replace('_', ' ', $group)), ' ', __('Fields', 'participants-database') ?></h3>
+          <h3><?php echo $group_titles[$group], ' ', __('Fields', 'participants-database') ?></h3>
           <p>
             <?php
             if ('internal' !== $group) :
@@ -644,14 +646,14 @@ foreach ($groups as $group) {
       foreach ($a as $e) {
         if (strpos($e, '::') !== false) {
           list($key, $value) = explode('::', $e);
-          $array[trim($key)] = PDb_prep_value(trim($value));
+          $array[trim($key)] = PDb_prep_value(trim($value), true);
         } else {
-          $array[PDb_prep_value($e)] = PDb_prep_value($e);
+          $array[PDb_prep_value($e)] = PDb_prep_value($e, true);
         }
       }
     } else {
       foreach ($a as $e) {
-        $array[] = PDb_prep_value($e);
+        $array[] = PDb_prep_value($e, true);
       }
     }
 

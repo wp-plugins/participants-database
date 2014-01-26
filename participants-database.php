@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5.4
+  Version: 1.5.4.1
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -76,7 +76,7 @@ class Participants_Db extends PDb_Base {
    * 
    * @var string current Db version
    */
-  public static $db_version = '0.8';
+  public static $db_version = '0.9';
   /**
    * name of the WP option where the current db version is stored
    * @var string
@@ -205,7 +205,7 @@ class Participants_Db extends PDb_Base {
    */
   public static $instance_index = 0;
   /**
-   * this is set when the PDb_List::show_pagination_control() methid is called so 
+   * this is set when the PDb_List::show_pagination_control() method is called so 
    * that only one pagination control is shown on a page
    * @var bool 
    */
@@ -395,13 +395,17 @@ class Participants_Db extends PDb_Base {
    */
   public static function plugin_menu() {
 
-    /*
-     * intialize the plugin settings for the plugin settings pages
-     */
-    if (!is_object(self::$Settings)) {
-    self::$Settings = new PDb_Settings();
+    
+    global $pagenow;
+    if (($pagenow == 'admin.php' && $_GET['page'] == 'participants-database_settings_page') || $pagenow == 'options.php') {
+			/*
+			 * intialize the plugin settings for the plugin settings pages
+			 */
+			if (!is_object(self::$Settings)) {
+				self::$Settings = new PDb_Settings();
+			}
+			self::$Settings->initialize();
     }
-    self::$Settings->initialize();
 
     // define the plugin admin menu pages
     add_menu_page(
@@ -548,14 +552,13 @@ class Participants_Db extends PDb_Base {
    */
   public static function include_scripts() {
 
-    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__), array( 'dashicons' ));
+    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
     wp_register_style('custom_plugin_css', plugins_url('/css/custom_css.php', __FILE__));
 
     if (self::$plugin_options['use_plugin_css'] && self::$shortcode_present) {
-
       wp_enqueue_style('pdb-frontend');
-      wp_enqueue_style('custom_plugin_css');
     }
+    wp_enqueue_style('custom_plugin_css');
 
     wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));
@@ -1065,15 +1068,21 @@ class Participants_Db extends PDb_Base {
   }
 
   /**
-   * gets the field attributes as filtered by the type of form to display
+   * gets a set of field attributes as filtered by context
    *
-   * @param string $filter sets the context of the display and determines the set of columns to return
-   * @return object the object is ordered first by the order of the group, then by the field order
+   * @param string|array $filter sets the context of the display and determines the 
+   *                             set of columns to return, also accepts an array of 
+   *                             column names
+   * @return object the object is ordered first by the order of the group, then 
+   *                by the field order
    */
   public static function get_column_atts($filter = 'new') {
 
     global $wpdb;
 
+    if (is_array($filter)) {
+      $where = 'WHERE v.name IN ("' . implode( '","', $filter) . '")';
+    } else {
     switch ($filter) {
 
       case 'signup':
@@ -1101,14 +1110,14 @@ class Participants_Db extends PDb_Base {
         $where = 'WHERE v.display_column > 0 ';
         break;
 
-      case 'frontend':
+  		case 'frontend': // record and single modules
 
-        $where = 'WHERE g.display = 1 AND v.form_element <> "captcha"';
+          $where = 'WHERE g.display = 1';
         break;
 
       case 'readonly':
 
-        $where = is_admin() ? 'WHERE v.group = "internal"' : 'WHERE v.group = "internal" OR v.readonly = 1';
+          $where = 'WHERE v.group = "internal" OR v.readonly = 1';
         break;
       
       case 'backend':
@@ -1123,7 +1132,8 @@ class Participants_Db extends PDb_Base {
       case 'new':
       default:
 
-        $where = 'WHERE v.name NOT IN ( "id", "captcha" ) ';
+          $where = 'WHERE v.name <> "id"  AND v.form_element <> "captcha"';
+			}
     }
 
     $sql = 'SELECT v.*, g.order FROM ' . self::$fields_table . ' v INNER JOIN ' . self::$groups_table . ' g ON v.group = g.name ' . $where . ' ORDER BY g.order, v.order';
@@ -1191,15 +1201,19 @@ class Participants_Db extends PDb_Base {
    * this processes all record form submissions front-end and back-
    * 
    * @global object $wpdb
+   * 
    * @param array  $post           the array of new values (typically the $_POST array)
    * @param string $action         the db action to be performed: insert or update
-   * @param mixed  $participant_id the id of the record to update. If it is false, it creates
-   *                               a new record, if true, it creates or updates the default record.
+   * @param int|bool   $participant_id the id of the record to update. If it is false, it 
+   *                                   creates a new record, if true, it creates or updates 
+   *                                   the default record.
+   * @param array|bool $column_names   array of column names to process from the $post 
+   *                                   array, if false, processes a preset set of columns
    *
    * @return unknown int ID of the record created or updated, bool false if 
    *                 submission does not validate
    */
-  public static function process_form($post, $action, $participant_id = false) {
+  public static function process_form($post, $action, $participant_id = false, $column_names = false) {
 
     global $wpdb;
 
@@ -1296,10 +1310,20 @@ class Participants_Db extends PDb_Base {
         return false;
     }
 
-    $new_values = array();
-    $columns = array();
+    
 
-    // determine the set of columns to process
+    /*
+     * determine the set of columns to process
+     * 
+     */
+    $new_values = array();
+    $column_data = array();
+    if (isset($_POST['pdb_data_keys'])) $column_names = PDb_Base::get_indexed_names( explode('.', $_POST['pdb_data_keys']));
+    if (is_array($column_names)) {
+
+      $column_set = $column_names;
+    } else {
+
     if ( isset($_POST['action']) && $_POST['action'] == 'signup') {
       
       $column_set = 'signup';
@@ -1307,19 +1331,20 @@ class Participants_Db extends PDb_Base {
       
       $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
     }
+    }
+    $columns = self::get_column_atts($column_set);
 
     // gather the submit values and add them to the query
-    foreach (self::get_column_atts($column_set) as $column_atts) :
+    foreach ($columns as $column) {
     
       // the validation object is only instantiated when this method is called
       // by a form submission
       if (is_object(self::$validation_errors)) {
-
-        self::$validation_errors->validate(( isset($post[$column_atts->name]) ? $post[$column_atts->name] : ''), $column_atts, $post);
+        self::$validation_errors->validate(( isset($post[$column->name]) ? $post[$column->name] : ''), $column, $post);
       }
       $new_value = false;
       // we can process individual submit values here
-      switch ($column_atts->name) {
+      switch ($column->name) {
 
         case 'id':
           $new_value = $participant_id;
@@ -1341,36 +1366,17 @@ class Participants_Db extends PDb_Base {
           break;
 
         case 'private_id':
-          $new_value = $action == 'insert' ? self::generate_pid() : false;
+          if ($post['private_id'] !== '') $new_value = $post['private_id'];
+          else $new_value = $action == 'insert' ? self::generate_pid() : false;
           break;
 
         default :
 
-          /*
-           * NOTE: not sure why we were doing this, there doesn't seem to be a need 
-           * to put in a default value here; it will be supplied with the form and 
-           * if the user wants to keep the default value they can leave it in, or 
-           * they can replace it or blank it out: this code doesn't allow that, so 
-           * we've replaced it with a simple continue in the case of an unsubmitted 
-           * value.
-           */
-          // replace unsubmitted fields with the default if defined
-//          if (!empty($column_atts->default)) {
-//            
-//              if (
-//                      (!isset($post[$column_atts->name]) or (isset($post[$column_atts->name]) and empty($post[$column_atts->name]))) and $column_atts->form_element != 'hidden' and $action == 'insert'
-//              ) {
-//            $new_value = $column_atts->default;
-//            $post[$column_atts->name] = $new_value;
-//              }
-//          } elseif (!isset($post[$column_atts->name])) {
-//            continue;
-//          }
-          if (!isset($post[$column_atts->name])) {
+          if (!isset($post[$column->name])) {
             continue;
           }
           
-          switch ($column_atts->form_element) {
+          switch ($column->form_element) {
 
             case 'multi-checkbox':
             case 'multi-select-other':
@@ -1378,19 +1384,21 @@ class Participants_Db extends PDb_Base {
                * values of the multi-select. Any extra values are placed in an
                * 'other' array element
                */
-              if (isset($post[$column_atts->name])) {
-              if (is_array($post[$column_atts->name])) {
+              if (isset($post[$column->name])) {
 
-                $value_array = $post[$column_atts->name];
+                if (is_array($post[$column->name])) {
                 
-                //error_log(__METHOD__.' incoming values:'.print_r($value_array,1));
+                  if ($column->form_element == 'multi-select-other' && $i = array_search('other', $post[$column->name])) {
+                    unset($post[$column->name][$i]);
+                  }
                 
+                  $value_array = $post[$column->name];
               } else {
 
                 // build the value array from the string form used in CSV files
                 $value_array = array();
-                $incoming_value = preg_split('#([ ]*,[ ]*)#', trim($post[$column_atts->name]));
-                $field_values = self::unserialize_array($column_atts->values);
+                $incoming_value = preg_split('#([ ]*,[ ]*)#', trim($post[$column->name]));
+                $field_values = self::unserialize_array($column->values);
                 
                 foreach ($incoming_value as $v) {
 
@@ -1415,24 +1423,24 @@ class Participants_Db extends PDb_Base {
               /* translate the link markdown used in CSV files to the array format used in the database
                */
 
-              if (!is_array($post[$column_atts->name])) {
+              if (!is_array($post[$column->name])) {
 
-                $new_value = self::_prepare_array_mysql(self::get_link_array($post[$column_atts->name]));
+                $new_value = self::_prepare_array_mysql(self::get_link_array($post[$column->name]));
               } else {
 
-                $new_value = self::_prepare_array_mysql($post[$column_atts->name]);
+                $new_value = self::_prepare_array_mysql($post[$column->name]);
               }
               break;
 
             case 'rich-text':
               global $allowedposttags;
-              $new_value = wp_kses(stripslashes($post[$column_atts->name]), $allowedposttags);
+              $new_value = wp_kses(stripslashes($post[$column->name]), $allowedposttags);
               break;
 
             case 'date':
               $date = false;
-              if (isset($post[$column_atts->name]))
-                $date = self::parse_date($post[$column_atts->name], $column_atts, true);
+              if (isset($post[$column->name]))
+                $date = self::parse_date($post[$column->name], $column, true);
 
               $new_value = $date ? $date : false;
               break;
@@ -1442,8 +1450,8 @@ class Participants_Db extends PDb_Base {
               break;
 
             case 'password':
-              if (!empty($post[$column_atts->name])) {
-                $new_value = wp_hash_password(trim($post[$column_atts->name]));
+              if (!empty($post[$column->name])) {
+                $new_value = wp_hash_password(trim($post[$column->name]));
               } else {
                 $new_value = false;
               }
@@ -1452,26 +1460,26 @@ class Participants_Db extends PDb_Base {
             case 'image-upload':
             case 'file-upload':
               
-              if (isset($_POST[$column_atts->name . '-deletefile']) and $_POST[$column_atts->name . '-deletefile'] === 'delete') {
+              if (isset($_POST[$column->name . '-deletefile']) and $_POST[$column->name . '-deletefile'] === 'delete') {
                 if (self::$plugin_options['file_delete'] == 1 or is_admin() ) {
-                  self::delete_file($post[$column_atts->name]);
+                  self::delete_file($post[$column->name]);
                 }
-                unset($_POST[$column_atts->name]);
-                $post[$column_atts->name] = '';
+                unset($_POST[$column->name]);
+                $post[$column->name] = '';
               }
-              $new_value = self::_prepare_string_mysql(trim($post[$column_atts->name]));
+              $new_value = self::_prepare_string_mysql(trim($post[$column->name]));
               break;
 
             default:
-              if (!self::backend_user() && $column_atts->readonly != '0') {
+              if (!self::backend_user() && $column->readonly != '0') {
 
                 $new_value = false;
-              } elseif (is_array($post[$column_atts->name])) {
+              } elseif (is_array($post[$column->name])) {
 
-                $new_value = self::_prepare_array_mysql($post[$column_atts->name]);
+                $new_value = self::_prepare_array_mysql($post[$column->name]);
               } else {
 
-                $new_value = self::_prepare_string_mysql(trim($post[$column_atts->name]));
+                $new_value = self::_prepare_string_mysql(trim($post[$column->name]));
               }
           } // switch column_atts->form_element
       }  // swtich column_atts->name 
@@ -1483,10 +1491,11 @@ class Participants_Db extends PDb_Base {
         if (NULL !== $new_value) {
           $new_values[] = $new_value;
         }
-        $columns[] = "`" . $column_atts->name . "` = " . ( NULL === $new_value ? "NULL" : "%s" );
+        $column_data[] = "`" . $column->name . "` = " . ( NULL === $new_value ? "NULL" : "%s" );
       }
 
-    endforeach; // columns
+    } // columns
+
     // if the validation object exists and there are errors, stop here
     if (is_object(self::$validation_errors) && self::$validation_errors->errors_exist()) {
 
@@ -1498,7 +1507,7 @@ class Participants_Db extends PDb_Base {
     }
 
     // add in the column names
-    $sql .= implode(', ', $columns);
+    $sql .= implode(', ', $column_data);
 
     // add the WHERE clause
     $sql .= $where;
@@ -1604,6 +1613,7 @@ class Participants_Db extends PDb_Base {
     if ( is_object( $current_user ) ) $default_record['by'] = $current_user->display_name;
     $default_record['when'] = date_i18n(self::$date_format);
     $default_record['private_id'] = self::generate_pid();
+    date_default_timezone_set(ini_get('date.timezone'));
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
     $default_record['date_updated'] = date('Y-m-d H:i:s');
 
@@ -1613,7 +1623,10 @@ class Participants_Db extends PDb_Base {
   /**
    * gets a participant record object with its id
    *
+   * as of 1.5.4.1 returns only registered columns
+   *
    * @ver 1.5 added $wpdb->prepare
+   *
    *
    * @global object $wpdb
    * @param  string $id the record ID; returns default record if omitted
@@ -1631,7 +1644,9 @@ class Participants_Db extends PDb_Base {
 
     global $wpdb;
 
-    $sql = "SELECT * FROM " . self::$participants_table . " p WHERE p.id = %s";
+    $columns = $wpdb->get_col('SELECT `name` FROM ' . self::$fields_table);
+
+    $sql = 'SELECT p.' . implode(',p.', $columns) . ' FROM ' . self::$participants_table . ' p WHERE p.id = %s';
 
     $result = $wpdb->get_row($wpdb->prepare($sql, $id), ARRAY_A);
     
@@ -1903,14 +1918,28 @@ class Participants_Db extends PDb_Base {
     // error_log( __METHOD__.' post:'.print_r( $_POST, true ) );
 
     /*
+     * get the defined columns for the submitting shortcode (if any)
+     * 
+     * this is needed so that validation will be performed on the expected list 
+     * of fields, not just what's found in the POST array
+     */
+    $columns = false;
+    if (isset($_POST['pdb_data_keys'])) {
+      $columns = self::get_shortcode_columns($_POST['pdb_data_keys']);
+      unset($_POST['pdb_data_keys']);
+    }
+
+    /*
      * instantiate the validation object if we need to. This is necessary
      * because another script can instantiate the object in order to add a
      * feedback message
      * 
-     * we don't validate in the admin, they will be allowed to leave required field unfilled
+     * we don't validate administrators in the admin
      */
-    if (!is_object(self::$validation_errors) and (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) or $_POST['action'] == 'signup')) {
+    if (!is_object(self::$validation_errors)) {
+      if (!(is_admin() && current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']))) {
       self::$validation_errors = new PDb_FormValidation();
+    	}
     }
 
     switch ($_POST['action']) :
@@ -1931,7 +1960,7 @@ class Participants_Db extends PDb_Base {
 
         $id = isset($_POST['id']) ? $_POST['id'] : ( isset($_GET['id']) ? $_GET['id'] : false );
 
-        $participant_id = self::process_form($post_data, $_POST['action'], $id);
+        $participant_id = self::process_form($post_data, $_POST['action'], $id, $columns);
 
         if (false === $participant_id) {
 
@@ -2089,12 +2118,13 @@ class Participants_Db extends PDb_Base {
       case 'signup' :
 
         $_POST['private_id'] = self::generate_pid();
+        $columns[] = 'private_id';
         
         // route the $_POST data through a callback if defined
         $post_data = self::set_filter('before_submit_signup', $_POST);
 
         // only go to the thanks page if we have no errors
-        $post_data['id'] = self::process_form($post_data, 'insert');
+        $post_data['id'] = self::process_form($post_data, 'insert', false, $columns);
 
         if (false !== $post_data['id']) {
           
@@ -2788,7 +2818,7 @@ class Participants_Db extends PDb_Base {
        * sure. We also must assume that the database server and PHP server are on 
        * the same TZ.
        */
-      date_default_timezone_set(date_default_timezone_get()); // ini_get('date.timezone')
+      date_default_timezone_set(ini_get('date.timezone')); // ini_get('date.timezone')
       $date = strtotime($string);
     }
     

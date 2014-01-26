@@ -89,7 +89,9 @@ class PDb_Template_Item {
    */
   protected function prepare_display_value( $string ) {
     
-    return str_replace(array('"',"'"), array('&quot;','&#39;'), stripslashes($string));//htmlspecialchars( stripslashes( $string ), ENT_QUOTES, "UTF-8", false );
+    return $string;
+    //str_replace(array('"',"'"), array('&quot;','&#39;'), stripslashes($string));
+    //htmlspecialchars( stripslashes( $string ), ENT_QUOTES, "UTF-8", false );
   
   }
   
