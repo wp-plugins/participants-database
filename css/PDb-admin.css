@@ -40,6 +40,9 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
 .participants_db .manage-fields textarea {
   width: 100%;
 }
+.pre-mp6 .participants_db fieldset.widefat {
+  border: none;
+}
 .pagination {
   margin-bottom: 20px;
 }

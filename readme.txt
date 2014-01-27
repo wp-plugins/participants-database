@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
 Tested up to: 3.8.1
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 License: GPLv2
 
 Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
@@ -235,6 +235,21 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.5.4.1 =
+
+* field group tabs use group name if no title is defined for the group
+* HTML entities can be used in all field option ("values") definitions
+* fixed long field/group name bug. Names can be up to the maximum 64 characters
+* cleaned up plugin function spillover into other admin pages
+* better compatibility with pre-3.8 WP installs
+* signup and record shortcodes won't try to validate unincluded fields
+* all form submissions are validated for all users except plugin admin in the admin section
+* in admin, last used settings now retained: sort field, sort order, search field, search operator
+* better support for multi-page forms, user can't complete form by going back to the first page
+* links and other HTML now allowed in field titles and help text
+* field option titles used in all contexts
+
 
 = 1.5.4 =
 
@@ -477,9 +492,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4 =
-**BETA RELEASE**
-Bugfixes, API enhancements, bulletproofing.
+= 1.5.4.1 =
+bugfix release
+major bugs fixed: validating unincluded fields, long field/group names causing database error
 
 == Using the Plugin ==
 
