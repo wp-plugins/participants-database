@@ -70,8 +70,7 @@ class PDb_List_Admin {
     self::$user_settings = Participants_Db::$prefix . self::$user_settings . '-' . $user_ID;
     
     self::set_list_limit();
-    self::set_list_sort();
-
+  
     self::$registration_page_url = get_bloginfo('url') . '/' . ( isset(self::$options['registration_page']) ? self::$options['registration_page'] : '' );
 
     self::setup_display_columns();
@@ -83,8 +82,8 @@ class PDb_List_Admin {
         'search_field' => self::get_admin_user_setting('search_field', 'none'),
         'value' => '',
         'operator' => self::get_admin_user_setting('search_op', 'LIKE'),
-        'sortBy' => self::$options['admin_default_sort'],
-        'ascdesc' => self::$options['admin_default_sort_order'],
+        'sortBy' => self::get_admin_user_setting('sort_by', self::$options['admin_default_sort']),
+        'ascdesc' => self::get_admin_user_setting('sort_order', self::$options['admin_default_sort_order']),
         'submit-button' => '',
     );
 
@@ -93,6 +92,8 @@ class PDb_List_Admin {
     
     self::set_admin_user_setting('search_field', self::$filter['search_field']);
     self::set_admin_user_setting('search_op', self::$filter['operator']);
+    self::set_admin_user_setting('sort_by', self::$filter['sortBy']);
+    self::set_admin_user_setting('sort_order', self::$filter['ascdesc']);
     
     //error_log(__METHOD__.' request:'.print_r($_REQUEST,1).' filter:'.print_r(self::$filter,1));
 
@@ -211,9 +212,7 @@ class PDb_List_Admin {
 
         case self::$i18n['change']:
 
-          global $user_ID;
-
-          self::set_admin_user_setting('list_limit', $value);
+          if (floatval($_POST['list_limit']) > 0) self::set_admin_user_setting('list_limit', $_POST['list_limit']);
           $_GET[self::$list_page] = 1;
           break;
 
@@ -262,7 +261,7 @@ class PDb_List_Admin {
             $operator = mysql_real_escape_string(self::$filter['operator']);
         }
 
-        if (self::$filter['search_field'] != 'none') {
+        if (self::$filter['value'] !== '') {
 
           // if the field searched is a "date" field, convert the search string to a date
           $field_atts = Participants_Db::get_field_atts(self::$filter['search_field']);
@@ -835,7 +834,7 @@ class PDb_List_Admin {
           foreach (self::$display_columns as $column) {
             $title = strip_tags(stripslashes($column->title));
             printf(
-                    $head_pattern, str_replace(array('"',"'"), array('&quot;','&#39;'), $title), $column
+                    $head_pattern, str_replace(array('"',"'"), array('&quot;','&#39;'), $title), $column->name
             );
           }
         }
@@ -862,8 +861,8 @@ class PDb_List_Admin {
         private static function set_list_limit() {
 
           $limit_value = self::get_admin_user_setting('list_limit', self::$options['list_limit']);
-          if (isset($_POST['list_limit']) && is_numeric($_POST['list_limit']) && $_POST['list_limit'] > 0) {
-            $limit_value = $_POST['list_limit'];
+          if (isset($_REQUEST['list_limit']) && floatval($_REQUEST['list_limit']) > 0) {
+            $limit_value = $_REQUEST['list_limit'];
           }
           self::$page_list_limit = $limit_value;
           self::set_admin_user_setting('list_limit', $limit_value);
@@ -878,10 +877,7 @@ class PDb_List_Admin {
           
           $sort_order = isset($_POST['ascdesc']) ? $_POST['ascdesc'] : $sort_order;
           $sort_by = isset($_POST['sortBy']) ? $_POST['sortBy'] : $sort_by;
-          
-          self::$options['admin_default_sort'] = $sort_by;
-          self::$options['admin_default_sort_order'] = $sort_order;
-          
+                    
           //error_log(__METHOD__.' sort: '.self::$options['admin_default_sort'].' order: '.self::$options['admin_default_sort_order']);
           
           self::set_admin_user_setting('sort_by', $sort_by);
@@ -897,7 +893,7 @@ class PDb_List_Admin {
         public static function get_admin_user_setting($name, $setting = FALSE) {
           
           if ($settings = get_transient(self::$user_settings)) {
-            $setting = isset($settings[$name]) ? $settings[$name] : false;
+            $setting = $settings[$name] ? $settings[$name] : $setting;
           }
           return $setting;
         }
