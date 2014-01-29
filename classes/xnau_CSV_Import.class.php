@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    0.1
+ * @version    0.2
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    zydev_parseCSV class
  *
@@ -21,8 +21,14 @@
 
 abstract class xnau_CSV_Import {
 
-  // array of all the valid column names in the receiving database
+  /**
+   * @var array all the valid column names in the receiving database
+   */
   var $column_names;
+  /**
+   *
+   * @var int number of valid columns
+   */
   var $column_count;
   // holds the system path to the web root
   var $root_path;
@@ -173,7 +179,11 @@ abstract class xnau_CSV_Import {
 
     foreach ($this->CSV->data as $csv_line) {
 
-      //error_log( __METHOD__.' csv line= '.print_r( $csv_line, true ) );
+      if (WP_DEBUG) error_log( __METHOD__.'
+        
+columns:'.implode(',',$this->column_names).'
+  
+csv line= '.print_r( $csv_line, true ) );
 
       $values = array();
 

@@ -31,7 +31,7 @@ class PDb_CSV_Import extends xnau_CSV_Import {
 
     foreach ( $columns as $column ) {
     
-      if ( $column->CSV ) $this->column_names[] = $column->name;
+      if ( $column->CSV != '0') $this->column_names[] = $column->name;
     
     }
     

@@ -1302,7 +1302,9 @@ class Participants_Db extends PDb_Base {
         break;
 
       case 'insert':
-        $sql = 'INSERT INTO ' . self::$participants_table . ' SET date_recorded = NOW(), date_updated = NOW(), ';
+        $sql = 'INSERT INTO ' . self::$participants_table. ' SET ';
+        if (self::import_timestamp($post['date_recorded']) === false) $sql .= ' `date_recorded` = NOW(), ';
+        if (self::import_timestamp($post['date_updated']) === false) $sql .= ' `date_updated` = NOW(), ';
         $where = '';
         break;
 
@@ -1351,23 +1353,21 @@ class Participants_Db extends PDb_Base {
           break;
         
         case 'date_recorded':
-          
-          if ($action == 'insert' ) {
-            $new_value = false;
-          } else {
-            $post_date = isset($post['date_recorded']) ? self::parse_date($post['date_recorded']) : false;
-            $new_value = $post_date !== false ? date('Y-m-d H:i:s', $post_date) : false ;
-          }
-          break;
-
         case 'date_updated':
         case 'last_accessed':
-          $new_value = false;
+          
+          /*
+           * this func returns bool false if the timestamp is not present or is invalid, 
+           * returns the MySQL timestamp string otherwise
+           */
+          $new_value = self::import_timestamp(@$post[$column->name]);
+          
           break;
 
         case 'private_id':
-          if ($post['private_id'] !== '') $new_value = $post['private_id'];
+          if (is_string($post['private_id']) && $post['private_id'] !== '') $new_value = $post['private_id'];
           else $new_value = $action == 'insert' ? self::generate_pid() : false;
+          
           break;
 
         default :
@@ -1484,14 +1484,16 @@ class Participants_Db extends PDb_Base {
           } // switch column_atts->form_element
       }  // swtich column_atts->name 
 
-      // add the column and value to the sql
-      if (false !== $new_value) {
+      /*
+       * add the column and value to the sql; if it is bool false, skip it entirely. 
+       * Nulls are added as true nulls
+       */
+      if ($new_value !== false) {
 
-        // insert a true NULL if the field is NULL
-        if (NULL !== $new_value) {
+        if ($new_value !== null) {
           $new_values[] = $new_value;
         }
-        $column_data[] = "`" . $column->name . "` = " . ( NULL === $new_value ? "NULL" : "%s" );
+        $column_data[] = "`" . $column->name . "` = " . ( $new_value === null ? "NULL" : "%s" );
       }
 
     } // columns
@@ -2152,12 +2154,14 @@ class Participants_Db extends PDb_Base {
      * we check a transient based on the user's IP; if the user tries more than 3 
      * times per day to get a private ID, they are blocked for 24 hours
      */
+    setup_userdata();
     $transient = self::$prefix . 'retrieve-count-' . str_replace('.', '', $_SERVER['REMOTE_ADDR']);
     $count = get_transient($transient);
-    if ($count > 0 and $count <= 3) {
+    $max_tries = current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) ? 100 : 3; // give the plugin admin unlimited tries
+    if ($count > 0 and $count <= $max_tries) {
 
 // ok, they have a few more tries...
-    } elseif ($count > 3) {
+    } elseif ($count > $max_tries) {
 
 // too many tries, come back tomorrow
       error_log('Participants Database Plugin: IP blocked for too many retrieval attempts in 24-hour period: ' . $_SERVER['REMOTE_ADDR']);
