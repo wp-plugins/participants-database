@@ -2,6 +2,13 @@
 jQuery(document).ready( function($) {
   $('input[placeholder], textarea[placeholder]').placeholder();
   $('.participants_db .ui-tabs-nav li').append($('<span class="mask"/>'));
+  $('.manage-fields-wrap').on('focus', '.manage-fields input[type="text"]:not([id*=other], .digit)', function() {
+    $(this).closest('td').addClass('focused');
+    $(this).addClass('focused');
+  }).on('blur', '.manage-fields input[type="text"]', function() {
+    $(this).closest('td').removeClass('focused');
+    $(this).removeClass('focused');
+  });
 });
 /*!
  *  jQuery version compare plugin

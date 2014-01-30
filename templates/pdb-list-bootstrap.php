@@ -12,17 +12,6 @@ this is the default template which formats the list of records as a table
  * stylesheet (located in your theme directory) as the argument
  */
 //$this->add_stylesheet();
-
-// set up the bootstrap-style pagination block
-// sets the indicator class for the pagination display
-$this->pagination->set_current_page_class( 'active' );
-// wrap the current page indicator with a dummy anchor
-$this->pagination->set_anchor_wrap( true );
-// set the wrap class and element
-$this->pagination->set_wrappers( array(
-    'wrap_tag'=>'<div class="pagination">',
-    'wrap_tag_close' => '</div>'
-    ));
 ?>
 
 <?php /* SEARCH/SORT FORM */ ?>
@@ -78,7 +67,7 @@ $this->pagination->set_wrappers( array(
  * 
  * the tag wrapping the count statment can be supplied in the function argument, example here
  */
-$this->print_list_count('<h5 class="list-count"'); 
+$this->print_list_count('<h5>'); 
 ?>
 
 
@@ -231,11 +220,23 @@ $this->print_list_count('<h5 class="list-count"');
 	</table>
   <?php
 	// set up the bootstrap pagination classes and wrappers
+
+  // set up the bootstrap-style pagination block
+  // sets the indicator class for the pagination display
+  $this->pagination->set_current_page_class( 'active' );
+  // wrap the current page indicator with a dummy anchor
+  $this->pagination->set_anchor_wrap( false );
+  // set the wrap class and element
+//  $this->pagination->set_wrappers( array(
+//      'wrap_tag'=>'<div class="pagination">',
+//      'wrap_tag_close' => '</div>'
+//      ));
 	$this->pagination->set_props(array(
 																		 'first_last' => false,
-																		 'current_page_class'=>'active',
+																		 'current_page_class'=>'active currentpage',
 																		 'wrappers' => array(
-																												'wrap_class' => 'pagination pagination-large pagination-centered',
+																												'wrap_class' => 'pagination-large pagination-centered',
+                                                        'list_class' => 'pagination',
 																												),
 																		 ));
 	$this->pagination->show();

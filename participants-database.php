@@ -1303,8 +1303,8 @@ class Participants_Db extends PDb_Base {
 
       case 'insert':
         $sql = 'INSERT INTO ' . self::$participants_table. ' SET ';
-        if (self::import_timestamp($post['date_recorded']) === false) $sql .= ' `date_recorded` = NOW(), ';
-        if (self::import_timestamp($post['date_updated']) === false) $sql .= ' `date_updated` = NOW(), ';
+        if (self::import_timestamp(isset($post['date_recorded']) ? $post['date_recorded'] : '') === false) $sql .= ' `date_recorded` = NOW(), ';
+        if (self::import_timestamp(isset($post['date_updated']) ? $post['date_updated'] : '') === false) $sql .= ' `date_updated` = NOW(), ';
         $where = '';
         break;
 
@@ -1360,7 +1360,7 @@ class Participants_Db extends PDb_Base {
            * this func returns bool false if the timestamp is not present or is invalid, 
            * returns the MySQL timestamp string otherwise
            */
-          $new_value = self::import_timestamp(@$post[$column->name]);
+          $new_value = @self::import_timestamp($post[$column->name]);
           
           break;
 

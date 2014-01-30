@@ -216,12 +216,17 @@ class PDb_Field_Item extends PDb_Template_Item {
 
     $this->field_class = ( $this->validation != 'no' ? "required-field" : '' ) . ( in_array($this->form_element, array('text-line', 'date', 'timestamp')) ? ' regular-text' : '' );
 
-    if ($this->readonly && $this->form_element != 'captcha') {
+    if ($this->readonly && !in_array($this->form_element, array('captcha'))) {
 
-      if (in_array($this->form_element, array('date', 'timestamp')))
+      if (PDb_Shortcode::$readonly_inputs && !in_array($this->form_element, array('rich-text'))) {
+        
+        $this->attributes['disabled'] = 'disabled';
+        $this->_print();
+      } else {
+
         $this->value = PDb_FormElement::get_field_value_display($this);
-
       echo '<span class="pdb-readonly ' . $this->field_class . '" >' . $this->value . '</span>';
+      }
     } else {
 
       $this->_print();

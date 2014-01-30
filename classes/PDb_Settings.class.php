@@ -201,7 +201,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'group' => 'pdb-main',
         'options' => array(
             'type' => 'text',
-            'help_text' => __("the message shown when a field's value does match the value of another field. The first %s will show the name of the field, the second will show the name of the filed it must match.", 'participants-database'),
+            'help_text' => __("the message shown when a field's value does match the value of another field. The first %s will show the name of the field, the second will show the name of the field it must match.", 'participants-database'),
             'value' => __('The %s field must match the %s field.', 'participants-database'),
         )
     );
@@ -502,7 +502,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             (
             'type' => 'dropdown-other',
             'help_text' => __('send people to this page to request their private link.', 'participants-database'),
-            'options' => $this->_get_pagelist(true),
+            'options' => $this->_get_pagelist(false,false),
             'attributes' => array('other' => 'Post ID'),
             'value' => 'none',
         )
@@ -604,7 +604,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             (
             'type' => 'dropdown-other',
             'help_text' => __('The page where your participant record ([pdb_record] shortcode) is displayed. You can use a Post ID for posts and custom post types.', 'participants-database'),
-            'options' => $this->_get_pagelist(false,true),  
+            'options' => $this->_get_pagelist(false,false),  
             'attributes' => array('other' => 'Post ID'),
         )
     );
@@ -744,7 +744,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'attributes' => array('other' => 'Post ID'),
             'type' => 'dropdown-other',
             'help_text' => __('this is the page where the [pdb_single] shortcode is located. If you want to assign a post or custom post type, select "Post ID" and enter the post ID in the "other" box.', 'participants-database'),
-            'options' => $this->_get_pagelist(false,true),
+            'options' => $this->_get_pagelist(false,false),
         )
     );
 
@@ -1049,7 +1049,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $pagelist = array();
     
-    if (!$with_blank) $pagelist['null_select'] = false;
+    if ($with_blank) $pagelist['null_select'] = false;
 
     if ($with_none)
       $pagelist[__('Same Page', 'participants-database')] = 'none';

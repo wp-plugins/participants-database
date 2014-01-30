@@ -32,7 +32,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, 2012, 2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.4
+ * @version    Release: 1.5.4.1
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -175,7 +175,7 @@ abstract class xnau_FormElement {
   /**
    * name of the instantiating module
    * 
-   * @var string
+   * @var string name of the instantiating module
    */
   var $module;
   
@@ -708,10 +708,7 @@ abstract class xnau_FormElement {
      */
     $this->_set_null_select();
     
-    $this->_add_option_series();
-    
-    // add the "other" option
-    if ( $other ) $this->_addline( '<option ' . ( ! empty( $this->value ) ? $this->_set_selected( $this->options, $this->value, 'selected', false ) : '' ) . ' value="other" >'.$otherlabel.'</option>' );
+    $this->_add_option_series($other ? $otherlabel : false);
     
     $this->_addline( '</select>', -1 );
     
@@ -800,11 +797,20 @@ abstract class xnau_FormElement {
       if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
     }
     
-    // determine the label for the other field
+    /*
+     * determine the label for the other field: start with the default value, then 
+     * in the field definition, the finally the string if set in the template via 
+     * the attributes array
+     */
+    $otherlabel = $this->i18n['other'];
+    if ($i = array_search('other', $this->options)) {
+      $otherlabel = array_search('other',$this->options);
+      unset($this->options[$otherlabel]);
+    }
     if ( isset( $this->attributes['other'] ) ) {
       $otherlabel = $this->attributes['other'];
       unset( $this->attributes['other'] );
-    } else $otherlabel = $this->i18n['other'];
+    }
     
     // make a unique prefix for the function
     $js_prefix = $this->_prep_js_string($this->name)/*.'_'*/;
@@ -812,10 +818,10 @@ abstract class xnau_FormElement {
     $this->attributes['onChange'] = $js_prefix.'SelectOther(this)';
     
     // put it in a conatiner
-    $this->_addline( '<div class="selectother"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . '>' );
+    $this->_addline('<div class="selectother ' . $type . '-other-control-group"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . ' name="' . $this->name . '">');
     $this->indent++;
     
-    $type == 'checkbox' ? $this->_add_checkbox_series() : $this->_add_radio_series();
+    $type == 'checkbox' ? $this->_add_checkbox_series($otherlabel) : $this->_add_radio_series($otherlabel);
     
     // add the "other" option
     $options = $this->options;
@@ -1033,11 +1039,13 @@ abstract class xnau_FormElement {
   }
   
   /**
-   * builds a checkbox series
+   * builds a checkbox or radio input series
    *
    * @param string $type sets the type of input series, defaults to checkbox
+   * @param string|bool if string, add an "other" option with this label
    */
-  protected function _add_checkbox_series( $type = 'checkbox' ) {
+  protected function _add_input_series($type = 'checkbox', $otherlabel = false)
+  {
     
     // checkboxes are grouped, radios are not
     $this->group = $type == 'checkbox' ? true : false;
@@ -1048,7 +1056,7 @@ abstract class xnau_FormElement {
 			$this->classes = '';
 			}
     
-    $null_select = isset($this->options['null_select']) ?  $this->options['null_select'] : false;
+    $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : ($type == 'checkbox' ? '' : false);
     if ($null_select !== false) {
       $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), ''), 1);
     }
@@ -1058,7 +1066,12 @@ abstract class xnau_FormElement {
        
     foreach ($this->_make_assoc($this->options) as $option_key => $option_value) {
       
-      $this->attributes['id'] = $this->legal_name($this->name . '-' . strtolower($option_value));
+      if (($option_value === false or $option_value === 'false' or $option_value === 'optgroup') and !empty($option_key)) {
+        /*
+         * this is where we would implement some kind of grouping for display purposes
+         */
+      } else {
+        $this->attributes['id'] = $this->legal_name($this->name . '-' . trim(strtolower($option_value)));
       $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
       $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
       $this->_addline($option_key . '</label>');
@@ -1066,14 +1079,28 @@ abstract class xnau_FormElement {
     
     $this->_addline('</span>');
   }
+  }
   
   /**
    * adds a series of radio buttons
+   * 
+   * @param string|bool if string, add an "other" option with this label
    */
-  protected function _add_radio_series() {
+  protected function _add_checkbox_series($otherlabel = false)
+  {
     
-    $this->_add_checkbox_series( 'radio' );
+    $this->_add_input_series('checkbox', $otherlabel);
+  }
     
+  /**
+   * adds a series of radio buttons
+   * 
+   * @param string|bool if string, add an "other" option with this label
+   */
+  protected function _add_radio_series($otherlabel = false)
+  {
+
+    $this->_add_input_series('radio', $otherlabel);
   }
   
   /**
@@ -1081,18 +1108,25 @@ abstract class xnau_FormElement {
    * 
    * if an element in the options array has a value of bool false, it will open an 
    * optgroup using the key as the group 
+   * 
+   * @var string|bool label of the "other" option if any
    */
-  protected function _add_option_series() {
+  protected function _add_option_series($otherlabel = false)
+  {
     
     foreach ( $this->_make_assoc( $this->options ) as $key => $value ) {
       
-      if (($value === false or $value === 'false') and !empty($key)) {
+      if (($value === false or $value === 'false' or $value === 'optgroup') and !empty($key)) {
         $this->_add_options_divider ($key);
+      } elseif($value == 'other') {
+        $otherlabel = $key;
       } elseif (!empty($value) or $value === 0) {
         $this->_addline( '<option value="' . $value . '" ' . $this->_set_selected( $value, $this->value, 'selected' ) . ' >' . stripslashes($key) . '</option>', -1 );
       }
 
     }
+    // add the "other" option
+    if ( $otherlabel !== false ) $this->_addline( '<option ' . ( $this->value !== '' ? $this->_set_selected( $this->options, $this->value, 'selected', false ) : '' ) . ' value="other" >'.$otherlabel.'</option>' );
     
     if ($this->inside) {
        $this->_addline ('</optgroup>');
@@ -1320,9 +1354,10 @@ abstract class xnau_FormElement {
    * 
    * If $this->options['null_select'] has a string value, it will be used as the 
    * display value for the null option. 
-   * If $this->options['null_select'] is true or the field value is empty, a blank 
-   * unselected null option will be added. 
+   * If $this->options['null_select'] is blank, a blank unselected null option will 
+   * be added. 
    * If $this->options['null_select'] is false no null state option will be added.
+   * If the value is empty and no null select is defined, a blank one will be added
    * 
    * @return null
    */
@@ -1330,7 +1365,8 @@ abstract class xnau_FormElement {
     
     $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : false;
     // remove the null_select from the options array
-    if (isset($this->options['null_select'])) unset($this->options['null_select']);
+    if (isset($this->options['null_select']))
+      unset($this->options['null_select']);
     /*
      * the null select option is added if it is not canceled by a null select value 
      * of false or 'false'

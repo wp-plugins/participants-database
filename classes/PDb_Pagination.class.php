@@ -226,13 +226,16 @@ class PDb_Pagination {
   public function set_wrappers($wrappers = array()) {
 
     $defaults = array(
-        'wrap_class' => 'pagination ' . Participants_Db::$prefix . 'pagination',
+        'wrap_class' => '',
+        'list_class' => '',
         'wrap_tag' => 'div',
         'all_button_wrap_tag' => 'ul',
         'button_wrap_tag' => 'li',
     );
 
     $this->wrappers = shortcode_atts($defaults, $wrappers);
+    
+    $this->wrappers['wrap_class'] = 'pagination ' . Participants_Db::$prefix . 'pagination ' . $this->wrappers['wrap_class'];
   }
 
   /**
@@ -397,10 +400,11 @@ class PDb_Pagination {
     }
 
     return sprintf(
-            '<%1$s class="%2$s"><%3$s>%4$s</%3$s></%1$s>', 
+            '<%1$s class="%2$s"><%3$s%4$s>%5$s</%3$s></%1$s>', 
             $wrap_tag, 
             $wrap_class, 
             $all_button_wrap_tag, 
+            (empty($list_class) ? '' : ' class="' . $list_class . '" '),
             $output
     );
   }

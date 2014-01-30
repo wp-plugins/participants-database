@@ -648,7 +648,7 @@ foreach ($groups as $group) {
           list($key, $value) = explode('::', $e);
           $array[trim($key)] = PDb_prep_value(trim($value), true);
         } else {
-          $array[PDb_prep_value($e)] = PDb_prep_value($e, true);
+          $array[PDb_prep_value($e, true)] = PDb_prep_value($e, true);
         }
       }
     } else {
@@ -684,7 +684,7 @@ foreach ($groups as $group) {
   {
 
     if ($single_encode)
-      return htmlentities($value, ENT_COMPAT, "UTF-8", false); // htmlentities(trim(stripslashes(html_entity_decode ($value))), ENT_QUOTES, "UTF-8", false);
+      return $value;
     else
       return htmlentities(trim(stripslashes($value)), ENT_QUOTES, "UTF-8", true);
   }
@@ -697,8 +697,6 @@ foreach ($groups as $group) {
 
     // unless we find a custom message, use the class error message
     $message = $error;
-
-    if (false !== strpos($error, 'Duplicate entry')) {
 
       $item = false;
 
@@ -715,14 +713,13 @@ foreach ($groups as $group) {
           break;
       }
 
-      if ($item && false !== stripos($message, 'duplicate')) {
+    if ($item && false !== stripos($error, 'duplicate')) {
 
         $message = sprintf(__('The %1$s was not added. There is already a %1$s with that name, please choose another.', 'participants-database'), $item);
       }
 
       return $message;
     }
-  }
 
   function PDb_prep_title($title)
   {
