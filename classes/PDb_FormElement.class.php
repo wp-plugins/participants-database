@@ -134,7 +134,7 @@ class PDb_FormElement extends xnau_FormElement {
   }
   
   /**
-   * returns an element value formatted for display or storage
+   * returns an element value formatted for display
    * 
    * this supplants the function Participants_Db::prep_field_for_display
    * 

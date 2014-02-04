@@ -173,7 +173,6 @@ abstract class xnau_FormElement {
   var $prefix = 'form-element';
   
   /**
-   * name of the instantiating module
    * 
    * @var string name of the instantiating module
    */
