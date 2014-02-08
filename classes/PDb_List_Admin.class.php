@@ -16,7 +16,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.3.7
+ * @version    Release: 1.5.4.1
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 class PDb_List_Admin {
@@ -41,7 +41,11 @@ class PDb_List_Admin {
   static $participants;
   // holds the url of the registrations page
   static $registration_page_url;
-  // holds the columns to display in the list
+  /**
+   * holds the columns to display in the list
+   * 
+   * @var array of field objects
+   */
   static $display_columns;
   // holds th list of sortable columns
   static $sortables;
@@ -66,26 +70,31 @@ class PDb_List_Admin {
     self::$user_settings = Participants_Db::$prefix . self::$user_settings . '-' . $user_ID;
     
     self::set_list_limit();
-    self::set_list_sort();
+    //self::set_list_sort();
 
     self::$registration_page_url = get_bloginfo('url') . '/' . ( isset(self::$options['registration_page']) ? self::$options['registration_page'] : '' );
 
-    self::$display_columns = PDb_Shortcode::get_list_display_columns('admin_column');
+    self::setup_display_columns();
 
     self::$sortables = Participants_Db::get_sortables();
 
     // set up the basic values
     $default_values = array(
-        'search_field' => 'none',
+        'search_field' => self::get_admin_user_setting('search_field', 'none'),
         'value' => '',
-        'operator' => '=',
-        'sortBy' => self::$options['admin_default_sort'],
-        'ascdesc' => self::$options['admin_default_sort_order'],
+        'operator' => self::get_admin_user_setting('search_op', 'LIKE'),
+        'sortBy' => self::get_admin_user_setting('sort_by', self::$options['admin_default_sort']),
+        'ascdesc' => self::get_admin_user_setting('sort_order', self::$options['admin_default_sort_order']),
         'submit-button' => '',
     );
 
     // merge the defaults with the $_REQUEST array so if there are any new values coming in, they're included
     self::$filter = shortcode_atts($default_values, $_REQUEST);
+    
+    self::set_admin_user_setting('search_field', self::$filter['search_field']);
+    self::set_admin_user_setting('search_op', self::$filter['operator']);
+    self::set_admin_user_setting('sort_by', self::$filter['sortBy']);
+    self::set_admin_user_setting('sort_order', self::$filter['ascdesc']);
     
     //error_log(__METHOD__.' request:'.print_r($_REQUEST,1).' filter:'.print_r(self::$filter,1));
 
@@ -204,10 +213,7 @@ class PDb_List_Admin {
 
         case self::$i18n['change']:
 
-          global $user_ID;
-
-          set_transient(self::$user_settings, self::$page_list_limit);
-          //Participants_Db::$plugin_settings->update_option( 'list_limit', self::$page_list_limit );
+          if (floatval($_POST['list_limit']) > 0) self::set_admin_user_setting('list_limit', $_POST['list_limit']);
           $_GET[self::$list_page] = 1;
           break;
 
@@ -256,7 +262,7 @@ class PDb_List_Admin {
             $operator = mysql_real_escape_string(self::$filter['operator']);
         }
 
-        if (self::$filter['search_field'] != 'none') {
+        if (self::$filter['value'] !== '') {
 
           // if the field searched is a "date" field, convert the search string to a date
           $field_atts = Participants_Db::get_field_atts(self::$filter['search_field']);
@@ -443,7 +449,7 @@ class PDb_List_Admin {
     global $post;
     ?>
       <div class="pdb-searchform">
-        <form method="post" id="sort_filter_form" onKeyPress="return checkEnter(event)" >
+        <form method="post" id="sort_filter_form" >
           <input type="hidden" name="action" value="sort">
                   <table class="form-table"><tbody><tr><td>
           <fieldset class="widefat inline-controls">
@@ -458,6 +464,8 @@ class PDb_List_Admin {
 
           $filter_columns[$column->title] = $column->name;
         }
+        // alphabetize the dropdown
+        asort($filter_columns);
 
         $element = array(
             'type' => 'dropdown',
@@ -526,7 +534,7 @@ class PDb_List_Admin {
   {
             ?>
 
-      <form id="list_form"  method="post"  onKeyPress="return checkEnter(event)" >
+      <form id="list_form"  method="post">
             <?php PDb_FormElement::print_hidden_fields(array('action' => 'list_action')) ?>
         <input type="hidden" id="select_count" value="0" />
                 <table class="form-table"><tbody><tr><td>
@@ -623,23 +631,20 @@ class PDb_List_Admin {
               <?php
               foreach (self::$display_columns as $column) {
 
-                // get the form element value for the field
-                $column_atts = Participants_Db::get_field_atts($column, '`name`,`form_element`,`default`, `group`');
-
                 // this is where we place form-element-specific text transformations for display
-                switch ($column_atts->form_element) {
+                switch ($column->form_element) {
 
                   case 'image-upload':
 
                     $image_params = array(
-                        'filename' => basename($value[$column]),
+                        'filename' => basename($value[$column->name]),
                         'link' => '',
                         'mode' => (self::$options['admin_thumbnails'] ? 'image':'filename'),
                       );
 
                     if (
                             isset(self::$options['single_record_link_field']) &&
-                            $column == self::$options['single_record_link_field'] &&
+                            $column->name == self::$options['single_record_link_field'] &&
                             !empty(self::$options['single_record_page'])
                     ) {
 
@@ -657,15 +662,15 @@ class PDb_List_Admin {
                   case 'date':
                   case 'timestamp':
 
-                    if (!empty($value[$column])) {
+                    if (!empty($value[$column->name])) {
 
                       $format = Participants_Db::$date_format;
-                      if (Participants_Db::$plugin_options['show_time'] == 1 and $column_atts->form_element == 'timestamp' ) {
+                      if (Participants_Db::$plugin_options['show_time'] == 1 and $column->form_element == 'timestamp' ) {
                         // replace spaces with &nbsp; so the time value stays together on a broken line
                         $format .= ' ' . str_replace(' ', '&\\nb\\sp;', get_option('time_format'));
                       }
-                      $time = Participants_Db::is_valid_timestamp($value[$column]) ? (int) $value[$column] : Participants_Db::parse_date($value[$column],$column_atts, $column_atts->form_element == 'date');
-                      $display_value = $value[$column] == '0000-00-00 00:00:00' ? '' : date_i18n($format, $time);
+                      $time = Participants_Db::is_valid_timestamp($value[$column->name]) ? (int) $value[$column->name] : Participants_Db::parse_date($value[$column->name],$column->name, $column->form_element == 'date');
+                      $display_value = $value[$column->name] == '0000-00-00 00:00:00' ? '' : date_i18n($format, $time);
                       //$display_value = date_i18n($format, $time);
                     }
                     else
@@ -677,14 +682,14 @@ class PDb_List_Admin {
                   case 'multi-checkbox':
                     // multi selects are displayed as comma separated lists
 
-                    $display_value = is_serialized($value[$column]) ? implode(', ', unserialize($value[$column])) : $value[$column];
+                    $display_value = is_serialized($value[$column->name]) ? implode(', ', unserialize($value[$column->name])) : $value[$column->name];
                     break;
 
                   case 'link':
 
-                    if (is_serialized($value[$column])) {
+                    if (is_serialized($value[$column->name])) {
 
-                      $params = unserialize($value[$column]);
+                      $params = unserialize($value[$column->name]);
 
                       if (empty($params))
                         $page_link = array('', '');
@@ -694,7 +699,7 @@ class PDb_List_Admin {
                     } else {
 
                       // in case we got old unserialized data in there
-                      $params = array_fill(0, 2, $value[$column]);
+                      $params = array_fill(0, 2, $value[$column->name]);
                     }
 
                     $display_value = Participants_Db::make_link($params[0], $params[1]);
@@ -703,8 +708,8 @@ class PDb_List_Admin {
 
                   case 'rich-text':
 
-                    if (!empty($value[$column]))
-                      $display_value = '<span class="textarea">' . $value[$column] . '</span>';
+                    if (!empty($value[$column->name]))
+                      $display_value = '<span class="textarea">' . $value[$column->name] . '</span>';
                     else
                       $display_value = '';
                     break;
@@ -713,7 +718,7 @@ class PDb_List_Admin {
 
                     if (
                             isset(self::$options['single_record_link_field']) &&
-                            $column == self::$options['single_record_link_field'] &&
+                            $column->name == self::$options['single_record_link_field'] &&
                             !empty(self::$options['single_record_page'])
                     ) {
 
@@ -722,29 +727,29 @@ class PDb_List_Admin {
                       $delimiter = false !== strpos($url, '?') ? '&' : '?';
                       $url = $url . $delimiter . 'pdb=' . $value['id'];
 
-                      $display_value = sprintf($template, $url, $value[$column]);
+                      $display_value = sprintf($template, $url, $value[$column->name]);
                     } elseif (self::$options['make_links']) {
 
-                      $display_value = Participants_Db::make_link($value[$column]);
+                      $display_value = Participants_Db::make_link($value[$column->name]);
                     } else {
 
-                      $display_value = NULL === $value[$column] ? $column_atts->default : esc_html($value[$column]);
+                      $display_value = NULL === $value[$column->name] ? $column->default : esc_html($value[$column->name]);
                     }
 
                     break;
 
                   case 'hidden':
 
-                    $display_value = NULL === $value[$column] ? '' : esc_html($value[$column]);
+                    $display_value = NULL === $value[$column->name] ? '' : esc_html($value[$column->name]);
 
                     break;
 
                   default:
 
-                    $display_value = NULL === $value[$column] ? $column_atts->default : esc_html($value[$column]);
+                    $display_value = NULL === $value[$column->name] ? $column->default : esc_html($value[$column->name]);
                 }
 
-                if ($column == 'private_id')
+                if ($column->name == 'private_id')
                   printf(
                           $PID_pattern, $display_value, Participants_Db::get_record_link($display_value)
                   );
@@ -825,11 +830,27 @@ class PDb_List_Admin {
           <?php
           // print the top header row
           foreach (self::$display_columns as $column) {
-            $title = stripslashes(Participants_Db::column_title($column));
+            $title = strip_tags(stripslashes($column->title));
             printf(
-                    $head_pattern, str_replace(array('"',"'"), array('&quot;','&#39;'), $title), $column
+                    $head_pattern, str_replace(array('"',"'"), array('&quot;','&#39;'), $title), $column->name
             );
           }
+        }
+
+        /**
+         * sets up the main list columns
+         */
+        private static function setup_display_columns() {
+          
+          global $wpdb;
+          $sql = '
+          SELECT f.name, f.form_element, f.default, f.group, f.title
+          FROM ' . Participants_Db::$fields_table . ' f 
+          WHERE f.name IN ("' . implode('","', PDb_Shortcode::get_list_display_columns('admin_column')) . '") 
+          ORDER BY f.admin_column ASC';
+          
+          self::$display_columns = $wpdb->get_results($sql);
+          
         }
 
         /**
@@ -837,12 +858,9 @@ class PDb_List_Admin {
          */
         private static function set_list_limit() {
 
-          $limit_value = self::$options['list_limit'];
-          if ($setting = self::get_admin_user_setting('list_limit')) {
-            $limit_value = $setting;
-          }
-          if (isset($_POST['list_limit']) && is_numeric($_POST['list_limit']) && $_POST['list_limit'] > 0) {
-            $limit_value = $_POST['list_limit'];
+          $limit_value = self::get_admin_user_setting('list_limit', self::$options['list_limit']);
+          if (isset($_REQUEST['list_limit']) && floatval($_REQUEST['list_limit']) > 0) {
+            $limit_value = $_REQUEST['list_limit'];
           }
           self::$page_list_limit = $limit_value;
           self::set_admin_user_setting('list_limit', $limit_value);
@@ -852,25 +870,13 @@ class PDb_List_Admin {
          */
         private static function set_list_sort() {
 
-          $sort_by = self::$options['admin_default_sort'];
-          $sort_order = self::$options['admin_default_sort_order'];
-          
-          error_log(__METHOD__.'seting: '.self::$user_settings.' sort: '.self::$options['admin_default_sort'].' order: '.self::$options['admin_default_sort_order']);
-          
-          if ($setting = self::get_admin_user_setting('sort_by')) {
-            $sort_by = $setting;
-          }
-          if ($setting = self::get_admin_user_setting('sort_order')) {
-            $sort_order = $setting;
-          }
+          $sort_by = self::get_admin_user_setting('sort_by', self::$options['admin_default_sort']);
+          $sort_order = self::get_admin_user_setting('sort_order', self::$options['admin_default_sort_order']);
           
           $sort_order = isset($_POST['ascdesc']) ? $_POST['ascdesc'] : $sort_order;
           $sort_by = isset($_POST['sortBy']) ? $_POST['sortBy'] : $sort_by;
           
-          self::$options['admin_default_sort'] = $sort_by;
-          self::$options['admin_default_sort_order'] = $sort_order;
-          
-          error_log(__METHOD__.' sort: '.self::$options['admin_default_sort'].' order: '.self::$options['admin_default_sort_order']);
+          //error_log(__METHOD__.' sort: '.self::$options['admin_default_sort'].' order: '.self::$options['admin_default_sort_order']);
           
           self::set_admin_user_setting('sort_by', $sort_by);
           self::set_admin_user_setting('sort_order', $sort_order);
@@ -879,14 +885,13 @@ class PDb_List_Admin {
          * gets a user setting
          * 
          * @param string $name name of the setting to get
+         * @param string|bool $setting if there is no setting, supply this value instead
          * @return string|bool the setting value or false if not found
          */
-        public static function get_admin_user_setting($name) {
+        public static function get_admin_user_setting($name, $setting = false) {
           
-          $setting = false;
           if ($settings = get_transient(self::$user_settings)) {
-            $setting = isset($settings[$name]) ? $settings[$name] : false;
-          }
+            }
           return $setting;
         }
         /**

@@ -187,8 +187,32 @@ class PDb_CAPTCHA {
         'group' => true,
         )
             );
-    $this->validation = '#^' . call_user_func($operators[$o], $a, $b ) . '$#';
+    try {
+      $regex_value = call_user_func($operators[$o], $a, $b );
+    } catch (Exception $e) {
+      error_log(Participants_Db::$plugin_title . ' bcmath function could not be called: using alternative method. ' );
+      $regex_value = $this->compute($o, $a, $b);
+    }
+    $this->validation = '#^' . $regex_value . '$#';
     $this->captcha_params = array('a' => $a, 'o' => $o, 'b' => $b);
+  }
+  /**
+   * performs a math operation to resolve a captcha challenge
+   * 
+   * @param string $op the operator
+   * @param int $a operand
+   * @param int $b operand
+   * @return string
+   */
+  protected function compute($op, $a, $b) {
+    switch($op){
+      case '&times;':
+        return $a * $b;
+      case '&minus;':
+        return $a - $b;
+      case '+':
+        return $a + $b;
+    }
   }
   /**
    * grabs the element values and adds them to the current object

@@ -81,12 +81,12 @@ jQuery(document).ready(function($) {
             var newContent = $(html);
             idFix(newContent);
             var
-                    pagination = newContent.find('.pagination'),
+                    pagination = newContent.find('.pagination').first(),
                     replaceContent = newContent.find('.list-container').length ? newContent.find('.list-container') : newContent;
             replaceContent.find('a.obfuscate[rel]').each(function() {xnau_email_obfuscate($(this));});
             container.find('.list-container').replaceWith(replaceContent)
-            if ($('.pagination').length) {
-              container.find('.pagination').replaceWith(pagination);
+            if (container.find('.pagination').first().length) {
+              container.find('.pagination').first().replaceWith(pagination);
             } else {
               container.find('.list-container').after(pagination);
             }

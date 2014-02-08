@@ -552,10 +552,9 @@ class Participants_Db extends PDb_Base {
     wp_register_style('custom_plugin_css', plugins_url('/css/custom_css.php', __FILE__));
 
     if (self::$plugin_options['use_plugin_css'] && self::$shortcode_present) {
-
       wp_enqueue_style('pdb-frontend');
-      wp_enqueue_style('custom_plugin_css');
     }
+    wp_enqueue_style('custom_plugin_css');
 
     wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));
@@ -1300,7 +1299,9 @@ class Participants_Db extends PDb_Base {
         break;
 
       case 'insert':
-        $sql = 'INSERT INTO ' . self::$participants_table . ' SET date_recorded = NOW(), date_updated = NOW(), ';
+        $sql = 'INSERT INTO ' . self::$participants_table. ' SET ';
+        if (self::import_timestamp(isset($post['date_recorded']) ? $post['date_recorded'] : '') === false) $sql .= ' `date_recorded` = NOW(), ';
+        if (self::import_timestamp(isset($post['date_updated']) ? $post['date_updated'] : '') === false) $sql .= ' `date_updated` = NOW(), ';
         $where = '';
         break;
 
@@ -1349,22 +1350,21 @@ class Participants_Db extends PDb_Base {
           break;
         
         case 'date_recorded':
-          
-          if ($action == 'insert' ) {
-            $new_value = false;
-          } else {
-            $post_date = isset($post['date_recorded']) ? self::parse_date($post['date_recorded']) : false;
-            $new_value = $post_date !== false ? date('Y-m-d H:i:s', $post_date) : false ;
-          }
-          break;
-
         case 'date_updated':
         case 'last_accessed':
-          $new_value = false;
+          
+          /*
+           * this func returns bool false if the timestamp is not present or is invalid, 
+           * returns the MySQL timestamp string otherwise
+           */
+          $new_value = @self::import_timestamp($post[$column->name]);
+          
           break;
 
         case 'private_id':
-          $new_value = $action == 'insert' ? self::generate_pid() : false;
+          if (is_string($post['private_id']) && $post['private_id'] !== '') $new_value = $post['private_id'];
+          else $new_value = $action == 'insert' ? self::generate_pid() : false;
+          
           break;
 
         default :
@@ -1484,14 +1484,16 @@ class Participants_Db extends PDb_Base {
           } // switch column_atts->form_element
       }  // swtich column_atts->name 
 
-      // add the column and value to the sql
-      if (false !== $new_value) {
+      /*
+       * add the column and value to the sql; if it is bool false, skip it entirely. 
+       * Nulls are added as true nulls
+       */
+      if ($new_value !== false) {
 
-        // insert a true NULL if the field is NULL
-        if (NULL !== $new_value) {
+        if ($new_value !== null) {
           $new_values[] = $new_value;
         }
-        $column_data[] = "`" . $column->name . "` = " . ( NULL === $new_value ? "NULL" : "%s" );
+        $column_data[] = "`" . $column->name . "` = " . ( $new_value === null ? "NULL" : "%s" );
       }
 
     } // columns
@@ -1626,7 +1628,8 @@ class Participants_Db extends PDb_Base {
    * as of 1.5.5 returns only registered columns
    *
    * @ver 1.5 added $wpdb->prepare
-   *
+   * 
+   * TODO: add db result caching
    *
    * @global object $wpdb
    * @param  string $id the record ID; returns default record if omitted
@@ -1924,9 +1927,9 @@ class Participants_Db extends PDb_Base {
      * of fields, not just what's found in the POST array
      */
     $columns = false;
-    if (isset($_POST['index_key'])) {
-      $columns = self::get_shortcode_columns($_POST['index_key']);
-      unset($_POST['index_key']);
+    if (isset($_POST['pdb_data_keys'])) {
+      $columns = self::get_shortcode_columns($_POST['pdb_data_keys']);
+      unset($_POST['pdb_data_keys']);
     }
 
     /*
@@ -1934,10 +1937,12 @@ class Participants_Db extends PDb_Base {
      * because another script can instantiate the object in order to add a
      * feedback message
      * 
-     * we don't validate in the admin, they will be allowed to leave required field unfilled
+     * we don't validate administrators in the admin
      */
-    if (!is_object(self::$validation_errors) and (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) or $_POST['action'] == 'signup')) {
+    if (!is_object(self::$validation_errors)) {
+      if (!(is_admin() && current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']))) {
       self::$validation_errors = new PDb_FormValidation();
+      }
     }
 
     switch ($_POST['action']) :
@@ -2115,6 +2120,9 @@ class Participants_Db extends PDb_Base {
 
       case 'signup' :
         
+        $_POST['private_id'] = self::generate_pid();
+        $columns[] = 'private_id';
+        
         // route the $_POST data through a callback if defined
         $post_data = self::set_filter('before_submit_signup', $_POST);
 
@@ -2147,12 +2155,14 @@ class Participants_Db extends PDb_Base {
      * we check a transient based on the user's IP; if the user tries more than 3 
      * times per day to get a private ID, they are blocked for 24 hours
      */
+    setup_userdata();
     $transient = self::$prefix . 'retrieve-count-' . str_replace('.', '', $_SERVER['REMOTE_ADDR']);
     $count = get_transient($transient);
-    if ($count > 0 and $count <= 3) {
+    $max_tries = current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) ? 100 : 3; // give the plugin admin unlimited tries
+    if ($count > 0 and $count <= $max_tries) {
 
 // ok, they have a few more tries...
-    } elseif ($count > 3) {
+    } elseif ($count > $max_tries) {
 
 // too many tries, come back tomorrow
       error_log('Participants Database Plugin: IP blocked for too many retrieval attempts in 24-hour period: ' . $_SERVER['REMOTE_ADDR']);

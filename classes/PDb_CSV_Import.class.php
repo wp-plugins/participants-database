@@ -31,13 +31,34 @@ class PDb_CSV_Import extends xnau_CSV_Import {
 
     foreach ( $columns as $column ) {
     
-      if ( $column->CSV ) $this->column_names[] = $column->name;
+      if ( $column->CSV != '0') $this->column_names[] = $column->name;
     
     }
     
     $this->column_count = count( $this->column_names );
         
     
+  }
+  
+  /**
+   * takes a raw title row from the CSV and sets the column names array with it
+   * if the imported row is different from the plugin's defined CSV columns
+   *
+   */
+  protected function import_columns() {
+
+    // build the column names from the CSV if it's there
+    if (!$this->CSV->error and is_array($this->CSV->titles) and $this->column_names != $this->CSV->titles) {
+
+      $this->column_names = $this->CSV->titles;
+
+      $this->errors[] = __('New columns imported from the CSV file.', 'participants-database');
+
+      // remove enclosure characters
+      array_walk($this->column_names, array($this, '_enclosure_trim'), $this->CSV->enclosure);
+
+      $this->column_count = count($this->column_names);
+    }
   }
   
   function _set_upload_dir() {

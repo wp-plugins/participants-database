@@ -14,6 +14,11 @@
 
 class PDb_Base {
   /**
+   * set if a shortcode is called on a page
+   * @var bool
+   */
+  public static $shortcode_present = false;
+  /**
    * parses a list shortcode filter string into an array
    * 
    * this creates an array that makes it easy to manipulate and interact with the 
@@ -224,6 +229,25 @@ class PDb_Base {
     }
 
     return $filename;
+  }
+
+  /**
+   * processes an incoming timestamp
+   * 
+   * timestamps are usually handled by the plugin automatically, but when records 
+   * are being imported via CSV, they should be imported
+   * 
+   * @var string $timestamp a timestamp value, could be unix timestamp or text date
+   * @return bool|string if the timestamp is valid, a MySQL timestamp is returns; 
+   *                     bool false otherwise
+   */
+  public static function import_timestamp($timestamp) {
+    
+    $post_date = $timestamp !== null ? Participants_Db::parse_date($timestamp) : false;
+    $new_value = $post_date !== false ? date('Y-m-d H:i:s', $post_date) : false;
+    
+    return $new_value;
+    
   }
 
   /**
@@ -566,7 +590,7 @@ class PDb_Base {
    * or vice versa
    * 
    * @param array $fieldnames the array of field names
-   * @param bool  $indices if true returns array of indices, if flase returns array of fieldnames
+   * @param bool  $indices if true returns array of indices, if false returns array of fieldnames
    * @return array an array of integers
    */
   public static function get_field_indices($fieldnames, $indices = true) {
@@ -584,6 +608,15 @@ class PDb_Base {
    */
   public static function get_indexed_names($ids) {
     return self::get_field_indices($ids, false);
+  }
+  /**
+   * gets a list of column names from a dot-separated string of ids
+   * 
+   * @param string $ids the string of ids
+   * @return array of field names
+   */
+  public static function get_shortcode_columns($ids) {
+    return self::get_field_indices(explode('.',$ids), false);
   }
 }
 

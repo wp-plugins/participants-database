@@ -290,8 +290,9 @@ class PDb_List extends PDb_Shortcode {
           
         foreach ($record as $field => $value) {
           
-          
-
+          /*
+           * TODO: optimize this
+           */
           $field_object = $this->_get_record_field($field);
           // set the current value of the field
           $this->_set_field_value($field_object);
@@ -365,9 +366,9 @@ class PDb_List extends PDb_Shortcode {
      * filter property
      */
     if (isset($_POST['action']) && $_POST['action'] == 'pdb_list_filter') {
-      $this->filter = shortcode_atts($default_values, $_POST);
+      $this->filter = shortcode_atts($default_values, array_map('urldecode',$_POST));
     } elseif (isset($_GET['operator']) && !empty($_GET['operator'])) {
-      $this->filter = shortcode_atts($default_values, $_GET);
+      $this->filter = shortcode_atts($default_values, array_map('urldecode',$_GET));
     } else {
       $this->filter = $default_values;
     }
@@ -376,11 +377,6 @@ class PDb_List extends PDb_Shortcode {
     
     // prevent list page value from carrying over to next query
     unset($this->filter[$this->list_page]);
-    
-    // decode all passed-in values
-    foreach($this->filter as &$n) {
-      $n = urldecode($n);
-    }
 
     // get the ORDER BY clause
     $order_clause = $this->_build_order_clause();

@@ -48,11 +48,15 @@ input.focused {
 .participants_db .manage-fields textarea {
   width: 100%;
 }
+.pre-mp6 .participants_db fieldset.widefat {
+  border: none;
+}
 .pagination {
   margin-bottom: 20px;
 }
 .branch-3-7 .redfade,
-.branch-3-6 .redfade {
+.branch-3-6 .redfade,
+.branch-3-5 .redfade {
   box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
   border-color: rgba(197, 99, 59, 0.5);
   background-color: rgb( 255,255,255);
@@ -104,6 +108,10 @@ fieldset.widefat.inline-controls label {
 h4 .lowast {
   position: relative;
   top: -3px;
+}
+.admin-edit-participant .fieldnote {
+  color: #AAAAAA;
+  font-style: italic;
 }
 input[readonly] {
   border:none;
@@ -405,15 +413,18 @@ a.dragger {
   cursor: move;
 }
 .branch-3-7 .glyphicon.glyphicon-sort:after, 
-.branch-3-6 .glyphicon.glyphicon-sort:after {
+.branch-3-6 .glyphicon.glyphicon-sort:after, 
+.branch-3-5 .glyphicon.glyphicon-sort:after {
   content: "↕";
 }
 .branch-3-7 .glyphicon.glyphicon-remove:after, 
-.branch-3-6 .glyphicon.glyphicon-remove:after {
+.branch-3-6 .glyphicon.glyphicon-remove:after, 
+.branch-3-5 .glyphicon.glyphicon-remove:after {
   content: "☓";
 }
 .branch-3-7 .glyphicon.glyphicon-edit:after, 
-.branch-3-6 .glyphicon.glyphicon-edit:after {
+.branch-3-6 .glyphicon.glyphicon-edit:after, 
+.branch-3-5 .glyphicon.glyphicon-edit:after {
   content: "✎";
 }
 .glyphicon.glyphicon-sort:after {
@@ -467,7 +478,8 @@ a.dragger {
   z-index: 1000;
 }
 .branch-3-7 .mask,
-.branch-3-6 .mask  {
+.branch-3-6 .mask,
+.branch-3-5 .mask  {
   background-color: white;
 }
 .ui-tabs-nav .mask {
@@ -512,7 +524,8 @@ a.dragger {
   margin-bottom:0;
 }
 .branch-3-7 .participants_db .ui-tabs-nav li,
-.branch-3-6 .participants_db .ui-tabs-nav li {
+.branch-3-6 .participants_db .ui-tabs-nav li,
+.branch-3-5 .participants_db .ui-tabs-nav li {
   margin: 1px 0 2px;
 }
 .participants_db .ui-tabs-nav .ui-state-default a {

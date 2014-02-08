@@ -264,7 +264,7 @@ class PDb_Template {
    */
   private function _setup_fields(&$object) {
     $this->base_type = get_class($object);
-    $this->module = strtolower(str_replace('PDb_', '', $this->base_type));
+    $this->module = $object->module;
     $this->fields = new stdClass();
     $this->groups = array();
     switch ($this->base_type) {

@@ -236,6 +236,21 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.4.1 =
+
+* field group tabs use group name if no title is defined for the group
+* HTML entities can be used in all field option ("values") definitions
+* fixed long field/group name bug. Names can be up to the maximum 64 characters
+* cleaned up plugin function spillover into other admin pages
+* better compatibility with pre-3.8 WP installs
+* signup and record shortcodes won't try to validate unincluded fields
+* all form submissions are validated for all users except plugin admin in the admin section
+* in admin, last used settings now retained: sort field, sort order, search field, search operator
+* better support for multi-page forms, user can't complete form by going back to the first page
+* links and other HTML now allowed in field titles and help text
+* field option titles used in all contexts
+
+
 = 1.5.4 =
 
 * more visual compatibility tweaks with 3.8 WP admin redesign, dashicons
@@ -477,9 +492,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4 =
-**BETA RELEASE**
-Bugfixes, API enhancements, bulletproofing.
+= 1.5.4.1 =
+bugfix release
+major bugs fixed: validating unincluded fields, long field/group names causing database error
 
 == Using the Plugin ==
 

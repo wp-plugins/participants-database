@@ -580,23 +580,25 @@ abstract class PDb_Shortcode {
   /**
    *  gets the field attribues for named field
    * 
-   * @param string $field_name
+   * if given an array, returns an array of field objects
+   * 
+   * @param string|array $fields
    * @global object $wpdb
+   * @return single object or array of objects, indexed by field name
    */
-  protected function _get_record_field($field_name) {
+  protected function _get_record_field($fields) {
 
     global $wpdb;
-
     $columns = array('name', 'title', 'default', 'help_text', 'form_element', 'validation', 'readonly', 'values', 'persistent');
+    $field_objects = array();
 
     $sql = 'SELECT v.' . implode(',v.', $columns) . ', "' . $this->module . '" AS "module" 
             FROM ' . Participants_Db::$fields_table . ' v 
-            WHERE v.name = "' . $field_name . '" 
-            ';
+            WHERE v.name IN ("' . implode('","',(array)$fields) . '") 
+            ORDER BY v.order';
+    $result = $wpdb->get_results($sql, OBJECT_K);
 
-    $sql .= ' ORDER BY v.order';
-
-    return current($wpdb->get_results($sql, OBJECT_K));
+    return is_array($fields) ? $result : current($result);
   }
 
   /*   * **************
@@ -949,10 +951,10 @@ abstract class PDb_Shortcode {
     $column_set = array();
     $set = $set == 'admin_column' ? 'admin_column' : 'display_column';
 
-    $sql = "
-      SELECT `name`,`" . $set . "`
-      FROM " . Participants_Db::$fields_table . "
-      WHERE `" . $set . "` > 0";
+    $sql = '
+      SELECT f.name, f.' . $set . '
+      FROM ' . Participants_Db::$fields_table . ' f 
+      WHERE f.' . $set . ' > 0';
 
     $columns = $wpdb->get_results($sql, ARRAY_A);
 

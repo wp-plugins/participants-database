@@ -13,7 +13,8 @@ this is the default template which formats the list of records as a table
  */
 //$this->add_stylesheet();
 ?>
-
+<div class="wrap <?php echo $this->wrap_class ?>">
+<a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
 <?php /* SEARCH/SORT FORM */ ?>
   <?php if ( $filter_mode != 'none' ) : ?>
   <div class="pdb-searchform">
@@ -24,7 +25,7 @@ this is the default template which formats the list of records as a table
       <p class="value_error"><?php _e( 'Please type in something to search for.', Participants_Db::PLUGIN_NAME )?></p>
     </div>
 
-    <?php $this->search_sort_form_top( true, 'form-horizontal' ); ?>
+    <?php $this->search_sort_form_top( false, 'form-horizontal' ); ?>
 
     <?php if ( $filter_mode == 'filter' || $filter_mode == 'both' ) : ?>
 

@@ -116,7 +116,7 @@ abstract class xnau_FormElement {
    *
    * @var array
    */
-	var $textarea_dims = array( 'rows'=> 2, 'cols'=> 40 );
+  var $textarea_dims = array('rows' => 2, 'cols' => 40);
   
   /**
    * element group status
@@ -141,6 +141,7 @@ abstract class xnau_FormElement {
   /**
    * @var string the linebreak character
    */
+
   const BR = PHP_EOL;
   
   /**
@@ -746,7 +747,7 @@ abstract class xnau_FormElement {
     $this->_addline( '<div class="multicheckbox"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . '>' );
     $this->indent++;
 
-    $this->_add_checkbox_series('checkbox');
+    $this->_add_checkbox_series();
 
     $this->_addline('</div>', -1);
   }
@@ -991,9 +992,9 @@ abstract class xnau_FormElement {
 			$this->classes = '';
 			}
     
-    $null_select = isset($this->options['null_select']) ?  $this->options['null_select'] : false;
+    $null_select = isset($this->options['null_select']) || $type == 'checkbox' ? $this->options['null_select'] : false;
     if ($null_select !== false) {
-      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), ''), 1);
+      $this->_addline($this->_input_tag('hidden', (is_string($null_select) ? $null_select : '')), 1);
     }
     unset($this->options['null_select']);
     
@@ -1006,13 +1007,15 @@ abstract class xnau_FormElement {
          * this is where we would implement some kind of grouping for display purposes
          */
       } else {
-      $this->attributes['id'] = $this->legal_name($this->name . '-' . strtolower($option_value));
+        $this->attributes['id'] = $this->legal_name($this->name . '-' . trim(strtolower($option_value)));
       $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
       $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
       $this->_addline($option_key . '</label>');
     }
     }
     if ($otherlabel) {
+      
+      $value = $type == 'checkbox' ? (isset($this->value['other']) ? $this->value['other'] : '') : $this->value;
       $this->attributes['class'] =  'otherselect';
       $this->_addline('<label ' . $class . ' for="' . $this->name . '_otherselect">');
       $this->_addline(sprintf('<input type="%s" id="%s_otherselect" name="%s"  value="%s" %s %s />', 
@@ -1020,7 +1023,7 @@ abstract class xnau_FormElement {
               $this->name, 
               $type == 'checkbox' ? 'temp' : $this->name, 
               $otherlabel, 
-              $this->_set_selected($this->options, ( $type == 'checkbox' ? $this->value['other'] : $this->value), 'checked', false), 
+              $this->_set_selected($this->options, $value, 'checked', $value === ''), 
               $this->_attributes()
               ), 1);
       //$this->_addline('<input type="' . $type . '" id="' . $this->name . '_otherselect" name="' . ($type == 'checkbox' ? 'temp' : $this->name) . '"  value="' . $otherlabel . '" ' . $this->_set_selected($this->options, ( $type == 'checkbox' ? $this->value['other'] : $this->value), 'checked', false) . ' ' . $this->_attributes() . ' />', 1);

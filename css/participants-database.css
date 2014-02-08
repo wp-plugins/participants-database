@@ -205,8 +205,8 @@
 .pdb-list .pagination a,
 .pdb-pagination a {
   float:left;
-  margin: 0 -1px 0 0;
-  padding: 6px 10px;
+  margin: 0 -2px 0 0;
+  padding: 6px 12px;
   border-width: 1px;
   border-style: solid;
   border-color: rgba(204, 204, 204, 1) rgba(204, 204, 204, 0.25);

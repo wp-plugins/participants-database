@@ -106,17 +106,32 @@ class PDb_Signup extends PDb_Shortcode {
     );
     
     $sent = true; // start by assuming the notification email has been sent
+    /*
+     * this is set true if the form is a multi-page form. This is so a multi-page form 
+     * can't be completed by skipping back to the signup form, they must go to a page 
+     * with a thanks shortcode
+     */
+    //error_log(__METHOD__.' checking return: '.print_r($shortcode_atts,1));
+    $redirected = false;
+    if ($shortcode_atts['module'] != 'thanks' && ((isset($shortcode_atts['action']) && $shortcode_atts['action'] !== ''))) {
+      // this is set true if the signup form is supposed to be redirected after the submission
+      $redirected = true;
+    }
 
     if ((isset($_GET['m']) && $_GET['m'] == 'r') || $shortcode_atts['module'] == 'retrieve') {
+      /*
+       * we're proceesing a link retrieve request
+       */
       $shortcode_atts['module'] = 'retrieve';
-    } elseif (Participants_Db::$session->get('pdbid')) { // this will be true after a successful submission
-
-      $this->participant_id = Participants_Db::$session->get('pdbid');
+    } elseif ($this->participant_id = Participants_Db::$session->get('pdbid')) {
+      /*
+       * the submission is successful, clear the session
+       */
       Participants_Db::$session->clear('pdbid');
       Participants_Db::$session->clear('captcha_vars');
       Participants_Db::$session->clear('captcha_result');
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
-      if ($this->participant_values) {
+      if ($this->participant_values && !$redirected) {
         // check the notification sent status of the record
         $sent = $this->check_sent_status($this->participant_id);
         $this->submitted = true;
@@ -124,9 +139,17 @@ class PDb_Signup extends PDb_Shortcode {
       }
       $shortcode_atts['id'] = $this->participant_id;
     } elseif ($shortcode_atts['module'] == 'signup') {
-
+      /*
+       * we're showing the signup form
+       */
       $this->participant_values = Participants_Db::get_default_record();
-    } else return; // no type set, nothing to show.
+    } else {
+      /*
+       * either there was no type set or it's a multi-page form and we've come back 
+       * to the signup form before completing all the pages.
+       */
+      return;
+    }
 
     // run the parent class initialization to set up the $shortcode_atts property
     parent::__construct($shortcode_atts, $shortcode_defaults);
@@ -225,12 +248,14 @@ class PDb_Signup extends PDb_Shortcode {
   {
 
     if (!empty($this->shortcode_atts['action'])) {
-
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
-    } elseif (isset($this->options['signup_thanks_page']) and $this->options['signup_thanks_page'] != 'none') {
-
+    }
+    if (!$this->submission_page) {
+      if (isset($this->options['signup_thanks_page']) && $this->options['signup_thanks_page'] != 'none') { 
       $this->submission_page = get_permalink($this->options['signup_thanks_page']);
-    } else {
+      }
+    }
+    if (!$this->submission_page) {
 
       // the signup thanks page is not set up, so we submit to the page the form is on
       $this->submission_page = $_SERVER['REQUEST_URI'];

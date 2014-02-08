@@ -102,13 +102,13 @@ if ($participant_values) :
             <?php
             $add_title = '';
             if ($column->form_element == 'hidden') {
-              $add_title = sprintf(' (%s)', __('hidden', 'participants-database'));
+              $add_title = sprintf(' <span class="fieldnote">(%s)</span>', __('hidden', 'participants-database'));
             } elseif (in_array($column->name, $readonly_columns) or $column->form_element == 'timestamp') {
               $attributes['class'] = 'readonly-field';
               if (!current_user_can(Participants_Db::$plugin_options['record_edit_capability'])) {
               $attributes['readonly'] = 'readonly';
               }
-              $add_title = sprintf(' (%s)', __('read only', 'participants-database'));
+              $add_title = sprintf(' <span class="fieldnote">(%s)</span>', __('read only', 'participants-database'));
             }
             ?>
             <th><?php echo $column_title . $add_title ?></th>
@@ -183,6 +183,11 @@ if ($participant_values) :
                   case 'hidden':
 
                     $column->form_element = 'text-line';
+                    break;
+                  
+                  case 'timestamp':
+                    
+                    if (Participants_Db::import_timestamp($column->value) === false) $column->value = '';
                     break;
                 }
               }
