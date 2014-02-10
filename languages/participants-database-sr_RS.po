@@ -1,0 +1,1709 @@
+# Copyright (C) 2013 Participants Database
+# This file is distributed under the same license as the Participants Database package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Participants Database 1.4.9.2\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/participants-database\n"
+"POT-Creation-Date: 2013-03-22 22:04:46+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2013-06-13 14:09+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.5.5\n"
+"Language: Srpski Latinica\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: classes/CSV_Import.class.php:58
+msgid "The file %s has been uploaded."
+msgstr "Datoteka %s je otpremljena."
+
+# This is plural!
+# %s zapisa dodato
+#: classes/CSV_Import.class.php:64
+#, fuzzy
+msgid "%s record added"
+msgid_plural "%s records added"
+msgstr[0] "%s zapis dodat"
+
+# This is plural!
+# %s podudarajućih zapisa ažurirano
+#: classes/CSV_Import.class.php:68
+msgid "%s matching record updated"
+msgid_plural "%s matching records updated"
+msgstr[0] "%s podudarajući zapis ažuriran"
+
+# This is plural!
+# preskočeno duplih zapisa %s
+#: classes/CSV_Import.class.php:73
+msgid "%s duplicate record skipped"
+msgid_plural "%s duplicate records skipped"
+msgstr[0] "preskočen dupli zapis %s"
+
+#: classes/CSV_Import.class.php:77
+msgid "Zero records imported"
+msgstr "Nula zapisa uvezeno"
+
+#: classes/CSV_Import.class.php:82
+msgid ""
+"There was an error uploading the file. This could be a problem with "
+"permissions on the uploads directory."
+msgstr ""
+"Došlo je do greške pri otpremanju (upolading) datoteke. Ovo bi mogao biti "
+"problem sa nad direktorijumom dodano (uploads)."
+
+#: classes/CSV_Import.class.php:82 classes/CSV_Import.class.php:88
+msgid "Destination"
+msgstr "Odredište"
+
+#: classes/CSV_Import.class.php:88
+msgid ""
+"Target directory does not exist and could not be created. Try creating it "
+"manually."
+msgstr ""
+"Odredišni direktorijum ne postoji ili ne može da se napravi. Pokušajte da ga "
+"napravite ručno."
+
+#. translators: the %s will be the name of the file
+#: classes/CSV_Import.class.php:142
+msgid "Error occured while trying to add the data to the database"
+msgstr "Došlo je do greške pri pokušaju da dodate podatke u bazu podataka"
+
+#: classes/CSV_Import.class.php:142
+msgid ""
+"Input file does not exist or path is incorrect.<br />Attempted to load: %s"
+msgstr ""
+"Ulazna datoteka ne postoji ili putanja nije tačna.<br />Pokušano učitavanje: "
+"%s"
+
+#: classes/CSV_Import.class.php:188
+msgid ""
+"The number of items in line %s is incorrect.<br />There are %s and there "
+"should be %s."
+msgstr ""
+"Broj stavki u liniji %s nije ispravan.<br />Postoje %s  a treba da bude %s."
+
+#: classes/CSV_Import.class.php:197
+msgid "Number of values does not match number of columns"
+msgstr "Broj vrednosti ne odgovara broju kolona"
+
+#: classes/CSV_Import.class.php:286
+msgid "New columns imported from the CSV file."
+msgstr "Nove kolone uvežene (Imported) iz CSV datoteke."
+
+#: classes/FormElement.class.php:150
+msgctxt "indicates a write-in choice"
+msgid "other"
+msgstr "drugo"
+
+#: classes/FormElement.class.php:151
+msgctxt "indicates the text to be clicked to go to another web page"
+msgid "Link Text"
+msgstr "Tekst Veze"
+
+#: classes/FormElement.class.php:734 manage_fields.php:386
+msgid "delete"
+msgstr "izbrisati"
+
+#: classes/PDb_List.class.php:598 templates/pdb-list-bootstrap.php:34
+#: templates/pdb-list-detailed.php:32
+msgid "Please select a column to search in."
+msgstr "Molimo izaberite kolonu za pretraživanje."
+
+#: classes/PDb_List.class.php:599 templates/pdb-list-bootstrap.php:35
+#: templates/pdb-list-detailed.php:33
+msgid "Please type in something to search for."
+msgstr "Molimo otkucate nešto za pretraživanje."
+
+#: classes/PDb_List.class.php:607 templates/pdb-list-bootstrap.php:45
+#: templates/pdb-list-detailed.php:48
+msgid "Search"
+msgstr "Pretraga"
+
+#: classes/PDb_List.class.php:622 classes/PDb_List_Admin.class.php:455
+#: templates/pdb-list-bootstrap.php:62 templates/pdb-list-detailed.php:76
+msgid "Sort by"
+msgstr "Sortiraj po"
+
+#: classes/PDb_List.class.php:674 classes/PDb_List_Admin.class.php:415
+msgid "show all"
+msgstr "prikaži sve"
+
+#: classes/PDb_List.class.php:723 classes/PDb_List_Admin.class.php:471
+#: classes/PDb_Settings.class.php:297
+msgid "Ascending"
+msgstr "Uzlazno"
+
+#: classes/PDb_List.class.php:724 classes/PDb_List_Admin.class.php:472
+#: classes/PDb_Settings.class.php:297
+msgid "Descending"
+msgstr "Silazno"
+
+#. translators: the following 5 strings are used in logic matching, please test
+#. after translating in case special characters cause problems
+#: classes/PDb_List.class.php:1105 classes/PDb_List_Admin.class.php:785
+msgctxt "submit button label"
+msgid "Delete Checked"
+msgstr "Izbrisati Izabrano"
+
+#: classes/PDb_List.class.php:1106 classes/PDb_List_Admin.class.php:786
+msgctxt "submit button label"
+msgid "Change"
+msgstr "Promeniti"
+
+#: classes/PDb_List.class.php:1107 classes/PDb_List_Admin.class.php:787
+msgctxt "submit button label"
+msgid "Sort"
+msgstr "Sortirati"
+
+#: classes/PDb_List.class.php:1108 classes/PDb_List_Admin.class.php:788
+msgctxt "submit button label"
+msgid "Filter"
+msgstr "Filter"
+
+#: classes/PDb_List.class.php:1109 classes/PDb_List_Admin.class.php:789
+msgctxt "submit button label"
+msgid "Clear"
+msgstr "Očistiti"
+
+#: classes/PDb_List.class.php:1110 classes/PDb_List_Admin.class.php:790
+msgctxt "search button label"
+msgid "Search"
+msgstr "Pretraga"
+
+#: classes/PDb_List_Admin.class.php:119
+msgctxt "noun; page number indicator"
+msgid "Page"
+msgstr "Strana"
+
+#: classes/PDb_List_Admin.class.php:329
+msgid "Do you really want to delete the selected record?"
+msgstr "Da li zaista želite da obrišete izabrani zapis ?"
+
+#: classes/PDb_List_Admin.class.php:330
+msgid "Do you really want to delete the selected records?"
+msgstr "Da li zaista želite da obrišete izabrane zapise ?"
+
+#: classes/PDb_List_Admin.class.php:391
+msgid "List Participants: %s record found, sorted by:"
+msgid_plural "List Participants: %s records found, sorted by:"
+msgstr[0] "Lista Učesnika: %s zapis pronađen, sortirana po:"
+
+#: classes/PDb_List_Admin.class.php:412
+msgid "Show only records with"
+msgstr "Pokaži samo zapise sa"
+
+#: classes/PDb_List_Admin.class.php:439
+msgid "is"
+msgstr "je"
+
+#: classes/PDb_List_Admin.class.php:440
+msgid "is not"
+msgstr "nije"
+
+#: classes/PDb_List_Admin.class.php:441
+msgid "contains"
+msgstr "sadrži"
+
+#: classes/PDb_List_Admin.class.php:442
+msgid "doesn&#39;t contain"
+msgstr "ne sadrži"
+
+#: classes/PDb_List_Admin.class.php:443
+msgid "is greater than"
+msgstr "je veće od"
+
+#: classes/PDb_List_Admin.class.php:444
+msgid "is less than"
+msgstr "je manje od"
+
+#: classes/PDb_List_Admin.class.php:505
+msgid "Show %s items per page."
+msgstr "Prikaži %s stavki po strani."
+
+#: classes/PDb_List_Admin.class.php:561
+msgid "Edit"
+msgstr "Izmeni"
+
+#: classes/PDb_List_Admin.class.php:696 templates/pdb-list-detailed.php:291
+msgid "No records found"
+msgstr "Nema pronađenih zapisa"
+
+#: classes/PDb_List_Admin.class.php:714
+msgid "Export CSV"
+msgstr "Izvezi CSV"
+
+#: classes/PDb_List_Admin.class.php:726
+msgid "File Name"
+msgstr "Ime Datoteke"
+
+#: classes/PDb_List_Admin.class.php:728
+msgid "Download CSV for this list"
+msgstr "Preuzmi CSV za ovu listu"
+
+#: classes/PDb_List_Admin.class.php:731
+msgid ""
+"This will download the whole list of participants that match your search "
+"terms, and in the order specified by the sort. The export will include "
+"records on all list pages. The fields included in the export are defined in "
+"the \"CSV\" column on the Manage Database Fields page."
+msgstr ""
+"Ovo će preuzeti celu listu učesnika koji se podudaraju sa kriterijumima za "
+"pretragu, sortirane oi izabranoj vrsti. Izvoz (export) će sadržati sve "
+"zapise na svim izlistanim stranama. Polja sadržana u preuzimanju su "
+"definisana u  \"CSV\" koloni na stranici Upravljane Poljima Baze Podataka."
+
+#. translators: uses the check symbol in a phrase that means "check all"
+#: classes/PDb_List_Admin.class.php:746
+msgid "all"
+msgstr "svi"
+
+#: classes/PDb_Pagination.class.php:350
+msgid "First"
+msgstr "Prvi"
+
+#: classes/PDb_Pagination.class.php:359
+msgid "Previous"
+msgstr "Prethodni"
+
+#: classes/PDb_Pagination.class.php:376 participants-database.php:2700
+msgid "Next"
+msgstr "Sledeći"
+
+#: classes/PDb_Pagination.class.php:385
+msgid "Last"
+msgstr "Poslednji"
+
+#: classes/PDb_Settings.class.php:17
+msgid "General Settings"
+msgstr "Opšte Podešavanja"
+
+#: classes/PDb_Settings.class.php:18
+msgid "Signup Form Settings"
+msgstr "Obrazac Podešavanja Prijava"
+
+#: classes/PDb_Settings.class.php:19
+msgid "Record Form Settings"
+msgstr "Obrazac Podešavanja Zapisa"
+
+#: classes/PDb_Settings.class.php:20
+msgid "List Display Settings"
+msgstr "Lista Podešavanja Ekrana"
+
+#: classes/PDb_Settings.class.php:24
+msgid ""
+"Settings for the [pdb_record] shortcode, which is used to show a user-"
+"editable form on the website."
+msgstr ""
+"Podešavanja za [pdb_record] kod, koji se koristi za prikaz korisničkog "
+"obrasca (form) za izmene na web sajtu."
+
+#: classes/PDb_Settings.class.php:25
+msgid ""
+"Settings for the [pdb_list] shortcode, which is used to show a list of "
+"records from the database."
+msgstr ""
+"Podešavanja za [pdb_list] kod, koji se koristi za prikaz liste zapisa iz "
+"baze podataka."
+
+#: classes/PDb_Settings.class.php:26
+msgid ""
+"Settings for the [pdb_signup] shortcode, which is used to show a signup or "
+"registration form on the website."
+msgstr ""
+"Podešavanja za [pdb_signup] kod, koji se koristi za prikaz obrasca (form) "
+"prijave ili registracije web sajtu."
+
+#: classes/PDb_Settings.class.php:33
+msgid "Save Plugin Settings"
+msgstr "Sačuvaj Podešavanja Dodatka"
+
+#: classes/PDb_Settings.class.php:59
+msgid "File Upload Location"
+msgstr "Mesto Primljenih Datoteka"
+
+#: classes/PDb_Settings.class.php:63
+msgid ""
+"This defines where the uploaded files will go, relative to the WordPress "
+"root. The default location is '/wp-content/uploads/participants-"
+"database'<br />Don't put it in the plugin folder, the images and files could "
+"get deleted when the plugin is updated."
+msgstr ""
+"Ovo definiše gde će ići primljene (uploaded) datoteke u odnosu na WordPress "
+"root. Standardna lokacija je '/wp-content/uploads/participants-database'<br /"
+">Nemojte ih stavljati u direktorijum dodatka, jer će slike i datoteke mogle "
+"biti obrisane prilikom ažuriranja dodatka."
+
+#: classes/PDb_Settings.class.php:70
+msgid "File Upload Limit"
+msgstr "Limit Primljene Datoteke"
+
+#: classes/PDb_Settings.class.php:74
+msgid "the maximum allowed file size for an uploaded image"
+msgstr "maksimalno dozvoljena veličina datoteke za primljenu (uploaded) sliku"
+
+#: classes/PDb_Settings.class.php:82
+msgid "Default Image"
+msgstr "Podrazumevana Slika"
+
+#: classes/PDb_Settings.class.php:86
+msgid ""
+"Path (relative to WP root) of an image file to show if no image has been "
+"defined for an image field. Leave blank for no default image."
+msgstr ""
+"Putanja (u odnosu na WP root) na datoteku slike za prikaz ukoliko slika nije "
+"definisana za polje slike. Ostaviti prazno za nema podrazumevane slike."
+
+#: classes/PDb_Settings.class.php:93
+msgid "Link Image to Fullsize"
+msgstr "Veza Ka Slici U Punoj Veličini"
+
+#: classes/PDb_Settings.class.php:98
+msgid ""
+"place a link to the full-size image on images. This link will work with most "
+"\"lightbox\" plugins."
+msgstr ""
+"postavite vezu ka punoj veličini na slici. Ova veza će raditi sa većinom "
+"\"lightbox\" dodataka."
+
+#: classes/PDb_Settings.class.php:106
+msgid "Use the Plugin CSS"
+msgstr "Koristi CSS Dodatka"
+
+#: classes/PDb_Settings.class.php:111
+msgid "use the plugin's CSS to style the output of shortcodes"
+msgstr "koristi CSS stil dodatka za izlaz koda"
+
+#: classes/PDb_Settings.class.php:119
+msgid "Make Links Clickable"
+msgstr "Napravi Linkove Sa Klik Vezom"
+
+#: classes/PDb_Settings.class.php:124
+msgid ""
+"if a \"text-line\" field looks like a link (begins with \"http\" or is an "
+"email address) make it clickable"
+msgstr ""
+"Ako \"text-line\" polje izgleda kao veza (počinje sa \"http\" ili je email "
+"adresa) napravi da može da se klikne na nju"
+
+#: classes/PDb_Settings.class.php:132
+msgid "Protect Email Addresses"
+msgstr "Zaštita Email Adrese"
+
+#: classes/PDb_Settings.class.php:137
+msgid "protect email addresses in text-line fields with Javascript"
+msgstr "zaštiti email adrese u liniji tekst polja sa javascript-om"
+
+#: classes/PDb_Settings.class.php:145
+msgid "Missing Field Error Message"
+msgstr "Poruka O Grešci Nedostaje Polje"
+
+#: classes/PDb_Settings.class.php:149
+msgid ""
+"the message shown when a field is required, but left empty (the %s is "
+"replaced by the name of the field)"
+msgstr ""
+"poruka se pojavljuje kada je polje obavezno ali je ostavljeno prazno( %s je "
+"zamenjeno sa imenom polja)"
+
+#: classes/PDb_Settings.class.php:150
+msgid "The %s field is required."
+msgstr "%s polje je obavezno."
+
+#: classes/PDb_Settings.class.php:156
+msgid "Invalid Field Error Message"
+msgstr "Poruka O Grešci Neispravno Polje"
+
+#: classes/PDb_Settings.class.php:160
+msgid ""
+"the message shown when a field's value does not pass the validation test"
+msgstr "poruka se prikazuje kada vrednost polja ne prođe test za proveru"
+
+#: classes/PDb_Settings.class.php:161
+msgid "The %s field appears to be incorrect."
+msgstr "%s polje izgleda da je netačno."
+
+#: classes/PDb_Settings.class.php:167
+msgid "Non-Matching Field Error Message"
+msgstr "Poruka O Grešci Ne-Odgovarajuće Polje"
+
+#: classes/PDb_Settings.class.php:171
+msgid ""
+"the message shown when a field's value does match the value of another field"
+msgstr ""
+"poruka se prikazuje kada je vrednost polja jednaka vrednosti drugog polja"
+
+#: classes/PDb_Settings.class.php:172
+msgid "The %s field must match."
+msgstr " %s polje mora da odgovara."
+
+#: classes/PDb_Settings.class.php:178
+msgid "Field Error Style"
+msgstr "Polje Pogrešan Stil"
+
+#: classes/PDb_Settings.class.php:182
+msgid ""
+"the CSS style applied to an input or text field that is missing or has not "
+"passed validation. This must be a valid CSS rule"
+msgstr ""
+"CSS stil primenjen na ulazno ili tekst polje, nedostaje ili nije prošao "
+"proveru valjanosti. Ovo mora biti važeće CSS pravilo."
+
+#: classes/PDb_Settings.class.php:183
+msgid "border: 1px solid red"
+msgstr "border: 1px solid crvena"
+
+#: classes/PDb_Settings.class.php:189
+msgid "Mark Required Fields"
+msgstr "Označiti Obavezna Polja"
+
+#: classes/PDb_Settings.class.php:194
+msgid "mark the title of required fields?"
+msgstr "označiti naziv obaveznih polja ?"
+
+#: classes/PDb_Settings.class.php:202
+msgid "Required Field Marker"
+msgstr "Oznaka Obaveznog  Polja"
+
+#: classes/PDb_Settings.class.php:206
+msgid ""
+"html added to field title for required fields if selected above (the %s is "
+"replaced by the title of the field)"
+msgstr ""
+"html dodat nazivu polja za obavezna polja ukoliko je izabrano gore ( %s je "
+"zamenjen sa nazivom polja)"
+
+#: classes/PDb_Settings.class.php:213
+msgid "Use Rich Text Editor"
+msgstr "Koristiti Obogaćeni Tekst Editor"
+
+#: classes/PDb_Settings.class.php:218
+msgid ""
+"enable the rich text editor on \"rich-text\" fields for front-end users. If "
+"deselected, \"rich-text\" fields will appear as text-area fields. This does "
+"not affect admin users, who always have the use of the rich-text editor."
+msgstr ""
+"omogućiti obogaćeni tekst editor na \"rich-text\" poljima za krajnje "
+"korisnike. Ako nije izabrano, \"rich-text\" polja će se pojaviti kao teskt-"
+"oblasti polja. Ovo ne utiče na admin korisnike, koji uvek mogu koristiti "
+"obogaćeni tekst editor."
+
+#: classes/PDb_Settings.class.php:226
+msgid "Use WordPress Auto Formatting"
+msgstr "Koristiti WordPress Automatskog Formatiranja"
+
+#: classes/PDb_Settings.class.php:231
+msgid "Use WordPress&#39; auto formatting on rich text fields."
+msgstr ""
+"Upotreba WordPress automatskog formatiranja na poljima sa obogaćenim tekstom."
+
+#: classes/PDb_Settings.class.php:239
+msgid "Send HTML Email"
+msgstr "Pošalji HTML Email"
+
+#: classes/PDb_Settings.class.php:244
+msgid ""
+"use rich text in plugin emails? If you turn this off, be sure to remove all "
+"HTML tags from the email body settings for the plugin."
+msgstr ""
+"koristiti obogaćeni tekst u dodatku emaila ? Ako ga isključite, obavezno "
+"uklonite sve HTML tags iz tela email poruke podešavanja dodatka.  "
+
+#: classes/PDb_Settings.class.php:252
+msgid "Strict Date Format"
+msgstr "Striktan Format Datuma"
+
+#: classes/PDb_Settings.class.php:257
+msgid ""
+"This forces date inputs to be interpreted strictly according to the date "
+"format setting of the site. You should tell your users what format you are "
+"expecting them to use. This also applies to date values used in [pdb_list] "
+"shortcode filters. The date with your current setting looks like this: "
+"<strong>%s</strong> %s"
+msgstr ""
+"To primorava da se uneti datum tumači striktno u skladu sa podešenim "
+"formatom datuma na našem sajtu. Potrebno je korisnicima proslediti "
+"obaveštenje koji format datuma očekujete da koriste. Ovo se odnosi i na "
+"vrednosti datuma korišćene u [pdb_list] filterima koda. Datum sa trenutno "
+"važećim postavkama izgleda ovako: <strong>%s</strong> %s"
+
+#: classes/PDb_Settings.class.php:265
+msgid "Record Edit Access Level"
+msgstr "Izmena Zapisa Nivo Pristupa"
+
+#: classes/PDb_Settings.class.php:269
+msgid ""
+"sets the user access level for adding, editing and listing records. (fields "
+"management and plugin settings always require admin level access)"
+msgstr ""
+"postavlja korisnički nivo pristupa za dodavanje, uređivanje i liste zapisa. "
+"(upravljanje poljima i podešavanjima dodataka uvek zahteva admin nivo "
+"pristupa)"
+
+#: classes/PDb_Settings.class.php:271
+msgid "Author"
+msgstr "Autor"
+
+#: classes/PDb_Settings.class.php:271
+msgid "Editor"
+msgstr "Urednik"
+
+#: classes/PDb_Settings.class.php:271
+msgid "Admin"
+msgstr "Admin"
+
+#: classes/PDb_Settings.class.php:278
+msgid "Admin List Default Sort"
+msgstr "Admin Lista Standardno Sortirana"
+
+#: classes/PDb_Settings.class.php:284
+msgid ""
+"The record list shown in the admin section will be sorted by this field by "
+"default. (Field must be checked \"sortable.\")"
+msgstr ""
+"Lista zapisa prikazana u admin delu će biti podrazumevano sortirana po ovom "
+"polju (Polje mora biti obeleženo \"sortable.\")"
+
+#: classes/PDb_Settings.class.php:291
+msgid "Admin List Default Sort Order"
+msgstr "Admin Lista Podrazumevano Sortiranje"
+
+#: classes/PDb_Settings.class.php:295
+msgid "Sets the default order of the record list in the admin."
+msgstr "Postavljeni podrazumevani redosled u listi zapisa u admin."
+
+#: classes/PDb_Settings.class.php:310
+msgid "Records per Page"
+msgstr "Zapisa po Stranici"
+
+#: classes/PDb_Settings.class.php:314
+msgid "the number of records to show on each page"
+msgstr "broj zapisa za prikazivanje na svakoj stranici"
+
+#: classes/PDb_Settings.class.php:322
+msgid "Single Record Link Field"
+msgstr "Polje Veze ka Jedinstvenom Zapisu"
+
+#: classes/PDb_Settings.class.php:327
+msgid ""
+"select the field on which to put a link to the [pdb_single] shortcode. Leave "
+"blank or set to \"none\" for no link."
+msgstr ""
+"izaberite polje na koje će pokazivati vezu ka [pdb_single] kodu. Ostavite "
+"prazno ili postavite \"none\" za opciju bez pokazivanja veze."
+
+#: classes/PDb_Settings.class.php:334
+msgid "Single Record Page"
+msgstr "Jednistvena Stranica Zapisa"
+
+#: classes/PDb_Settings.class.php:340
+msgid ""
+"this is the page where the [pdb_single] shortcode is located. If you want to "
+"assign a post or custom post type, select \"Post ID\" and enter the post ID "
+"in the \"other\" box."
+msgstr ""
+"ovo je stranica gde se nalazi [pdb_single] kod. Ukoliko želite da dodelite "
+"poruku ili prilagođeni tip poruke, izaberite \"Post ID\" i unesite ID poruke "
+"\"other\" polje."
+
+#: classes/PDb_Settings.class.php:347
+msgid "Strict User Searching"
+msgstr "Strogo Korisničko Pretraživanje"
+
+#: classes/PDb_Settings.class.php:352
+msgid ""
+"When checked, the frontend list search must match the whole field exactly. "
+"If unchecked, the search will match if the search term is found in part of "
+"the field. Searches are not case-sensitive either way."
+msgstr ""
+"Kada je obeleženo, korisnička (frontend) lista pretrage mora tačno "
+"odgovarati celom polju. Ukoliko nije obeleženo, pretraga će prikazati listu "
+"gde se nalazi traženi termin u bilo kom delu polja. Pretraga nije osetljiva "
+"na velika ili mala slova."
+
+#: classes/PDb_Settings.class.php:359
+msgid "Enable AJAX Search Functionality"
+msgstr "Omogući AJAX Funkciju Pretraživanja"
+
+#: classes/PDb_Settings.class.php:364
+msgid ""
+"This enables list search results that are updated without reloading the "
+"page. It requires Javascript, but search will still work if Javascript is "
+"disabled in the user's browser."
+msgstr ""
+"Ovo omogućava spisak rezultata pretraživanja koji se ažuriraju ali bez "
+"ponovnog učitavanja stranice. To zahteva Javascript ali će pretraga i dalje "
+"funkcionisati ako je Javascript onemogućen u pretraživaču korisnika."
+
+#: classes/PDb_Settings.class.php:378
+msgid "Signup Button Text"
+msgstr "Tekst Dugmeta Prijava"
+
+#: classes/PDb_Settings.class.php:382
+msgid "text shown on the button to sign up"
+msgstr "tekst prikazan na dugmetu za prijavu"
+
+#: classes/PDb_Settings.class.php:383
+msgctxt "the text on a button to submit a signup form"
+msgid "Sign Up"
+msgstr "Prijava"
+
+#: classes/PDb_Settings.class.php:389
+msgid "Signup Thanks Page"
+msgstr "Stranica Zahvalnosti Za Prijavu"
+
+#: classes/PDb_Settings.class.php:394
+msgid ""
+"after they singup, send them to this page for a thank you message. This page "
+"is where you put the [pdb_signup_thanks] shortcode, but you don&#39;t have "
+"to do that if you have them go back to the same page. You can also use a "
+"Post ID for posts and custom post types."
+msgstr ""
+"nakon što se prijave, preusmerite ih na stranicu sa porukom zahvalnosti. Ova "
+"stranica je mesto gde ste stavili [pdb_signup_thanks] kod ali ukoliko želite "
+"da ostanu na istoj stranici, zanemarite ovo. Takođe, možete koristiti ID "
+"poruke za poruke ili prilagođene tipove poruke."
+
+#: classes/PDb_Settings.class.php:402
+msgid "Send Signup Response Email"
+msgstr "Pošalji Email Odgovor Na Prijavu"
+
+#: classes/PDb_Settings.class.php:407
+msgid "Send a receipt email to people who sign up"
+msgstr "Pošalji email potvrdu osobama koje se prijave"
+
+#: classes/PDb_Settings.class.php:415
+msgid "Signup Email From Address"
+msgstr "Registracioni Email Sa Adrese"
+
+#: classes/PDb_Settings.class.php:419
+msgid ""
+"the \"From\" address on signup receipt emails. If the recipient hits \"reply"
+"\", their reply will go to this address. It is a good idea to use an email "
+"address from the same domain as this website."
+msgstr ""
+"Adresa \"From\" sadžana u email potvrdi registracije. Ukoliko primalac "
+"klikne na \"reply\", odgovor će biti poslat na ovu email adresu. Preporuka "
+"je koristiti an email adresu sa istog domena kao i web sajt."
+
+#: classes/PDb_Settings.class.php:426
+msgid "Signup Email From Name"
+msgstr "Registracioni Email Od Imena"
+
+#: classes/PDb_Settings.class.php:430
+msgid "the \"From\" name on signup receipt emails."
+msgstr " \"Od\" ime na registraciji primljenog emaila."
+
+#: classes/PDb_Settings.class.php:437
+msgid "Signup Response Email Subject"
+msgstr "Naslov Email Odgovor Na Registraciju"
+
+#: classes/PDb_Settings.class.php:441
+msgid ""
+"subject line for the signup response email; placeholder tags can be used "
+"(see below)"
+msgstr ""
+"Naslov za email odgovor na registraciju; placeholder tags mogu biti "
+"korišćeni (pogledaj dole)"
+
+#: classes/PDb_Settings.class.php:442
+msgid "You've just signed up on %s"
+msgstr "Upravo ste se prijavili na %s"
+
+#: classes/PDb_Settings.class.php:448
+msgid "Signup Response Email"
+msgstr "Email Odgovor Na Registraciju"
+
+#: classes/PDb_Settings.class.php:452
+msgid ""
+"Body of the email a visitor gets when they sign up. It includes a link "
+"([record_link]) back to their record so they can fill it out. Can include "
+"HTML, placeholders:[first_name],[last_name],[email],[record_link]. You can "
+"only use placeholders for fields that are present in the signup form, "
+"including hidden fields."
+msgstr ""
+"Sadržaj email-a koji posetilac dobija kada se prijavi. On sadrži vezu "
+"([record_link]) nazad na njegov zapis tako da može da ga popuni. Može "
+"sadržati HTML, placeholders:[first_name],[last_name],[email],[record_link]. "
+"Možete da koristite placeholders za polja koja postoje u registracionom "
+"obrascu (form), uključujući i sakrivena polja."
+
+#. translators: the %s will be the name of the website
+#: classes/PDb_Settings.class.php:454
+msgid ""
+"<p>Thank you, [first_name], for signing up with %s.</p><p>You may complete "
+"your registration with additional information or update your information by "
+"visiting this private link at any time: <a href=\"[record_link]\">"
+"[record_link]</a>.</p>"
+msgstr ""
+"<p>Hvala Vam, [first_name], na registraciji na %s.</p><p>Možete da završite "
+"registraciju sa dodatnim informacijama ili da ažurirate vaše podatke ako "
+"posetite Vaš PRIVATNU vezu u bilo kom trenutku: <a href=\"[record_link]\">"
+"[record_link]</a>. Pristup je moguć samo korišćenjem vaše PRIVATNE veze</p>"
+
+#: classes/PDb_Settings.class.php:460
+msgid "Signup Thanks Message"
+msgstr "Hvala Poruka Registracija"
+
+#: classes/PDb_Settings.class.php:464
+msgid ""
+"Note to display on the web page after someone has submitted a signup form. "
+"Can include HTML and placeholders (see above)"
+msgstr ""
+"Napomena za prikaz na web strani nakon što je neko predao zahtev za "
+"registraciju obrazac (form). Može da sadrži HTML i placeholders (pogledaj "
+"iznad)"
+
+#: classes/PDb_Settings.class.php:465
+msgid ""
+"<p>Thank you, [first_name] for signing up!</p><p>You will receive an email "
+"acknowledgement shortly. You may complete your registration with additional "
+"information or update your information by visiting the link provided in the "
+"email.</p>"
+msgstr ""
+"<p>Hvala Vam, [first_name] za prijavljivanje!</p><p>Ubrzo ćete primiti E-"
+"mail potvrdu. Možete da završite registraciju sa dodatnim informacijama ili "
+"da ažurirate vaše podatke klikom na vezu u poruci E-mail-a.</p>"
+
+#: classes/PDb_Settings.class.php:471
+msgid "Send Signup Notification Email"
+msgstr "Pošalji Email Obaveštenje O Registraciji"
+
+#: classes/PDb_Settings.class.php:476
+msgid "Send an email notification that a signup has occurred."
+msgstr "Pošalji email obaveštenje da se desila registracija."
+
+#: classes/PDb_Settings.class.php:485
+msgid "Signup Notification Recipients"
+msgstr "Primaoci Obaveštenja O Registraciji"
+
+#: classes/PDb_Settings.class.php:489
+msgid "comma-separated list of email addresses to send signup notifications to"
+msgstr ""
+"zarezom razdvojen spisak email adresa za slanje obaveštenja o registraciji"
+
+#: classes/PDb_Settings.class.php:496
+msgid "Signup Notification Email Subject"
+msgstr "Tema Email Obaveštenja O Registraciji"
+
+#: classes/PDb_Settings.class.php:500
+msgid ""
+"subject of the notification email; placeholder tags can be used (see above)"
+msgstr ""
+"tema email obaveštenja; placeholders tags mogu biti korišćeni (pogledaj gore)"
+
+#. translators: the %s will be the name of the website
+#: classes/PDb_Settings.class.php:502
+msgid "New signup on %s"
+msgstr "Nova registracija na %s"
+
+#: classes/PDb_Settings.class.php:508
+msgid "Signup Notification Email"
+msgstr "Email Obaveštenje O Registraciji"
+
+#: classes/PDb_Settings.class.php:512
+msgid ""
+"notification email body. The [admin_record_link] tag will supply the URL for "
+"editing the record in the admin."
+msgstr ""
+"sadržaj email obaveštenja. [admin_record_link] tag će dostaviti URL za "
+"izmene zapisa u admin."
+
+#: classes/PDb_Settings.class.php:513
+msgid ""
+"<p>A new signup has been submitted</p><ul><li>Name: [first_name] [last_name]"
+"</li><li>Email: [email]</li></ul><p>Edit this new record here: <a href="
+"\"[admin_record_link]\">[admin_record_link]</a></p>"
+msgstr ""
+"<p>Dostavljena je nova registracija</p><ul><li>Ime: [first_name] [last_name]"
+"</li><li>Email: [email]</li></ul><p>Ovde izmenite novi zapis: <a href="
+"\"[admin_record_link]\">[admin_record_link]</a></p>"
+
+#: classes/PDb_Settings.class.php:519
+msgid "Duplicate Record Check Field"
+msgstr "Provera Polja Duplikat Zapisa"
+
+#: classes/PDb_Settings.class.php:524
+msgid ""
+"when a signup is submitted or CSV record is imported, this field is checked "
+"for a duplicate"
+msgstr ""
+"kada je registracija podneta ili CSV zapis prenesen (imported), ovo polje se "
+"proverava za duplikat"
+
+#: classes/PDb_Settings.class.php:531
+msgid "Duplicate Record Preference"
+msgstr "Prednost Duplikat Zapisa"
+
+#: classes/PDb_Settings.class.php:536
+msgid ""
+"when the submission matches the Duplicate Record Check Field of an existing "
+"record. This also applies to importing records from a CSV file."
+msgstr ""
+"kada se dostavljanje podudara sa Provera Polja Duplikat Zapisa na postojećem "
+"zapisu. Ovo se takođe odnosi i na uvoz (import) zapisa iz CSV datoteke."
+
+#: classes/PDb_Settings.class.php:539
+msgid "Create a new record with the submission"
+msgstr "Napravi novi zapis sa dostavljanjem"
+
+#: classes/PDb_Settings.class.php:540
+msgid "Overwrite matching record with new data"
+msgstr "Zameni podudaran zapis sa novim podatkom"
+
+#: classes/PDb_Settings.class.php:541
+msgid "Show a validation error message"
+msgstr "Prikaži poruku o grešci potvrđivanja (validacije)"
+
+#: classes/PDb_Settings.class.php:548
+msgid "Duplicate Record Error Message"
+msgstr "Poruka O Grešci Duplikat Zapisa"
+
+#: classes/PDb_Settings.class.php:552
+msgid ""
+"If \"Show a validation error message\" is selected above, this message will "
+"be shown if a signup is made with a \"check field\" that matches an existing "
+"record."
+msgstr ""
+"Ako je gore izabrano \"Prikaži poruku o grešci validacije\", ova poruka će "
+"biti prikazana ako je registracija izvršena sa \"proveri polje\" koje "
+"odgovaa već postojećem zapisu."
+
+#: classes/PDb_Settings.class.php:553
+msgid "A record with that %s already exists. Please choose another."
+msgstr "Zapis sa tim %s već postoji. Molim izaberite drugi."
+
+#: classes/PDb_Settings.class.php:559
+msgid "Show Field Groups"
+msgstr "Prikaži Grupe Polja"
+
+#: classes/PDb_Settings.class.php:564
+msgid "Show groups and group descriptions in the signup form."
+msgstr "Prikaži grupe i opise grupa na obrascu (form) registracije."
+
+#: classes/PDb_Settings.class.php:578
+msgid "Participant Record Page"
+msgstr "Strana Zapisa Učesnika"
+
+#: classes/PDb_Settings.class.php:583
+msgid ""
+"The page where your participant record ([pdb_record] shortcode) is "
+"displayed. You can use a Post ID for posts and custom post types."
+msgstr ""
+"Strana gde je pirkazan zapis vašeg učesnika ([pdb_record]). Možete koristiti "
+"Poruka ID za poruke i prilagođene tipove poruka."
+
+#: classes/PDb_Settings.class.php:591
+msgid "Save Changes Label"
+msgstr "Sačuvaj Izmene Oznaka"
+
+#: classes/PDb_Settings.class.php:596
+msgid "label for the save changes button on the record form"
+msgstr "oznaka za dugme sačuvati izmene dugme na obrascu (form) zapisa"
+
+#: classes/PDb_Settings.class.php:597
+msgid "Save Your Changes"
+msgstr "Sačuvajte Promene"
+
+#: classes/PDb_Settings.class.php:603
+msgid "Save Button Text"
+msgstr "Sačuvati Dugme Tekst"
+
+#: classes/PDb_Settings.class.php:608
+msgid "text on the \"save\" button"
+msgstr "tekst na \"sačuvati\" dugmetu"
+
+#: classes/PDb_Settings.class.php:609
+msgctxt "a label for a button to save a form"
+msgid "Save"
+msgstr "Sačuvati"
+
+#: classes/PDb_Settings.class.php:615
+msgid "Show Group Descriptions"
+msgstr "Prikaži Opise Grupe"
+
+#: classes/PDb_Settings.class.php:620
+msgid "Show the group description under each group title in the record form."
+msgstr "Prikaži opis grupe ispod svakog naslova grupe u obrascu (form) zapisa."
+
+#: classes/PDb_Settings.class.php:628
+msgid "Record Updated Message"
+msgstr "Poruka Ažuriran Zapis"
+
+#: classes/PDb_Settings.class.php:632
+msgid "the message shown when a record form has been successfully submitted"
+msgstr "poruka se prikazuje kada je zapis na obrascu (form) uspešno dostavljen"
+
+#: classes/PDb_Settings.class.php:633
+msgid "Your information has been updated:"
+msgstr "Vaše informacije su ažurirane:"
+
+#: classes/PDb_Settings.class.php:639
+msgid "Send Record Form Update Notification Email"
+msgstr "Pošaljite Email Obaveštenje O Ažuriranju Zapisa Obrasca"
+
+#: classes/PDb_Settings.class.php:644
+msgid ""
+"Send an email notification that a record has been updated. These will be "
+"sent to the email addresses listed in the \"Signup Notification Recipients\" "
+"setting."
+msgstr ""
+"Pošalji email obaveštenje da je zapis ažuriran. Ovo će biti poslato na email "
+"adrese navedene u podešavanjima \"Primaoci Obaveštenja O Registraciji\"."
+
+#: classes/PDb_Settings.class.php:652
+msgid "Record Update Email Subject"
+msgstr "Naslov Email-a Ažuriranja Zapisa"
+
+#: classes/PDb_Settings.class.php:656
+msgid ""
+"subject line for the record update notification email; placeholders can be "
+"used."
+msgstr ""
+"naslov za email obaveštenje o ažuriranju zapisa; placeholders se mogu "
+"koristiti."
+
+#: classes/PDb_Settings.class.php:657
+msgid "A record has just been updated on %s"
+msgstr "Zapis je upravo ažuriran na %s"
+
+#: classes/PDb_Settings.class.php:663
+msgid "Record Update Notification Email"
+msgstr "Email Obaveštenje O Ažuriranju Zapisa"
+
+#: classes/PDb_Settings.class.php:667
+msgid ""
+"Body of the the email sent when a user updates their record. Any field from "
+"the form can be included by using a replacement code of the form: "
+"[field_name]. For instance: [last_name],[address],[email] etc. (The field "
+"name is under the \"name\" column on the \"Manage Database Fields\" page.)  "
+"Also available is [date] which will show the date and time of the update and "
+"[admin_record_link] tag for a link to edit the record in the admin."
+msgstr ""
+"Sadržaj E-mail poruke poslate kada korisnik ažurira svoje zapise. Bilo koje "
+"polje sa obrasca (form) može biti sadržano korišćenjem kod zamene na "
+"obrascu: [field_name]. Na primer: [last_name],[address],[email] itd. (Ime "
+"polja je pod \"ime\" kolonom na strani \"Upravljanje Poljima Baze Podataka"
+"\".)  takođe dostupan je i [date] koji će pokazati datum i vreme ažuriranja "
+"i [admin_record_link] tag za vezu uređivanja zapisa u admin."
+
+#: classes/PDb_Settings.class.php:668
+msgid ""
+"<p>The following record was updated on [date]:</p><ul><li>Name: [first_name] "
+"[last_name]</li><li>Address: [address]</li><li>[city], [state], [country]</"
+"li><li>Phone: [phone]</li><li>Email: [email]</li></ul><p>Edit this record <a "
+"href=\"[admin_record_link]\">here.</a></p>"
+msgstr ""
+"<p>Sledeći zapis je ažuriran na dan [date]:</p><ul><li>Ime: [first_name] "
+"[last_name]</li><li>Adresa: [address]</li><li>[city], [state], [country]</"
+"li><li>Telefon: [phone]</li><li>Email: [email]</li></ul><p>uredi ovaj zapis "
+"<a href=\"[admin_record_link]\">ovde.</a></p>"
+
+#: classes/PDb_Settings.class.php:674
+msgid "Record Not Found Error Message"
+msgstr "Zapis Nije Pronađen Poruka O Grešci"
+
+#: classes/PDb_Settings.class.php:678
+msgid ""
+"message to show if the record page was accessed without a valid identifier. "
+"Leave this empty if you want nothing at all to show."
+msgstr ""
+"poruka za prikaz ako je strani zapisa pristupljeno bez važećeg "
+"identifikatora. Ostavite ovo prazno ako želite da ne prikaže bilo šta."
+
+#: classes/PDb_Settings.class.php:679
+msgid "No record was found."
+msgstr "Nijedan zapis nije pronađen."
+
+#: classes/PDb_Settings.class.php:689
+msgid "Same Page"
+msgstr "Ista Strana"
+
+#: classes/PDb_Settings.class.php:719
+msgid "None"
+msgstr "Nijedan"
+
+#: classes/PDb_Settings.class.php:759 participants-database.php:334
+#: participants-database.php:335
+msgid "Settings"
+msgstr "Podešavanja"
+
+#: classes/PDb_Shortcode.class.php:126
+msgctxt "message to show if the plugin cannot find the template"
+msgid ""
+"<%1$s>The template %2$s was not found.</%1$s> Please make sure the name is "
+"correct and the template file is in the correct location."
+msgstr ""
+"<%1$s>Šablon %2$s nije pronađen.</%1$s> Proverite da li je tačno ime i da li "
+"je šablon datoteka na odgovarajućoj lokaciji."
+
+#: edit_participant.php:19
+msgid "Add New Participant Record"
+msgstr "Dodaj Novi Zapis Učesnika"
+
+#: edit_participant.php:24
+msgid "Edit Existing Participant Record"
+msgstr "Uredi Zapis Postojećeg Učesnika"
+
+#: edit_participant.php:83
+msgctxt "abbreviation for \"identification\""
+msgid "ID"
+msgstr "ID"
+
+#: edit_participant.php:83
+msgctxt "indicates a new record is being entered"
+msgid "(new record)"
+msgstr "(novi zapis)"
+
+#: edit_participant.php:207
+msgid "Save the Record"
+msgstr "Sačuvaj Zapis"
+
+#: edit_participant.php:214
+msgid ""
+"<strong>Submit:</strong> save record and return to list<br><strong>Apply:</"
+"strong> save record and continue with same record<br><strong>Next:</strong> "
+"save record and then start a new one"
+msgstr ""
+"<strong>Prosledi:</strong> sačuvaj zapis i vrati se na "
+"listu<br><strong>Primeni:</strong> sačuvaj zapis i nastavi sa istim "
+"zapisom<br><strong>Sledeće:</strong> sačuvaj zapis i pokreni novi zapis"
+
+#. translators: these strings are used in logic matching, please test after
+#. translating in case special characters cause problems
+#: manage_fields.php:9
+msgid "Update Fields"
+msgstr "Azuriraj Polja"
+
+#: manage_fields.php:10
+msgid "Update Groups"
+msgstr "Ažuriraj Grupe"
+
+#: manage_fields.php:11
+msgid "Add Field"
+msgstr "Dodaj Polje"
+
+#: manage_fields.php:12
+msgid "Add Group"
+msgstr "Dodaj Grupu"
+
+#: manage_fields.php:13
+msgid "new field title"
+msgstr "naslov novog polja"
+
+#: manage_fields.php:14
+msgid "new group title"
+msgstr "naslov nove grupe"
+
+#: manage_fields.php:120
+msgid "Cannot add a field with that name"
+msgstr "Ne mogu da dodam polje sa tim imenom"
+
+#: manage_fields.php:121
+msgid "This name is reserved; please choose another. Reserved names are"
+msgstr ""
+"ovo ime je rezervisano; molim Vas da izaberete drugo. Rezervisana imena su "
+
+#: manage_fields.php:207 participants-database.php:316
+#: participants-database.php:317
+msgid "Manage Database Fields"
+msgstr "Upravljanje Poljima Baze Podataka"
+
+#: manage_fields.php:216 manage_fields.php:223
+msgid "Field Groups"
+msgstr "Grupe Polja"
+
+#: manage_fields.php:224
+msgid "Help"
+msgstr "Pomoć"
+
+#: manage_fields.php:232
+msgid "Fields"
+msgstr "Polja"
+
+#: manage_fields.php:276
+msgid "No fields in this group"
+msgstr "Nema polja u ovoj grupi"
+
+#: manage_fields.php:370
+msgid "Edit / Add / Remove Field Groups"
+msgstr "Uredi / Dodaj / Ukloni Grupe Polja"
+
+#: manage_fields.php:385
+msgid "fields"
+msgstr "polja"
+
+#: manage_fields.php:579
+msgid "The %1$s was not added. Your new %1$s must have a unique name."
+msgstr "Nije dodat %1$s . Vaš novi %1$s mora imati jedinstveno ime."
+
+#: manage_fields_help.php:4
+msgid "Manage Fields Help"
+msgstr "Pomoć Upravljanje Poljima"
+
+#: manage_fields_help.php:5
+msgid "Defining Database Fields"
+msgstr "Određivanje Polja Baze Podataka"
+
+#: manage_fields_help.php:6
+msgid ""
+"The database stores information about people. On this page, you can "
+"determine what pieces of information are stored and how they are presented "
+"and interacted with. Take a look at the \"Add Participant\" page to see how "
+"the form is presented. You will be able to see your changes to how the "
+"fields are set up by checking this page."
+msgstr ""
+"Baza podataka skladišti podatke o ljudima. Na ovoj strani,možete odrediti "
+"koji delovi informacija se skladište, kako su predstavljeni i kako se mogu "
+"korisititi. Pogledajte stranu \"Dodaj Učesnika\" kako je obrazac (form) "
+"predstavljen. Moći ćete da vidite vaše promene i kako su polja postavljena "
+"na ovoj strani."
+
+#: manage_fields_help.php:7
+msgid ""
+"<strong>Important:</strong> Some of the changes you can make here will "
+"affect existing records in the database. It is best to set up your database "
+"before you begin adding records, but it is possible to add fields to the "
+"database at any time. Any records that were entered before the new field was "
+"added will have no value for the field. This can be filled in by then "
+"editing the record."
+msgstr ""
+"<strong>Važno:</strong> Neke od promena koje ovde možete uraditi, uticaće na "
+"postojeće zapise u bazi podataka. Najbolje je da podesite vašu bazu podataka "
+"pre nego što počnete sa dodavanjem zapisa ali je moguće i dodavanje polja "
+"bazi podataka u bilo kom trenutku. Bilo koji zapis, unet pre nego što je "
+"dodato novo polje, neće imati vrednost za to polje. Ono može biti popunjeno "
+"naknadnim uređivanjem zapisa."
+
+#: manage_fields_help.php:8
+msgid "Delete"
+msgstr "Izbrisati"
+
+#: manage_fields_help.php:9
+msgid ""
+"Click on the red \"X\" to delete a field. If there are existing records with "
+"this data field, that information will not be deleted from the database, but "
+"you will no longer be able to display or edit it."
+msgstr ""
+"Kliknite na crveno \"X\" da obrišete polje. Ukoliko već postoje zapisi u "
+"ovom polju, te informacije neće biti obrisane iz baze podataka ali više neće "
+"biti dostupne za prikaz ili izmene."
+
+#: manage_fields_help.php:10
+msgid "Order"
+msgstr "Redosled"
+
+#: manage_fields_help.php:11
+msgid ""
+"Click and drag to reorder the fields. You do not need to click on \"Update\" "
+"for the change to take effect."
+msgstr ""
+"Kliknite i prevucite da bi promenili redosled polja. Nema potrebe da "
+"kliknete na \"Ažuriranje\" da bi promena stupila na snagu."
+
+#: manage_fields_help.php:12
+msgid "Title"
+msgstr "Naslov"
+
+#: manage_fields_help.php:13
+msgid ""
+"This is the display title for your field. You can change it at any time, it "
+"won&#39;t affect the field in any way other than to change how it is labeled "
+"in forms.<p>"
+msgstr ""
+"Ovo je prikaz naslova vašeg polja. Možete da ga promenite u bilo kom "
+"trenutku i to neće imati uticaj na polje na bilo koji način osim da se "
+"promeni naziv u samom obrascu (form).<p>"
+
+#: manage_fields_help.php:14
+msgid "Default"
+msgstr "Podrazumevano"
+
+#: manage_fields_help.php:15
+msgid "If you wish to pre-load a field with a value, you can put it here."
+msgstr ""
+"Ukoliko želite da unapred učitate polje sa vrednošću, možete ga staviti ovde."
+
+#: manage_fields_help.php:16
+msgid "Group"
+msgstr "Grupa"
+
+#: manage_fields_help.php:17
+msgid ""
+"The database fields are organized into groups, and you can select which "
+"group the database field belongs to here. You can edit the groups under the "
+"\"Field Groups\" tab."
+msgstr ""
+"Polja iz baze podataka su organizovane u grupe tako da ovde možete izabrati "
+"kojoj grupi pripada polje baze podataka. Možete izmeniti grupe pod jezičkom "
+"\"Grupe Polja\""
+
+#: manage_fields_help.php:18
+msgid "Help Text"
+msgstr "Pomoćni Tekst"
+
+#: manage_fields_help.php:19
+msgid ""
+"When a form is displayed, sometimes it is a good idea to explain something "
+"about the information you want in a field. Any text you put in here will be "
+"displayed next to the field. HTML is allowed, but be careful with that, you "
+"can break things!"
+msgstr ""
+"Kada je obrazac (form) prikazana, ponekada je dobra ideja objasniti kakvu "
+"vrstu informacija očekujete u polju. Bilo kakav tekst, unet ovde, biće "
+"prikazan pored polja. HTML nije dozvoljen, budite pažljivi sa tim, možete "
+"onesposobiti dalji rad!"
+
+#: manage_fields_help.php:20
+msgid "Form Element"
+msgstr "Element Obrasca (Form)"
+
+#: manage_fields_help.php:21
+msgid ""
+"If your piece of information is a simple line of text (like a name), it "
+"should be presented in the form as a text field. If a longer piece of text "
+"is called for, a text-field would be a better choice, and so forth. This is "
+"where you can determine what kind of form element this particular piece of "
+"information will be preseted with."
+msgstr ""
+"Ako je vaš deo informacije jednostavna linija teksta (kao npr. ime), ona bi "
+"trebalo da bude predstavljena na obrascu (form) kao tekst polje. Ako je u "
+"pitanju duži deo teksta, tekst-polje bi bio bolji izbor i tako dalje. Ovo je "
+"mesto gde možete odrediti vrstu elementa na obrascu tj. kako će podatak biti "
+"predstavljen."
+
+#: manage_fields_help.php:22
+msgid ""
+"Under the multiple-choice dropdown are the form elements you can choose "
+"from. It is really best to avoid changing this once you have begun adding "
+"records to the database using this field&hellip;unpredictable things can "
+"happen, and although you won&#39;t lose any data, it can make a mess! That "
+"said, it <em>is</em> possible to change between similar elements, like text/"
+"text-field or select/dropdown or select-other/dropdown-other. Be warned, "
+"it&#39;s safest to set this up before you start getting data for the field."
+msgstr ""
+"U okviru padajuće liste višestrukog izbora su elementi obrasca (form) koje "
+"možete da birate. Zaista je najbolje izbeći menjanje ovoga kada ste već "
+"počeli sa unosom zapisa u bazu podataka korišćenjem ovog polja. Mogu se "
+"dogoditi nepredvidljive stvari i iako nećete izgubiti bilo kakve podatke, "
+"napraviće Vam nered! <em>Moguće je </em> izvršiti promene između sličnih "
+"elemenata, kao što je tekst/tekst-polje ili izaberi/padajući ili izaberi-"
+"drugo/padajući-drugo. Budite oprezni, najbezbednije je da sve ovo podesite "
+"pre nego što počnete da dobijate podatke za ova polja."
+
+#: manage_fields_help.php:23
+msgid "Values"
+msgstr "Vrednosti"
+
+#: manage_fields_help.php:24
+msgid ""
+"For form elements that have multiple choices, you need to define those "
+"choices here. Type in a comma-separated list of the options you want to "
+"present."
+msgstr ""
+"Za elemente obrasca (form) koji imaju mogućnost višestrukog izbora, potrebno "
+"je te izbore definisati ovde. Ukucajte, odvojeno zarezima, listu izbora koju "
+"želite da predstavite."
+
+#: manage_fields_help.php:25
+msgid ""
+"Don&#39;t try to have a comma in one of your options, though! It&#39;s "
+"posiible to break things by trying to include other (mostly non-text and "
+"punctuation) characters, so test things, and if you get erratic behavior in "
+"the form, you may have characters here that are messing things up. Most "
+"international language characters should be fine, just type them in. Don&#39;"
+"t try to use HTML entities or codes, it just won&#39;t work."
+msgstr ""
+"Ne pokušavajte da imate zarez u nekoj od vaših opcija! Moguće je razdvojiti "
+"delove unosom drugih (najčešće ne-tekstualnih i interpunkcijskih) karaktera, "
+"pa zato testirajte i ukoliko se desi da dobijete čudno dešavanje u formi, "
+"možda imate karaktere koji su poremetili celu priču. Većina znakova u "
+"stranim jezicima bi morala da bude u redu, samo ih unesite. Ne pokušavajte "
+"da koristite HTML entitete ili pravila, jednostavno neće raditi."
+
+#: manage_fields_help.php:26
+msgid "Validation"
+msgstr "Potvrđivanje"
+
+#: manage_fields_help.php:27
+msgid ""
+"If you wish certain fields to be required or have a specific kind of "
+"content, you can set that here. \"Not Required\" means you don&#39;t care if "
+"the field is filled in or not. \"Required\" simply means the field must have "
+"something in it. \"match/regex\" gives you some advanced options for "
+"validating a field. To match the field to the value of another field, put "
+"the name of that field in the box. You can also use a regex to validate the "
+"field, but it is for advanced users, so if you don&#39;t know what a regex "
+"is, get some help before trying to use this feature."
+msgstr ""
+"Ako želite da određena polja budu obavezna ili da imaju određenu vrstu "
+"sadržaja, možete to podesiti ovde. \"Nije Obavezno\" znači da Vam nije bitno "
+"da li polje ima sadrži vrednost ili ne. \"Obavezno\" jednostavno znači da "
+"polje mora biti popunjeno nekim sadržajem (vrednošću). \"match/regex\" daje "
+"Vam neke napredne mogućnosti za potvrđivanje polja. Da bi polje odgovaralo "
+"vrednosti ili sadržaju nekog drugog polja, stavite ime tog polja u polje "
+"(box). Takođe možete koristiti regex za potvrđivanje polja ali to je "
+"namenjeno iskusnijim korisnicima pa ako ne znate šta je regex, potražite "
+"pomoć pre nego što pokušate da koristite ovu funkciju."
+
+#: manage_fields_help.php:28
+msgid "Admin Column"
+msgstr "Admin Kolona"
+
+#: manage_fields_help.php:29
+msgid ""
+"This only affects the \"List Participants\" page of the plugin. On that "
+"page, the database records are listed. Since it would be impractical to "
+"include every field as a column in this list, you can select which fields "
+"are shown here. \"0\" means don&#39;t display it, a number sets the order in "
+"which the column will appear. You have to make sure the numbers make sense, "
+"if you have multiple items with the same number (other than 0), only the "
+"last one with the number will appear."
+msgstr ""
+"To samo utiče na stranu dodatka \"Lista Učesnika\". Na toj strani se "
+"prikazuju zapisi iz baze podataka. Budući da bi bilo nepraktično obuhvatiti "
+"svako polje kao kolonu u ovoj listi, možete izabrati koja polja će biti "
+"prikazana. \"0\" znači nije prikazano, broj određuje redosled pojavljivanja "
+"kolona. Morate proveriti da li su brojevi logični, inače će se desiti da ako "
+"imate više stavki sa istim brojem (izuzev 0), samo poslednja stavka sa istim "
+"brojem bude prikazana."
+
+#: manage_fields_help.php:30
+msgid "Display Column"
+msgstr "Prikaži Kolonu"
+
+#: manage_fields_help.php:31
+msgid ""
+"When using the [pdb_list] shortcode to display the list of records, this "
+"column determines whether the column will be shown and in what order."
+msgstr ""
+"Kada koristite [pdb_list] za prikaz liste zapisa, ova kolona određuje da li "
+"će kolona biti prikazana i kojim redosledom."
+
+#: manage_fields_help.php:32
+msgid "Switches"
+msgstr "Prekidači"
+
+#: manage_fields_help.php:33
+msgid ""
+"<strong>Sortable</strong> means the list presented on the \"List Participants"
+"\" page can be sorted by this field. Of course, it must have a non-zero "
+"value in \"Column\" to be seen at all."
+msgstr ""
+"<strong>Redosled</strong> znači da lista predstavljena na \"Lista Učesnika\" "
+"strani može biti sortirana po ovom polju. Naravno, mora imati ne-nula "
+"vrednost u \"Kolona\" da bi se uopšte i videlo."
+
+#: manage_fields_help.php:34
+msgid ""
+"<strong>CSV</strong> means the field is one that can be imported or exported "
+"with a CSV file. If you are using CSV files to bring in records, you should "
+"set these switches based on which fields you are planning to import. When "
+"exporting a CSV, this switch determines whether the field will be exported."
+"<p>"
+msgstr ""
+"<strong>CSV</strong> znači da je polje moguće uvesti (imported) ili izvesti "
+"(exported) sa CSV datotekom. Ukoliko koristite CSV datoteke za preuzimanje "
+"zapisa, trebalo bi da podesite obeležite ove prekidače na osnovu polja koja "
+"planirate da uvezete (import). Kada izvozite (exporting) CSV, ovaj prekidač "
+"određuje da li će polje biti izvezeno.<p>"
+
+#: manage_fields_help.php:35
+msgid ""
+"<strong>Persistent</strong> is a convenience feature helpful when you are "
+"manually entering a series of records in the admin. If set, it means the "
+"field will carry over to the next blank entry. For instance, if a group of "
+"records from the same city are being entered, set the \"city\" field to be "
+"persistent, then once a city value has been entered in the first record of "
+"the series, the next blank record will have this city pre-filled."
+msgstr ""
+"<strong>Postojanost</strong> je korisna praktična opcija kada ručno unosite "
+"seriju zapisa u admin.Ako se podesi,prenosiće vrednost vrednost polja na "
+"sledeće prazno polje. Na primer, ukoliko se unosi grupa zapisa koji su iz "
+"isotg grada, podesite polje \"city\" da bude postojano, onda će prva uneta "
+"vrednost u to polje biti prenesena na svaki sledeći red zapisa (slog), tj. "
+"biće Vam već popunjeno polje grad sa vrednošću."
+
+#: manage_fields_help.php:36
+msgid ""
+"<strong>Signup</strong> selects this field for use in the brief signup form "
+"that is presented with the [pdb_signup] shortcode."
+msgstr ""
+"<strong>Registracija</strong> odabire ovo polje za upotrebu u skraćenoj "
+"formi registracije koje je predstavljeno sa [pdb_signup]."
+
+#: manage_fields_help.php:37
+msgid ""
+"<strong>Readonly</strong> means that plugin users can see the value of the "
+"field, but cannot edit it. The field will be editable in the admin."
+msgstr ""
+"<strong>Samo za čitanje</strong> zanči da korisnici dodatka mogu samo videti "
+"vrednost polja ali ga ne mogu menjat. Polje će moći da se menja samo u admin "
+"delu."
+
+#. #-#-#-#-#  plugin.pot (Participants Database 1.4.9.2)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: participants-database.php:243
+msgid "Participants Database"
+msgstr "Baza Podataka Učesnika"
+
+#: participants-database.php:298 participants-database.php:299
+msgid "List Participants"
+msgstr "Lista Učesnika"
+
+#: participants-database.php:307 participants-database.php:308
+msgid "Add Participant"
+msgstr "Dodaj Učesnika"
+
+#: participants-database.php:325 participants-database.php:326
+#: upload_csv.php:9
+msgid "Import CSV File"
+msgstr "Prenesi (Import) CSV Datoteku"
+
+#: participants-database.php:343 participants-database.php:344
+msgid "Setup Guide"
+msgstr "Vodič Za Podešavanje"
+
+#: participants-database.php:352 participants-database.php:353
+msgid "Edit Record"
+msgstr "Izmeni Zapis"
+
+#. translators: don't translate the words in brackets {}
+#: participants-database.php:529
+msgctxt "message to show if the plugin cannot find the template"
+msgid "Missing Template"
+msgstr "Nedostaje Šablon"
+
+#: participants-database.php:543
+msgid "No record found for %s."
+msgstr "Nema zapisa za %s."
+
+#: participants-database.php:2073
+msgid "Not Required"
+msgstr "Nije Obavezno"
+
+#: participants-database.php:2074
+msgid "Required"
+msgstr "Obavezno"
+
+#: participants-database.php:2075
+msgid "Email"
+msgstr "Email"
+
+#: participants-database.php:2306
+msgid ""
+"There is something wrong with the file you tried to upload. Try another."
+msgstr ""
+"Nešto nije u redu sa datotekom koju ste pokušali da pošaljete (Upload). "
+"Probajte sa drugom datotekom."
+
+#: participants-database.php:2316
+msgid "You may only upload image files like JPEGs, GIFs or PNGs."
+msgstr ""
+"Možete poslati (Upload) samo slike sa ekstenzijom .JPEG, .GIF ili .PNG."
+
+#: participants-database.php:2334
+msgid ""
+"The image you tried to upload is too large. The file must be smaller than "
+"%sK."
+msgstr ""
+"Slika koju ste pokušali da pošaljete (Upload) je prevelika. Datoteka mora "
+"biti manja od %sK."
+
+#: participants-database.php:2341
+msgid "The file could not be saved."
+msgstr "Datoteka nije mogla biti sačuvana."
+
+#: participants-database.php:2367
+msgid "The uploads directory (%s) could not be created."
+msgstr "Pošalji (Uploads) direktorijum (%s) ne može biti napravljen."
+
+#: participants-database.php:2562
+msgid ""
+"The date for \"%s\" was invalid. Please input the date with the exact format "
+"shown"
+msgstr ""
+"Datum za \"%s\" je nevažeći. Molimo da unesete datum u tačno prikazanom "
+"obliku"
+
+#: participants-database.php:2698
+msgid "Submit"
+msgstr "Dostavi"
+
+#: participants-database.php:2699
+msgid "Apply"
+msgstr "Primeniti"
+
+#: participants-database.php:2713
+msgid "WordPress Plugin"
+msgstr "WordPress Dodatak"
+
+#: participants-database.php:2714
+msgid ""
+"Helping organizations manage their volunteers, members and participants."
+msgstr ""
+"Pomaže organizacijama da upravljaju svojim volonterima, članovima i "
+"učesnicima."
+
+#: participants-database.php:2717
+msgid "Developed by"
+msgstr "Razvijen od strane"
+
+#: participants-database.php:2718
+msgid ""
+"Suggestions or crticisms of this plugin? I&#39;d love to hear them: email "
+msgstr ""
+"Imate predloge ili kritike na ovaj dodatak? Biće mi drago da ih čujem: email"
+
+#: participants-database.php:2721
+msgid ""
+"Please consider contributing to the continued support and development of "
+"this software by visiting %1$sthis plugin&#39;s page,%3$s giving the plugin "
+"a %2$srating%3$s or review, or dropping something in the %1$stip jar.%3$s "
+"Thanks!"
+msgstr ""
+"Molim Vas da razmislite o doprinosu stalnoj podršci i razvoju ove aplikacije "
+"tako što ćete posetiti stranu %1$s ovog dodatka, %3$s dajući dodatku "
+"%2$socenu%3$s ili recenziju ili dodavanjem ponečeg  na %1$vrh tegle.%3$s "
+"Hvala!"
+
+#: upload_csv.php:29
+msgid "1. Prepare a spreadsheet file with the correct format:"
+msgstr "1. Pripremite datoteku tabele u ispravnom formatu:"
+
+#: upload_csv.php:31
+msgid ""
+"To properly import your membership data, the columns in your spreadsheet "
+"must match exactly the columns in the database. Currently, the CSV import "
+"columns are as follows:"
+msgstr ""
+"Da bi ste pravilno preneli (Import) podatke o članstvu, kolone u vašoj "
+"tabeli moraju biti identične kolonama u bazi podataka. Trenutno, CSV kolone "
+"za prenos (Import) su:"
+
+#: upload_csv.php:46
+msgid ""
+"This means your spreadsheet needs to have %s columns, and the heading in "
+"each of those columns needs to match exactly the names above. If there is no "
+"data for a particular column, you can include it and leave it blank, or "
+"leave it out entirely. The order of the columns doesn&#39;t matter."
+msgstr ""
+"To znači da Vaša tabela mora imati %s kolona i da naslov svake od tih kolona "
+"odgovara imenu iznad. ako nema podataka za određenu kolonu, možete je "
+"uvrstiti i ostaviti praznu ili ostaviti u potpunosti. Redosled kolona nije "
+"bitan."
+
+#: upload_csv.php:47
+msgid ""
+"If the imported CSV file has a different column set, that column set will be "
+"imported and used. If a column name does not match a defined column in the "
+"database, the data from that column will be discarded"
+msgstr ""
+"Ukoliko prenesena (Import) CSV datoteka ima drugačiji skup kolona, taj skup "
+"kolona će biti prenesen (Import) i korišćen. Ukoliko ime kolone nije "
+"odgovarajuće definisanoj koloni u bazi podataka, podaci iz te kolone će biti "
+"obačeni "
+
+#: upload_csv.php:48
+msgid "Get Blank CSV File"
+msgstr "Preuzmite praznu CSV datoteku"
+
+#: upload_csv.php:48
+msgid ""
+"You can download this file, then open it in Open Office, Excel or Google "
+"Docs."
+msgstr ""
+"Možete preuzeti ovu datoteku a potom joj i pristupiti koristeći Open Office, "
+"Excel ili Google Docs."
+
+#: upload_csv.php:54
+msgid "2. Upload the .csv file"
+msgstr "2. Pošalji (Upload) .csv datoteku"
+
+#: upload_csv.php:56
+msgid ""
+"When you have your spreadsheet properly set up and filled with data, export "
+"it as any of the following: \"comma-delimited csv\", or just \"csv\". Save "
+"it to your computer then upload it here."
+msgstr ""
+"Kada imate tabelu ispravno podešenu i popunjenu podacima, možete je izvesti "
+"(preneti) u jednom od navedenih formata:  \"razdvojene zarezom CSV\", ili "
+"samo \"csv\". "
+
+#: upload_csv.php:57
+msgid ""
+"Exported CSV files should be comma-delimited and enclosed with double-quotes "
+"(\"). Encoding should be \"UTF-8.\""
+msgstr ""
+"Preuzete CSV datoteke trebaju biti razdvojene zarezom i pod navodnicima "
+"(\"). Kodirano u \"UTF-8.\""
+
+#: upload_csv.php:58
+msgid ""
+"<strong>Note:</strong> Depending on the \"Duplicate Record Preference\" "
+"setting, imported records are checked against existing records by the field "
+"set in the \"Duplicate Record Check Field\" setting. If a record matching an "
+"existing record is imported, one of three things can happen, based on the "
+"\"Duplicate Record Preference\" setting:"
+msgstr ""
+"<strong>Napomena:</strong> U zavisnosti od podešavanja \"Dupli Zapis "
+"Prioritet\", preneseni zapisi će biti provereni sa postojećim zapisima polja "
+"u  \"Dupli Zapis Provera Polja\" podešavanju. Ako zapis odgovara već "
+"postojćem biće uvežen, jedna od tri stvari može da se desi, na osnovue "
+"\"Dupli Zapisi Prioritet\" podešavanje:"
+
+#: upload_csv.php:59
+msgid "Current Setting"
+msgstr "Aktivna Podešavanja"
+
+#: upload_csv.php:62
+msgid ""
+"%sOverwrite%s an existing record with a matching %s will be updated with the "
+"data from the imported record. Blank or missing fields will not overwrite "
+"existing data."
+msgstr ""
+"%sUpisaćemo%s na postojeći zapis %s tako da će zapis biti ažuriran sa "
+"podatkom iz prenetog (imported) zapisa. Prazna ili nedostajuća polja neće "
+"biti upisana na postojeće podatke."
+
+#: upload_csv.php:65
+msgid ""
+"%sCreate New%s adds all imported records as new records without checking for "
+"a match."
+msgstr ""
+"%sNapravi novi%s dodaje sve prenete (imported) zapise kao nove zapise bez "
+"provere da li već postoje."
+
+#: upload_csv.php:68
+msgid ""
+"%sDon&#39;t Import%s does not import the new record if it matches the %s of "
+"an existing one."
+msgstr ""
+"%sNemoj Prenositi%s  (Import) neće preneti novi zapis ukoliko takav odgovara "
+"%s već postojećem zapisu."
+
+#: upload_csv.php:77
+msgid "Choose .csv file to import:"
+msgstr "Izaberi .csv datoteku za prenos (Import):"
+
+#: upload_csv.php:78
+msgid "Upload File"
+msgstr "Pošalji (Upload) datoteku"
+
+#. Plugin URI of the plugin/theme
+msgid "http://xnau.com/wordpress-plugins/participants-database"
+msgstr "http://xnau.com/wordpress-plugins/participants-database"
+
+#. Description of the plugin/theme
+msgid "Plugin for managing a database of participants, members or volunteers"
+msgstr ""
+"Dodatak za upravljanje bazom podataka učesnika, članova ili dobrovoljaca"
+
+#. Author of the plugin/theme
+msgid "Roland Barker"
+msgstr "Roland Barker"
+
+#. Author URI of the plugin/theme
+msgid "http://xnau.com"
+msgstr "http://xnau.com"
