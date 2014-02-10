@@ -244,6 +244,7 @@ bug fixes:
 
 * undeclared property $readonly_fields error
 * record updates not getting timestamp set
+* problem with list search results not coming in in some cases
 * readonly fields in form context now have "readonly" attribute instead of "disabled"
 * record form now shows captcha if named in the shortcode "fields" attribute
 * checkbox series now completely wrapped in checkbox group wrapper
@@ -508,7 +509,7 @@ Taking defensive precautions against other plugins in the admin:
 
 = 1.5.4.2 =
 bugfix release
-bugs fixed: $readonly_fields error fixed, record updates now getting timestamp updated
+bugs fixed: $readonly_fields error fixed, record updates now getting timestamp updated, list search results
 
 == Using the Plugin ==
 
