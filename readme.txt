@@ -247,7 +247,8 @@ bug fixes:
 * readonly fields in form context now have "readonly" attribute instead of "disabled"
 * record form now shows captcha if named in the shortcode "fields" attribute
 * checkbox series now completely wrapped in checkbox group wrapper
-* added Serbian translation
+
+Added Serbian translation
 
 = 1.5.4.1 =
 
