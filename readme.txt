@@ -448,67 +448,6 @@ Taking defensive precautions against other plugins in the admin:
 * CSV export now requires admin privileges
 * improved handling of rich text content displays
 
-= 1.3.7 =
-* fixed potential problem with timestamp fields having their datatype changed
-* dates and arrays are now made readable for inclusion in emails
-* improved security on list searches: prevent unwanted records from appearing
-* records added in the backend are now properly timestamped
-
-= 1.3.6 =
-* better handling of search and sort functions, pagination in frontend record list
-* new "strict search" setting forces exact match in user (frontend) searches on `[pdb_list]`
-* fixed issue with select/other and multiselect/other fields not following user selects in some cases
-* fixed bug that duplicated records edited in the admin if unique emails checked, email not validated and blank
-
-= 1.3.5 =
-* fixed submit bug with webkit browsers
-* corrected de-capitalization of fields when auto-linking enabled
-* eliminated empty IMG tags for empty image fields
-* included "date_updated" and "date_recorded" fields in frontend list sorts
-* removed non-displayed fields from fronent list sorting dropdown
-* added "display_count" option to `[pdb_list]` display
-
-= 1.3.4 =
-* added sort and search field options to `[pdb_list]` shortcode
-* added new "hidden" field for adding extra data to signups
-* list shortcode filtering, sorting and display may now use internal fields
-* multi-select array fields may now be exported/imported
-* fixed bug in manage fields where backslashes were removed from regexes
-* uploading CSV files now properly handles missing upload directory
-* front-end edits no longer overwrite admin fields
-* improved handling of linked URL's and email addresses
-* prevent multiple submissions and multiple email notifications
-* "textarea" form element now uses "text" MySQL datatype
-
-= 1.3.3 =
-* HTML emails can be switched off in settings; possible confict with other plugins
-* fixed broken link to image on some systems
-* fixed plugin CSS affecting rich text fields on other admin pages
-* removed PHP short open code in list class file
-* group name (not title) is no longer changeable: it caused orphaned fields to disappear
-
-= 1.3.2 =
-* moved templates and image uploads defaults out of the plugin directory
-* updated instructions for using singe-record templates
-* image files are now stored as filenames only to allow portability; backward compatibility provided for
-
-
-= 1.3.1 =
-* fixed error in make_link method causing broken links in installations not using rewrites
-* added Italian translation by Mario of trevisoeasy.it
-* removed 'internal' from list of possible field group assignments
-* added 'like' operator to list filter
-* made it possible to place a single record link on an image field
-
-= 1.3 =
-* added individual record shortcode using template
-* several bugfixes: link element, textareas with links
-* better HTML on list display table
-* setting to add marker to title of required fields
-* added option to use WYSIWYG editor on text areas (for logged-in WP users only)
-* list shortcode can now specify which columns (fields) to show
-* dates before 1970 now work
-
 == Upgrade Notice ==
 
 = 1.5.4.3 =
