@@ -355,7 +355,8 @@ class PDb_List extends PDb_Shortcode {
     /*
      * translate the "submit_button" value into the "submit" value of the filter
      */
-    if (isset($_REQUEST['submit_button'])) $_GET['submit'] = $_REQUEST['submit_button'];
+    if (isset($_GET['submit_button'])) $_GET['submit'] = $_GET['submit_button'];
+    if (isset($_POST['submit_button'])) $_POST['submit'] = $_POST['submit_button'];
 
     /* filtering parameters can come from three sources: the shortcode, $_POST (AJAX) 
      * and $_GET (pagination and non-AJAX search form submissions) We merge the $_POST 
