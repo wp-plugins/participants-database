@@ -238,6 +238,10 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.4.3 =
+
+* undeclared property $readonly_fields error (this time for sure!)
+
 = 1.5.4.2 =
 
 bug fixes:
@@ -507,9 +511,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.2 =
-bugfix release
-bugs fixed: $readonly_fields error fixed, record updates now getting timestamp updated, list search results
+= 1.5.4.3 =
+
+bugfix release for single issue: $readonly_fields error
 
 == Using the Plugin ==
 

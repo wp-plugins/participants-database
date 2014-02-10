@@ -573,22 +573,11 @@ class PDb_List_Admin {
           <?php
           // template for printing the registration page link in the admin
           $PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
-
-          // template for printing a header item
-//          $head_pattern = '
-//<th class="%2$s" scope="col">
-//  <a href="' . admin_url('admin.php?page=participants-database-list_participants') . '&submit=Sort&orderBy=%2$s&ascdesc=' . (self::$filter['ascdesc'] == 'asc' ? 'desc' : 'asc') . '">
-//    <span>%1$s</span>
-//    <span class="sorting-indicator"></span>
-//  </a>
-//</th>
-//';
           $head_pattern = '
 <th class="%2$s" scope="col">
   <span>%1$s</span>
 </th>
 ';
-
           //template for outputting a column
           $col_pattern = '<td>%s</td>';
 
@@ -621,17 +610,13 @@ class PDb_List_Admin {
                 <tr>
         <?php // print delete check  ?>
                   <td>
-                         <?php // _e('Edit', 'participants-database') ?>
                     <?php if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) : ?>
                       <input type="checkbox" name="pid[]" value="<?php echo $value['id'] ?>" onClick="addSelects(this.checked)">
                     <?php endif ?>
-                          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>"><span class="glyphicon glyphicon-edit"></span></a>
+                          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>" title="<?php _e('Edit', 'participants-database') ?>"><span class="glyphicon glyphicon-edit"></span></a>
                   </td>
               <?php
               foreach (self::$display_columns as $column) {
-
-                // get the form element value for the field
-//                $column = Participants_Db::get_field_atts($column, '`name`,`form_element`,`default`, `group`');
 
                 // this is where we place form-element-specific text transformations for display
                 switch ($column->form_element) {

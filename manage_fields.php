@@ -354,7 +354,7 @@ foreach ($groups as $group) {
                       ));
                       if ('internal' !== $group) :
                         ?>
-                        <a href="#" name="delete_<?php echo $database_row['id'] ?>" class="delete" ref="<?php _e('field', 'participants-database') ?>"><span class="glyphicon glyphicon-remove"></span></a>
+                        <a href="#" title="<?php echo $database_row['id'] ?>" name="delete_<?php echo $database_row['id'] ?>" class="delete" ref="<?php _e('field', 'participants-database') ?>"><span class="glyphicon glyphicon-remove"></span></a>
                       </td>
                       <?php
                     endif; // internal group test
