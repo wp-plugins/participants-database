@@ -241,11 +241,13 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 = 1.5.4.2 =
 
 bug fixes:
+
 * undeclared property $readonly_fields error
 * record updates not getting timestamp set
 * readonly fields in form context now have "readonly" attribute instead of "disabled"
 * record form now shows captcha if named in the shortcode "fields" attribute
 * checkbox series now completely wrapped in checkbox group wrapper
+* added Serbian translation
 
 = 1.5.4.1 =
 
