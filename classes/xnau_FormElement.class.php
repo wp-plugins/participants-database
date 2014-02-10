@@ -811,10 +811,6 @@ abstract class xnau_FormElement {
       unset( $this->attributes['other'] );
     }
     
-    // make a unique prefix for the function
-    $js_prefix = $this->_prep_js_string($this->name)/*.'_'*/;
-    
-    $this->attributes['onChange'] = $js_prefix.'SelectOther(this)';
     
     // put it in a conatiner
     $this->_addline('<div class="selectother ' . $type . '-other-control-group"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . ' name="' . $this->name . '">');
@@ -825,6 +821,10 @@ abstract class xnau_FormElement {
     // add the "other" option
     $options = $this->options;
     $options[] = '';
+		
+    // make a unique prefix for the function
+    $js_prefix = $this->_prep_js_string($this->name)/*.'_'*/;
+    $this->attributes['onChange'] = $js_prefix.'SelectOther(this)';
 		
 		//error_log( 'options:'.print_r( $options, true ).' values:'.print_r( $this->value, true ));
     $this->_addline( '<label for="'.$this->name.'">' );
@@ -1057,7 +1057,7 @@ abstract class xnau_FormElement {
     
     $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : ($type == 'checkbox' ? '' : false);
     if ($null_select !== false) {
-      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), ''), 1);
+      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), false), 1);
     }
     unset($this->options['null_select']);
     
