@@ -220,7 +220,7 @@ class PDb_Field_Item extends PDb_Template_Item {
 
       if (PDb_Shortcode::$readonly_inputs && !in_array($this->form_element, array('rich-text'))) {
         
-        $this->attributes['disabled'] = 'disabled';
+        $this->attributes['readonly'] = 'readonly';
         $this->_print();
       } else {
 

@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5.4.1
+  Version: 1.5.4.2
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -1356,6 +1356,10 @@ class Participants_Db extends PDb_Base {
         case 'date_updated':
         case 'last_accessed':
           
+          // clear the value if it's a record update
+          if ($action == 'update' && $column->name == 'date_updated') {
+            $post['date_updated'] = '';
+          }
           /*
            * this func returns bool false if the timestamp is not present or is invalid, 
            * returns the MySQL timestamp string otherwise

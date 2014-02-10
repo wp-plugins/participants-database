@@ -95,6 +95,8 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * Norwegian: Anders Kleppe
 
+* Serbian: Cherry, NBG, [www.trade.in.rs](http://trade.in.rs/)
+
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
 == Installation ==

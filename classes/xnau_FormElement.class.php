@@ -1074,10 +1074,9 @@ abstract class xnau_FormElement {
       $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
       $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
       $this->_addline($option_key . '</label>');
-    }
-    
+    	}
+  	}
     $this->_addline('</span>');
-  }
   }
   
   /**
