@@ -633,7 +633,9 @@ abstract class PDb_Shortcode {
 
       default:
 
-        $sql .= ' AND v.form_element <> "captcha" AND v.form_element <> "placeholder"';
+        $sql .= ' AND v.form_element <> "placeholder"';
+        // captcha is not shown unless specifically named in the shortcode
+        if (!is_array($this->display_columns)) $sql .= ' AND v.form_element <> "captcha"';
     }
 
     if (is_array($this->display_columns)) {
@@ -917,11 +919,11 @@ abstract class PDb_Shortcode {
         $where .= 'WHERE field.signup = 1 ' . $groups . ' AND field.form_element <> "placeholder"';
         break;
       
-        case 'record':
       case 'retrieve':
         $where .= 'WHERE ' . $groups . ' AND field.form_element <> "placeholder"';
         break;
         
+      case 'record':
       default:
         $where .= 'WHERE ' . $groups . ' AND field.form_element <> "captcha" AND field.form_element <> "placeholder"';
     }

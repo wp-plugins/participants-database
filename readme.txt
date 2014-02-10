@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
 Tested up to: 3.8.1
-Stable tag: 1.5.4.1
+Stable tag: 1.5.4.2
 License: GPLv2
 
 Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
@@ -94,6 +94,8 @@ This plugin is fully compliant with WordPress Internationalization standards and
 * Slovak: Branco Radenovich [WebHostingGeeks.com](http://webhostinggeeks.com/blog/)
 
 * Norwegian: Anders Kleppe
+
+* Serbian: Cherry, NBG, [www.trade.in.rs](http://trade.in.rs/)
 
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
@@ -235,6 +237,15 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.5.4.2 =
+
+bug fixes:
+* undeclared property $readonly_fields error
+* record updates not getting timestamp set
+* readonly fields in form context now have "readonly" attribute instead of "disabled"
+* record form now shows captcha if named in the shortcode "fields" attribute
+* checkbox series now completely wrapped in checkbox group wrapper
 
 = 1.5.4.1 =
 
@@ -492,9 +503,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.1 =
+= 1.5.4.2 =
 bugfix release
-major bugs fixed: validating unincluded fields, long field/group names causing database error
+bugs fixed: $readonly_fields error fixed, record updates now getting timestamp updated
 
 == Using the Plugin ==
 
