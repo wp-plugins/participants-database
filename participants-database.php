@@ -1271,7 +1271,8 @@ class Participants_Db extends PDb_Base {
             PDb_Signup::update_sent_status($participant_id, false);
             // set the update mode
             $action = 'update';
-
+            // empty the private ID that signup assigned, the record will already have one
+            $post['private_id'] = '';
             break;
 
           case 2:
