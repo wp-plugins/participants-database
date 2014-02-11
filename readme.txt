@@ -238,6 +238,12 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.4.4 =
+
+* readonly displays for dropdowns, radios and multiselects
+* record updates leave private ID unchanged
+* new setting to enable alternative sessions management if PHP sessions is not working
+
 = 1.5.4.3 =
 
 * undeclared property $readonly_fields error (this time for sure!)
@@ -450,9 +456,10 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.3 =
+= 1.5.4.4 =
 
-bugfix release for single issue: $readonly_fields error
+readonly display for dropdowns, radios and multiselects
+several minor bug fixes
 
 == Using the Plugin ==
 
