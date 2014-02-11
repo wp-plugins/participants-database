@@ -243,6 +243,7 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 * readonly displays for dropdowns, radios and multiselects
 * record updates leave private ID unchanged
 * new setting to enable alternative sessions management if PHP sessions is not working
+* fixed bug in PDbTemplate class that would return empty fields in a list
 
 = 1.5.4.3 =
 
