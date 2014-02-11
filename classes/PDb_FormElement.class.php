@@ -328,11 +328,15 @@ class PDb_FormElement extends xnau_FormElement {
 
     $this->_addline($this->print_hidden_fields(array('MAX_FILE_SIZE' => $max_size, $this->name => $this->value)));
 
+    if (!isset($this->attributes['readonly'])) {
+    
     $this->_addline($this->_input_tag('file'));
 
     // add the delete checkbox if there is a file defined
     if (!empty($this->value))
       $this->_addline('<span class="file-delete" ><label><input type="checkbox" value="delete" name="' . $this->name . '-deletefile" ' . $this->_attributes () . '>' . __('delete', 'participants-database') . '</label></span>');
+    
+    }
     
     $this->_addline('</div>');
   }
@@ -434,6 +438,42 @@ class PDb_FormElement extends xnau_FormElement {
       return $timestamp;
     }
   
+  }
+ 
+  /**
+   * get the title that corresponds to a value from a value series
+   * 
+   * this func grabs the value and matches it to a title from a list of values set 
+   * for a particular field
+   * 
+   * if there is no title defined, or if the values is stored as a simple string, 
+   * the value is returned unchanged
+   * 
+   * @global object $wpdb
+   * @param array $values
+   * @param string $fieldname
+   * @return array of value=>title pairs
+   */
+  public static function get_value_titles($values, $fieldname)
+  {
+    global $wpdb;
+    $sql = 'SELECT f.values FROM ' . Participants_Db::$fields_table . ' AS f WHERE f.name = "%s"';
+    $options_array = maybe_unserialize($wpdb->get_var($wpdb->prepare($sql, $fieldname)));
+    $return = array();
+    if (is_array($options_array)) {
+      $i = 0;
+      foreach ($options_array as $index => $option_value) {
+        if (!is_string($index) or $index == 'other') {
+          // we use the stored value
+          $return[$option_value] = $option_value;
+        } elseif ($option_value == $values[$i]) {
+          // grab the option title
+          $return[$option_value] = $index;
+        }
+        $i++;
+      }
+    }
+    return $return;
   }
  
   /**

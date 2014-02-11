@@ -218,7 +218,7 @@ class PDb_Field_Item extends PDb_Template_Item {
 
     if ($this->readonly && !in_array($this->form_element, array('captcha'))) {
 
-      if (PDb_Shortcode::$readonly_inputs && !in_array($this->form_element, array('rich-text'))) {
+      if (!in_array($this->form_element, array('rich-text'))) {
         
         $this->attributes['readonly'] = 'readonly';
         $this->_print();

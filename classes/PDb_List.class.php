@@ -342,7 +342,7 @@ class PDb_List extends PDb_Shortcode {
     /*
      * set up the basic values; sort values come from the shortcode
      */
-    $default_values = array(
+    $default_filter_values = array(
         'search_field' => 'none',
         'value'        => '',
         'operator'     => 'LIKE',
@@ -353,24 +353,23 @@ class PDb_List extends PDb_Shortcode {
         'orderstring'  => $this->_get_orderstring(),
     );
     
-    /*
-     * translate the "submit_button" value into the "submit" value of the filter
-     */
-    if (isset($_REQUEST['submit_button'])) $_GET['submit'] = $_REQUEST['submit_button'];
-
-    /* filtering parameters can come from three sources: the shortcode, $_POST (AJAX) 
-     * and $_GET (pagination and non-AJAX search form submissions) We merge the $_POST 
+    /* filtering parameters can come from three sources: the shortcode, $_POST (AJAX and 
+     * search forms) and $_GET (pagination and direct URL filters) We merge the $_POST 
      * and $_GET values with the defaults to get our initial set of filtering parameters. 
      * Then we process the shortcode filter, skipping any specific column filters that 
      * were brought in from the $_POST or $_GET. The processed values are kept in the 
      * filter property
+     * 
+     * translate the "submit_button" value into the "submit" value of the filter
      */
     if (isset($_POST['action']) && $_POST['action'] == 'pdb_list_filter') {
-      $this->filter = shortcode_atts($default_values, array_map('urldecode',$_POST));
+      if (isset($_POST['submit_button'])) $_POST['submit'] = $_POST['submit_button'];
+      $this->filter = shortcode_atts($default_filter_values, array_map('urldecode',$_POST));
     } elseif (isset($_GET['operator']) && !empty($_GET['operator'])) {
-      $this->filter = shortcode_atts($default_values, array_map('urldecode',$_GET));
+      if (isset($_GET['submit_button'])) $_GET['submit'] = $_GET['submit_button'];
+      $this->filter = shortcode_atts($default_filter_values, array_map('urldecode',$_GET));
     } else {
-      $this->filter = $default_values;
+      $this->filter = $default_filter_values;
     }
     
     
@@ -381,21 +380,13 @@ class PDb_List extends PDb_Shortcode {
     // get the ORDER BY clause
     $order_clause = $this->_build_order_clause();
 
-    /* at this point, we have our base query, now we need to add any WHERE clauses
-     */
-//    error_log(__METHOD__.' filter property:'.print_r($this->filter,1));
-//    error_log(__METHOD__.' shortcode_atts:'.print_r($this->shortcode_atts,1));
-
-    // add the shortcode filtering statements
+    // set up the shortcode filtering statements
     $clauses = $this->_process_shortcode_filter();
     
-//    error_log(__METHOD__.' clauses from the shortcode:'.print_r($clauses,1));
-
     /*
      * process the user search, which has been placed in the filter property. These 
      * values must be made secure as it is direct input from the browser 
      */
-    
     if (  empty($this->filter['submit']) ) {
       // do nothing
     } elseif ($this->filter['submit'] == $this->i18n['clear']) {
@@ -410,8 +401,7 @@ class PDb_List extends PDb_Shortcode {
       $this->is_search_result = false;
     } elseif (
             !empty($this->filter['value']) &&
-            'none' != $this->filter['search_field'] /* &&
-            in_array($this->filter['search_field'], $this->searchable_columns())*/
+            'none' != $this->filter['search_field']
     ) {
       
       $this->is_search_result = true;

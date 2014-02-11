@@ -46,16 +46,14 @@ class PDb_Session {
 	/**
 	 * construct the class
    * 
-   * the global PDB_USE_PHP_SESSIONS must be set to true to use PHP sessions, it's 
-   * not automatic because prior to PHP 5.4 it's difficult to determine if sessions 
-   * are working without a page load...and by then it's too late.
+   * we check the setting for using PHP session, if false, we use a WP Transient-based session
    * 
    * we are just using this alternate form of session mnagement instead of PHP 
    * sessions for now
 	 */
 	public function __construct() {
 
-		$this->use_php_sessions = defined( 'PDB_USE_PHP_SESSIONS' ) && PDB_USE_PHP_SESSIONS;
+		$this->use_php_sessions = (bool) Participants_Db::$plugin_options['use_php_sessions'];
     
     $this->session_name = Participants_Db::$prefix . 'session';
 

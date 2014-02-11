@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
 Tested up to: 3.8.1
-Stable tag: 1.5.4.3
+Stable tag: 1.5.4.4
 License: GPLv2
 
 Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
@@ -238,6 +238,13 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.4.4 =
+
+* readonly displays for dropdowns, radios and multiselects
+* record updates leave private ID unchanged
+* new setting to enable alternative sessions management if PHP sessions is not working
+* fixed bug in PDbTemplate class that would return empty fields in a list
+
 = 1.5.4.3 =
 
 * undeclared property $readonly_fields error (this time for sure!)
@@ -450,9 +457,11 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.3 =
+= 1.5.4.4 =
 
-bugfix release for single issue: $readonly_fields error
+readonly display for dropdowns, radios and multiselects
+blank fields in list when using PDb_Template class
+several minor bug fixes
 
 == Using the Plugin ==
 

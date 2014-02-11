@@ -691,6 +691,8 @@ abstract class xnau_FormElement {
       unset( $this->attributes['other'] );
     } else $otherlabel = $this->i18n['other'];
     
+    if (!isset($this->attributes['readonly'])) {
+    
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
 
@@ -722,6 +724,11 @@ abstract class xnau_FormElement {
       $this->_addline('<input type="text" class="otherfield" name="' . $this->name . '" value="' . ( $is_other ? $this->value : '' ) . '" ' . $this->_attributes() . ' >');
       $this->_addline('</div>');
     }
+      
+    } else {
+      // readonly display
+      $this->_addline('<input type="text" class="pdb-readonly" name="' . $this->name . '" value="' . $this->value . '" ' . $this->_attributes() . ' >');
+    }
   }
 
   /**
@@ -744,12 +751,17 @@ abstract class xnau_FormElement {
 
 		$this->value = (array) $this->value;
 
+    if (!isset($this->attributes['readonly'])) {
+
     $this->_addline( '<div class="multicheckbox"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . '>' );
     $this->indent++;
 
     $this->_add_checkbox_series();
 
     $this->_addline('</div>', -1);
+    } else {
+      $this->_readonly_multi();
+    }
   }
   
   /**
@@ -807,8 +819,11 @@ abstract class xnau_FormElement {
    */
   protected function _select_other_multi()
   {
-    
+    if (!isset($this->attributes['readonly'])) {
     $this->_select_other('checkbox');
+    } else {
+      $this->_readonly_multi();
+    }
   }
 	
 	/**
@@ -851,6 +866,30 @@ abstract class xnau_FormElement {
 		$this->_addline( $this->_input_tag( 'text', $title, false ).'</div>' );
 		
 	}
+																			
+  /**
+   * produces the output for a read-only multi-select element
+   * 
+   */
+  protected function _readonly_multi() {
+    
+    $display = array();
+    $this->group = true;
+    
+    $this->_addline('<div class="readonly-value-group">');
+    
+    foreach((array)$this->value as $value) {
+      
+      if ($value !== '') {
+        
+        $display[] = $value;
+        $this->_addline( $this->_input_tag( 'hidden', $value ) );
+        
+      }
+    }
+    $this->_addline('<span class="pdb-readonly">' . implode(', ',$display) . '</span></div>');
+    
+  }
 																			
 		
 
@@ -920,11 +959,13 @@ abstract class xnau_FormElement {
 
     $this->_addline($this->print_hidden_fields(array('MAX_FILE_SIZE' => $max_size, $this->name => $this->value)));
 
+    if (!isset($this->attributes['readonly'])) {
     $this->_addline($this->_input_tag('file'));
 
     // add the delete checkbox if there is a file defined
     if (!empty($this->value))
       $this->_addline('<span class="file-delete" ><label><input type="checkbox" value="delete" name="' . $this->name . '-deletefile">' . __('delete', 'participants-database') . '</label></span>');
+    }
     
     $this->_addline('</div>');
   }
@@ -994,7 +1035,7 @@ abstract class xnau_FormElement {
     
     $null_select = isset($this->options['null_select']) || $type == 'checkbox' ? $this->options['null_select'] : false;
     if ($null_select !== false) {
-      $this->_addline($this->_input_tag('hidden', (is_string($null_select) ? $null_select : '')), 1);
+      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), false), 1);
     }
     unset($this->options['null_select']);
     
@@ -1276,7 +1317,7 @@ abstract class xnau_FormElement {
    */
   protected function _prep_comp_string( $string ) {
 
-    return is_string($string) ? html_entity_decode( $string, ENT_QUOTES, 'UTF-8') : $string;
+    return is_string($string) ? trim(html_entity_decode( $string, ENT_QUOTES, 'UTF-8')) : $string;
 
   }
 

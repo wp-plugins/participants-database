@@ -1008,6 +1008,20 @@ class PDb_Settings extends xnau_Plugin_Settings {
         ),
     );
 
+    $this->plugin_settings[] = array(
+        'name' => 'use_php_sessions',
+        'title' => __('Use PHP Sessions', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('uncheck this if PHP sessions are not working.', 'participants-database'),
+            'value' => 1,
+            'options' => array(1, 0),
+        ),
+    );
+
+
     /******************************************************
      *
      *   custom CSS setting
@@ -1049,7 +1063,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $pagelist = array();
     
-    if (!$with_blank) $pagelist['null_select'] = false;
+    if ($with_blank) $pagelist['null_select'] = '';
 
     if ($with_none)
       $pagelist[__('Same Page', 'participants-database')] = 'none';

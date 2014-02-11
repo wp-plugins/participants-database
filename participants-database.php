@@ -1264,7 +1264,8 @@ class Participants_Db extends PDb_Base {
             PDb_Signup::update_sent_status($participant_id, false);
             // set the update mode
             $action = 'update';
-
+            // empty any private ID that signup assigned, the record will already have one
+            $post['private_id'] = '';
             break;
 
           case 2:
@@ -1353,6 +1354,10 @@ class Participants_Db extends PDb_Base {
         case 'date_updated':
         case 'last_accessed':
           
+          // clear the value if it's a record update
+          if ($action == 'update' && $column->name == 'date_updated') {
+            $post['date_updated'] = '';
+          }
           /*
            * this func returns bool false if the timestamp is not present or is invalid, 
            * returns the MySQL timestamp string otherwise
@@ -1694,7 +1699,8 @@ class Participants_Db extends PDb_Base {
    * @param string $value the value to search for
    * @param bool   $single if true, return only one ID
    *
-   * @return int|bool returns integer if one match, array of integers if multiple matches, false if no match
+   * @return int|array|bool returns integer if one match, array of integers if multiple 
+   *                        matches (and single is false), false if no match
    */
   private static function _get_participant_id_by_term($term, $value, $single = true) {
 

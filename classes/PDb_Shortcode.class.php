@@ -161,10 +161,6 @@ abstract class PDb_Shortcode {
    * @var array all field objects used by the shortcode
    */
   var $columns = array();
-  /**
-   * holds the current value of the "readonly_inputs" shortcode attribute
-   */
-  public static $readonly_inputs;
 
   /**
    * instantiates the shortcode object
@@ -193,7 +189,6 @@ abstract class PDb_Shortcode {
         'action' => '',
         'target_instance' => Participants_Db::$instance_index,
         'target_page' => '',
-        'readonly_inputs' => false,
         'record_id' => false,
         'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
     );
@@ -204,8 +199,6 @@ abstract class PDb_Shortcode {
     $this->_setup_shortcode_atts($shortcode_atts, $subclass_shortcode_defaults);
     
     $this->module = $this->shortcode_atts['module'];
-    
-    self::$readonly_inputs = $this->shortcode_atts['readonly_inputs'];
     
     /* 
      * save the shotcode attributes to the session array
