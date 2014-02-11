@@ -459,6 +459,7 @@ Taking defensive precautions against other plugins in the admin:
 = 1.5.4.4 =
 
 readonly display for dropdowns, radios and multiselects
+blank fields in list when using PDb_Template class
 several minor bug fixes
 
 == Using the Plugin ==

@@ -278,7 +278,7 @@ class PDb_Template {
           $this->fields->{$name}->module = $object->module;
           $this->fields->{$name}->value = $value;
         }
-        reset($object->record->values);
+        reset($object->record->fields);
         break;
       case 'PDb_Signup':
       case 'PDb_Single':
