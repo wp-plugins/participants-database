@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5.4.3
+  Version: 1.5.4.4
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -493,6 +493,7 @@ class Participants_Db extends PDb_Base {
     wp_register_script(self::$prefix.'settings_script', plugins_url('js/settings.js', __FILE__));
     wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'otherselect', plugins_url('js/otherselect.js', __FILE__), array('jquery'));
     //wp_register_script( 'datepicker', plugins_url( 'js/jquery.datepicker.js', __FILE__ ) );
     //wp_register_script( 'edit_record', plugins_url( 'js/edit.js', __FILE__ ) );
 
@@ -505,6 +506,7 @@ class Participants_Db extends PDb_Base {
       wp_enqueue_script(self::$prefix.'cookie');
       wp_enqueue_script(self::$prefix.'jq-placeholder');
       wp_enqueue_script(self::$prefix.'admin');
+      wp_enqueue_script(self::$prefix.'otherselect');
     }
 
     if (false !== stripos($hook, 'participants-database-list_participants')) {
@@ -563,6 +565,7 @@ class Participants_Db extends PDb_Base {
     wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'otherselect', plugins_url('js/otherselect.js', __FILE__), array('jquery'));
 
     // this is now handled conditionally in the wp_footer action
     //wp_enqueue_script( 'jquery' );
@@ -583,6 +586,7 @@ class Participants_Db extends PDb_Base {
       wp_enqueue_script('jquery');
       wp_enqueue_script(self::$prefix.'shortcode');
       wp_enqueue_script(self::$prefix.'jq-placeholder');
+      wp_enqueue_script(self::$prefix.'otherselect');
     }
   }
 
@@ -1697,7 +1701,8 @@ class Participants_Db extends PDb_Base {
    * @param string $value the value to search for
    * @param bool   $single if true, return only one ID
    *
-   * @return int|bool returns integer if one match, array of integers if multiple matches, false if no match
+   * @return int|array|bool returns integer if one match, array of integers if multiple 
+   *                        matches (and single is false), false if no match
    */
   private static function _get_participant_id_by_term($term, $value, $single = true) {
 

@@ -684,7 +684,7 @@ foreach ($groups as $group) {
   {
 
     if ($single_encode)
-      return $value;
+      return trim($value);
     else
       return htmlentities(trim(stripslashes($value)), ENT_QUOTES, "UTF-8", true);
   }

@@ -502,7 +502,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             (
             'type' => 'dropdown-other',
             'help_text' => __('send people to this page to request their private link.', 'participants-database'),
-            'options' => $this->_get_pagelist(false,false),
+            'options' => $this->_get_pagelist(true),
             'attributes' => array('other' => 'Post ID'),
             'value' => 'none',
         )
@@ -604,7 +604,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             (
             'type' => 'dropdown-other',
             'help_text' => __('The page where your participant record ([pdb_record] shortcode) is displayed. You can use a Post ID for posts and custom post types.', 'participants-database'),
-            'options' => $this->_get_pagelist(false,false),  
+            'options' => $this->_get_pagelist(false,true),  
             'attributes' => array('other' => 'Post ID'),
         )
     );
@@ -744,7 +744,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'attributes' => array('other' => 'Post ID'),
             'type' => 'dropdown-other',
             'help_text' => __('this is the page where the [pdb_single] shortcode is located. If you want to assign a post or custom post type, select "Post ID" and enter the post ID in the "other" box.', 'participants-database'),
-            'options' => $this->_get_pagelist(false,false),
+            'options' => $this->_get_pagelist(false,true),
         )
     );
 
@@ -1008,6 +1008,20 @@ class PDb_Settings extends xnau_Plugin_Settings {
         ),
     );
 
+    $this->plugin_settings[] = array(
+        'name' => 'use_php_sessions',
+        'title' => __('Use PHP Sessions', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('uncheck this if PHP sessions are not working.', 'participants-database'),
+            'value' => 1,
+            'options' => array(1, 0),
+        ),
+    );
+
+
     /******************************************************
      *
      *   custom CSS setting
@@ -1049,7 +1063,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $pagelist = array();
     
-    if ($with_blank) $pagelist['null_select'] = false;
+    if ($with_blank) $pagelist['null_select'] = '';
 
     if ($with_none)
       $pagelist[__('Same Page', 'participants-database')] = 'none';
