@@ -464,7 +464,7 @@ Taking defensive precautions against other plugins in the admin:
 
 = 1.5.4.5 =
 
-fixed bug affecting dropdown elements
+fixed bug affecting dropdown and select/other elements
 
 == Using the Plugin ==
 
