@@ -1110,7 +1110,7 @@ abstract class xnau_FormElement {
       
       if (($value === false or $value === 'false' or $value === 'optgroup') and !empty($key)) {
         $this->_add_options_divider($key);
-      } elseif($value == 'other') {
+      } elseif($value === 'other') {
         $otherlabel = $key;
       } elseif (!empty($value) or $value === 0) {
         $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . stripslashes($key) . '</option>', -1);
