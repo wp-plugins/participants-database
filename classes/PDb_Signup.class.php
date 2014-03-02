@@ -85,10 +85,6 @@ class PDb_Signup extends PDb_Shortcode {
    */
   private $errors = array();
 
-  // methods
-
-  //
-
 	/**
    * instantiates the signup form object
    *
@@ -123,6 +119,7 @@ class PDb_Signup extends PDb_Shortcode {
        */
       $shortcode_atts['module'] = 'retrieve';
     } elseif ($this->participant_id = Participants_Db::$session->get('pdbid')) {
+      
       /*
        * the submission is successful, clear the session
        */
@@ -131,6 +128,7 @@ class PDb_Signup extends PDb_Shortcode {
       Participants_Db::$session->clear('captcha_result');
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
       if ($this->participant_values && !$redirected) {
+        
         // check the notification sent status of the record
         $sent = $this->check_sent_status($this->participant_id);
         $this->submitted = true;

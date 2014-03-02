@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.5.4.5
+  Version: 1.5.4.6
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -76,7 +76,7 @@ class Participants_Db extends PDb_Base {
    * 
    * @var string current Db version
    */
-  public static $db_version = '0.9';
+  public static $db_version = '1.0';
   /**
    * name of the WP option where the current db version is stored
    * @var string
@@ -2717,8 +2717,8 @@ class Participants_Db extends PDb_Base {
     }
     
     $date = false;
-    // if it is a default zero timestamp, treat it as "no date"
-    if ($string == '0000-00-00 00:00:00') return false;
+    // if it is a default zero timestamp or other empty value, treat it as "no date"
+    if ($string == '0000-00-00 00:00:00' || empty($string)) return false;
 
     /*
      * we have two options to parse a date string into a timestamp: the 
