@@ -201,7 +201,7 @@ abstract class PDb_Shortcode {
     $this->module = $this->shortcode_atts['module'];
     
     /* 
-     * save the shotcode attributes to the session array
+     * save the shortcode attributes to the session array
      * 
      * skip this if doing AJAX because it would just store the default values, not 
      * the actual values from the shortcode 
