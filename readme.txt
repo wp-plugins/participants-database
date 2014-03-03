@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
 Tested up to: 3.8.1
-Stable tag: 1.5.4.5
+Stable tag: 1.5.4.6
 License: GPLv2
 
 Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
@@ -238,6 +238,12 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.4.6 =
+
+* fixed transaction errors when MySQL is in a strict mode
+* checkboxes may now use value titles
+* AJAX search response now uses template defined in the shortcode
+
 = 1.5.4.5 =
 
 * added otherselect.js to handle dropdown/other fields
@@ -462,9 +468,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.5 =
+= 1.5.4.6 =
 
-fixed bug affecting dropdown and select/other elements
+compatibility with strict MySQL server modes
 
 == Using the Plugin ==
 
