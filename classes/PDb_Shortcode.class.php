@@ -207,7 +207,7 @@ abstract class PDb_Shortcode {
      * the actual values from the shortcode 
      */
     if ($this->shortcode_atts['filtering'] != 1) {
-    Participants_Db::$session->set($this->prefix . 'shortcode_atts', array( $this->module => array( Participants_Db::$instance_index => $this->shortcode_atts)));
+      Participants_Db::$session->update($this->prefix . 'shortcode_atts', array( $this->module => array( Participants_Db::$instance_index => $this->shortcode_atts)));
     }
 
     $this->wrap_class = $this->prefix . $this->module . ' ' . $this->prefix . 'instance-' . Participants_Db::$instance_index;

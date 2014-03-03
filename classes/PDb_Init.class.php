@@ -643,8 +643,6 @@ class PDb_Init
         }
       }
       
-      if (WP_DEBUG) error_log( Participants_Db::PLUGIN_NAME.' plugin updated to Db version '.get_option( Participants_Db::$db_version_option ) );
-      
       if ('0.9' == get_option(Participants_Db::$db_version_option)) {
         /*
          * set TIMESTAMP fields to allow NULL and set the default to NULL
