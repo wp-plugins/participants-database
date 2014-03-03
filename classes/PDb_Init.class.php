@@ -647,24 +647,16 @@ class PDb_Init
         /*
          * set TIMESTAMP fields to allow NULL and set the default to NULL
          */
-        $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$participants_table . "` MODIFY COLUMN `date_updated` TIMESTAMP NULL DEFAULT NULL");
-        if ($success !== false)
-          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$participants_table . "` MODIFY COLUMN `last_accessed` TIMESTAMP NULL DEFAULT NULL");
+        $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$participants_table . "` MODIFY COLUMN `date_updated` TIMESTAMP NULL DEFAULT NULL, MODIFY COLUMN `last_accessed` TIMESTAMP NULL DEFAULT NULL");
         /*
          * set other "not null" columns to NULL so the empty default value won't trigger an error
          */
         if ($success !== false)
           $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$participants_table . "` MODIFY COLUMN `private_id` VARCHAR(6) NULL");
         if ($success !== false)
-          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$fields_table . "` MODIFY COLUMN `name` VARCHAR(64) NULL");
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$fields_table . "` MODIFY COLUMN `name` VARCHAR(64) NULL, MODIFY COLUMN `title` TINYTEXT NULL, MODIFY COLUMN `group` VARCHAR(64) NULL");
         if ($success !== false)
-          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$fields_table . "` MODIFY COLUMN `title` TINYTEXT NULL");
-        if ($success !== false)
-          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$fields_table . "` MODIFY COLUMN `group` VARCHAR(64) NULL");
-        if ($success !== false)
-          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$groups_table . "` MODIFY COLUMN `name` VARCHAR(64) NULL");
-        if ($success !== false)
-          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$groups_table . "` MODIFY COLUMN `title` TINYTEXT NULL");
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$groups_table . "` MODIFY COLUMN `name` VARCHAR(64) NULL, MODIFY COLUMN `title` TINYTEXT NULL");
         //
         if ($success !== false) {
           $table_status = $wpdb->get_results("SHOW TABLE STATUS WHERE `name` = '" . Participants_Db::$participants_table . "'");
