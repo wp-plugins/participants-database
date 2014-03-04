@@ -652,7 +652,8 @@ abstract class xnau_FormElement {
       } else {
         $title = $this->is_assoc( $this->options ) ? key( $this->options ) : false;
         $checked_value = current($this->options);
-        if ($unchecked_value = next($this->options) === false) $unchecked_value = '';
+        $unchecked_value = next($this->options);
+        if ($unchecked_value === false) $unchecked_value = '';
       }
 
       
