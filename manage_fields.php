@@ -2,7 +2,7 @@
 /*
  * add / edit / delete fields and field groups and their attributes
  * 
- * ver. 1.5.4.1
+ * ver. 1.5.4.7
  */
 /* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
 global $PDb_i18n;
@@ -11,6 +11,8 @@ $PDb_i18n = array(
     'update groups' => __('Update Groups', 'participants-database'),
     'add field' => __('Add Field', 'participants-database'),
     'add group' => __('Add Group', 'participants-database'),
+    'field' => __('field', 'participants-database'),
+    'group' => __('group', 'participants-database'),
     'new field title' => __('new field title', 'participants-database'),
     'new group title' => __('new group title', 'participants-database'),
     'order' => _x('Order', 'column name', 'participants-database'),
@@ -178,7 +180,7 @@ if (isset($_POST['action'])) {
         $error_msgs[] = PDb_parse_db_error($wpdb->last_error, $_POST['action']);
       break;
 
-    case 'delete_field':
+    case 'delete_' . $PDb_i18n['field']:
 
       global $wpdb;
       $wpdb->hide_errors();
@@ -190,7 +192,7 @@ if (isset($_POST['action'])) {
 
       break;
 
-    case 'delete_group':
+    case 'delete_' . $PDb_i18n['group']:
 
       global $wpdb;
       //$wpdb->hide_errors();
