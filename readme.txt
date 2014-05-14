@@ -243,6 +243,7 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 = 1.5.4.8 =
 
 * compatibility with WP 3.9 and PHP 5.5
+* plugin admin menu visibility now controlled by plugin admin roles
 
 = 1.5.4.7 =
 

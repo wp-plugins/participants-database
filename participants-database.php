@@ -437,7 +437,7 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('Manage Database Fields', 'participants-database'), 
             __('Manage Database Fields', 'participants-database'), 
-            'manage_options', 
+            self::$plugin_options['plugin_admin_capability'], 
             self::$plugin_page . '-manage_fields', 
             array(__CLASS__, 'include_admin_file')
     );
@@ -446,7 +446,7 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('Import CSV File', 'participants-database'), 
             __('Import CSV File', 'participants-database'), 
-            'manage_options', 
+            self::$plugin_options['plugin_admin_capability'], 
             self::$plugin_page . '-upload_csv', 
             array(__CLASS__, 'include_admin_file')
     );
@@ -455,7 +455,7 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('Settings', 'participants-database'), 
             __('Settings', 'participants-database'), 
-            'manage_options', 
+            self::$plugin_options['plugin_admin_capability'], 
             self::$plugin_page . '_settings_page', 
             array(self::$Settings, 'show_settings_form')
     );
@@ -464,7 +464,7 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('Setup Guide', 'participants-database'), 
             __('Setup Guide', 'participants-database'), 
-            'manage_options', 
+            self::$plugin_options['plugin_admin_capability'], 
             self::$plugin_page . '-setup_guide', 
             array(__CLASS__, 'include_admin_file')
     );
