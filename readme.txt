@@ -238,6 +238,10 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.4.7 =
+
+* fixed checkbox lock bug
+
 = 1.5.4.6 =
 
 * fixed transaction errors when MySQL is in a strict mode
@@ -468,8 +472,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.6 =
+= 1.5.4.7 =
 
+fixed locked checkbox bug
 compatibility with strict MySQL server modes
 
 == Using the Plugin ==
