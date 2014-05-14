@@ -258,7 +258,7 @@ class PDb_List_Admin {
 
           default:
 
-            $operator = mysql_real_escape_string(self::$filter['operator']);
+            $operator = esc_sql(self::$filter['operator']);
         }
 
         if (self::$filter['value'] !== '') {
@@ -282,18 +282,18 @@ class PDb_List_Admin {
             
             if ($value !== false) {
             
-              $stored_date = "DATE(p." . mysql_real_escape_string(self::$filter['search_field']) . ")";
+              $stored_date = "DATE(p." . esc_sql(self::$filter['search_field']) . ")";
             
               if ($value2 !== false and !empty($value2)) {
                 
-                  self::$list_query .= " WHERE " . $stored_date . " > DATE_ADD(FROM_UNIXTIME(0), interval " . mysql_real_escape_string($value) . " second) AND " . $stored_date . " < DATE_ADD(FROM_UNIXTIME(0), interval " . mysql_real_escape_string($value2) . " second)";
+                  self::$list_query .= " WHERE " . $stored_date . " > DATE_ADD(FROM_UNIXTIME(0), interval " . esc_sql($value) . " second) AND " . $stored_date . " < DATE_ADD(FROM_UNIXTIME(0), interval " . esc_sql($value2) . " second)";
                   
               } else {
 
                 if ($operator == 'LIKE')
                   $operator = '=';
 
-                self::$list_query .= " WHERE " . $stored_date . " " . $operator . " DATE_ADD(FROM_UNIXTIME(0), interval " . mysql_real_escape_string($value) . " second) ";
+                self::$list_query .= " WHERE " . $stored_date . " " . $operator . " DATE_ADD(FROM_UNIXTIME(0), interval " . esc_sql($value) . " second) ";
               }
             }
               } elseif ($field_atts->form_element == 'date') { 
@@ -310,23 +310,23 @@ class PDb_List_Admin {
 
             if ($value !== false) {
               
-              $stored_date = "CAST(p." . mysql_real_escape_string(self::$filter['search_field']) . " AS SIGNED)";
+              $stored_date = "CAST(p." . esc_sql(self::$filter['search_field']) . " AS SIGNED)";
             
               if ($value2 !== false and !empty($value2)) {
                 
-                  self::$list_query .= " WHERE " . $stored_date . " > CAST(" . mysql_real_escape_string($value) . " AS SIGNED) AND " . $stored_date . " < CAST(" . mysql_real_escape_string($value2) . "  AS SIGNED)";
+                  self::$list_query .= " WHERE " . $stored_date . " > CAST(" . esc_sql($value) . " AS SIGNED) AND " . $stored_date . " < CAST(" . esc_sql($value2) . "  AS SIGNED)";
                   
               } else {
 
                 if ($operator == 'LIKE') $operator = '=';
 
-                self::$list_query .= " WHERE " . $stored_date . " " . $operator . " CAST(" . mysql_real_escape_string($value) . " AS SIGNED)";
+                self::$list_query .= " WHERE " . $stored_date . " " . $operator . " CAST(" . esc_sql($value) . " AS SIGNED)";
               }
                 
             }
           } else {
             
-            self::$list_query .= ' WHERE p.' . mysql_real_escape_string(self::$filter['search_field']) . ' ' . $operator . " " . $delimiter[0] . mysql_real_escape_string($value) . $delimiter[1] . " ";
+            self::$list_query .= ' WHERE p.' . esc_sql(self::$filter['search_field']) . ' ' . $operator . " " . $delimiter[0] . esc_sql($value) . $delimiter[1] . " ";
             
           }
 
@@ -334,7 +334,7 @@ class PDb_List_Admin {
         }
 
         // add the sorting
-        self::$list_query .= ' ORDER BY p.' . mysql_real_escape_string(self::$filter['sortBy']) . ' ' . mysql_real_escape_string(self::$filter['ascdesc']);
+        self::$list_query .= ' ORDER BY p.' . esc_sql(self::$filter['sortBy']) . ' ' . esc_sql(self::$filter['ascdesc']);
 
         // go back to the first page to display the newly sorted/filtered list
         if (isset($_POST['submit-button']))
@@ -353,7 +353,7 @@ class PDb_List_Admin {
 
       default:
 
-        self::$list_query = 'SELECT * FROM ' . Participants_Db::$participants_table . ' ORDER BY `' . mysql_real_escape_string(self::$filter['sortBy']) . '` ' . mysql_real_escape_string(self::$filter['ascdesc']);
+        self::$list_query = 'SELECT * FROM ' . Participants_Db::$participants_table . ' ORDER BY `' . esc_sql(self::$filter['sortBy']) . '` ' . esc_sql(self::$filter['ascdesc']);
     }
   }
 

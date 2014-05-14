@@ -469,7 +469,7 @@ class PDb_List extends PDb_Shortcode {
           $operator = '=';
           $wildcard = '';
         }
-        $filter_value = mysql_real_escape_string($filter_value);
+        $filter_value = esc_sql($filter_value);
 
         if (Participants_Db::$plugin_options['strict_search']) {
           if (in_array($search_field->form_element, array('multi-checkbox', 'multi-select-other'))) {
