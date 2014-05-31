@@ -224,15 +224,11 @@ Therefore, this plugin is *absolutely not* for the storage of any kind of inform
 
 Yes, there is a plugin setting called "Make Links Clickable" that scans the fields looking for something that starts with "http" it will then wrap that in a link tag so it will be clickable. It will also render email addresses clickable.
 
-Even better than that, there is a new form field type called "link" that lets people fill in a URL and also give it a text label such as "My Website" that will click to the URL.
+There is also a form field type called "link" that lets people fill in a URL and also give it a text label such as "My Website" that will click to the URL.
 
 = Is a CAPTCHA available for the forms? =
 
 You can define a "captcha" form element which will show a simple math question for the user to answer.
-
-= I'm getting a blank page in the admin when I click on the plugin menu =
-
-This is a problem that crops up on MultiSite installations. It's not a serious error, it's just that that top item is not supposed to be a clickable link, and so it doesn't go anywhere. All the real pages in the admin are working, you just have to avoid clicking on that non-working top menu item. Someday when I have some spare time, I'll figure out how to fix this...so probably never.
 
 == Screenshots ==
 
