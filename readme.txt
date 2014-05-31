@@ -3,8 +3,8 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
-Tested up to: 3.9
-Stable tag: 1.5.4.8
+Tested up to: 3.9.1
+Stable tag: 1.5.4.9
 License: GPLv2
 
 Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
@@ -98,6 +98,8 @@ This plugin is fully compliant with WordPress Internationalization standards and
 * Serbian: Cherry, NBG, [www.trade.in.rs](http://trade.in.rs/)
 
 * Romanian: Cornelia Năescu
+
+* Ukranian: Michael Yunat, [http://getvoip.com/blog](http://getvoip.com)
 
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
@@ -222,15 +224,11 @@ Therefore, this plugin is *absolutely not* for the storage of any kind of inform
 
 Yes, there is a plugin setting called "Make Links Clickable" that scans the fields looking for something that starts with "http" it will then wrap that in a link tag so it will be clickable. It will also render email addresses clickable.
 
-Even better than that, there is a new form field type called "link" that lets people fill in a URL and also give it a text label such as "My Website" that will click to the URL.
+There is also a form field type called "link" that lets people fill in a URL and also give it a text label such as "My Website" that will click to the URL.
 
 = Is a CAPTCHA available for the forms? =
 
 You can define a "captcha" form element which will show a simple math question for the user to answer.
-
-= I'm getting a blank page in the admin when I click on the plugin menu =
-
-This is a problem that crops up on MultiSite installations. It's not a serious error, it's just that that top item is not supposed to be a clickable link, and so it doesn't go anywhere. All the real pages in the admin are working, you just have to avoid clicking on that non-working top menu item. Someday when I have some spare time, I'll figure out how to fix this...so probably never.
 
 == Screenshots ==
 
@@ -240,9 +238,15 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 
 == Changelog ==
 
+= 1.5.4.9 =
+
+* security patch for CSV download
+* added Ukranian translation
+
 = 1.5.4.8 =
 
 * compatibility with WP 3.9 and PHP 5.5
+* plugin admin menu visibility now controlled by plugin admin roles
 
 = 1.5.4.7 =
 
@@ -478,9 +482,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.8 =
+= 1.5.4.9 =
 
-compatibility fixes with WP 3.9 and PHP 5.5
+security update
 
 == Using the Plugin ==
 
