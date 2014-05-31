@@ -105,6 +105,11 @@ class PDb_List_Admin {
     if (WP_DEBUG)
       error_log(__METHOD__ . ' list query= ' . self::$list_query);
 
+    if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) {
+      global $current_user;
+      set_transient(Participants_Db::$prefix . 'admin_list_query' . $current_user->ID, self::$list_query, 3600 * 24);
+    }
+
     // get the $wpdb object
     global $wpdb;
 
@@ -776,7 +781,6 @@ class PDb_List_Admin {
           <input type="hidden" name="subsource" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
           <input type="hidden" name="action" value="output CSV" />
           <input type="hidden" name="CSV type" value="participant list" />
-          <input type="hidden" name="query" value="<?php echo rawurlencode(self::$list_query) ?>" />
           <?php
           $date_string = str_replace(array('/', '#', '.', '\\', ', ', ',', ' '), '-', date_i18n(Participants_Db::$date_format));
           $suggested_filename = Participants_Db::PLUGIN_NAME . '-' . $date_string . '.csv';

@@ -2051,6 +2051,9 @@ class Participants_Db extends PDb_Base {
 
       case 'output CSV':
 
+        if (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) {
+          die();
+        }
         $header_row = array();
         $title_row = array();
         $data = array();
@@ -2091,9 +2094,14 @@ class Participants_Db extends PDb_Base {
 
             if (isset($_POST['include_csv_titles'])) $data[] = $title_row;
 
-            $query = str_replace('*', ' ' . trim($import_columns, ',') . ' ', rawurldecode($_POST['query']));
+            global $current_user;
+            $query = get_transient(Participants_Db::$prefix . 'admin_list_query' . $current_user->ID);
 
-            $data += self::_prepare_CSV_rows($wpdb->get_results($query, ARRAY_A));
+            if ($query) {
+              $query = str_replace('*', ' ' . trim($import_columns, ',') . ' ', $query);
+
+							$data += self::_prepare_CSV_rows($wpdb->get_results($query, ARRAY_A));
+            }
 
             break;
 

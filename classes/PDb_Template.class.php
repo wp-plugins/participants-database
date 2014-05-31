@@ -9,9 +9,6 @@
  * use the class by instantiating it with the "$this" variable, then use the resuting 
  * object methods in your template: $record = new PDb_Template($this);
  * 
- * for a list template, you must instantiate in the loop with each new record:
- * $record = new PDb_Template($this->record);
- *
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
@@ -300,12 +297,14 @@ class PDb_Template {
             unset($this->values[$name]);
           }
         }
+        reset($this->values);
         foreach($this->record as $name => $values) {
           $this->groups[$name] = new stdClass();
           $this->groups[$name]->name = $name;
           $this->groups[$name]->title = $values->title;
           $this->groups[$name]->description = $values->description;
         }
+        reset($this->record);
         break;
     }
     //unset($this->record->options);
