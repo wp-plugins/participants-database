@@ -3,7 +3,7 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
-Tested up to: 3.9
+Tested up to: 3.9.1
 Stable tag: 1.5.4.8
 License: GPLv2
 
@@ -98,6 +98,8 @@ This plugin is fully compliant with WordPress Internationalization standards and
 * Serbian: Cherry, NBG, [www.trade.in.rs](http://trade.in.rs/)
 
 * Romanian: Cornelia Năescu
+
+* Ukranian: Michael Yunat, [http://getvoip.com/blog](http://getvoip.com)
 
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
@@ -239,6 +241,11 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.5.4.9 =
+
+* security patch for CSV download
+* added Ukranian translation
 
 = 1.5.4.8 =
 
@@ -479,9 +486,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.8 =
+= 1.5.4.9 =
 
-compatibility fixes with WP 3.9 and PHP 5.5
+security update
 
 == Using the Plugin ==
 
