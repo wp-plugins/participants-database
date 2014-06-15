@@ -33,8 +33,9 @@
       $id = $this->shortcode_atts['record_id'];
     } else $id = 0;
 		// override the shortcode att if the value is in the URI
-    if ( isset( $_GET['pdb'] ) ) {
-      $id = $_GET['pdb'];
+    $get_pdb = filter_input(INPUT_GET, 'pdb', FILTER_VALIDATE_INT, array('min_range' => 1));
+    if (!empty($get_pdb)) {
+      $id = $get_pdb;
     }
     $record_id = Participants_Db::get_record_id_by_term( $this->shortcode_atts['term'], $id );
     

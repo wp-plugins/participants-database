@@ -1,5 +1,4 @@
 <?php
-
 /**
  * parent class for auxiliary plugins to the Participants Database Plugin
  *
@@ -13,7 +12,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 3.0
+ * @version    Release: 3.1
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if (!class_exists('PDb_Aux_Plugin')) :
@@ -88,9 +87,9 @@ class PDb_Aux_Plugin {
 
     $this->plugin_path = plugin_basename($plugin_file);
     $this->connected = $this->check_connection();
-    register_activation_hook($plugin_file, array($this, '_activate_plugin'));
 
     if($this->connected) {
+      register_activation_hook($plugin_file, array($this, '_activate_plugin'));
       $this->plugin_data = get_plugin_data($plugin_file);
       $this->aux_plugin_settings = $this->aux_plugin_name;
       $this->subclass = $subclass;
@@ -99,6 +98,7 @@ class PDb_Aux_Plugin {
       add_action('admin_menu', array($this, 'add_settings_page'));
       add_action('admin_init', array($this, 'settings_api_init'));
       add_action('init', array(&$this, 'initialize_updater'));
+      add_action( 'plugins_loaded', array(&$this, 'load_textdomain'));
     }
   }
   
@@ -149,6 +149,23 @@ class PDb_Aux_Plugin {
       deactivate_plugins($this->plugin_path);
       $this->_trigger_error('The Participants Database plugin must be installed and activated for the ' . $this->aux_plugin_title . ' plugin to be activated.');
     }
+  }
+
+  /**
+   * loads the plugin text domain
+   * 
+   * defaults to the main plugin translation file
+   * 
+   */
+  public function load_textdomain() {
+    $translation_file_path = dirname( $this->plugin_path ) . '/languages/';
+    if (is_file($translation_file_path . $this->aux_plugin_name . '.mo')) {
+      $plugin_name = $this->aux_plugin_name;
+    } else {
+      $plugin_name = Participants_Db::PLUGIN_NAME;
+      $translation_file_path = Participants_Db::translation_file_path();
+    }
+    load_plugin_textdomain($plugin_name, false, $translation_file_path);
   }
 
   /*********************************
@@ -233,7 +250,7 @@ class PDb_Aux_Plugin {
    *                      help    - help text
    *                      options - an array of options for multiple-option input types (name => title)
    */
-  function setting_callback_function($atts)
+  public function setting_callback_function($atts)
   {
     $options = get_option($this->aux_plugin_settings);
     $defaults = array(
@@ -247,63 +264,145 @@ class PDb_Aux_Plugin {
         'options' => '',                      // 7
         'select'  => '',                      // 8
     );
-    $fields = shortcode_atts($defaults, $atts);
-    $fields['value'] = isset($options[$atts['name']]) ? $options[$atts['name']] : $atts['value'];
+    $setting = shortcode_atts($defaults, $atts);
+    $setting['value'] = isset($options[$atts['name']]) ? $options[$atts['name']] : $atts['value'];
     // create an array of numeric keys
-    $selectstring = $this->set_selectstring($fields['type']);
     for($i = 0;$i<count($defaults);$i++) $keys[] = $i;
     // replace the string keys with numeric keys in the order defined in $defaults
-    $values = array_combine($keys,$fields);
-    switch ($fields['type']){
-      case 'text':
-        $pattern = '<input name="' . $this->aux_plugin_settings . '[%1$s]" type="%2$s" value="%3$s" title="%4$s" class="%5$s" style="%6$s"  />';
-        if (!empty($fields['help'])) $pattern .= '<p class="description">%7$s</p>';
-        vprintf($pattern, $values);
-        break;
-      case 'textarea':
-        $pattern = '<textarea name="' . $this->aux_plugin_settings . '[%1$s]" title="%4$s" class="%5$s" style="%6$s"  />%3$s</textarea>';
-        if (!empty($fields['help'])) $pattern .= '<p class="description">%7$s</p>';
-        vprintf($pattern, $values);
-        break;
-      case 'checkbox':
-        $values[8] = $fields['value'] == 1 ? $selectstring : '';
-        $pattern = '<input name="' . $this->aux_plugin_settings . '[%1$s]" type="hidden" value="0" />
-<input name="' . $this->aux_plugin_settings . '[%1$s]" type="%2$s" value="1" title="%4$s" class="%5$s" style="%6$s" %9$s />';
-        if (!empty($fields['help'])) $pattern .= '<p class="description">%7$s</p>';
-        vprintf($pattern, $values);
-        break;
-      case 'radio':
-        $pattern = '<label title="%4$s"><input type="%2$s" %9$s value="%3$s" name="' . $this->aux_plugin_settings . '[%1$s]"> <span>%4$s</span></label><br />';
-        echo '<div class="' . $fields['type'] . ' ' . $fields['class'] . '" >';
-        foreach ($fields['options'] as $name => $title) {
-          $values[8] = $fields['value'] == $name ? $selectstring : '';
-          $values[2] = $name;
-          $values[3] = $title;
-          vprintf($pattern, $values);
-        }
-        echo '</div>';
-        if (!empty($fields['help'])) echo '<p class="description">' . $fields['help'] . '</p>';
-        break;
+    $values = array_combine($keys,$setting);
+    
+    $values[3] = htmlspecialchars($values[3]);
+    $values[8] = $this->set_selectstring($setting['type']);
+    
+    if (is_callable(array($this, '_build_' . $setting['type']))) {
+      echo call_user_func(array($this, '_build_' . $setting['type']), $values);
     }
   }
   
+  /**
+   * builds a text setting element
+   * 
+   * @param array $values array of setting values
+   *                       0 - setting name
+   *                       1 - element type
+   *                       2 - setting value
+   *                       3 - title
+   *                       4 - CSS class
+   *                       5 - CSS style
+   *                       6 - help text
+   *                       7 - setting options array
+   *                       8 - select string
+   * @return string HTML
+   */
+  protected function _build_text($values) {
+    $pattern = "\n" . '<input name="' . $this->aux_plugin_settings . '[%1$s]" type="%2$s" value="%3$s" title="%4$s" class="%5$s" style="%6$s"  />';
+    if (!empty($values[6])) $pattern .= "\n" . '<p class="description">%7$s</p>';
+    return vsprintf($pattern, $values);
+  }
+  
+  /**
+   * builds a text area setting element
+   * 
+   * @param array $values array of setting values
+   * @return string HTML
+   */
+  protected function _build_textarea($values) {
+        $pattern = '<textarea name="' . $this->aux_plugin_settings . '[%1$s]" title="%4$s" class="%5$s" style="%6$s"  />%3$s</textarea>';
+    if (!empty($values[6]))
+      $pattern .= '<p class="description">%7$s</p>';
+    return vsprintf($pattern, $values);
+  }
+  
+  /**
+   * builds a checkbox setting element
+   * 
+   * @param array $values array of setting values
+   * @return string HTML
+   */
+  protected function _build_checkbox($values) {
+    $selectstring = $this->set_selectstring($values[1]);
+    $values[8] = $values[2] == 1 ? $selectstring : '';
+    $pattern = '
+<input name="' . $this->aux_plugin_settings . '[%1$s]" type="hidden" value="0" />
+<input name="' . $this->aux_plugin_settings . '[%1$s]" type="%2$s" value="1" title="%4$s" class="%5$s" style="%6$s" %9$s />
+';
+    if (!empty($values[6])) $pattern .= '<p class="description">%7$s</p>';
+    return vsprintf($pattern, $values);
+  }
+  
+  /**
+   * builds a radio button setting element
+   * 
+   * @param array $values array of setting values
+   * @return string HTML
+   */
+  protected function _build_radio($values) {
+    $selectstring = $this->set_selectstring($values[1]);
+    $html = '';
+    $pattern = "\n" . '<label title="%4$s"><input type="%2$s" %9$s value="%3$s" name="' . $this->aux_plugin_settings . '[%1$s]"> <span>%4$s</span></label><br />';
+    $html .= "\n" . '<div class="' . $values[1] . ' ' . $values[4] . '" >';
+    foreach ($values[7] as $name => $title) {
+      $values[8] = $values[2] == $name ? $selectstring : '';
+          $values[2] = $name;
+          $values[3] = $title;
+      $html .= vsprintf($pattern, $values);
+    }
+$html .= "\n" . '</div>';
+    if (!empty($setting['help'])) $html .= "\n" . '<p class="description">' . $setting['help'] . '</p>';
+    return $html;
+  }
+  
+  /**
+   * builds a multi-checkbox setting element
+   * 
+   * @param array $values array of setting values
+   * @return string HTML
+   */
+  protected function _build_multicheckbox($values) {
+    $selectstring = $this->set_selectstring($values[1]);
+    $html = '';
+    $pattern = "\n" . '<label title="%4$s"><input type="checkbox" %9$s value="%4$s" name="' . $this->aux_plugin_settings . '[%1$s][]"> <span>%4$s</span></label><br />';
+    $html .= "\n" . '<div class="checkbox-group ' . $values[1] . ' ' . $values[4] . '" >';
+    for ($i= 0;$i < count($values[7]);$i++) {
+      $value = $values[7][$i];
+      $values[8] = in_array($value, $values[2]) ? $selectstring : '';
+      $values[3] = $value;
+      $html .= vsprintf($pattern, $values);
+    }
+$html .= "\n" . '</div>';
+    if (!empty($setting['help'])) $html .= "\n" . '<p class="description">' . $setting['help'] . '</p>';
+    return $html;
+  }
   /**
    * sets the select string
    * 
    * define a select indicator string fro form elements that offer multiple slections
    * 
-   * @param string the form element type
+   * @param string $type the form element type
    */
-  private function set_selectstring($type) {
+  protected function set_selectstring($type) {
     switch ($type) {
       case 'radio':
       case 'checkbox':
+      case 'multicheckbox':
         return 'checked="checked"';
       case 'dropdown':
         return 'selected="selected"';
       default:
         return '';
     }
+  }
+  /**
+   * builds a text setting control
+   * 
+   * @param array $setting the parameters of the setting
+   * @param array $values  an array of setting values for use as a replacement array
+   * @return string the setting control HTMLn
+   */
+  protected function _text_setting($setting,$values) {
+    $pattern = '<input name="' . $this->aux_plugin_settings . '[%1$s]" type="%2$s" value="%3$s" title="%4$s" class="%5$s" style="%6$s"  />';
+    if (!empty($setting['help'])) $pattern .= '<p class="description">%7$s</p>';
+    return vsprintf($pattern, $values);
   }
   
   /**

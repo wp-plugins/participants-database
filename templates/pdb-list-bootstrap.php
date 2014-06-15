@@ -72,7 +72,7 @@ $this->print_list_count('<h5>');
 ?>
 
 
-  <table class="table pdb-list" >
+  <table class="table pdb-list list-container" >
   
     
     <?php if ( $record_count > 0 ) : ?>
@@ -243,3 +243,4 @@ $this->print_list_count('<h5>');
 	$this->pagination->show();
 	
 	?>
+</div>

@@ -186,8 +186,8 @@ msgid "List Participants"
 msgstr ""
 
 #: classes/PDb_List_Admin.class.php:427
-msgid "%s record found, sorted by:"
-msgid_plural "%s records found, sorted by:"
+msgid "%s record found, sorted by: %s"
+msgid_plural "%s records found, sorted by: %s"
 msgstr[0] ""
 msgstr[1] ""
 

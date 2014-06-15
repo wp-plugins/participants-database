@@ -22,6 +22,7 @@ class PDb_Image extends xnau_Image_Handler {
    *                     'classname' => a classname for the image
    *                     'wrap_tags' => array of open and close HTML
    *                     'link' URI for a wrapping anchor tag
+   *                     'relstring' => string to show in the "rel" attribute of the image
    *                     'mode' => display mode: as an image or a filename or both
    *                     'module' => calling module
    */
@@ -31,8 +32,8 @@ class PDb_Image extends xnau_Image_Handler {
     
     $this->classname .= ' ' . Participants_Db::$prefix . 'image image-field-wrap';
     
-    if (empty($this->link) and $this->link !== false) {
-      $this->link = $this->image_defined && Participants_Db::$plugin_options['image_link'] == 1 ? $this->image_uri : '';
+    if ($this->link === '') {
+      $this->link = $this->image_defined && Participants_Db::plugin_setting_is_true('image_link') ? $this->image_uri : '';
     }
     
   }
@@ -92,7 +93,7 @@ class PDb_Image extends xnau_Image_Handler {
     } elseif ( Participants_Db::$plugin_options['image_link'] == 1 and $this->image_defined) {
       
       $this->image_wrap = array(
-                        '<span class="%1$s"><a href="%2$s" rel="lightbox" title="%3$s" >',
+                        '<span class="%1$s"><a href="%2$s" rel="%4$s" title="%3$s" >',
                         '</a></span>'
                         );
 

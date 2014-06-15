@@ -27,39 +27,6 @@ jQuery(document).ready(function($) {
   $('a.obfuscate[rel]').each(function() {
     xnau_email_obfuscate($(this));
   });
-  // dropdown-other controls
-  var
-          othergroup = $('div.dropdown-other-control-group');
-  othergroup.on('change', 'select.otherselect', function() {
-    var 
-            thisGroup = $(this).closest('.dropdown-other-control-group'),
-            thisName = thisGroup.attr('name'),
-            otherLabel = thisGroup.attr('rel');
-    if ($(this).val() == 'other') {
-      thisGroup.find('.otherselect').attr('name','temp');
-      thisGroup.find('.otherfield').attr('name', thisName).select();
-    } else {
-      thisGroup.find('.otherselect').attr('name', thisName);
-      thisGroup.find('.otherfield')
-              .attr('name','temp')
-              .val(thisGroup.find('.otherselect').find('option:selected').text()==""?"("+otherLabel+")":"");
-    }
-  });
-  othergroup.on('click', 'input.otherfield', function() {
-    var 
-            thisGroup = $(this).closest('.dropdown-other-control-group'),
-            thisName = thisGroup.attr('name'),
-            otherLabel = thisGroup.attr('rel');
-    thisGroup.find('.otherfield').attr('name',thisName);
-    thisGroup
-            .find('.otherselect option:selected').removeAttr('selected')
-            .end()
-            .find('.otherselect option[value=other]').prop('selected', true)
-            .end()
-            .find('.otherselect').attr('name','temp');
-    return true;
-  });
-  othergroup.find('.otherselect').trigger('change');
   });
 /**
  * converts a text-obfuscated email address to a clickable mailto link

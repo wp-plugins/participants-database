@@ -25,7 +25,7 @@ if (file_exists($langfile)) {
 <ol>
 <li>Place the &#8220;&#91;pdb_list]&#8221; shortcode on the page where you want the list of participants to go.</li>
 <li>On the &#8220;Manage Database Fields&#8221; page you can determine which fields get shown in the list and which column they will be in. This is under the &#8220;Display&#8221; column and you give each field you want to show a number which determines which column the field will appear in. Zero means it won&#8217;t show at all.</li>
-<li>On the page where you want the record detail to show, place the &#8220;&#91;pdb_single]&#8221; shortcode. This page won&#8217;t show anything unless it is visited using a link with the ID of the record to show in it. For example: <pre>/participants/detail?pid=27</pre></li>
+<li>On the page where you want the record detail to show, place the &#8220;&#91;pdb_single]&#8221; shortcode. This page won&#8217;t show anything unless it is visited using a link with the ID of the record to show in it. For example: <pre>/participants/detail?pdb=27</pre></li>
 <li>On the plugin settings page, under the &#8220;List Display&#8221; tab, set the &#8220;Single Record Link Field&#8221; to the field in the list (like 'first_name') where you want the link to the detail page to go.</li>
 <li>Next, set the &#8220;Single Record Page&#8221; setting to point to the page where you put the &#8220;&#91;pdb_single]&#8221; shortcode.</li>
 </ol>

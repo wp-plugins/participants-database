@@ -4,6 +4,7 @@
  * 
  * ver. 1.5.5
  */
+if (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) exit;
 /* translators: these strings are used in logic matching, please test after translating in case special characters cause problems */
 global $PDb_i18n;
 $PDb_i18n = array(
@@ -11,6 +12,8 @@ $PDb_i18n = array(
     'update groups' => __('Update Groups', 'participants-database'),
     'add field' => __('Add Field', 'participants-database'),
     'add group' => __('Add Group', 'participants-database'),
+    'field' => __('field', 'participants-database'),
+    'group' => __('group', 'participants-database'),
     'new field title' => __('new field title', 'participants-database'),
     'new group title' => __('new group title', 'participants-database'),
     'order' => _x('Order', 'column name', 'participants-database'),
@@ -37,26 +40,26 @@ $PDb_i18n = array(
 );
 // process form submission
 $error_msgs = array();
-if (isset($_POST['action'])) {
+$action = filter_input(INPUT_POST, 'action');
+if (!empty($action)) {
 
-  switch ($_POST['action']) {
+  switch ($action) {
 
     case 'reorder_fields':
       unset($_POST['action'], $_POST['submit-button']);
       foreach ($_POST as $key => $value) {
-        $wpdb->update(Participants_Db::$fields_table, array('order' => $value), array('id' => str_replace('row_', '', $key)));
+        $wpdb->update(Participants_Db::$fields_table, array('order' => filter_var($value, FILTER_VALIDATE_INT)), array('id' => filter_var(str_replace('row_', '', $key), FILTER_VALIDATE_INT)));
       }
       break;
 
     case 'reorder_groups':
       unset($_POST['action'], $_POST['submit-button']);
       foreach ($_POST as $key => $value) {
-        $wpdb->update(Participants_Db::$groups_table, array('order' => $value), array('name' => str_replace('order_', '', $key)));
+        $wpdb->update(Participants_Db::$groups_table, array('order' => filter_var($value, FILTER_VALIDATE_INT)), array('name' => filter_var(str_replace('order_', '', $key), FILTER_SANITIZE_STRING)));
       }
       break;
 
     case $PDb_i18n['update fields']:
-
       // dispose of these now unneeded fields
       unset($_POST['action'], $_POST['submit-button']);
 
@@ -68,7 +71,7 @@ if (isset($_POST['action'])) {
 
         if ($row['status'] == 'changed') {
 
-          $id = $row['id'];
+          $id = filter_var($row['id'], FILTER_VALIDATE_INT);
 
           if (!empty($row['values'])) {
 
@@ -87,13 +90,13 @@ if (isset($_POST['action'])) {
            * data. If the user really wants to do this, they will have to do it manually
            */
           if (isset($row['group']) && $row['group'] != 'internal') {
-            $sql = "SHOW FIELDS FROM " . Participants_Db::$participants_table . " WHERE field = '" . $row['name'] . "'";
-            $field_info = $wpdb->get_results($sql);
+            $sql = "SHOW FIELDS FROM " . Participants_Db::$participants_table . ' WHERE `field` = "%s"';
+            $field_info = $wpdb->get_results($wpdb->prepare($sql, $row['name']));
             $new_type = PDb_FormElement::get_datatype($row['form_element']);
             $current_type = current($field_info)->Type;
             if ($new_type != $current_type and !($new_type == 'tinytext' and $current_type == 'text')) {
 
-              $sql = "ALTER TABLE " . Participants_Db::$participants_table . " MODIFY COLUMN `" . $row['name'] . "` " . $new_type;
+              $sql = "ALTER TABLE " . Participants_Db::$participants_table . " MODIFY COLUMN `" . esc_sql($row['name']) . "` " . $new_type;
 
               $result = $wpdb->get_results($sql);
             }
@@ -165,7 +168,7 @@ if (isset($_POST['action'])) {
       }
       $result = Participants_Db::add_blank_field($atts);
       if (false === $result)
-        $error_msgs[] = PDb_parse_db_error($wpdb->last_error, $_POST['action']);
+        $error_msgs[] = PDb_parse_db_error($wpdb->last_error, $action);
       break;
 
     // add a new blank field
@@ -183,7 +186,7 @@ if (isset($_POST['action'])) {
       $wpdb->insert(Participants_Db::$groups_table, $atts);
 
       if ($wpdb->last_error)
-        $error_msgs[] = PDb_parse_db_error($wpdb->last_error, $_POST['action']);
+        $error_msgs[] = PDb_parse_db_error($wpdb->last_error, $action);
       break;
 
     case 'delete_field':
@@ -191,9 +194,9 @@ if (isset($_POST['action'])) {
       global $wpdb;
       $wpdb->hide_errors();
 
-      $result = $wpdb->query('
+      $result = $wpdb->query($wpdb->prepare('
 				DELETE FROM ' . Participants_Db::$fields_table . '
-				WHERE id = ' . $wpdb->escape($_POST['delete'])
+				WHERE id = "%s"' ,$_POST['delete'])
       );
 
       break;
@@ -608,11 +611,19 @@ foreach ($groups as $group) {
    */
   function PDb_make_name($string)
   {
-
-    // first scrub non-letter characters
-    $name = strtolower(str_replace(array(' ', '-', "'", '"', '%', '\\', '#', '.', '&'), array('_', '_', '', '', 'pct', '', '', '', 'and'), stripslashes(substr($string, 0, 64))));
-    // now allow only proper unicode letters, numerals and legal symbols
-    return preg_replace('#[^\p{L}\p{N}\$_]#u', '', $name);
+    /*
+     * truncate to 64 characters, then replace any characters that would cause problems 
+     * in queries
+     */
+    $name = strtolower(str_replace(
+            array(' ', '-', '/', "'", '"', '\\', '#', '.', '$', '&',   '%'  ), 
+            array('_', '_', '_', '' , '' , ''  , '' , '' , '' , 'and', 'pct'), 
+            stripslashes(substr($string, 0, 64))
+            ));
+    /*
+     * allow only proper unicode letters, numerals and legal symbols
+     */
+    return preg_replace('#[^\p{L}\p{N}_]#u', '', $name);
   }
 
   function PDb_trim_array($array)

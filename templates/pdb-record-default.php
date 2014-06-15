@@ -57,7 +57,7 @@
       <tr>
         <th><h3><?php $this->print_save_changes_label() ?></h3></th>
         <td class="submit-buttons">
-          <?php $this->print_submit_button('button-primary'); // you can specify a class for the button ?>
+          <?php $this->print_submit_button('button-primary'); // you can specify a class for the button, second parameter sets button text ?>
         </td>
       </tr>
       

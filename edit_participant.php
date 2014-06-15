@@ -6,11 +6,12 @@
  * admin_init action
  *
  */
+if (!current_user_can(Participants_Db::$plugin_options['record_edit_capability'])) exit;
 
+$input_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('min_range' => 1));
 if (!isset($participant_id)) {
-
   // if there is no id in the request, use the default record
-  $participant_id = isset($_REQUEST['id']) ? $_REQUEST['id'] : false;
+  $participant_id = empty($input_id) ? false : $input_id;
 }
 
 if (false === $participant_id) {
@@ -51,11 +52,10 @@ if ($participant_values) :
 
   $section = '';
   ?>
-  <div class="wrap admin-edit-participant">
+  <div class="wrap pdb-admin-edit-participant">
     <h2><?php echo $page_title ?></h2>
     <?php
     if (is_object(Participants_Db::$validation_errors)) {
-
       echo Participants_Db::$validation_errors->get_error_html();
     } else {
       Participants_Db::admin_message();
@@ -101,14 +101,15 @@ if ($participant_values) :
             ?>
             <?php
             $add_title = '';
+            $fieldnote_pattern = ' <span class="fieldnote">%s</span>';
             if ($column->form_element == 'hidden') {
-              $add_title = sprintf(' <span class="fieldnote">(%s)</span>', __('hidden', 'participants-database'));
+              $add_title = sprintf($fieldnote_pattern, __('hidden', 'participants-database'));
             } elseif (in_array($column->name, $readonly_columns) or $column->form_element == 'timestamp') {
               $attributes['class'] = 'readonly-field';
               if (!current_user_can(Participants_Db::$plugin_options['record_edit_capability'])) {
               $attributes['readonly'] = 'readonly';
               }
-              $add_title = sprintf(' <span class="fieldnote">(%s)</span>', __('read only', 'participants-database'));
+              $add_title = sprintf($fieldnote_pattern, __('read only', 'participants-database'));
             }
             ?>
             <th><?php echo $column_title . $add_title ?></th>
@@ -129,12 +130,12 @@ if ($participant_values) :
               if (isset($_POST[$column->name])) {
 
                 if (is_array($_POST[$column->name]))
-                  $column->value = $_POST[$column->name];
+                  $column->value = filter_var_array($_POST[$column->name], FILTER_SANITIZE_STRING);
 
                 elseif ('rich-text' == $column->form_element)
-                  $column->value = $_POST[$column->name];
+                  $column->value = filter_input(INPUT_POST, $column->name, FILTER_SANITIZE_SPECIAL_CHARS);
                 else
-                  $column->value = esc_html(stripslashes($_POST[$column->name]));
+                  $column->value = filter_input(INPUT_POST, $column->name, FILTER_SANITIZE_SPECIAL_CHARS);
               }
 
               $field_class = ( $column->validation != 'no' ? "required-field" : '' ) . ( in_array($column->form_element, array('text-line', 'date')) ? ' regular-text' : '' );
@@ -232,7 +233,7 @@ if ($participant_values) :
   <?php if (is_admin()) : ?>
           <tr>
           <td colspan="2" class="submit-buttons">
-            <?php if (isset($_GET['id'])) : ?><input class="button button-default button-leftarrow" type="submit" value="<?php echo self::$i18n['previous'] ?>" name="submit_button"><?php endif ?>
+            <?php if (!empty($input_id)) : ?><input class="button button-default button-leftarrow" type="submit" value="<?php echo self::$i18n['previous'] ?>" name="submit_button"><?php endif ?>
             <input class="button button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit_button">
             <input class="button button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit_button">
             <input class="button button-default button-rightarrow" type="submit" value="<?php echo self::$i18n['next'] ?>" name="submit_button">
@@ -242,7 +243,7 @@ if ($participant_values) :
             <td colspan="2">
               <?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', 'participants-database') ?>
               <br />
-              <?php if (isset($_GET['id'])) {_e('<strong>Previous:</strong> save and move to previous record', 'participants-database'); } ?>
+              <?php if (!empty($input_id)) {_e('<strong>Previous:</strong> save and move to previous record', 'participants-database'); } ?>
             </td>
           </tr>
   <?php else : ?>

@@ -138,21 +138,30 @@ class PDb_Template_Item {
   }
   
   /**
-   * assigns the object properties that match properties in the slupplied object
+   * assigns the object properties that match properties in the supplied object
    * 
    * @param object $item the supplied object
    * @param string $class the classname of the instantiating class
    */
   protected function assign_props( $item, $class = __CLASS__ ) {
     
-    // grab and assign the class properties from the provided object
-    foreach( get_class_vars( $class ) as $property => $value ) {
+    $class_properties = get_class_vars( $class );
       
-      // skip any properties not needed in the subclass object
-      if ( ! in_array( $property, array( 'options' ) ) && isset( $item->$property ) ) {
+    if (is_object(Participants_Db::$fields[$item->name])) {
+      $field = clone Participants_Db::$fields[$item->name];
+    }
+    
+    // grab and assign the class properties from the provided object
+    foreach( $class_properties as $property => $value ) {
+      
+      if ( isset( $item->$property ) ) {
         
         $this->$property = $item->$property;
       
+      } elseif (isset($field->$property)) {
+        
+        $this->$property = $field->$property;
+        
       }
       
     }

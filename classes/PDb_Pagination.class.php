@@ -19,35 +19,31 @@
 class PDb_Pagination {
 
   /**
-   * Current Page
    *
-   * @var integer
+   * @var int the current page
    */
   var $page;
 
   /**
-   * Size of the records per page
    *
-   * @var integer
+   * @var int number of records per page
    */
   var $size;
 
   /**
-   * Total records
    *
-   * @var integer
+   * @var int the total record count
    */
   var $total_records;
 
   /**
-   * Link used to build navigation
    *
-   * @var string
+   * @var string the page navigation href value
    */
   var $link;
 
   /**
-   * Wrapper for the pagination links
+   * wrapper for the pagination links
    *
    * @var array
    *        'wrap_tag'            tag name for the overall wrapper; default: div
@@ -58,37 +54,32 @@ class PDb_Pagination {
   public $wrappers;
 
   /**
-   * class name for current page link
    *
-   * @var string
+   * @var string class name for current page link
    */
   private $current_page_class;
 
   /**
-   * class name for a disabled link
    *
-   * @var string
+   * @var string class name for a disabled link
    */
   private $disabled_class;
 
   /**
-   * flag to select wrapping dummy anchor tag around current page link
    *
-   * @var bool
+   * @var bool flag to select wrapping dummy anchor tag around current page link
    */
   private $anchor_wrap;
 
   /**
-   * flag to enable first/last page links
    *
-   * @var bool
+   * @var bool flag to enable first/last page links
    */
   private $first_last;
 
   /**
-   * was the object instantiated by a filtering operation?
    * 
-   * @var bool
+   * @var bool was the object instantiated by a filtering operation?
    */
   private $filtering;
 
@@ -101,13 +92,14 @@ class PDb_Pagination {
    *                'total_records' int the total records in the full query
    *                'link'          string the URL for page links
    *                'add_variables' additional GET string to add
+   *                'instance'      the list instance the control is attached to
    */
   function __construct($args) {
     extract(wp_parse_args($args, array(
                 'page' => 1,
                 'size' => 10,
                 'total_records' => false,
-                'link' => '',
+                'link' => 'page=%1$s',
                 'current_page_class' => 'currentpage',
                 'disabled_class' => 'disabled',
                 'filtering' => 0,

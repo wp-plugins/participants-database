@@ -7,7 +7,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.4
+ * @version    Release: 1.5.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -158,7 +158,7 @@ class PDb_FormElement extends xnau_FormElement {
 
           $image = new PDb_Image(array(
               'filename' => $field->value,
-              'link' => (isset($field->link) ? $field->link : ''),
+              'link' => $field->link,
               'mode' => 'both',
               'module' => $field->module,
               ));
@@ -178,8 +178,6 @@ class PDb_FormElement extends xnau_FormElement {
             $return = $field->value;
           }
           
-          
-
         break;
         
       case 'file-upload' :
@@ -207,7 +205,7 @@ class PDb_FormElement extends xnau_FormElement {
         if (self::is_empty($field->value) === false) {
           $date = Participants_Db::parse_date($field->value, $field);
           $format = Participants_Db::$date_format;
-          if (Participants_Db::$plugin_options['show_time'] == '1' and $field->form_element == 'timestamp') {
+          if (Participants_Db::plugin_setting_is_true('show_time') and $field->form_element === 'timestamp') {
             $format .= ' ' . get_option('time_format');
           }
           $return = date_i18n($format, $date);
@@ -227,6 +225,7 @@ class PDb_FormElement extends xnau_FormElement {
         $multivalues = Participants_Db::unserialize_array($field->value);
         // remove empty elements and convert to string for display
         $multivalues = array_filter((array)$multivalues, array( __CLASS__, 'is_displayable'));
+        
         $titles = array();
         foreach($multivalues as $value) {
           $titles[] = self::get_value_title($value, $field->name);
@@ -236,7 +235,7 @@ class PDb_FormElement extends xnau_FormElement {
 
       case 'link' :
 
-        $linkdata = Participants_Db::unserialize_array($field->value);
+        $linkdata = maybe_unserialize($field->value);
 
         if (!is_array($linkdata)) {
 
@@ -277,9 +276,25 @@ class PDb_FormElement extends xnau_FormElement {
         $return = sprintf('<span class="textarea richtext">%s</span>', Participants_Db::process_rich_text($field->value));
         break;
       
+      case 'dropdown':
+      case 'radio':
+      case 'checkbox':
+      case 'dropdown-other':
+      case 'select-other':
+        
+        $return = sprintf('<span class="%s">%s</span>', $field->form_element, self::get_value_title($field->value, $field->name) );
+        break;
+      
+      case 'hidden':
+        
+        // error_log(__METHOD__.' comparing: '.$field->value . ' and '. $field->default);
+        
+        if ($field->value === $field->default) {
+          $field->value = '';
+        }
+      
       default :
 
-        $field->value = self::get_value_title($field->value, $field->name);
         $return = self::make_link($field);
 
       endswitch;
@@ -425,7 +440,7 @@ class PDb_FormElement extends xnau_FormElement {
 
     if (Participants_Db::is_valid_timestamp($timestamp)) {
       
-      $format = Participants_Db::$date_format;
+      $format = Participants_Db::plugin_setting_is_true('strict_dates') ? Participants_Db::plugin_setting('input_date_format') : Participants_Db::$date_format;
       
       if ($time) {
         $format .= ' ' . get_option('time_format');
@@ -456,9 +471,7 @@ class PDb_FormElement extends xnau_FormElement {
    */
   public static function get_value_titles($values, $fieldname)
   {
-    global $wpdb;
-    $sql = 'SELECT f.values FROM ' . Participants_Db::$fields_table . ' AS f WHERE f.name = "%s"';
-    $options_array = maybe_unserialize($wpdb->get_var($wpdb->prepare($sql, $fieldname)));
+    $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
     $return = array();
     if (is_array($options_array)) {
       $i = 0;
@@ -492,9 +505,8 @@ class PDb_FormElement extends xnau_FormElement {
    */
   public static function get_value_title($value, $fieldname)
   {
-    global $wpdb;
-    $sql = 'SELECT f.values FROM ' . Participants_Db::$fields_table . ' AS f WHERE f.name = "%s"';
-    $options_array = maybe_unserialize($wpdb->get_var($wpdb->prepare($sql, $fieldname)));
+    if (isset(Participants_Db::$fields[$fieldname])) {
+      $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
 
     if (is_array($options_array)) {
       foreach ($options_array as $index => $option_value) {
@@ -504,6 +516,27 @@ class PDb_FormElement extends xnau_FormElement {
           // grab the option title
           return $index;
         }
+      }
+    }
+    }
+    return $value;
+  }
+  
+  /**
+   * gets the value that corresponds to a value title
+   * 
+   * @param string $title the title of the value
+   * @param string $fieldname the name of the field
+   * @return string the value that matches the title given
+   */
+  public static function get_title_value($title, $fieldname) {
+    if (isset(Participants_Db::$fields[$fieldname])) {
+      $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
+
+      if (is_array($options_array) && isset($options_array[$title])) {
+        $value = $options_array[$title];
+      } else {
+        $value = $title;
       }
     }
     return $value;

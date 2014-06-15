@@ -4,6 +4,9 @@
   display: inline-block;
   margin: 0 5px;
 }
+[class*="pdb-"] .checkbox .helptext {
+  display: inline;
+}
 .glyphicon {
   font: 400 20px/1 sans-serif;
 }

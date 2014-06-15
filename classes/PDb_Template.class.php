@@ -9,15 +9,12 @@
  * use the class by instantiating it with the "$this" variable, then use the resuting 
  * object methods in your template: $record = new PDb_Template($this);
  * 
- * for a list template, you must instantiate in the loop with each new record:
- * $record = new PDb_Template($this->record);
- *
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    0.4
+ * @version    0.5
  * @link       http://xnau.com/wordpress-plugins/
  */
 class PDb_Template {
@@ -48,13 +45,13 @@ class PDb_Template {
    */
   var $module;
   /**
-   * they type of object used to instantiate the class
+   * the type of object used to instantiate the class
    * 
    * @var string $base_type
    */
   var $base_type;
   /**
-   * this is an indexed array of raw field values
+   * this is an indexed array of raw (as stored) field values
    * 
    * @var array $values
    */
@@ -81,6 +78,7 @@ class PDb_Template {
     $this->_setup_fields($object);
     $this->set_edit_page(Participants_Db::$plugin_options['registration_page']);
     $this->set_detail_page(Participants_Db::$plugin_options['single_record_page']);
+    
   }
   
   /**
@@ -189,10 +187,10 @@ class PDb_Template {
    * 
    * @var string $name the fields name
    * @var string $prop the field property to get
-   * @return string
+   * @return string|array
    */
   public function get_field_prop($name, $prop) {
-    return (isset($this->fields->{$name}->{$prop}) ? $this->fields->{$name}->{$prop} : '');
+    return (isset($this->fields->{$name}->{$prop}) ? maybe_unserialize($this->fields->{$name}->{$prop}) : '');
   }
   
   /**
@@ -273,12 +271,15 @@ class PDb_Template {
         $this->values = $object->record->values;
         foreach($object->record->fields as $field_object) {
           $name = $field_object->name;
-          $value = $field_object->value;
+          $value = isset($field_object->value) ? $field_object->value : '';
           $this->fields->{$name} = Participants_Db::get_column($name);
           $this->fields->{$name}->module = $object->module;
           $this->fields->{$name}->value = $value;
         }
-        reset($object->record->values);
+        reset($object->record->fields);
+        
+        //error_log(__METHOD__.' resetting:'.print_r(current($object->record->fields,1)));
+        
         break;
       case 'PDb_Signup':
       case 'PDb_Single':
@@ -300,12 +301,14 @@ class PDb_Template {
             unset($this->values[$name]);
           }
         }
+        reset($this->values);
         foreach($this->record as $name => $values) {
           $this->groups[$name] = new stdClass();
           $this->groups[$name]->name = $name;
           $this->groups[$name]->title = $values->title;
           $this->groups[$name]->description = $values->description;
         }
+        reset($this->record);
         break;
     }
     //unset($this->record->options);

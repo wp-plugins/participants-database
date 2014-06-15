@@ -1,256 +1,257 @@
-# Copyright (C) 2013 Participants Database
+# Copyright (C) 2014 Participants Database
 # This file is distributed under the same license as the Participants Database package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Participants Database 1.4.9.2\n"
+"Project-Id-Version: Participants Database 1.5.4.4\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/participants-database\n"
 "POT-Creation-Date: 2013-12-27 17:36:25+00:00\n"
-"PO-Revision-Date: 2014-06-01 16:08-1000\n"
+"PO-Revision-Date: 2014-06-01 16:06-1000\n"
 "Last-Translator: Roland Barker <webdesign@xnau.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: fr_FR\n"
+"Language: ro_RO\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 1.6.5\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2);\n"
 
 #: classes/PDb_FormElement.class.php:324
 #: classes/xnau_FormElement.class.php:986 manage_fields.php:461
 msgid "delete"
-msgstr "détruire"
+msgstr "șterge"
 
 #: classes/PDb_FormElement.class.php:433
 msgid "Text-line"
-msgstr ""
+msgstr "Text-line"
 
 #: classes/PDb_FormElement.class.php:434
 msgid "Text Area"
-msgstr ""
+msgstr "Text Area"
 
 #: classes/PDb_FormElement.class.php:435
 msgid "Rich Text"
-msgstr ""
+msgstr "Rich Text"
 
 #: classes/PDb_FormElement.class.php:436
 msgid "Checkbox"
-msgstr ""
+msgstr "Checkbox"
 
 #: classes/PDb_FormElement.class.php:437
 msgid "Radio Buttons"
-msgstr ""
+msgstr "Radio Buttons"
 
 #: classes/PDb_FormElement.class.php:438
 msgid "Dropdown List"
-msgstr ""
+msgstr "Dropdown List"
 
 #: classes/PDb_FormElement.class.php:439
 msgid "Date Field"
-msgstr ""
+msgstr "Date Field"
 
 #: classes/PDb_FormElement.class.php:440
 msgid "Dropdown/Other"
-msgstr ""
+msgstr "Dropdown/Altele"
 
 #: classes/PDb_FormElement.class.php:441
 msgid "Multiselect Checkbox"
-msgstr ""
+msgstr "Multiselect Checkbox"
 
 #: classes/PDb_FormElement.class.php:442
 msgid "Radio Buttons/Other"
-msgstr ""
+msgstr "Radio Buttons/Altele"
 
 #: classes/PDb_FormElement.class.php:443
 msgid "Multiselect/Other"
-msgstr ""
+msgstr "Multiselect/Altele"
 
 #: classes/PDb_FormElement.class.php:444
 msgid "Link Field"
-msgstr ""
+msgstr "Link Field"
 
 #: classes/PDb_FormElement.class.php:445
 msgid "Image Upload Field"
-msgstr ""
+msgstr "Câmp de încărcare imagine"
 
 #: classes/PDb_FormElement.class.php:446
 msgid "File Upload Field"
-msgstr ""
+msgstr "Câmp de încărcare fișier"
 
 #: classes/PDb_FormElement.class.php:447
 msgid "Hidden Field"
-msgstr ""
+msgstr "Câmp ascuns"
 
 #: classes/PDb_FormElement.class.php:448
 msgid "Password Field"
-msgstr ""
+msgstr "Câmp pentru parolă"
 
 #: classes/PDb_FormElement.class.php:449
 msgid "CAPTCHA"
-msgstr ""
+msgstr "CAPTCHA"
 
 #: classes/PDb_Init.class.php:700
-#, fuzzy
 msgid "Participant Info"
-msgstr "Ajouter un participant"
+msgstr "Informație Participant"
 
 #: classes/PDb_Init.class.php:701
 msgid "Personal Info"
-msgstr ""
+msgstr "Informații Personale"
 
 #: classes/PDb_Init.class.php:702
 msgid "Administrative Info"
-msgstr ""
+msgstr "Informații Administrative"
 
 #: classes/PDb_Init.class.php:703
 msgid "Record Info"
-msgstr ""
+msgstr "Informație Înregistrată"
 
 #: classes/PDb_List.class.php:786 templates/pdb-list-bootstrap.php:34
 #: templates/pdb-list-detailed.php:31 templates/pdb-search-default.php:22
 msgid "Please select a column to search in."
-msgstr "Choisissez une colonne pour la recherche SVP."
+msgstr "Vă rugăm să selectați o coloană în care să căutați"
 
 #: classes/PDb_List.class.php:787 templates/pdb-list-bootstrap.php:35
 #: templates/pdb-list-detailed.php:32 templates/pdb-search-default.php:23
 msgid "Please type in something to search for."
-msgstr "Entrez ce que vous recherchez SVP."
+msgstr "Vă rugăm să scrieți ceva pentru a căuta."
 
 #: classes/PDb_List.class.php:795 templates/pdb-list-bootstrap.php:45
 #: templates/pdb-list-detailed.php:47 templates/pdb-search-default.php:35
 msgid "Search"
-msgstr "Rechercher"
+msgstr "Căutare"
 
 #: classes/PDb_List.class.php:810 classes/PDb_List_Admin.class.php:491
 #: templates/pdb-list-bootstrap.php:62 templates/pdb-list-detailed.php:75
 #: templates/pdb-search-default.php:63
 msgid "Sort by"
-msgstr "Trier par"
+msgstr "Sortare după"
 
 #: classes/PDb_List.class.php:881
 msgid "select"
-msgstr ""
+msgstr "selectează"
 
 #: classes/PDb_List.class.php:952 classes/PDb_List_Admin.class.php:506
 #: classes/PDb_Settings.class.php:810 classes/PDb_Settings.class.php:836
 msgid "Ascending"
-msgstr "Croissant"
+msgstr "Ascendent"
 
 #: classes/PDb_List.class.php:953 classes/PDb_List_Admin.class.php:507
 #: classes/PDb_Settings.class.php:810 classes/PDb_Settings.class.php:836
 msgid "Descending"
-msgstr "Décroissant"
+msgstr "Descendent"
 
 #. translators: the following 5 strings are used in logic matching, please test
 #. after translating in case special characters cause problems
 #: classes/PDb_List.class.php:1385 classes/PDb_List_Admin.class.php:857
 msgctxt "submit button label"
 msgid "Delete Checked"
-msgstr "Détruire selection"
+msgstr "Șterge elementul bifat"
 
 #: classes/PDb_List.class.php:1386 classes/PDb_List_Admin.class.php:858
 msgctxt "submit button label"
 msgid "Change"
-msgstr "Modifier"
+msgstr "Schimbă"
 
 #: classes/PDb_List.class.php:1387 classes/PDb_List_Admin.class.php:859
 msgctxt "submit button label"
 msgid "Sort"
-msgstr "Trier"
+msgstr "Sortează"
 
 #: classes/PDb_List.class.php:1388 classes/PDb_List_Admin.class.php:860
 msgctxt "submit button label"
 msgid "Filter"
-msgstr "Filtrer"
+msgstr "Filtrează"
 
 #: classes/PDb_List.class.php:1389 classes/PDb_List_Admin.class.php:861
 msgctxt "submit button label"
 msgid "Clear"
-msgstr "Effacer"
+msgstr "Resetează"
 
 #: classes/PDb_List.class.php:1390 classes/PDb_List_Admin.class.php:862
 msgctxt "search button label"
 msgid "Search"
-msgstr "Rechercher"
+msgstr "Caută"
 
 #: classes/PDb_List_Admin.class.php:199
 msgid "Record delete successful."
-msgstr ""
+msgstr "Ștergerea înregistrării a reușit."
 
 #: classes/PDb_List_Admin.class.php:360 participants-database.php:508
 msgid "Do you really want to delete the selected record?"
-msgstr "Voulez-vous vraiment détruire l'entrée sélectionnée?"
+msgstr "Doriți într-adevăr să ștergeți înregistrarea selectată?"
 
 #: classes/PDb_List_Admin.class.php:361 participants-database.php:509
 msgid "Do you really want to delete the selected records?"
-msgstr "Voulez-vous vraiment détruire les entrées sélectionnées?"
+msgstr "Doriți într-adevăr să ștergeți înregistrările selectate?"
 
 #: classes/PDb_List_Admin.class.php:426 participants-database.php:416
 #: participants-database.php:417
 msgid "List Participants"
-msgstr "Lister les participants"
+msgstr "Lista Participanților"
 
 #: classes/PDb_List_Admin.class.php:427
 #, fuzzy
 msgid "%s record found, sorted by: %s"
 msgid_plural "%s records found, sorted by: %s"
-msgstr[0] "Pas d'entrée trouvée pour %s."
-msgstr[1] "Pas d'entrée trouvée pour %s."
+msgstr[0] "%s rezultate găsite, sortate după:"
+msgstr[1] "%s înregistrare găsită, sortată în funcție de:"
+msgstr[2] "%s înregistrări găsite, sortate în funcție de:"
 
 #: classes/PDb_List_Admin.class.php:447
 msgid "Show only records with"
-msgstr "Afficher seulement les entrées contenant"
+msgstr "Arată doar înregistrările cu"
 
 #: classes/PDb_List_Admin.class.php:450
 msgid "show all"
-msgstr "tout afficher"
+msgstr "Arată toate înregistrările"
 
 #: classes/PDb_List_Admin.class.php:475
 msgid "is"
-msgstr "est"
+msgstr "este"
 
 #: classes/PDb_List_Admin.class.php:476
 msgid "is not"
-msgstr "n'est pas"
+msgstr "nu este"
 
 #: classes/PDb_List_Admin.class.php:477
 msgid "contains"
-msgstr "contient"
+msgstr "conține"
 
 #: classes/PDb_List_Admin.class.php:478
 msgid "doesn&#39;t contain"
-msgstr "ne contient pas"
+msgstr "nu conține"
 
 #: classes/PDb_List_Admin.class.php:479
 msgid "is greater than"
-msgstr "supérieur à"
+msgstr "este mai mare decât"
 
 #: classes/PDb_List_Admin.class.php:480
 msgid "is less than"
-msgstr "inférieur à"
+msgstr "este mai mic/ă decât"
 
 #: classes/PDb_List_Admin.class.php:546
 msgid "Show %s items per page."
-msgstr "Afficher %s éléments par page."
+msgstr "Afișează %s elemente pe pagină."
 
 #: classes/PDb_List_Admin.class.php:760
 msgid "No records found"
-msgstr "Aucune entrée trouvée"
+msgstr "No records found"
 
 #: classes/PDb_List_Admin.class.php:778
 msgid "Export CSV"
-msgstr "Exporter en CSV"
+msgstr "Exportă CSV"
 
 #: classes/PDb_List_Admin.class.php:791
 msgid "File Name"
-msgstr "Nom du fichier"
+msgstr "Nume Fișier"
 
 #: classes/PDb_List_Admin.class.php:793
 msgid "Download CSV for this list"
-msgstr "Télécharger CSV pour cette liste"
+msgstr "Descărcați CSV pentru această listă"
 
 #: classes/PDb_List_Admin.class.php:794
 msgid "Include field titles"
-msgstr ""
+msgstr "Includeți denumirea câmpurilor"
 
 #: classes/PDb_List_Admin.class.php:797
 msgid ""
@@ -259,86 +260,87 @@ msgid ""
 "records on all list pages. The fields included in the export are defined in "
 "the \"CSV\" column on the Manage Database Fields page."
 msgstr ""
-"Ceci téléchargera la liste des participants correspondant à votre recherche, "
-"et dans l'ordre spécifié par le tri. L'export comprendra des entrées pour "
-"toutes les pages de la liste. Les champs inclus sont définis dans la colonne "
-"\"CSV\" de la page Gestion des champs de la base."
+"Acest lucru va descărca întreaga listă de participanți care se potrivesc cu "
+"termenii .dvs de căutare, și în ordinea specificată de sortare. Exportul va "
+"include înregistrări pe toate paginile listei. Câmpurile incluse în export "
+"sunt definite în coloana  \"CSV\" de pe pagina Gestioneză Câmpurile Bazei de "
+"Date."
 
 #: classes/PDb_Pagination.class.php:355
 msgid "First"
-msgstr "Premier"
+msgstr "Primul"
 
 #: classes/PDb_Pagination.class.php:365 participants-database.php:2820
 msgid "Previous"
-msgstr "Précédent"
+msgstr "Anterior"
 
 #: classes/PDb_Pagination.class.php:382 participants-database.php:2819
 msgid "Next"
-msgstr "Suivant"
+msgstr "Următor"
 
 #: classes/PDb_Pagination.class.php:394
 msgid "Last"
-msgstr "Dernier"
+msgstr "Ultimul"
 
 #: classes/PDb_Settings.class.php:18
 msgid "General Settings"
-msgstr "Réglages généraux"
+msgstr "Setări Generale"
 
 #: classes/PDb_Settings.class.php:19
 msgid "Signup Form Settings"
-msgstr "Réglages page d'inscription"
+msgstr "Setări Formular de Înscriere"
 
 #: classes/PDb_Settings.class.php:20
 msgid "Record Form Settings"
-msgstr "Réglages formulaire détaillé"
+msgstr "Setări Formular de Înregistrare"
 
 #: classes/PDb_Settings.class.php:21
 msgid "List Display Settings"
-msgstr "Réglages d'affichage de liste"
+msgstr "Setările listei de afișare"
 
 #: classes/PDb_Settings.class.php:22
 msgid "Resend Link Settings"
-msgstr ""
+msgstr "Setările Link-ului de Retrimitere"
 
 #: classes/PDb_Settings.class.php:23
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Setări avansate"
 
 #: classes/PDb_Settings.class.php:24
 msgid "Custom CSS"
-msgstr ""
+msgstr "CSS personalizat"
 
 #: classes/PDb_Settings.class.php:28
 msgid ""
 "Settings for the [pdb_record] shortcode, which is used to show a user-"
 "editable form on the website."
 msgstr ""
-"Réglages pour le shortcode [pdb_record], utilisé pour afficher le formulaire "
-"éditable en ligne par l'utilisateur."
+"Setările pentru shortcode-ul [pdb_record] , care este folosit pentru a afișa "
+"un formular editabil de către utilizator pe site."
 
 #: classes/PDb_Settings.class.php:29
 msgid ""
 "Settings for the [pdb_list] shortcode, which is used to show a list of "
 "records from the database."
 msgstr ""
-"Réglages pour le shortcode [pdb_list], utilisé pour afficher une liste "
-"d'entrées provenant de la base."
+"Setările pentru shortcode-ul [pdb_list] , care este folosit pentru a afișa o "
+"listă de înregistrări din baza de date."
 
 #: classes/PDb_Settings.class.php:30
 msgid ""
 "Settings for the [pdb_signup] shortcode, which is used to show a signup or "
 "registration form on the website."
 msgstr ""
-"Réglages pour le shortcode [pdb_signup], utilisé pour afficher un formulaire "
-"d'inscription en ligne."
+"Setările pentru shortcode-ul [pdb_signup], care este folosit pentru a arăta "
+"o înscriere sau un formular de înregistrare pe site."
 
 #: classes/PDb_Settings.class.php:31
 msgid "Settings for the lost private link resend function."
-msgstr ""
+msgstr "Setările pentru funcția de retrimitere a link-ului privat pierdut."
 
 #: classes/PDb_Settings.class.php:32
 msgid "Settings for special configurations."
-msgstr ""
+msgstr "Setări pentru configurații speciale."
 
 #: classes/PDb_Settings.class.php:33
 msgid ""
@@ -347,14 +349,19 @@ msgid ""
 "blog/wordpress/firebug-wordpress-css/\">Use Firebug for Editing WordPress "
 "Themes.</a></p>"
 msgstr ""
+"Reguli CSS personalizate pentru stilizare pluging.</h4><p>Dacă sunteți "
+"novice în ceea ce privește CSS-ul, incercati acest tutorial pentru a vă "
+"ajuta să începeți: <a href=\"http://www.ostraining.com/blog/wordpress/"
+"firebug-wordpress-css/\">Utilizați Firebug pentru a edita teme WordPress.</"
+"a></p>"
 
 #: classes/PDb_Settings.class.php:42
 msgid "Save Plugin Settings"
-msgstr "Enregistrer les réglages du plugin"
+msgstr "Salvați Setările Plugin-ului"
 
 #: classes/PDb_Settings.class.php:82
 msgid "File Upload Location"
-msgstr "Emplacement des fichiers (upload)"
+msgstr "Locația fișierului de încărcat"
 
 #: classes/PDb_Settings.class.php:86
 msgid ""
@@ -363,190 +370,202 @@ msgid ""
 "database'<br />Don't put it in the plugin folder, the images and files could "
 "get deleted when the plugin is updated."
 msgstr ""
-"Ceci définit la destination des fichiers en upload, par rapport à la racine "
-"de WordPress. L'emplacement par défaut est '/wp-content/uploads/participants-"
-"database'<br />Ne pas utiliser le répertoire du plugin, car les images et "
-"fichiers risqueraient alors d'être détruits dans les mises à jour."
+"Aceasta definește unde vor merge fișierele încărcate , față de radacina "
+"WordPress-ului. Locația implicită este '/wp-content/uploads/participants-"
+"database'<br />Nu-l puneți în dosarul plugin-ului, imaginile și fișierele "
+"pot fi șterse atunci când plugin-ul este actualizat."
 
 #: classes/PDb_Settings.class.php:93
 msgid "File Upload Limit"
-msgstr "Limite pour fichiers en upload"
+msgstr "Limita fișierului încărcat"
 
 #: classes/PDb_Settings.class.php:97
 msgid "the maximum allowed file size (in kilobytes) for an uploaded file"
-msgstr ""
+msgstr "dimensiunea maximă (în kilobytes) permisă pentru un fișier încărcat"
 
 #: classes/PDb_Settings.class.php:104
 msgid "Allowed File Types"
-msgstr ""
+msgstr "Tipuri de fișiere permise"
 
 #: classes/PDb_Settings.class.php:108
 msgid ""
 "list of allowed file types by file extension. Please be aware that there are "
 "security risks in allowing file uploads."
 msgstr ""
+"Lista de tipuri de fișiere permise, în fucție de extensie. Vă rugăm să fiți "
+"conștienți de faptul că există riscuri de securitate în ceea ce privește "
+"permisiunea încărcării de fișiere."
 
 #: classes/PDb_Settings.class.php:115
 msgid "Default Image"
-msgstr "Image par défaut"
+msgstr "Imaginea Implicită"
 
 #: classes/PDb_Settings.class.php:119
 msgid ""
 "Path (relative to WP root) of an image file to show if no image has been "
 "defined for an image field. Leave blank for no default image."
 msgstr ""
-"Chemin (relatif à la racine WP) d'un fichier image à utiliser quand aucune "
-"image n'est fournie pour un champ image. Laisser blanc si pas d'image par "
-"défaut."
+"Calea (relativă la rădăcina WP)  unui fișier de imagine care apare dacă nici "
+"o imagine nu a fost definită pentru un câmp de imagine. Lasă gol pentru nici "
+"o imagine implicită."
 
 #: classes/PDb_Settings.class.php:126
 msgid "Link Image to Fullsize"
-msgstr "Lien vers image en pleine taille"
+msgstr "Link-ul pentru imaginea în marime completă"
 
 #: classes/PDb_Settings.class.php:131
 msgid ""
 "place a link to the full-size image on images. This link will work with most "
 "\"lightbox\" plugins."
 msgstr ""
-"placer un lien sur l'image vers l'image en pleine taille. Ce lien devrait "
-"fonctionner avec la plupart des plugins \"lightbox\"."
+"plasați un link către imaginea în mărime completă. Acest link va lucra cu "
+"cele mai multe din plugin-urile de tip \"lightbox\" ."
 
 #: classes/PDb_Settings.class.php:139
 msgid "Allow File Delete"
-msgstr ""
+msgstr "Permiteți Ștergerea Fișierului "
 
 #: classes/PDb_Settings.class.php:144
 msgid ""
 "if checked, allows uploaded files and images to be deleted from storage when "
 "deleted from a record by a user"
 msgstr ""
+"dacă este bifat, permite ștergerea din folderul de depozitare a fișierelor "
+"și imaginilor încărcate, atunci când sunt șterse dintr-o înregistrare de "
+"către un utilizator"
 
 #: classes/PDb_Settings.class.php:152
 msgid "Make Links Clickable"
-msgstr "Rendre les liens cliquables"
+msgstr "Face Link-urile clickabile"
 
 #: classes/PDb_Settings.class.php:157
 msgid ""
 "if a \"text-line\" field looks like a link (begins with \"http\" or is an "
 "email address) make it clickable"
 msgstr ""
-"si un champ \"texte\" ressemble à un lien (commence par \"http\" ou adresse "
-"email), le rendre cliquable. "
+"în cazul în care un câmp de tip \"text-line\"  arată ca o legătură (începe "
+"cu \"http \" sau este o adresă de e-mail), fă-l clickabil"
 
 #: classes/PDb_Settings.class.php:165
 msgid "Protect Email Addresses"
-msgstr "Protéger les adresses email"
+msgstr "Protejează Adresa de Email"
 
 #: classes/PDb_Settings.class.php:170
 msgid "protect email addresses in text-line fields with Javascript"
-msgstr "protéger les adresses email dans les champs texte par du Javascript"
+msgstr ""
+"protejează adresele de e-mail în câmpurile de tip text-line cu Javascript"
 
 #: classes/PDb_Settings.class.php:178
 msgid "Missing Field Error Message"
-msgstr "Message d'erreur pour champ manquant"
+msgstr "Mesaj de eroare Câmp Necompletat"
 
 #: classes/PDb_Settings.class.php:182
 msgid ""
 "the message shown when a field is required, but left empty (the %s is "
 "replaced by the name of the field)"
 msgstr ""
-"message affiché quand est champ est requis, mais laissé vide (le %s est "
-"remplacé par le nom du champ)"
+"mesajul afișat atunci când un câmp este obligatoriu, dar lăsat gol (%s se "
+"înlocuiește cu numele câmpului)"
 
 #: classes/PDb_Settings.class.php:183
 msgid "The %s field is required."
-msgstr "The champ %s est obligatoire."
+msgstr "Câmpul%s este obligatoriu."
 
 #: classes/PDb_Settings.class.php:189
 msgid "Invalid Field Error Message"
-msgstr "Message d'erreur pour champ incorrect"
+msgstr "Mesaj de eroare Câmp Invalid"
 
 #: classes/PDb_Settings.class.php:193
 msgid ""
 "the message shown when a field's value does not pass the validation test"
 msgstr ""
-"message affiché quand la valeur d'un champ de satisfait pas le test de "
-"validation"
+"mesajul este afișat atunci când valoarea unui câmp nu trece testul de "
+"validare"
 
 #: classes/PDb_Settings.class.php:194
 msgid "The %s field appears to be incorrect."
-msgstr "Le champ %s semble incorrect."
+msgstr "Câmpul%s pare a fi incorect."
 
 #: classes/PDb_Settings.class.php:200
 msgid "Non-Matching Field Error Message"
-msgstr "Message d'erreur pour champ non-correspondant"
+msgstr "Mesaj de Eroare de Nepotrivire de Câmpuri"
 
 #: classes/PDb_Settings.class.php:204
+#, fuzzy
 msgid ""
 "the message shown when a field's value does match the value of another "
 "field. The first %s will show the name of the field, the second will show "
 "the name of the filed it must match."
 msgstr ""
+"mesaj afișat atunci când valoarea unui câmp se potrivește cu valoarea din "
+"alt câmp. Primul %s va afișa numele de domeniu, al doilea va arăta numele "
+"câmpului cu care trebuie să se potrivească."
 
 #: classes/PDb_Settings.class.php:205
 msgid "The %s field must match the %s field."
-msgstr ""
+msgstr "Câmpul %s trebuie să se potrivească cu câmpul %s ."
 
 #: classes/PDb_Settings.class.php:212
 msgid "Failed CAPTCHA Message"
-msgstr ""
+msgstr "Mesaj CAPTCHA nereușit"
 
 #: classes/PDb_Settings.class.php:216
 msgid "the message shown when the CAPTCHA (verify human) test failed"
 msgstr ""
+"mesajul este afișat atunci când  testul CAPTCHA (verificare umană) a eșuat"
 
 #: classes/PDb_Settings.class.php:217
 msgid "Pleast try the %s question again."
-msgstr ""
+msgstr "Vă rugăm să încercați din nou această întrebare %s "
 
 #: classes/PDb_Settings.class.php:223
 msgid "Field Error Style"
-msgstr "Style pour erreur de champ"
+msgstr "Stilul Erorii de Câmp"
 
 #: classes/PDb_Settings.class.php:227
 msgid ""
 "the CSS style applied to an input or text field that is missing or has not "
 "passed validation. This must be a valid CSS rule"
 msgstr ""
-"style CSS appliqué au paramètre ou champ texte qui manque ou ne satisfait "
-"pas la validation. Ceci doit être une règle CSS valide"
+"stilul CSS aplicat un câmp de intrare sau de text care lipsește sau nu a "
+"trecut testul de validare. Aceasta trebuie să fie o regulă CSS validă"
 
 #: classes/PDb_Settings.class.php:234
 msgid "Mark Required Fields"
-msgstr "Marquer les champs obligatoires"
+msgstr "Marcheaza Cimpurile Obligatorii"
 
 #: classes/PDb_Settings.class.php:239
 msgid "mark the title of required fields?"
-msgstr "marquer les titres des champs obligatoires?"
+msgstr "marchează denumirea câmpurilor obligatorii?"
 
 #: classes/PDb_Settings.class.php:247
 msgid "Required Field Marker"
-msgstr "Marqueur de champ obligatoire"
+msgstr "Marcator de Câmp Obligatoriu "
 
 #: classes/PDb_Settings.class.php:251
 msgid ""
 "html added to field title for required fields if selected above (the %s is "
 "replaced by the title of the field)"
 msgstr ""
-"html ajouté au titre du champ pour les champs obligatoires quand sélectionné "
-"ci-dessus (the champ %s est remplacé par le titre du champ)"
+"html adăugat la titlul câmpului pentru câmpurile obligatorii dacă este "
+"selectat, mai sus ( %s se înlocuiește cu titlul câmpului )"
 
 #: classes/PDb_Settings.class.php:276
 msgid "Signup Button Text"
-msgstr "Texte du bouton d'inscription"
+msgstr "Texul Butonului Înregistrează-te"
 
 #: classes/PDb_Settings.class.php:280
 msgid "text shown on the button to sign up"
-msgstr "texte affiché sur le bouton d'inscription"
+msgstr "textul afișat pe butonul de înscriere"
 
 #: classes/PDb_Settings.class.php:281
 msgctxt "the text on a button to submit a signup form"
 msgid "Sign Up"
-msgstr "S'inscrire"
+msgstr "Înregistrează-te"
 
 #: classes/PDb_Settings.class.php:287
 msgid "Signup Thanks Page"
-msgstr "Page de post-incription"
+msgstr "Pagina de Mulțumire"
 
 #: classes/PDb_Settings.class.php:291
 msgid ""
@@ -555,55 +574,60 @@ msgid ""
 "have to do that if you have them go back to the same page. You can also use "
 "a Post ID for posts and custom post types."
 msgstr ""
+"după ce se inregistrează, trimiteți-i la această pagină pentru un mesajul de "
+"mulțumire. Această pagină este locul unde ați pus shortcut-ul "
+"[pdb_signup_thanks] , dar nu este necesar să faceți asta, dacă îi trimiteți "
+"înapoi la aceeași pagină. Puteți folosi, de asemenea, un ID de Postare "
+"pentru postări și tipuri de postări personalizate."
 
 #: classes/PDb_Settings.class.php:300
 msgid "Show Field Groups"
-msgstr "Afficher les groupes de champs"
+msgstr "Arată Grupurile de Câmpuri"
 
 #: classes/PDb_Settings.class.php:305
 msgid "Show groups and group descriptions in the signup form."
-msgstr ""
-"Afficher les groupes et leurs descriptions dans le formulaire d'inscription."
+msgstr "Arată grupurile și descrierile de grup în formularul de înscriere."
 
 #: classes/PDb_Settings.class.php:313
 msgid "Duplicate Record Check Field"
-msgstr "Champ de test de doublon"
+msgstr "Duplicați Câmpurile de Înregistrare Bifate "
 
 #: classes/PDb_Settings.class.php:318
 msgid ""
 "when a signup is submitted or CSV record is imported, this field is checked "
 "for a duplicate"
 msgstr ""
-"quand une inscription est demandée ou un fichier CSV importé, on testera la "
-"présence d'un doublon avec ce champ"
+"atunci când o înscriere este executată sau o înregistrare CSV este "
+"importată, acest câmp este verificat pentru un duplicat"
 
 #: classes/PDb_Settings.class.php:325
 msgid "Duplicate Record Preference"
-msgstr "Préférence en cas de doublon"
+msgstr "Duplicați Preferințele de Înregistrare "
 
 #: classes/PDb_Settings.class.php:330
 msgid ""
 "when the submission matches the Duplicate Record Check Field of an existing "
 "record. This also applies to importing records from a CSV file."
 msgstr ""
-"quand une inscription révèle un doublon via le champ de test choisi. Ceci "
-"s'applique également aux entrées importées depuis un fichier CSV."
+"în cazul în care execuția se potrivește cu Duplicarea Înregistrării unui "
+"Câmp Bifat al unei înregistrări existente. Acest lucru este valabil și "
+"pentru importul de înregistrări dintr-un fisier CSV."
 
 #: classes/PDb_Settings.class.php:333
 msgid "Create a new record with the submission"
-msgstr "Créer une nouvelle entrée avec l'import"
+msgstr "Creați o înregistrare nouă prin executare"
 
 #: classes/PDb_Settings.class.php:334
 msgid "Overwrite matching record with new data"
-msgstr "Remplacer l'entrée en doublon par la nouvelle"
+msgstr "Suprascrie potrivirea înregistrarii, cu noi date"
 
 #: classes/PDb_Settings.class.php:335
 msgid "Show a validation error message"
-msgstr "Afficher un message d'erreur"
+msgstr "Afișează un mesaj de eroare de validare"
 
 #: classes/PDb_Settings.class.php:343
 msgid "Duplicate Record Error Message"
-msgstr "Message d'erreur de doublon"
+msgstr "Mesaj de eroare al Duplicării de Înregistrare "
 
 #: classes/PDb_Settings.class.php:347
 msgid ""
@@ -611,25 +635,25 @@ msgid ""
 "be shown if a signup is made with a \"check field\" that matches an existing "
 "record."
 msgstr ""
-"Si l'option \"Afficher un message d'erreur\" est choisie ci-dessus, ce "
-"message sera affiché si une inscription est demandée avec un champ de test "
-"qui correspond à celui d'une entrée existante."
+"În cazul în care \"Afișează un mesaj de eroare de validare\" este selectat, "
+"mai sus, acest mesaj va fi afișat în cazul în care o înscriere se face cu o "
+"\"bifare câmp \", care se potrivește cu o înregistrare existentă."
 
 #: classes/PDb_Settings.class.php:348
 msgid "A record with that %s already exists. Please choose another."
-msgstr "Une fiche avec ce %s existe déjà. Merci de faire un autre choix."
+msgstr "O înregistrare cu acest %e există, deja. Vă rugăm să alegeți alt nume"
 
 #: classes/PDb_Settings.class.php:354
 msgid "Send Signup Response Email"
-msgstr "Envoyer email de confirmation d'inscription"
+msgstr "Trimite un e-mail de răspuns la înregistrare"
 
 #: classes/PDb_Settings.class.php:358
 msgid "Send a receipt email to people who sign up"
-msgstr "Envoyer un email de confirmation après l'inscription"
+msgstr "Trimite un e-mail primire pentru persoanele care se înscriu"
 
 #: classes/PDb_Settings.class.php:366
 msgid "Signup Email From Address"
-msgstr "Adresse d'expéditeur de l'email d'inscription"
+msgstr "Înregistrează-te de la adresa de e-mail "
 
 #: classes/PDb_Settings.class.php:370
 msgid ""
@@ -637,39 +661,38 @@ msgid ""
 "\", their reply will go to this address. It is a good idea to use an email "
 "address from the same domain as this website."
 msgstr ""
-"l'adresse qui apparaît dans le champ \"From\" des emails de confirmation "
-"d'inscription. Utilisée quand le destinataire répond à cet email. Il est "
-"conseillé d'employer une adresse avec le même nom de domaine que ce site."
+"e-mailurile de primire în varianta înregistrării \"de la \" adresa de e-"
+"mail. Dacă destinatarul apasă \"răspunde \", răspunsul lor va merge la "
+"această adresă. Este un idee bună să utilizați o adresă de e-mail de la "
+"același domeniu ca și al site-ului dumneavoastră."
 
 #: classes/PDb_Settings.class.php:377
 msgid "Signup Email From Name"
-msgstr "Nom d'expéditeur de l'email d'inscription"
+msgstr "E-mail de Inregistrare De la Numele"
 
 #: classes/PDb_Settings.class.php:381
 msgid "the \"From\" name on signup receipt emails."
-msgstr ""
-"le nom qui apparaît dans le champ \"From\" des emails de confirmation "
-"d'inscription."
+msgstr "varianta \"de la \", Nume pe e-mailurile de primire a înscrierii."
 
 #: classes/PDb_Settings.class.php:388
 msgid "Signup Response Email Subject"
-msgstr " Sujet de l'email d'inscription"
+msgstr "Subiectul E-mail-ului de Răspuns la Înscriere"
 
 #: classes/PDb_Settings.class.php:392
 msgid ""
 "subject line for the signup response email; placeholder tags can be used "
 "(see below)"
 msgstr ""
-"Champ sujet de l'email de confirmation d'inscription; des noms de variables "
-"peuvent être utilisées (voir ci-dessous)"
+"linia de subiect pentru e-mail-ul de răspuns la înscriere; un placeholder "
+"pentru tag-uri  poate fi utilizat (a se vedea mai jos)"
 
 #: classes/PDb_Settings.class.php:393
 msgid "You've just signed up on %s"
-msgstr "Vous venez de vous inscrire à %s"
+msgstr "Tocmai v-ați înscris pe %s"
 
 #: classes/PDb_Settings.class.php:399
 msgid "Signup Response Email"
-msgstr "Email de confirmation d'inscription"
+msgstr "E-mail de Răspuns la Înscriere"
 
 #: classes/PDb_Settings.class.php:403
 msgid ""
@@ -679,12 +702,12 @@ msgid ""
 "only use placeholders for fields that are present in the signup form, "
 "including hidden fields."
 msgstr ""
-"Corps du message qu'un utilisateur reçoit après son inscription. Il comprend "
-"un lien ([record_link]) vers la fiche individuelle pour que celle-ci puisse "
-"être complétée. Peut contenir: du HTML, les variables: [first_name],"
-"[last_name],[email],[record_link]. Vous pouvez uniquement utiliser les "
-"variables présentes dans le formulaire d'inscription, y compris les champs "
-"cachés."
+"Corpul de e-mail-ului primit de un vizitator atunci când se înregistrează. "
+"Acesta include un link ([record_link]) înapoi la înregistrarea lor, astfel "
+"încât aceștia s-o completeze. Pot include placeholdere HTML: [first_name], "
+"[last_name], [email], [record_link]. Puteți folosi placeholdere doar pentru "
+"câmpurile care sunt prezente în formularul de înscriere, inclusiv câmpurile "
+"ascunse."
 
 #. translators: the %s will be the name of the website
 #: classes/PDb_Settings.class.php:405
@@ -694,22 +717,22 @@ msgid ""
 "visiting this private link at any time: <a href="
 "\"[record_link]\">[record_link]</a>.</p>"
 msgstr ""
-"<p>Merci, [first_name], pour votre inscription à %s.</p><p>Vous pouvez "
-"compléter ou mettre à jour les informations vous concernant à tout moment en "
-"utilisant le lien privé suivant: <a href=\"[record_link]\">[record_link]</a>."
-"</p>"
+"<p>Mulţumesc, [first_name], pentru că te-ai înscris la %s.</p><p>Puteţi "
+"finaliza înregistrarea dumneavoastră cu informații suplimentare sau "
+"actualiza informațiile vizitând acest link privat, în orice moment: <a href="
+"\"[record_link]\">[record_link]</a>.</p>"
 
 #: classes/PDb_Settings.class.php:411
 msgid "Signup Thanks Message"
-msgstr "Message de post-inscription"
+msgstr "Mesaj de Mulțumire la Inregistrare"
 
 #: classes/PDb_Settings.class.php:415
 msgid ""
 "Note to display on the web page after someone has submitted a signup form. "
 "Can include HTML and placeholders (see above)"
 msgstr ""
-"Message à afficher sur la page web une fois que quelqu'un a effectué son "
-"inscription. Peut contenir du HTML et des variables (voir ci-dessus)"
+"Notă de afișat pe pagina web după ce cineva a depus un formular de "
+"înscriere. Poate include HTML și placeholdere (a se vedea mai sus)"
 
 #: classes/PDb_Settings.class.php:416
 msgid ""
@@ -718,55 +741,56 @@ msgid ""
 "information or update your information by visiting the link provided in the "
 "email.</p>"
 msgstr ""
-"<p>Merci, [first_name] pour cette inscription!</p><p>Vous ne tarderez pas à "
-"recevoir un email de confirmation. Vous pourrez compléter ou mettre à jour "
-"vos informations en utilisant le lien privé figurant dans cet email.</p>"
+"<p>Mulțumesc, [first_name] pentru înregistrare! </p><p>Veți primi o "
+"confirmare e-mail în scurt timp. Puteți finaliza înregistrarea dumneavoastră "
+"cu informații suplimentare sau actualiza informațiile dvs., vizitând link-ul "
+"din e-mail.</ P>"
 
 #: classes/PDb_Settings.class.php:422
 msgid "Send Signup Notification Email"
-msgstr "Envoyer un email de notification d'inscription"
+msgstr "Trimite notificare de înscriere prin email"
 
 #: classes/PDb_Settings.class.php:427
 msgid "Send an email notification that a signup has occurred."
-msgstr "Envoyer un email notifiant qu'une inscription a eu lieu."
+msgstr "Trimite un email de notificare la înscriere."
 
 #: classes/PDb_Settings.class.php:436
 msgid "Signup Notification Recipients"
-msgstr "Destinataires de la notification d'inscription"
+msgstr "Destinatarii notificării de înscriere"
 
 #: classes/PDb_Settings.class.php:440
 msgid "comma-separated list of email addresses to send signup notifications to"
 msgstr ""
-"liste d'adresses email (séparées par des virgules) auxquelles envoyer les "
-"notifications d'inscription"
+"Lista de adrese de e-mail, separata prin virgulă, pentru a trimite "
+"notificări de înscriere la"
 
 #: classes/PDb_Settings.class.php:447
 msgid "Signup Notification Email Subject"
-msgstr "Sujet de l'email de notification d'inscription"
+msgstr "Subiectul mailului de Notificare a Înregistrarii"
 
 #: classes/PDb_Settings.class.php:451 classes/PDb_Settings.class.php:565
 msgid ""
 "subject of the notification email; placeholder tags can be used (see above)"
 msgstr ""
-"sujet de l'email de notification; peut contenir des noms de variables (voir "
-"ci-dessus)"
+"subiect al emailului de notificare; tag-uri placeholder poat fi utilizate (a "
+"se vedea mai sus)"
 
 #. translators: the %s will be the name of the website
 #: classes/PDb_Settings.class.php:453
 msgid "New signup on %s"
-msgstr "Nouvelle inscription à %s"
+msgstr "Nouă înscriere pe %s"
 
 #: classes/PDb_Settings.class.php:459
 msgid "Signup Notification Email"
-msgstr "Email de notification d'inscription"
+msgstr "Email de Notificare a înregistrării"
 
 #: classes/PDb_Settings.class.php:463
 msgid ""
 "notification email body. The [admin_record_link] tag will supply the URL for "
 "editing the record in the admin."
 msgstr ""
-"corps du message de notification. La variable [admin_record_link] fournira "
-"l'URL permettant d'éditer l'entrée comme admin."
+"corpul e-mail-ului de notificare. Tag-ul [admin_record_link]  va furniza URL-"
+"ul pentru editarea înregistrării în admin."
 
 #: classes/PDb_Settings.class.php:464
 msgid ""
@@ -774,201 +798,218 @@ msgid ""
 "[last_name]</li><li>Email: [email]</li></ul><p>Edit this new record here: <a "
 "href=\"[admin_record_link]\">[admin_record_link]</a></p>"
 msgstr ""
-"<p>Une nouvelle inscription a été demandée</p><ul><li>Nom: [first_name] "
-"[last_name]</li><li>Email: [email]</li></ul><p>Editer cette entrée ici: <a "
-"href=\"[admin_record_link]\">[admin_record_link]</a></p>"
+"<p>O nouă înscriere a fost înaintată</p><ul><li>Nume: [first_name] "
+"[last_name]</li><li>Email: [email]</li></ul><p>Editează această înregistrare "
+"nouă aici: <a href=\"[admin_record_link]\">[admin_record_link]</a></p>"
 
 #: classes/PDb_Settings.class.php:476
 msgid "Enable Lost Private Link"
-msgstr ""
+msgstr "Activează Link Pierdut privat"
 
 #: classes/PDb_Settings.class.php:481
 msgid ""
 "Show a link on the signup form allowing users to have their private link "
 "emailed to them."
 msgstr ""
+"Arată un link pe formularul de înscriere care permite utilizatorilor de a "
+"avea link-ul lor privat trimis prin email."
 
 #: classes/PDb_Settings.class.php:489
 msgid "Lost Private Link Text"
-msgstr ""
+msgstr "Textul Linkului  Pierdut Privat "
 
 #: classes/PDb_Settings.class.php:493
 msgid "clickable text shown in the signup form"
-msgstr ""
+msgstr "Text clickabil prezentat în formularul de înscriere"
 
 #: classes/PDb_Settings.class.php:494 templates/pdb-signup-bootstrap.php:56
 msgid "Forget your private link? Click here to have it emailed to you."
 msgstr ""
+"Ai uitat link-ul privat? Click aici pentru a-l primi prin e-mail la tine."
 
 #: classes/PDb_Settings.class.php:499
 msgid "Lost Private Link Page"
-msgstr ""
+msgstr "Pagina Linkului Privat Pierdut"
 
 #: classes/PDb_Settings.class.php:504
 msgid "send people to this page to request their private link."
 msgstr ""
+"trimite persoanele la această pagină, ca să solicite link-ul lor privat."
 
 #: classes/PDb_Settings.class.php:513
 msgid "Lost Private Link ID Field"
-msgstr ""
+msgstr "ID-ul Cîmpului Pierdut Privat"
 
 #: classes/PDb_Settings.class.php:517
 msgid ""
 "The field used to identify the user&#39;s account. This must be a unique "
 "identifier for the record"
 msgstr ""
+"Câmpul utilizat pentru a identifica contul utilizatorului. Acest lucru "
+"trebuie să fie un identificator unic pentru înregistrare"
 
 #: classes/PDb_Settings.class.php:525
 msgid "Lost Private Link Email Subject"
-msgstr ""
+msgstr "Subiectul e-mail-ului Link-ului Privat Pierdut"
 
 #: classes/PDb_Settings.class.php:529
 msgid "subject line for the lost private link email"
-msgstr ""
+msgstr "linia de subiect pentru e-mail-ul Link-ului Privat Pierdut"
 
 #: classes/PDb_Settings.class.php:530
 msgid "Here is your private link on %s"
-msgstr ""
+msgstr "Iată link-ul .dvs privat pe %s"
 
 #: classes/PDb_Settings.class.php:536
 msgid "Lost Private Link Email"
-msgstr ""
+msgstr "E-mail-ul Link-ului Privat pierdut"
 
 #: classes/PDb_Settings.class.php:540
 msgid "Body of the email sent when a lost private link is requested."
-msgstr ""
+msgstr "Corp de e-mail trimis, atunci când se solicită un link privat pierdut."
 
 #. translators: the %s will be the name of the website
 #: classes/PDb_Settings.class.php:542
 msgid "Here is the private link you requested from %s:"
-msgstr ""
+msgstr "Iată link-ul privat pe care l-ați solicitat de la %s:"
 
 #: classes/PDb_Settings.class.php:548
 msgid "Send Lost Private Link Notification Email"
-msgstr ""
+msgstr "Trimite e-mail de notificare Link Privat Pierdut"
 
 #: classes/PDb_Settings.class.php:553
 msgid ""
 "Send an email notification that a lost private link has been requested. This "
 "email will go to the \"Signup Notification Recipients.\""
 msgstr ""
+"Trimite un email de notificare prin care a fost solicitat un link privat "
+"pierdut. Acest e-mail va merge la \"Notificare Înregistrare Destinatari. \""
 
 #: classes/PDb_Settings.class.php:561
 msgid "Lost Private Link Notification Email Subject"
-msgstr ""
+msgstr "Subiectul e-mail-ului de Notificare LinkPierdut"
 
 #. translators: the %s will be the name of the website
 #: classes/PDb_Settings.class.php:567
 msgid "A Lost Private Link has been requested on %s"
-msgstr ""
+msgstr "Un Link Pierdut Privat a fost solicitată pe %s"
 
 #: classes/PDb_Settings.class.php:573
 msgid "Lost Private Link Notification Email"
-msgstr ""
+msgstr "E-mail de Notificare Link Privat Pierdut"
 
 #: classes/PDb_Settings.class.php:577
 msgid "notification email body"
-msgstr ""
+msgstr "corpul e-mal-ului de notificare"
 
 #: classes/PDb_Settings.class.php:578
 msgid ""
 "<p>A lost private link has been requested by:</p><ul><li>Name: [first_name] "
 "[last_name]</li><li>Email: [email]</li></ul>"
 msgstr ""
+"<p>Un link privat pierdut a fost solicitat de către:</p><ul><li>Nume: "
+"[first_name] [last_name]</li><li>E-mail: [email]</li></ul>"
 
 #: classes/PDb_Settings.class.php:584
 msgid "Retrieve Private Link Error Message"
-msgstr ""
+msgstr "Mesaj de Eroare, Recuperare Link Privat"
 
 #: classes/PDb_Settings.class.php:588
 msgid ""
 "Message shown when a record matching the retrieve link idenifier cannot be "
 "found"
 msgstr ""
+"Mesaj afișat atunci când o înregistrare ce se potrivește cu identificatorul "
+"link-ului, nu a fost găsită."
 
 #: classes/PDb_Settings.class.php:589
 msgid "A record matching that %s cannot be found."
-msgstr ""
+msgstr "O înregistrare care să se potrivească cu %s nu poate fi găsită."
 
 #: classes/PDb_Settings.class.php:601
 msgid "Participant Record Page"
-msgstr "Page de formulaire détaillé"
+msgstr "Pagina de Înregistrare a Participantului"
 
 #: classes/PDb_Settings.class.php:606
 msgid ""
 "The page where your participant record ([pdb_record] shortcode) is "
 "displayed. You can use a Post ID for posts and custom post types."
 msgstr ""
-"La page qui affiche le formulaire détaillé (shortcode [pdb_record]). Vous "
-"pouvez aussi employer le \"Post ID\" (par ex. pour un \"custom post type\")."
+"Pagina unde este afișat dosarul dumneavoastră de participant ([pdb_record] "
+"shortcode). Aveți posibilitatea să utilizați un ID de postare pentru postări "
+"și tipuri de postări personalizate."
 
 #: classes/PDb_Settings.class.php:614
 msgid "Show Group Descriptions"
-msgstr "Afficher les descriptions des groupes"
+msgstr "Afișează Descrierile de grup"
 
 #: classes/PDb_Settings.class.php:619
 msgid "Show the group description under each group title in the record form."
 msgstr ""
-"Afficher la description de chaque groupe sous son titre dans le formulaire "
-"détaillé."
+"Afișează descrierea grupului sub fiecare titlu de grup în formularul de "
+"înregistrare."
 
 #: classes/PDb_Settings.class.php:627
 msgid "Save Changes Label"
-msgstr "Texte enregistrement des modifications"
+msgstr "Eticheta Salvați Modificările "
 
 #: classes/PDb_Settings.class.php:632
 msgid "label for the save changes button on the record form"
-msgstr "texte du bouton d'enregistrement des modifications"
+msgstr ""
+"etichetă de pe butonul de a salvează modificările pe formularul de "
+"înregistrare"
 
 #: classes/PDb_Settings.class.php:633
 msgid "Save Your Changes"
-msgstr "Enregistrer vos modifications"
+msgstr "Salvează Modificările"
 
 #: classes/PDb_Settings.class.php:639
 msgid "Save Button Text"
-msgstr "Texte du bouton enregistrer"
+msgstr "Textul Butonului Salvează"
 
 #: classes/PDb_Settings.class.php:644
 msgid "text on the \"save\" button"
-msgstr "Texte sur le bouton \"enregistrer\""
+msgstr "textulde pe butonul \"Salvează\" "
 
 #: classes/PDb_Settings.class.php:645
 msgctxt "a label for a button to save a form"
 msgid "Save"
-msgstr "Enregistrer"
+msgstr "Salvează"
 
 #: classes/PDb_Settings.class.php:651
 msgid "Record Updated Message"
-msgstr "Message de confirmation de mise-à-jour"
+msgstr "Înregistrează mesajul actualizat"
 
 #: classes/PDb_Settings.class.php:655
 msgid "the message shown when a record form has been successfully submitted"
 msgstr ""
-"le message affiché quand un formulaire détaillé a été soumis avec succès."
+"mesajul afișat atunci când un formular de înregistrare a fost transmis cu "
+"succes"
 
 #: classes/PDb_Settings.class.php:656
 msgid "Your information has been updated"
-msgstr ""
+msgstr "Informațiile dvs. au fost actualizate"
 
 #: classes/PDb_Settings.class.php:662
 msgid "Record Not Found Error Message"
-msgstr "Message d'erreur fiche introuvable"
+msgstr "Mesajul de Eroare: Nu s-au gasit înregistrări"
 
 #: classes/PDb_Settings.class.php:666
 msgid ""
 "message to show if the record page was accessed without a valid identifier. "
 "Leave this empty if you want nothing at all to show."
 msgstr ""
-"message à afficher quand la page individuelle est invoquée sans identifiant "
-"valide. Laisser vide si vous ne voulez rien afficher."
+"mesaj arătat dacă pagina de înregistrare a fost accesată fără un "
+"identificator valid. Lasă acest câmp gol dacă nu vrei să arăți nimic ."
 
 #: classes/PDb_Settings.class.php:667
 msgid "No record was found."
-msgstr "Aucune entrée trouvée."
+msgstr "Nici o înregistrare a fost găsită."
 
 #: classes/PDb_Settings.class.php:673
 msgid "Send Record Form Update Notification Email"
-msgstr "Envoyer email de notification de mise-à-jour"
+msgstr ""
+"Trimite e-mail-ul de notificare a Modificării Formularului de Înregistrare"
 
 #: classes/PDb_Settings.class.php:678
 msgid ""
@@ -976,29 +1017,29 @@ msgid ""
 "sent to the email addresses listed in the \"Signup Notification Recipients\" "
 "setting."
 msgstr ""
-"Envoyer un email de notification quand une fiche est mise à jour. Celui-ci "
-"sera envoyé aux adresses précisées dans la configuration des \"Destinataires "
-"de notification d'inscription\"."
+"Trimite un email de notificare când o înregistrare a fost actualizată. "
+"Acestea vor fi trimise la adresele de e-mail listate în setările "
+"\"Destinatari Notificări de Înregistrare\" "
 
 #: classes/PDb_Settings.class.php:686
 msgid "Record Update Email Subject"
-msgstr "Sujet du message de mise-à-jour de fiche"
+msgstr "Subiectul E-mail-ului de Actualizare a Înregistrării"
 
 #: classes/PDb_Settings.class.php:690
 msgid ""
 "subject line for the record update notification email; placeholders can be "
 "used."
 msgstr ""
-"Sujet de l'email de notification de mise-à-jour; on peut utiliser des "
-"variables."
+"Linie de subiect pentru e-mail-ul de notificare a actualizării "
+"înregistrării; se pot folosi placeholdere."
 
 #: classes/PDb_Settings.class.php:691
 msgid "A record has just been updated on %s"
-msgstr "Une entrée a été mise à jour sur %s"
+msgstr "O înregistrare tocmai a fost actualizată pe %s"
 
 #: classes/PDb_Settings.class.php:697
 msgid "Record Update Notification Email"
-msgstr "Email de notification de mise-à-jour de fiche"
+msgstr "E-mail de Notificare a Actualizării Înregistrării"
 
 #. translators: [date] and [admin_record_link] must not be translated, they
 #. must be used literally. The rest of the words enclosed in brackets can be
@@ -1012,13 +1053,13 @@ msgid ""
 "Also available is [date] which will show the date and time of the update and "
 "[admin_record_link] tag for a link to edit the record in the admin."
 msgstr ""
-"Corps du message envoyé quand un utilisateur met à jour sa fiche. Tous les "
-"champs de la fiche peuvent être inclus en utilisant un code de la forme "
-"[nom_du_champ]. Par exemple: [last_name],[address],[email] etc. (Le nom du "
-"champ figure dans la colonne \"Nom\" dans la page \"Gestion des champs de la "
-"base\".) On peut aussi utiliser [date] qui affichera la date et l'heure de "
-"la mise-à-jour, et [admin_record_link] pour un lien d'édition admin de la "
-"fiche."
+"Corp de e-mail trimis atunci când un utilizator își actualizează "
+"înregistrarea. Orice câmp din formular poate fi inclus prin utilizarea unui "
+"cod de înlocuire din formular: [field_name]. De exemplu: [last_name],"
+"[address],[email] etc. (Numele câmpului se află dedesubtul coloanei \"name\" "
+"pe pagina \"Manage Database Fields\")  Deasemenea este valabil [date] care "
+"arată data și timpul a tag-ului actualizat [admin_record_link]  pentru un "
+"link către editarea nregistrării în admin."
 
 #: classes/PDb_Settings.class.php:703
 msgid ""
@@ -1027,34 +1068,35 @@ msgid ""
 "li><li>Phone: [phone]</li><li>Email: [email]</li></ul><p>Edit this record <a "
 "href=\"[admin_record_link]\">here.</a></p>"
 msgstr ""
-"<p>La fiche suivante a été mis-à-jour le [date]:</p><ul><li>Nom: "
-"[first_name] [last_name]</li><li>Adresse: [address], [city]</"
-"li><li>Téléphone: [phone]</li><li>Email: [email]</li></ul><p>Editer cette "
-"fiche <a href=\"[admin_record_link]\">ici.</a></p>"
+"<p>Următoarea înregistrare a fost actualizată la [date]:</p><ul><li>Nume: "
+"[first_name] [last_name]</li><li>Adresă: [address]</li><li>[city], [state], "
+"[country]</li><li>Telefon: [phone]</li><li>E-mail: [email]</li></"
+"ul><p>Modifică această înregistrare <a href=\"[admin_record_link]\">aici.</"
+"a></p>"
 
 #: classes/PDb_Settings.class.php:716
 msgid "Records per Page"
-msgstr "Entrées par page"
+msgstr "Înregistrări pe pagină"
 
 #: classes/PDb_Settings.class.php:720
 msgid "the number of records to show on each page"
-msgstr "nombre d'entrées à afficher par page"
+msgstr "numărul de înregistrări care apar pe fiecare pagină"
 
 #: classes/PDb_Settings.class.php:728
 msgid "Single Record Link Field"
-msgstr "Champ du lien vers les fiches individuelles"
+msgstr "Câmpul Link-ului de Înregistrare"
 
 #: classes/PDb_Settings.class.php:733
 msgid ""
 "select the field on which to put a link to the [pdb_single] shortcode. Leave "
 "blank or set to \"none\" for no link."
 msgstr ""
-"sélectionne le champ dans lequel doit figurer le lien vers le shortcode "
-"[pdb_single]. Laisser vide ou mettre à \"aucun\" pour ne pas avoir de lien."
+"selectați câmpul în care să puneți un link către shortcode-ul [pdb_single] . "
+"Lăsați necompletat sau setat la \"none \" pentru nici un link."
 
 #: classes/PDb_Settings.class.php:740
 msgid "Single Record Page"
-msgstr "Page fiche individuelle"
+msgstr "Pagina Unică de inregistrare"
 
 #: classes/PDb_Settings.class.php:746
 msgid ""
@@ -1062,34 +1104,35 @@ msgid ""
 "assign a post or custom post type, select \"Post ID\" and enter the post ID "
 "in the \"other\" box."
 msgstr ""
-"page où le shortcode [pdb_single] est employé. Si vous voulez donner "
-"directement le \"Post ID\" (par ex. pour un \"custom post type\"), "
-"sélectionner ce choix dans le menu, puis entrez l'ID dans la boîte qui "
-"apparaît."
+"aceasta este pagina în care se află shortcut-ul [pdb_single]. Dacă doriți să "
+"alocați un tip de postare sau postare personalizată, selectaţi \"Post ID\" "
+"și introduceți ID-ul de postare în box-ul \"other\" ."
 
 #: classes/PDb_Settings.class.php:753
 msgid "No Records Message"
-msgstr ""
+msgstr "Mesajul Nici o înregistrare"
 
 #: classes/PDb_Settings.class.php:757
 msgid "Message shown when no records are found."
-msgstr ""
+msgstr "Mesaj afișat atunci când nu sunt găsite înregistrări."
 
 #: classes/PDb_Settings.class.php:758
 msgid "No Records Found"
-msgstr ""
+msgstr "Nu s-au găsit înregistrări"
 
 #: classes/PDb_Settings.class.php:763
 msgid "Show Count"
-msgstr ""
+msgstr "Arată Numărul"
 
 #: classes/PDb_Settings.class.php:768
 msgid "Show the list count on list displays. Can also be set in the shortcode."
 msgstr ""
+"Arată numărătoarea listei pe lista afișaj. Poate fi, de asemenea, setat în "
+"shortcut."
 
 #: classes/PDb_Settings.class.php:776
 msgid "List Count Template"
-msgstr ""
+msgstr "Şablon al Numărătoarei de Listă"
 
 #: classes/PDb_Settings.class.php:780
 msgid ""
@@ -1097,65 +1140,73 @@ msgid ""
 "found, %2$s - number of records shown per page, %3$s - starting record "
 "number, %4$s - ending record number, %5$s - the current page number"
 msgstr ""
+"șablon pentru afișarea numărului de listă. %1$s - numărul total de "
+"înregistrări găsite, %2$s - număr de înregistrări afisate pe pagină, %3$s - "
+"începând cu numărul de înregistrare, %4$s - se termină numărul de de "
+"înregistrare, %5$s - numărul paginii curente"
 
 #: classes/PDb_Settings.class.php:781
 msgid "Total Records Found: %1$s, showing %2$s per page"
-msgstr ""
+msgstr "Total Rezultate Găsite: %1$s, arătând %2$s pe pagină"
 
 #: classes/PDb_Settings.class.php:791
 msgid "List Default Sort"
-msgstr ""
+msgstr "Modul de Sortare Standard al Listei"
 
 #: classes/PDb_Settings.class.php:797
 msgid ""
 "The record list shown by the list shortcode will be sorted by this field by "
 "default. (Field must be checked \"sortable.\")"
 msgstr ""
+"Lista de înregistrări prezentată de shortcut-ul listei va fi sortată în "
+"funcție de acest câmp în mod implicit.(Câmpul trebuie să fie verificat "
+"\"sortable.\")"
 
 #: classes/PDb_Settings.class.php:804
 msgid "List Default Sort Order"
-msgstr ""
+msgstr "Ordinea de Sortare Implicita a Listei"
 
 #: classes/PDb_Settings.class.php:808
 msgid "Sets the default order of the records shown by the list shortcode."
 msgstr ""
+"Setează ordinea implicită a înregistrărilor prezentată de lista de shortcut."
 
 #: classes/PDb_Settings.class.php:817
 msgid "Admin List Default Sort"
-msgstr "Tri par défaut dans la liste d'admin "
+msgstr "Sortarea Implicită a Listei în Admin"
 
 #: classes/PDb_Settings.class.php:823
 msgid ""
 "The record list shown in the admin section will be sorted by this field by "
 "default. (Field must be checked \"sortable.\")"
 msgstr ""
-"La liste affichée dans la console d'admin sera triée par défaut par ce "
-"champ. (Le champ doit être coché \"triable\")"
+"The record list shown in the admin section will be sorted by this field by "
+"default. (Field must be checked \"sortable.\")"
 
 #: classes/PDb_Settings.class.php:830
 msgid "Admin List Default Sort Order"
-msgstr "Ordre par défaut de la liste d'admin"
+msgstr "Ordinea de sortare implicita a listei din Admin"
 
 #: classes/PDb_Settings.class.php:834
 msgid "Sets the default order of the record list in the admin."
-msgstr ""
-"Fixe l'ordre par défaut pour les entrées affichées dans la liste d'admin."
+msgstr "Setează ordinea implicită a listei de înregistrări în admin."
 
 #: classes/PDb_Settings.class.php:842
 msgid "Show Image Thumbnails in Admin List"
-msgstr ""
+msgstr "Arată Miniatura Imaginilor în Lista de Admin"
 
 #: classes/PDb_Settings.class.php:861
 msgid "Use the Plugin CSS"
-msgstr "Utiliser le CSS du plugin"
+msgstr "Utilizați CSS-ul Plugin-ului"
 
 #: classes/PDb_Settings.class.php:866
 msgid "use the plugin's CSS to style the output of shortcodes"
-msgstr "utiliser le CSS du plugin pour formater le résultat des shortcodes"
+msgstr ""
+"utilizați CSS-ul plugin-ului ca să stilizati aspectul a shortcod-urilor"
 
 #: classes/PDb_Settings.class.php:874
 msgid "Use Rich Text Editor"
-msgstr "Utiliser l'éditeur \"Rich Text\""
+msgstr "Utilizați Editorul de Text Îmbogățit"
 
 #: classes/PDb_Settings.class.php:879
 msgid ""
@@ -1163,44 +1214,46 @@ msgid ""
 "deselected, \"rich-text\" fields will appear as text-area fields. This does "
 "not affect admin users, who always have the use of the rich-text editor."
 msgstr ""
-"active l'éditeur \"Rich Text\" sur les champs de ce type pour les "
-"utilisateurs de l'interface. Quand désactivé, les champs \"rich-text\" "
-"apparaissent comme des champs textes. Ceci n'affecte pas les "
-"administrateurs, qui ont toujours accès à l'éditeur \"Rich Text\"."
+"activează editorul de text îmbogăţit pentru câmpurile de \"rich-text\" "
+"pentru utilizatorii front-end. . Dacă este debifat, \"rich-text\" câmpurile "
+"vor apărea în calitate de zone de câmpuri de text. Acest lucru nu afectează "
+"utilizatorii din admin, care au întotdeauna posibilitatea de utilizare a "
+"editorului de text îmbogățit."
 
 #: classes/PDb_Settings.class.php:887
 msgid "Use WordPress Auto Formatting"
-msgstr "Utiliser le formatage automatique de WordPress"
+msgstr "Folosiți Auto formatarea WordPress"
 
 #: classes/PDb_Settings.class.php:892
 msgid "Use WordPress&#39; auto formatting on rich text fields."
 msgstr ""
-"Utiliser le formatage automatique de WordPress sur les champs \"rich-text\"."
+"Foloseşte formatarea automată Wordpress&#39; pentru câmpurile de text "
+"îmbogăţit."
 
 #: classes/PDb_Settings.class.php:900
 msgid "Primary Email Address Field"
-msgstr ""
+msgstr "Câmpul Adresei de E-mail Principale"
 
 #: classes/PDb_Settings.class.php:905
 msgid "this field is the primary email address for the record"
-msgstr ""
+msgstr "acest câmp este adresa de e-mail principală pentru înregistrare"
 
 #: classes/PDb_Settings.class.php:913
 msgid "Send HTML Email"
-msgstr "Envoyer email en HTML"
+msgstr "Trimite E-mail HTML"
 
 #: classes/PDb_Settings.class.php:918
 msgid ""
 "use rich text in plugin emails? If you turn this off, be sure to remove all "
 "HTML tags from the email body settings for the plugin."
 msgstr ""
-"utiliser le \"rich-text\" dans les emails du plugin? Dans le cas contraire, "
-"assurez-vous de retirer les tags HTML des messages dans la configuration des "
-"emails du plugin."
+"utilizați text îmbogățit în plugin-ul e-mailurilor? Dacă alegeţi off, "
+"asigurați-vă că eliminaţi toate etichetele HTML din setările corpului de e-"
+"mail pentru plugin."
 
 #: classes/PDb_Settings.class.php:926
 msgid "Strict Date Format"
-msgstr "Format de date strict"
+msgstr "Format Strict de Dată"
 
 #: classes/PDb_Settings.class.php:931
 msgid ""
@@ -1210,14 +1263,19 @@ msgid ""
 "shortcode filters. The date with your current setting looks like this: "
 "<strong>%s</strong> %s"
 msgstr ""
+"Aceasta obligă intrările de dată să fie interpretate strict în conformitate "
+"cu \"Input Date Format\" setări. Trebuie să spuneți utilizatorilor ce format "
+"trebuie să utilizeze. Acest lucru este valabil și pentru valorile de de data "
+"utilizate în filtrele shortcode-ului din [pdb_list]. Data cu setarea curentă "
+"arată astfel: <strong>%s</strong> %s"
 
 #: classes/PDb_Settings.class.php:931
 msgid "Your current PHP installation does not support this setting."
-msgstr ""
+msgstr "Instalarea curentă PHP nu acceptă această setare."
 
 #: classes/PDb_Settings.class.php:939
 msgid "Input Date Format"
-msgstr ""
+msgstr "Introducerea Formatului de Dată"
 
 #: classes/PDb_Settings.class.php:944
 msgid ""
@@ -1225,36 +1283,43 @@ msgid ""
 "\" is enabled. You should use this for all localized (non-American English) "
 "date formats."
 msgstr ""
+"Stringul de formatare a datei pentru toate imput-urile de dată ale plugin-"
+"ului, atunci când \"Strict Date Format\" este activat. Ar trebui să "
+"utilizați acest lucru pentru toate formatele de dată locale(ne americane)."
 
 #: classes/PDb_Settings.class.php:951
 msgid "Show Timestamp Time"
-msgstr ""
+msgstr "Arată Marcajul Temporal al Timpului"
 
 #: classes/PDb_Settings.class.php:956
 msgid "Show time with timestamp dates"
-msgstr ""
+msgstr "Afişează timpul cu Mrcajul Temporal al datelor"
 
 #: classes/PDb_Settings.class.php:964
 msgid "Record Edit Access Level"
-msgstr "Enregistrer le niveau d'accès en édition"
+msgstr "Editarea Nivelului de acces al înregistrării"
 
 #: classes/PDb_Settings.class.php:968
 msgid "sets the user access level for adding, editing and listing records."
 msgstr ""
+"stabilește nivelul de acces de utilizator pentru adăugarea, editarea și "
+"listarea de înregistrări."
 
 #: classes/PDb_Settings.class.php:976
 msgid "Plugin Admin Access Level"
-msgstr ""
+msgstr "Nivelul de Access al Admiistrării Plugin-ului"
 
 #: classes/PDb_Settings.class.php:980
 msgid ""
 "sets the user access level for fields management, plugin settings, deleting "
 "records and CSV operations."
 msgstr ""
+"stabilește nivelul de acces de utilizator pentru managementul câmpurilor, "
+"setările plugin-ului, ștergerea înregistrărilor și operațiuni CSV."
 
 #: classes/PDb_Settings.class.php:988
 msgid "Strict User Searching"
-msgstr "Recherche stricte d'utilisateur"
+msgstr "Căutare Strictă de Utilizator"
 
 #: classes/PDb_Settings.class.php:993
 msgid ""
@@ -1262,13 +1327,14 @@ msgid ""
 "If unchecked, the search will match if the search term is found in part of "
 "the field. Searches are not case-sensitive either way."
 msgstr ""
-"Quand coché, la recherche dans la liste se fait sur le champ exact et "
-"entier. Sinon, la recherche correspond quand le terme entré se retrouve dans "
-"une partie du champ. Dans tous les cas, ne tient pas compte de la casse."
+"Când este bifată, căutarea în lista din frontend trebuie să se potrivească "
+"întregului câmp exact. Dacă nu este bifată, căutarea se va potrivi în cazul "
+"în care termenul de căutare se regăsește în parte în interiorul câmpului. "
+"Căutările nu sunt nici un fel case-sensitive."
 
 #: classes/PDb_Settings.class.php:1000
 msgid "Enable AJAX Search Functionality"
-msgstr "Activer la fonction de recherche AJAX"
+msgstr "Activaţi Căutarea Funcţională de tip AJAX"
 
 #: classes/PDb_Settings.class.php:1005
 msgid ""
@@ -1276,60 +1342,65 @@ msgid ""
 "page. It requires Javascript, but search will still work if Javascript is "
 "disabled in the user's browser."
 msgstr ""
-"Ceci active la mise à jour automatique des résultats de la recherche (sans "
-"recharger la page). Nécessite Javascript, mais la recherche fonctionnera "
-"même quand le Javascript est désactivé dans le navigateur de l'utilisateur."
+"Acest lucru permite ca lista cu rezultatele căutării, să fie actualizate "
+"fără a reîncărca pagina. Este nevoie de Javascript, dar căutarea va "
+"funcționa în continuare dacă Javascript este dezactivat în browser-ul "
+"utilizatorului."
 
 #: classes/PDb_Settings.class.php:1018
 msgid "Custom Plugin Stylesheet"
-msgstr ""
+msgstr "Foaie de Stil Personalizată a Plugin-ului"
 
 #: classes/PDb_Settings.class.php:1023
 msgid ""
 "use this to add your own styles or override styles applied to the output of "
 "all plugin shortcodes"
 msgstr ""
+"folosiţi aceasta pentru a adăuga propriile stiluri sau pentru a suprascrie "
+"stiluri aplicate la aspectul tuturor shortcode-urilor plugin-ului"
 
 #: classes/PDb_Settings.class.php:1033
 msgid "Plugin Print Stylesheet"
-msgstr ""
+msgstr "Foaie de Stil  Imprimată a Plugin-ului"
 
 #: classes/PDb_Settings.class.php:1038
 msgid "use this to format the printed output of all plugin shortcodes"
 msgstr ""
+"utilizați aceasta pentru a formata imaginea finală a tuturor shortcode-"
+"urilor plugin-ului"
 
 #: classes/PDb_Settings.class.php:1055
 msgid "Same Page"
-msgstr "Même page"
+msgstr "Aceeaşi Pagină"
 
 #: classes/PDb_Settings.class.php:1083
 msgid "None"
-msgstr "Aucun/e"
+msgstr "Nici unul"
 
 #: classes/PDb_Settings.class.php:1147
 msgid "Contributor"
-msgstr ""
+msgstr "Colaborator"
 
 #: classes/PDb_Settings.class.php:1148
 msgid "Author"
-msgstr "Auteur"
+msgstr "Autor"
 
 #: classes/PDb_Settings.class.php:1149
 msgid "Editor"
-msgstr "Editeur"
+msgstr "Editor"
 
 #: classes/PDb_Settings.class.php:1150
 msgid "Admin"
-msgstr "Admin"
+msgstr "Administrator"
 
 #: classes/PDb_Settings.class.php:1216 participants-database.php:452
 #: participants-database.php:453 participants-database.php:2979
 msgid "Settings"
-msgstr "Configuration"
+msgstr "Setări"
 
 #: classes/PDb_Settings.class.php:1306
 msgid "Only numeric values can be used for the \"%s\" setting."
-msgstr ""
+msgstr "Numai valori numerice pot fi folosite pentru \"%s\" setări."
 
 #: classes/PDb_Shortcode.class.php:235
 msgctxt "message to show if the plugin cannot find the template"
@@ -1337,98 +1408,104 @@ msgid ""
 "<%1$s>The template %2$s was not found.</%1$s> Please make sure the name is "
 "correct and the template file is in the correct location."
 msgstr ""
-"<%1$s>Le template %2$s est introuvable.</%1$s> Merci de vérifier son nom et "
-"son emplacement."
+"<%1$s>Şablonul %2$s nu a fost găsit.</%1$s> Asigurați-vă că numele este "
+"corect și fișierul șablon se află în locația corectă."
 
 #: classes/xnau_CSV_Import.class.php:58
 msgid "The file %s has been uploaded."
-msgstr "Le fichier %s a bien été chargé"
+msgstr "Fișierul %s a fost încărcat."
 
 #: classes/xnau_CSV_Import.class.php:64
 msgid "%s record added"
 msgid_plural "%s records added"
-msgstr[0] "%s entrée ajoutée"
-msgstr[1] "%s entrées ajoutées"
+msgstr[0] "%s o înregistrare adăugată"
+msgstr[1] "%s o înregistrare adăugată"
+msgstr[2] "%s înregistrări adăugate"
 
 #: classes/xnau_CSV_Import.class.php:68
 msgid "%s matching record updated"
 msgid_plural "%s matching records updated"
-msgstr[0] "%s entrée correspondante mise à jour"
-msgstr[1] "%s entrées correspondantes mises à jour"
+msgstr[0] "%s o înregistrare care se potriveşte actualizată"
+msgstr[1] "%s o înregistrare care se potriveşte actualizată"
+msgstr[2] "%s înregistrări care se potrivesc actualizate"
 
 #: classes/xnau_CSV_Import.class.php:73
 msgid "%s duplicate record skipped"
 msgid_plural "%s duplicate records skipped"
-msgstr[0] "%s entrée redondante omise"
-msgstr[1] "%s entrées redondantes omises"
+msgstr[0] "%s un duplicat de înregistrare sărit"
+msgstr[1] "%s un duplicat de înregistrare sărit"
+msgstr[2] "%s duplicate de înregistrări sărite"
 
 #: classes/xnau_CSV_Import.class.php:77
 msgid "Zero records imported"
-msgstr "Aucune entrée importée"
+msgstr "Zero înregistrări importate"
 
 #: classes/xnau_CSV_Import.class.php:82
 msgid ""
 "There was an error uploading the file. This could be a problem with "
 "permissions on the uploads directory."
 msgstr ""
-"Echec du chargement de fichier. Cela peut venir d'un problème de droits sur "
-"le répertoire d'upload."
+"S-a constatat o eroare la încărcarea fișierului. Ar putea fi o problemă cu "
+"permisiunile pe directorul de upload."
 
 #: classes/xnau_CSV_Import.class.php:82 classes/xnau_CSV_Import.class.php:88
 msgid "Destination"
-msgstr "Destination"
+msgstr "Destinaţie"
 
 #: classes/xnau_CSV_Import.class.php:88
 msgid ""
 "Target directory does not exist and could not be created. Try creating it "
 "manually."
 msgstr ""
-"Le répertoire cible n'existe pas et n'a pas pu être créé. Tentez de le créer "
-"manuellement."
+"Directorul țintă nu există și nu a putut fi creat. Încercați să-l creați "
+"manual."
 
 #. translators: the %s will be the name of the file
 #: classes/xnau_CSV_Import.class.php:142
 msgid "Error occured while trying to add the data to the database"
-msgstr "Erreur en essayant d'ajouter les données dans la base"
+msgstr ""
+"A apărut o eroare în timp ce încercaţi să adăugaţi date în baza de date."
 
 #: classes/xnau_CSV_Import.class.php:142
 msgid ""
 "Input file does not exist or path is incorrect.<br />Attempted to load: %s"
-msgstr "Le fichier à importer n'a pas pu être trouvé à l'endroit indiqué: %s"
+msgstr ""
+"Fișierul de intrare nu există sau calea este incorectă.<br />A încercat să "
+"încarce: %s"
 
 #: classes/xnau_CSV_Import.class.php:188
 msgid ""
 "The number of items in line %s is incorrect.<br />There are %s and there "
 "should be %s."
 msgstr ""
-"Le nombre d'éléments dans la ligne %s est incorrect.<br />Il y en a %s au "
-"lieu de %s attendu."
+"Numărul de articole în linie %s is este incorect.<br />Există %s și ar "
+"trebui să existe %s."
 
 #: classes/xnau_CSV_Import.class.php:197
 msgid "Number of values does not match number of columns"
-msgstr "Le nombre de valeurs et de colonnes ne correspondent pas"
+msgstr "Numărul de valori nu se potrivește cu numărul de coloane"
 
 #: classes/xnau_CSV_Import.class.php:298
 msgid "New columns imported from the CSV file."
-msgstr "Nouvelles colonnes importées depuis le fichier CSV"
+msgstr "Coloane noi importate din fișierul CSV."
 
 #: classes/xnau_FormElement.class.php:239
 msgctxt "indicates a write-in choice"
 msgid "other"
-msgstr "autre"
+msgstr "altele"
 
 #: classes/xnau_FormElement.class.php:240
 msgctxt "indicates the text to be clicked to go to another web page"
 msgid "Link Text"
-msgstr "Texte du lien"
+msgstr "Link Text"
 
 #: edit_participant.php:19
 msgid "Add New Participant Record"
-msgstr "Ajouter une nouvelle fiche"
+msgstr "Adauga o Noua Înregistrare Participant"
 
 #: edit_participant.php:24
 msgid "Edit Existing Participant Record"
-msgstr "Editer une fiche existante"
+msgstr "Modifică Înregistrare Participant existentă"
 
 #: edit_participant.php:83
 msgctxt "abbreviation for \"identification\""
@@ -1438,19 +1515,19 @@ msgstr "ID"
 #: edit_participant.php:83
 msgctxt "indicates a new record is being entered"
 msgid "(new record)"
-msgstr "(nouvelle fiche)"
+msgstr "(înregistrare nouă)"
 
 #: edit_participant.php:105
 msgid "hidden"
-msgstr ""
+msgstr "ascuns"
 
 #: edit_participant.php:108
 msgid "read only"
-msgstr "read only"
+msgstr "doar pentru citire"
 
 #: edit_participant.php:223
 msgid "Save the Record"
-msgstr "Enregistrer la fiche"
+msgstr "Salvați Înregistrarea"
 
 #: edit_participant.php:236
 msgid ""
@@ -1458,222 +1535,228 @@ msgid ""
 "strong> save record and continue with same record<br><strong>Next:</strong> "
 "save record and then start a new one"
 msgstr ""
-"<strong>Sauver:</strong> enregistrer la fiche et revenir à la "
-"liste<br><strong>Appliquer:</strong> enregistrer et poursuivre avec la même "
-"fiche<br><strong>Suivant:</strong> enregistrer la fiche et créer une nouvelle"
+"<strong>Execută:</strong> salvați înregistrarea și reveniţi la "
+"listă<br><strong>Aplicaţi:</strong> salvați înregistrarea și continuați cu "
+"aceeași înregistrare<br><strong>Următor:</strong> salvați înregistrarea și "
+"apoi începeţi una nouă"
 
 #: edit_participant.php:238
 msgid "<strong>Previous:</strong> save and move to previous record"
 msgstr ""
+"<strong>Anterior:</strong> salvați și treceţi la înregistrarea anterioară"
 
 #. translators: these strings are used in logic matching, please test after
 #. translating in case special characters cause problems
 #: manage_fields.php:10
 msgid "Update Fields"
-msgstr "Mettre à jour les champs"
+msgstr "Actualizare Campuri"
 
 #: manage_fields.php:11
 msgid "Update Groups"
-msgstr "Mettre à jour les groupes"
+msgstr "Actualizare Grupuri"
 
 #: manage_fields.php:12
 msgid "Add Field"
-msgstr "Ajouter un champ"
+msgstr "Adauga Câmp"
 
 #: manage_fields.php:13
 msgid "Add Group"
-msgstr "Ajouter un groupe"
+msgstr "Adauga Grup"
 
 #: manage_fields.php:14
 msgid "new field title"
-msgstr ""
+msgstr "titlu câmp nou"
 
 #: manage_fields.php:15
 msgid "new group title"
-msgstr ""
+msgstr "titlu grup nou"
 
 #: manage_fields.php:16
 msgctxt "column name"
 msgid "Order"
-msgstr ""
+msgstr "Ordine"
 
 #: manage_fields.php:17
 msgctxt "column name"
 msgid "Name"
-msgstr ""
+msgstr "Nume"
 
 #: manage_fields.php:18
 msgctxt "column name"
 msgid "Title"
-msgstr ""
+msgstr "Titlu"
 
 #: manage_fields.php:19
 msgctxt "column name"
 msgid "Default"
-msgstr ""
+msgstr "Implicit"
 
 #: manage_fields.php:20
 msgctxt "column name"
 msgid "Group"
-msgstr ""
+msgstr "Grup"
 
 #: manage_fields.php:21
 msgctxt "column name"
 msgid "Help Text"
-msgstr ""
+msgstr "Text Ajutător"
 
 #: manage_fields.php:22
 msgctxt "column name"
 msgid "Form Element"
-msgstr ""
+msgstr "Element de Formular"
 
 #: manage_fields.php:23
 msgctxt "column name"
 msgid "Values"
-msgstr ""
+msgstr "Valori"
 
 #: manage_fields.php:24
 msgctxt "column name"
 msgid "Validation"
-msgstr ""
+msgstr "Validare"
 
 #: manage_fields.php:25
 msgctxt "column name"
 msgid "Display Column"
-msgstr ""
+msgstr "Afișare Coloană"
 
 #: manage_fields.php:26
 msgctxt "column name"
 msgid "Admin Column"
-msgstr ""
+msgstr "Coloana Admin"
 
 #: manage_fields.php:27
 msgctxt "column name"
 msgid "Sortable"
-msgstr ""
+msgstr "Sortabil"
 
 #: manage_fields.php:28
 msgctxt "column name, acronym for \"comma separated values\""
 msgid "CSV"
-msgstr ""
+msgstr "CSV"
 
 #: manage_fields.php:29
 msgctxt "column name"
 msgid "Persistent"
-msgstr ""
+msgstr "Persistent"
 
 #: manage_fields.php:30
 msgctxt "column name"
 msgid "Signup"
-msgstr ""
+msgstr "Înscriere"
 
 #: manage_fields.php:31
 msgctxt "column name"
 msgid "Read Only"
-msgstr ""
+msgstr "Numai citire"
 
 #: manage_fields.php:32
 msgctxt "column name"
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: manage_fields.php:33
 msgctxt "column name"
 msgid "Delete"
-msgstr ""
+msgstr "Şterge"
 
 #: manage_fields.php:34
 msgctxt "column name"
 msgid "Display"
-msgstr ""
+msgstr "Afișare"
 
 #: manage_fields.php:35
 msgctxt "column name"
 msgid "Fields"
-msgstr ""
+msgstr "Câmpuri"
 
 #: manage_fields.php:36
 msgctxt "column name"
 msgid "Description"
-msgstr ""
+msgstr "Descriere"
 
 #: manage_fields.php:154
 msgid "Cannot add a field with that name"
-msgstr "Impossible d'ajouter un champ de ce nom"
+msgstr "Nu se poate adăuga un câmp cu acest nume"
 
 #: manage_fields.php:154
 msgid "This name is reserved; please choose another. Reserved names are"
 msgstr ""
-"Ce nom est réservé; merci d'en choisir un autre. Les noms réservés sont"
+"Acest nume este rezervat, vă rugăm să alegeți un altul. Numele rezervate sunt"
 
 #: manage_fields.php:236 participants-database.php:434
 #: participants-database.php:435
 msgid "Manage Database Fields"
-msgstr "Gérer les champs de la base"
+msgstr "Gestionați Câmpurile Bazei de date"
 
 #: manage_fields.php:246 manage_fields.php:254
 msgid "Field Groups"
-msgstr "Groupes de champs"
+msgstr "Grupuri de Câmpuri"
 
 #: manage_fields.php:255
 msgid "Help"
-msgstr "Aide"
+msgstr "Ajutor"
 
 #: manage_fields.php:263
 msgid "Fields"
-msgstr "Champs"
+msgstr "Câmpuri"
 
 #: manage_fields.php:325
 msgid "No fields in this group"
-msgstr "Aucun champ dans ce groupe"
+msgstr "Nu există câmpuri în acest grup"
 
 #: manage_fields.php:355 manage_fields.php:712
 msgid "field"
-msgstr ""
+msgstr "câmp"
 
 #: manage_fields.php:429
 msgid "Edit / Add / Remove Field Groups"
-msgstr "Editer / ajouter / détruire des groupes de champs"
+msgstr "Modifică / Adaugă / Eliminaţi Grupurile de Câmpuri"
 
 #: manage_fields.php:460
 msgid "fields"
-msgstr "champs"
+msgstr "câmpuri"
 
 #: manage_fields.php:483 manage_fields.php:707
 msgid "group"
-msgstr ""
+msgstr "grup"
 
 #: manage_fields.php:718
 msgid ""
 "The %1$s was not added. There is already a %1$s with that name, please "
 "choose another."
 msgstr ""
+"%1$s nu a fost adăugat. Există deja o %1$s cu acest nume, vă rugăm să "
+"alegeţi altul."
 
 #: manage_fields.php:782
 msgid "Not Required"
-msgstr "Non-obligatoire"
+msgstr "Nu este Necesar"
 
 #: manage_fields.php:783
 msgid "Required"
-msgstr "Obligatoire"
+msgstr "Necesar"
 
 #: manage_fields.php:784
 msgid "Email"
-msgstr "Email"
+msgstr "E-mail"
 
 #: manage_fields_help.php:4
 msgid "Manage Fields Help"
-msgstr "Aide sur la gestion des champs"
+msgstr "Ajutor la Gestionarea Câmpurilor"
 
 #: manage_fields_help.php:5
 msgid ""
 "Please visit the %sParticipants Database help pages%s for up-to-date "
 "information on using this plugin."
 msgstr ""
+"Vă rugăm să vizitați %sPagini de ajutor ale plugin-ului Participants Database"
+"%s pentru informaţii actualizate privind utiliyarea acestui plugin."
 
 #: manage_fields_help.php:6
 msgid "Defining Database Fields"
-msgstr "Définition des champs de la base"
+msgstr "Definirea Câmpurilor Bazei de Date"
 
 #: manage_fields_help.php:7
 msgid ""
@@ -1683,11 +1766,12 @@ msgid ""
 "the form is presented. You will be able to see your changes to how the "
 "fields are set up by checking this page."
 msgstr ""
-"La base contient des informations individuelles. Sur cette page, vous pouvez "
-"préciser la nature de l'information stockée, et comment elle est présentée "
-"et utilisée. Consultez la page \"Ajouter un participant\" pour voir comment "
-"le formulaire est présenté. Vous pourrez aussi y voir vos changements sur le "
-"réglage des champs."
+"Baza de date stochează informaţii despre persoane. Pe această pagină, puteți "
+"determina ce părţi de informații sunt stocate, modul în care acestea sunt "
+"prezentate și se interacţionează cu ele. Aruncati o privire la pagina \"Add "
+"Participant\" pentru a vedea cum se prezintă formularul. Veți fi capabil să "
+"vedeţi modificările, modul în care câmpurile sunt setate prin consultarea "
+"aceastei pagini."
 
 #: manage_fields_help.php:8
 msgid ""
@@ -1698,16 +1782,17 @@ msgid ""
 "added will have no value for the field. This can be filled in by then "
 "editing the record."
 msgstr ""
-"<strong>Important:</strong> Certains changements effectués ici pourraient "
-"affecter des entrées déjà existantes. L'idéal est de configurer la base "
-"avant de commencer à ajouter des entrées, mais il est toujours possible "
-"d'ajouter des champs. Toute entrée présente avant l'ajout d'un nouveau champ "
-"n'aura rien dans ce champ, mais on peut bien sûr les remplir ensuite en "
-"éditant la fiche."
+"<strong>Important:</strong> Unele dintre schimbările pe care le poti face "
+"aici va afecta înregistrările existente în baza de date. Este mai bine să "
+"creaţi baza de date înainte de a începe adăugarea de înregistrări, dar este "
+"posibil să adăugaţi câmpuri în baza de date în orice moment. Toate "
+"înregistrările care au fost introduse înainte de a introduce un nou câmp nu "
+"vor avea nici o valoare pentru acest câmp. Acesta poate fi completată prin "
+"editarea înregistrării."
 
 #: manage_fields_help.php:9
 msgid "Delete"
-msgstr "Détruire"
+msgstr "Şterge"
 
 #: manage_fields_help.php:10
 msgid ""
@@ -1715,25 +1800,25 @@ msgid ""
 "this data field, that information will not be deleted from the database, but "
 "you will no longer be able to display or edit it."
 msgstr ""
-"Cliquer sur le \"X\" rouge pour détruire un champ. Si certaines entrées "
-"utilisent ce champ, le contenu n'en sera pas détruit, mais vous ne pourrez "
-"plus y accéder ni le modifier."
+"Click pe \"X\"-ul roșu , pentru a șterge un câmp. Dacă există înregistrări "
+"anterioare cu acest câmpul de date, aceste informații nu vor fi șterse din "
+"baza de date, dar nu veți mai fi capabil să le afișaţi sau să le editaţi."
 
 #: manage_fields_help.php:11
 msgid "Order"
-msgstr "Ordre"
+msgstr "Ordonează"
 
 #: manage_fields_help.php:12
 msgid ""
 "Click and drag to reorder the fields. You do not need to click on \"Update\" "
 "for the change to take effect."
 msgstr ""
-"Cliquer et déplacer pour changer l'ordre des champs. Inutile de cliquer sur "
-"\"Mettre à jour\" pour valider ces changements."
+"Faceți clic și trageți pentru a rearanja câmpurile. Nu aveți nevoie să "
+"faceți clic pe \"Update\" pentru ca modificarea să aibă efect."
 
 #: manage_fields_help.php:13
 msgid "Title"
-msgstr "Titre"
+msgstr "Titlu"
 
 #: manage_fields_help.php:14
 msgid ""
@@ -1741,21 +1826,22 @@ msgid ""
 "won&#39;t affect the field in any way other than to change how it is labeled "
 "in forms.<p>"
 msgstr ""
-"Ceci constitue l'intitulé visible de votre champ. Vous pouvez le changer "
-"plus tard sans que cela n'affecte le champ d'aucune autre façon que sa "
-"dénomination dans les formulaires."
+"Afişează titlul pentru câmpul .dvs. Îl puteţi schimba oricând, aceasta nu va "
+"afecta domeniul în nici un fel decât să schimbe modul în care este etichetat "
+"în formular.<p>"
 
 #: manage_fields_help.php:15
 msgid "Default"
-msgstr "Défaut"
+msgstr "Implicit"
 
 #: manage_fields_help.php:16
 msgid "If you wish to pre-load a field with a value, you can put it here."
-msgstr "Si vous voulez pré-définir une valeur du champ, la donner ici"
+msgstr ""
+"Dacă doriți să pre-încărcaţi un câmp cu o valoare, puteți s-o puneţi aici."
 
 #: manage_fields_help.php:17
 msgid "Group"
-msgstr "Groupe"
+msgstr "grup"
 
 #: manage_fields_help.php:18
 msgid ""
@@ -1763,13 +1849,13 @@ msgid ""
 "group the database field belongs to here. You can edit the groups under the "
 "\"Field Groups\" tab."
 msgstr ""
-"Les champs de la base sont répartis en groupes, et vous pouvez choisir ici à "
-"quel groupe les champs appartiennent. Vous pouvez éditer les groupes dans "
-"l'onglet \"Groupes de champs\"."
+"Câmpurile bazei de date sunt organizate în grupuri, și puteți selecta din ce "
+"grup al bazei de date face parte câmpul, aici. Puteți edita grupurile de sub "
+"tab-ul \"Field Groups\" ."
 
 #: manage_fields_help.php:19
 msgid "Help Text"
-msgstr "Texte d'aide"
+msgstr "Text Ajutător"
 
 #: manage_fields_help.php:20
 msgid ""
@@ -1778,16 +1864,16 @@ msgid ""
 "displayed next to the field. HTML is allowed, but be careful with that, you "
 "can break things!"
 msgstr ""
-"Quand un formulaire est affiché, il peut être avisé de préciser ce que vous "
-"voulez comme information dans un champ. Le texte entré ici sera affiché à "
-"côté du champ. L'HTML est autorisé, mais peut perturber les choses."
+"Când se afișează un formular, uneori, este o idee bună să explicaţi ceva "
+"despre informațiile pe care le doriți într-un câmp. Orice text pe care îl "
+"puneţi în aici va fi afișat alături de câmp. HTML este permis, dar fiţi "
+"atent cu acesta, deoarece pot apăea erori!"
 
 #: manage_fields_help.php:21
 msgid "Form Element"
-msgstr "Elément de formulaire"
+msgstr "Element de Formular"
 
 #: manage_fields_help.php:22
-#, fuzzy
 msgid ""
 "If your piece of information is a simple line of text (like a name), it "
 "should be presented in the form as a text field. If a longer piece of text "
@@ -1795,10 +1881,11 @@ msgid ""
 "where you can determine what kind of form element this particular piece of "
 "information will be preseted with."
 msgstr ""
-"Si l'information est une simple chaîne de caractère (comme un nom), elle "
-"peut être présentée dans le formulaire comme un champ-texte. Si elle prend "
-"plus de place, une zone de texte est mieux adaptée, etc. Ceci sert à "
-"déterminer avec quel type d'élément de formulaire l'information sera fournie."
+"Dacă partea de informație este o simpla linie de text (cum ar fi un nume), "
+"ar trebui să fie prezentată în formular ca un câmp de text. În cazul în care "
+"o parte mai mare de text este necesară, un câmp de text ar fi o alegere mai "
+"bună, și așa mai departe. Aici puteți determina cu ce fel de element de "
+"formular va fi înzestrată  această parte de informație."
 
 #: manage_fields_help.php:23
 msgid ""
@@ -1810,18 +1897,18 @@ msgid ""
 "text-field or select/dropdown or select-other/dropdown-other. Be warned, "
 "it&#39;s safest to set this up before you start getting data for the field."
 msgstr ""
-"Dans ce menu déroulant figurent les éléments de formulaires parmi lesquels "
-"vous pouvez choisir. Il vaut mieux éviter de changer cela après avoir "
-"commencé à ajouter des entrées dans la base, car cela risque d'avoir des "
-"résultats assez imprévisibles, même si aucune info ne peut être perdue. "
-"Néanmoins il est <em>possible</em> de changer entre éléments semblables, "
-"comme text/text-field ou select/dropdown ou select-other/dropdown-other. "
-"Mais le plus sûr est de régler cela avant de commencer à recueillir des "
-"données pour ce champ."
+"Sub meniul vertical, cu variante multiple se află elementele de formular, "
+"din care puteți alege. Este într-adevăr cel mai bine să evitaţi schimbarea , "
+"odată ce a început adăugarea de înregistrări în baza de date folosind acest "
+"câmp ... lucruri imprevizibile pot întâmpla, și cu toate că nu veţi pierde "
+"date, se poate face o încurcătură! Acestea fiind spuse, <em>este</em>posibil "
+"să schimbaţi între elemente similare, cum ar fi text / câmp de text sau "
+"select/dropdown sau select-other/dropdown-other. Atenţie, este mai sigur e "
+"să setați acest lucru înainte de a începe să obtineţi date pentru câmp."
 
 #: manage_fields_help.php:24
 msgid "Values"
-msgstr "Valeurs"
+msgstr "valori"
 
 #: manage_fields_help.php:25
 msgid ""
@@ -1829,12 +1916,11 @@ msgid ""
 "choices here. Type in a comma-separated list of the options you want to "
 "present."
 msgstr ""
-"Pour les éléments de formulaire qui comportent des choix multiples, c'est "
-"ici que vous devez définir ces choix, sous la forme d'une liste d'options "
-"séparées par des virgules."
+"Pentru elementele de formular care au mai multe opțiuni, aveți nevoie să "
+"definiţi aceste posibilități aici. Introduceți într-o listă separată prin "
+"virgulă a opțiunilor pe care doriți să le prezentaţi aici."
 
 #: manage_fields_help.php:26
-#, fuzzy
 msgid ""
 "Don&#39;t try to have a comma in one of your options, though! It&#39;s "
 "posiible to break things by trying to include other (mostly non-text and "
@@ -1843,15 +1929,18 @@ msgid ""
 "international language characters should be fine, just type them in. Don&#39;"
 "t try to use HTML entities or codes, it just won&#39;t work."
 msgstr ""
-"Attention à ne pas inclure une virgule dans une option, néanmoins! Vous "
-"pouvez causer des problèmes en utilisant certains caractères non "
-"alphanumériques (ponctuation en particulier), donc testez soigneusement "
-"l'effet dans les formulaires. Les caractères accentués ne devraient pas "
-"poser problème. En revanche, pas d'HTML ici SVP."
+"Nu încercați să introduceţi o virgulă într-una din opțiuni, deși! Este "
+"posibil să stricaţi lucruri în încercarea de a include alte caractere (cea "
+"mai mare parte caractere non-text și semne de punctuație), deci faceţi "
+"teste, iar dacă observaţi un comportament ciudat în formular, este posibil "
+"să aveți caractere aici care încurcă lucrurile. Cele mai multe caractere din "
+"limbile internaționale ar trebui să fie în regulă, deci introduceți-le. Nu "
+"încercați să utilizați entități HTML sau coduri, aceasta pur și simplu nu va "
+"funcționa. "
 
 #: manage_fields_help.php:27
 msgid "Validation"
-msgstr "Validation"
+msgstr "Validare"
 
 #: manage_fields_help.php:28
 msgid ""
@@ -1864,18 +1953,19 @@ msgid ""
 "field, but it is for advanced users, so if you don&#39;t know what a regex "
 "is, get some help before trying to use this feature."
 msgstr ""
-"Si vous souhaitez que certains champs soient obligatoires, ou aient un "
-"certain type de contenu, vous pouvez le définir ici. \"Not Required\" "
-"signifie que vous n'imposez pas de le remplir. \"Required\" impose "
-"simplement que le champ contienne quelque chose. \"match/regex\" vous donne "
-"un réglage fin pour valider un champ. Avec match mettez simplement le nom "
-"d'un autre champ dans la case pour imposer à celui-ci de lui correspondre. "
-"L'usage des expressions régulières (regex) est plus compliqué, donc si vous "
-"ne connaissez pas le concept documentez-vous avant d'essayer."
+"Dacă doriți ca anumite câmpuri să fie necesare sau să aibă un anumit tip de "
+"conținut, puteți seta aceasta aici. \"Not Required\" înseamnă că nu vă pasă "
+"dacă câmpul este completat sau nu. \"Required\" înseamnă pur și simplu că "
+"câmpul trebuie să conţină ceva în el. \"match/regex\" vă oferă mai multe "
+"opțiuni avansate de validare a unui câmp. Pentru a potrivi valoarea câmpului "
+"cu valoarea uni alt domeniu, pune numele acelui câmp în casetă. Puteți "
+"folosi, de asemenea, o expresie regex pentru a valida valoarea câmpului, dar "
+"aceasta este pentru utilizatorii avansați, deci, dacă nu știți ce este un "
+"regex , căutaţi ajutor înainte de a încerca să utilizaţi această funcție."
 
 #: manage_fields_help.php:29
 msgid "Admin Column"
-msgstr "Colonne admin"
+msgstr "Coloană Admin"
 
 #: manage_fields_help.php:30
 msgid ""
@@ -1887,29 +1977,29 @@ msgid ""
 "if you have multiple items with the same number (other than 0), only the "
 "last one with the number will appear."
 msgstr ""
-"Ceci concerne seulement la page \"Liste des participants\" du plugin. Sur "
-"cette page apparaît la liste des entrées de la base. Comme il n'est pas "
-"souhaitable d'inclure tous les champs dans cette liste, vous pouvez choisir "
-"ici lesquels montrer: \"0\" pour ne pas l'afficher, ou un autre nombre pour "
-"le numéro de la colonne dans laquelle l'afficher. Vous devez vous assurer de "
-"la cohérence de ces nombres: si vous avez plusieurs champs avec le même "
-"(autre que 0), seul le dernier d'entre eux apparaîtra."
+"Acest lucru afectează numai pagina \"List Participants\" plugin-ului. Pe "
+"acea pagină sunt listate înregistrările bazei de date. Având în vedere că ar "
+"fi imposibil să se includă fiecare câmp din această listă ca o coloană, "
+"aveți posibilitatea să selectați care câmpuri sunt afișate aici. \"0\" "
+"înseamnă nu afișa, un număr setează ordinea în care vor apărea în coloană. "
+"Trebuie să vă asigurați că numerele au sens, dacă aveți mai multe elemente "
+"cu același număr (altul decât 0), doar ultimul cu numărul va apărea."
 
 #: manage_fields_help.php:31
 msgid "Display Column"
-msgstr "Colonne affichage"
+msgstr "Afișare coloană"
 
 #: manage_fields_help.php:32
 msgid ""
 "When using the [pdb_list] shortcode to display the list of records, this "
 "column determines whether the column will be shown and in what order."
 msgstr ""
-"Cette colonne détermine quels champs apparaissent, et leur ordre quand on "
-"utilise le shortcode [pdb-list] pour générer une liste."
+"Când utilizați shortcode-ul [pdb_list] pentru a afișa lista de înregistrări, "
+"această coloană determină dacă coloana va fi afișată și din ce ordine."
 
 #: manage_fields_help.php:33
 msgid "Switches"
-msgstr "Options"
+msgstr "Comutatori"
 
 #: manage_fields_help.php:34
 msgid ""
@@ -1917,9 +2007,9 @@ msgid ""
 "\" page can be sorted by this field. Of course, it must have a non-zero "
 "value in \"Column\" to be seen at all."
 msgstr ""
-"<strong>Triable</strong> signifie que la liste affichée sur la page \"Liste "
-"des participants\" peut être triée à l'aide de ce champ. Bien sûr, il doit "
-"avoir une valeur autre que 0 dans la colonne admin pour être vu."
+"<strong>Sortabil</strong> înseamnă că lista prezentată pe pagina \"List "
+"Participants\" poate fi sortată după acest câmp. Desigur, trebuie să aibă o "
+"valoare non-zero în \"Column\" ca să fie afişată."
 
 #: manage_fields_help.php:35
 msgid ""
@@ -1929,10 +2019,11 @@ msgid ""
 "exporting a CSV, this switch determines whether the field will be exported."
 "<p>"
 msgstr ""
-"<strong>CSV</strong> signifie que ce champ pourra être importé ou exporté "
-"via un fichier CSV. Si vous utilisez des fichiers CSV pour ajouter des "
-"champs, vous pouvez choisir ces options en fonction des champs à importer. A "
-"l'export, ceci définit les champs à exporter."
+"<strong>CSV</strong> înseamnă că câmpul unul care poate fi importat sau "
+"exportate cu un fișier CSV. Dacă utilizați fișiere CSV pentru a importa "
+"înregistrări, ar trebui să setați aceste switch-uri bazate pe câmpurile pe "
+"care intenționați să le importați. Când exportați un CSV, acest swich "
+"determină dacă câmpul va fi exportat.<p>"
 
 #: manage_fields_help.php:36
 msgid ""
@@ -1943,140 +2034,148 @@ msgid ""
 "persistent, then once a city value has been entered in the first record of "
 "the series, the next blank record will have this city pre-filled."
 msgstr ""
-"<strong>Persistant</strong> est une option utile pour ajouter manuellement "
-"une série d'entrées dans la base. Elle implique que la valeur du champ sera "
-"réutilisée par défaut dans l'entrée suivante. Par exemple, quand on ajoute "
-"une série de participants d'une même ville, l'option est pertinente pour le "
-"champ \"city\" pour pré-remplir cette case à partir de la valeur donnée dans "
-"la première entrée."
+"<strong>Persistent</strong>este o caracteristică utilă , comodă atunci când "
+"introduceți manual o serie înregistrări în admin. Dacă este setată, înseamnă "
+"că valoarea introdusă a câmpul se va repeta la următoarea înregistrare "
+"goală. De exemplu, dacă , un grup de înregistrări din același oraș sunt "
+"introduse, setaţi câmpul \"city\" să fie persistent, apoi o dată ce valoarea "
+"orașului a fost înscrisă în prima înregistrare din serie, următoarea "
+"înregistrare goală va avea acest oras pre-completat."
 
 #: manage_fields_help.php:37
 msgid ""
 "Persistent fields will also use their set default value in record edit forms "
 "where no value has been set in the record being edited"
 msgstr ""
+"Câmpurile persistente vor folosi, de asemenea, valoarea lor setată implicit "
+"în formularul de înregistrare, acolo unde nici o valoare nu a fost introdusă "
+"în înregistrare"
 
 #: manage_fields_help.php:38
 msgid ""
 "<strong>Signup</strong> selects this field for use in the brief signup form "
 "that is presented with the [pdb_signup] shortcode."
 msgstr ""
-"<strong>Inscription</strong> veut dire que ce champ apparaîtra dans le petit "
-"formulaire d'inscription généré par le shortcode [pdb_signup]."
+"<strong>Înscrie-te</strong> selectează acest câmp pentru a fi utilizat în "
+"formularul scurt de înscriereaceasta este afişat cu shortcode-ul "
+"[pdb_signup]."
 
 #: manage_fields_help.php:39
-#, fuzzy
 msgid ""
 "<strong>Readonly</strong> means that plugin users can see the value of the "
 "field, but cannot edit it. The field will be editable in the admin."
 msgstr ""
-"<strong>Lecture seule</strong> signifie que les utilisateurs peuvent voir "
-"l'avaleur du champ, mais pas la modifier. Le champ est évitable en admin "
-"seulement."
+"<strong>Numai Citire</strong> înseamnă că utilizatorii plugin-ului pot vedea "
+"valoarea câmpului, dar nu o pot edita. Câmpul va fi editat în admin."
 
 #. Plugin Name of the plugin/theme
 #: participants-database.php:338
 msgid "Participants Database"
-msgstr "Base de participants"
+msgstr "Bază de date de Participanţi"
 
 #: participants-database.php:425 participants-database.php:426
 msgid "Add Participant"
-msgstr "Ajouter un participant"
+msgstr "Adaugă participant"
 
 #: participants-database.php:443 participants-database.php:444
 #: upload_csv.php:8
 msgid "Import CSV File"
-msgstr "Importer un fichier CSV"
+msgstr "importă fişier CVS"
 
 #: participants-database.php:461 participants-database.php:462
 msgid "Setup Guide"
-msgstr "Guide de configuration"
+msgstr "Ghid de Configurare"
 
 #: participants-database.php:470 participants-database.php:471
 msgid "Edit Record"
-msgstr "Editer une entrée"
+msgstr "Modificare înregistrare"
 
 #. translators: don't translate the words in brackets {}
 #: participants-database.php:520
 msgid "You must remove all fields from the {name} group before deleting it."
 msgstr ""
+"Trebuie să eliminați toate câmpurile din grup {name} înainte de a-l șterge."
 
 #: participants-database.php:521
 msgid "Delete the \"{name}\" {thing}?"
-msgstr ""
+msgstr "Şterge \"{name}\" {lucrul}?"
 
 #: participants-database.php:2383
 msgid ""
 "There is something wrong with the file you tried to upload. Try another."
 msgstr ""
-"Il y a un problème avec le fichier que vous avez voulu charger. Essayez avec "
-"un autre."
+"Este ceva în neregulă cu fișierul pe care aţi încercat să-l încărcați. "
+"Încercați un altul."
 
 #: participants-database.php:2399 participants-database.php:2427
 msgid "For \"%s\", you may only upload image files like JPEGs, GIFs or PNGs."
 msgstr ""
+"Pentru \"%s\", puteţi încărca fişiere de imagine cu extensiile JPEG, GIF sau "
+"PNG."
 
 #: participants-database.php:2401
 msgid "The file selected for \"%s\" must be one of these types: %s. "
-msgstr ""
+msgstr "Fişierele selectate pentru \"%s\" trebuie să fie de acest tip: %s. "
 
 #: participants-database.php:2433
 msgid ""
 "The file you tried to upload is too large. The file must be smaller than %sK."
 msgstr ""
+"Fișierul pe care ați încercat să-l încărcați este prea mare. Fișierul "
+"trebuie să fie mai mic decât %sK."
 
 #: participants-database.php:2440
 msgid "The file could not be saved."
-msgstr "Ce fichier n'a pas pu être enregistré."
+msgstr "Fișierul nu a putut fi salvat."
 
 #: participants-database.php:2468
 msgid "The uploads directory (%s) could not be created."
-msgstr ""
+msgstr "Directorul de încărcări (%s) nu a putut fi creat."
 
 #: participants-database.php:2727
 msgid ""
 "The date for \"%s\" was invalid. Please input the date with the exact format "
 "shown"
 msgstr ""
-"La date pour \"%s\" n'est pas correcte. Entrez la date exactement au format "
-"indiqué."
+"Data pentru \"%s\" a fost nevalidă. Vă rugăm sa introduceţi data cu în "
+"formatul corect"
 
 #: participants-database.php:2817 templates/pdb-retrieve-default.php:45
 msgid "Submit"
-msgstr "Sauver"
+msgstr "Execută"
 
 #: participants-database.php:2818
 msgid "Apply"
-msgstr "Appliquer"
+msgstr "Aplicaţi"
 
 #: participants-database.php:2821
 msgid "The record has been updated."
-msgstr ""
+msgstr "Înregistrarea a fost actualizată."
 
 #: participants-database.php:2822
-#, fuzzy
 msgid "The new record has been added."
-msgstr "Le fichier %s a bien été chargé"
+msgstr "o noua înregistrare a fost adăugată."
 
 #: participants-database.php:2940
 msgid "WordPress Plugin"
-msgstr "Extension WordPress"
+msgstr "Plugin WordPress "
 
 #: participants-database.php:2941
 msgid ""
 "Helping organizations manage their volunteers, members and participants."
 msgstr ""
-"Aider les organisations à gérer leurs volontaires, membres et participants."
+"Ajutând organizațiile să gestioneze voluntarii, membrii și participanții lor."
 
 #: participants-database.php:2944
 msgid "Developed by"
-msgstr "Développé par"
+msgstr "Dezvoltat de"
 
 #: participants-database.php:2945
 msgid ""
 "Suggestions or crticisms of this plugin? I&#39;d love to hear them: email "
 msgstr ""
-"Suggestions ou commentaires sur cette extension? N'hésitez pas par email "
+"Sugestii sau critici în legătură cu acest plugin? Mi-ar plăcea să le aud: e-"
+"mail"
 
 #: participants-database.php:2948
 msgid ""
@@ -2085,25 +2184,26 @@ msgid ""
 "a %2$srating%3$s or review, or dropping something in the %1$stip jar.%3$s "
 "Thanks!"
 msgstr ""
-"N'hésitez pas à contribuer au bon support et développement de ce logiciel en "
-"vous rendant sur la %1$spage de l'extension%3$s, en donnant une note ou une "
-"évaluation, et je n'ai rien contre un %1$spourboire%3$s. Merci!"
+"Vă rugăm să contribuiţi la sprijinul continuu și la dezvoltarea acestui "
+"software vizitând %1$spagina acestui plugin ,%3$s dându-i acestui pluging un "
+"%2$srating%3$s sau recenzie, sau să donaţi ceva în %1$stip borcan.%3$s "
+"Mulţumesc!"
 
 #: templates/pdb-retrieve-default.php:10
 msgid "Request your Private Link"
-msgstr ""
+msgstr "Cerereţi Link-ul dvs. Privat"
 
 #: templates/pdb-retrieve-default.php:17
 msgid "Success: your private link has been emailed to you."
-msgstr ""
+msgstr "Aţi reuşit: link-ul privat a fost trimis prin email către .dvs."
 
 #: templates/pdb-retrieve-default.php:37
 msgid "Type in your %s, your private link will be emailed to you."
-msgstr ""
+msgstr "Introduceţi e-mail-ul dvs. %s, link-ul privat va fi trimis prin email."
 
 #: upload_csv.php:28
 msgid "Prepare a spreadsheet file with the correct format:"
-msgstr ""
+msgstr "Pregăti un fișier foaie de calcul cu formatul corect:"
 
 #: upload_csv.php:30
 msgid ""
@@ -2111,9 +2211,9 @@ msgid ""
 "must match exactly the columns in the database. Currently, the CSV import "
 "columns are as follows:"
 msgstr ""
-"Pour importer correctement vos données, les colonnes de votre table doivent "
-"correspondre exactement aux champs de votre base. Pour l'instant les "
-"colonnes du fichier CSV sont les suivantes:"
+"Pentru a importa în mod corespunzător datele de membru, coloanele din foaia "
+"de calcul trebuie să se potrivească exact cu coloanele din baza de date. În "
+"prezent, coloanele de import CSV sunt după cum urmează:"
 
 #: upload_csv.php:45
 msgid ""
@@ -2122,11 +2222,11 @@ msgid ""
 "data for a particular column, you can include it and leave it blank, or "
 "leave it out entirely. The order of the columns doesn&#39;t matter."
 msgstr ""
-"Ceci signifie que votre table doit avoir %s colonnes, et que leurs titres "
-"doivent correspondre exactement aux noms ci-dessus. S'il n'y a pas de "
-"données pour certaines colonnes vous pouvez inclure ces colonnes en les "
-"laissant vides, ou bien ne pas les inclure. L'ordre des colonnes est sans "
-"importance."
+"Aceasta înseamnă că foaia de calcul trebuie să aibă %s coloane, iar titlul "
+"din fiecare dintre aceste coloane trebuie să se potrivească exact cu numele "
+"de mai sus. În cazul în care nu există date pentru o anumită coloană, puteți "
+"să-l includeţi și să-l lăsați gol, sau să-l omiteţi în întregime. Ordinea "
+"coloanelor nu contează."
 
 #: upload_csv.php:46
 msgid ""
@@ -2134,24 +2234,26 @@ msgid ""
 "imported and used. If a column name does not match a defined column in the "
 "database, the data from that column will be discarded"
 msgstr ""
-"Si le fichier CSV comporte des colonnes dont le nom ne correspond pas à un "
-"champ de la base, ces colonnes ne seront pas utilisées."
+"Dacă fișierul CSV importat are setată o coloană diferită, această coloană va "
+"fi importată și utilizată. În cazul în care , numele de coloană nu se "
+"potrivește cu o coloană definită în baza de date, datele din coloana "
+"respectivă vor fi eliminate"
 
 #: upload_csv.php:47
 msgid "Get Blank CSV File"
-msgstr "Télécharger un fichier CSV à remplir"
+msgstr "Obțineți fișier CSV Gol "
 
 #: upload_csv.php:47
 msgid ""
 "You can download this file, then open it in Open Office, Excel or Google "
 "Docs."
 msgstr ""
-"Vous pouvez télécharger ce fichier, puis l'éditer avec Open Office, Excel ou "
+"Puteți descărca acest fișier, apoi deschideți-l în Open Office, Excel sau "
 "Google Docs."
 
 #: upload_csv.php:52
 msgid "Export the .csv file"
-msgstr ""
+msgstr "Exportați fișierul csv."
 
 #: upload_csv.php:54
 msgid ""
@@ -2159,22 +2261,21 @@ msgid ""
 "it as any of the following: \"comma-delimited csv\", or just \"csv\". Save "
 "it to your computer then upload it here."
 msgstr ""
-"Une fois que votre table est correctement préparée et remplie, exportez-la "
-"au format \"comma-delimited csv\", ou simplement \"csv\". Sauvez-la, puis "
-"importez-la ici."
+"Când aveți foaia de calcul configurată corespunzător și completată cu date, "
+"exportaţi-o după cum urmează:\"comma-delimited csv\", sau doar\"csv\". "
+"Salvați-o în computer, apoi încărcați-o aici."
 
 #: upload_csv.php:55
 msgid ""
 "Exported CSV files should be comma-delimited and enclosed with double-quotes "
 "(\"). Encoding should be \"UTF-8.\""
 msgstr ""
-"Les fichiers CSV exportés doivent avoir les champs séparés par des virgules "
-"et inclus dans des doubles-guillemets (\"). L'encodage doit être en \"UTF-8."
-"\""
+"Fișiere CSV exportate ar trebui să fie delimitate de virgulă și închise "
+"între ghilimele (\"). Codarea ar trebui să fie \"UTF-8.\""
 
 #: upload_csv.php:59
 msgid "Upload the .csv file"
-msgstr ""
+msgstr "Încărcați fișierul csv."
 
 #: upload_csv.php:62
 msgid ""
@@ -2184,14 +2285,16 @@ msgid ""
 "existing record is imported, one of three things can happen, based on the "
 "\"Duplicate Record Preference\" setting:"
 msgstr ""
-"<strong>Note:</strong> En fonction de la \"Préférence en cas de doublon\" "
-"les entrées importées sont comparées aux existantes sur le champ défini dans "
-"le réglage \"Champ de test de doublon\". En cas de doublon détecté, trois "
-"solutions possibles, en fonction de la \"Préférence en cas de doublon\":"
+"<strong>Notă:</strong> Depinzând de setările \"Duplicate Record Preference"
+"\" , înregistrările importate sunt verificate cu înregistrările existente "
+"după valoarea câmpului setat în \"Duplicate Record Check Field\". În cazul "
+"în care este importată o înregistrare care se potriveşte cu o înregistrare "
+"existentă , unul din următoarele trei lucruri se poate intampla, pe baza "
+"setărilor \"Duplicate Record Preference\" :"
 
 #: upload_csv.php:63
 msgid "Current Setting"
-msgstr "Réglage actuel"
+msgstr "Setări Curente"
 
 #: upload_csv.php:67
 msgid ""
@@ -2199,143 +2302,57 @@ msgid ""
 "data from the imported record. Blank or missing fields will not overwrite "
 "existing data."
 msgstr ""
-"%sRemplacer%s l'entrée existante avec un doublon sur %s sera mise à jour "
-"avec le contenu de l'entrée importée. Les champs vides ou manquant "
-"n'effaceront pas les valeurs existantes."
+"%sSuprascrie%s o înregistrare existentă cu care se potriveşte %s vor fi "
+"actualizate cu datele din dosarul importat. Câmpuri goale sau lipsă nu vor "
+"suprascrie datele existente."
 
 #: upload_csv.php:70
 msgid ""
 "%sCreate New%s adds all imported records as new records without checking for "
 "a match."
 msgstr ""
-"%sAjouter%s ajoute toutes les entrées importées sans tester les doublons."
+"%sCrează Nou%s adaugă toate înregistrările importate ca înregistrări noi "
+"fără a verifica dacă există vre o potrivire."
 
 #: upload_csv.php:73
 msgid ""
 "%sDon&#39;t Import%s does not import the new record if it matches the %s of "
 "an existing one."
 msgstr ""
-"%sSauter%s ne pas importer la nouvelle entrée en cas de doublon sur %s avec "
-"une existante."
+"%sNu importă%s nu importă o nouă înregistrare dacă se potrivește cu %s una "
+"deja existentă."
 
 #: upload_csv.php:83
 msgid "Choose .csv file to import:"
-msgstr "Choisir un fichier .csv à importer:"
+msgstr "Alegeți fişier .csv pentru import:"
 
 #: upload_csv.php:84
 msgid "Upload File"
-msgstr "Charger le fichier"
+msgstr "Încărcați fișier"
 
 #. Plugin URI of the plugin/theme
 msgid "http://xnau.com/wordpress-plugins/participants-database"
-msgstr ""
+msgstr "http://xnau.com/wordpress-plugins/participants-database"
 
 #. Description of the plugin/theme
 msgid "Plugin for managing a database of participants, members or volunteers"
-msgstr "Extension pour gérer une base de participants, membres ou volontaires"
+msgstr ""
+"Plugin pentru gestionarea unei baze de date de participanți, membri sau "
+"voluntari"
 
 #. Author of the plugin/theme
 msgid "Roland Barker"
-msgstr ""
+msgstr "Roland Barker"
 
 #. Author URI of the plugin/theme
 msgid "http://xnau.com"
-msgstr ""
-
-#~ msgctxt "noun; page number indicator"
-#~ msgid "Page"
-#~ msgstr "Page"
-
-#~ msgid "List Participants: %s record found, sorted by:"
-#~ msgid_plural "List Participants: %s records found, sorted by:"
-#~ msgstr[0] "Liste des participants: % entrée trouvée, triée par:"
-#~ msgstr[1] "Liste des participants: % entrées trouvées, triées par:"
+msgstr "http://xnau.com"
 
 #~ msgid "Edit"
-#~ msgstr "Editer"
+#~ msgstr "Editează"
 
-#~ msgid "all"
-#~ msgstr "tout"
+#~ msgid "Use PHP Sessions"
+#~ msgstr "Utilizați Sesiuni PHP"
 
-#~ msgid "the maximum allowed file size for an uploaded image"
-#~ msgstr "la taille maximum autorisée pour les fichiers ou images en upload"
-
-#~ msgid ""
-#~ "the message shown when a field's value does match the value of another "
-#~ "field"
-#~ msgstr ""
-#~ "message affiché quand la valeur d'un champ ne correspond pas à celle d'un "
-#~ "autre"
-
-#~ msgid "The %s field must match."
-#~ msgstr "Le champ %s doit correspondre."
-
-#~ msgid "border: 1px solid red"
-#~ msgstr "frontière: 1px rouge pleine"
-
-#~ msgid ""
-#~ "This forces date inputs to be interpreted strictly according to the date "
-#~ "format setting of the site. You should tell your users what format you "
-#~ "are expecting them to use. This also applies to date values used in "
-#~ "[pdb_list] shortcode filters. The date with your current setting looks "
-#~ "like this: <strong>%s</strong> %s"
-#~ msgstr ""
-#~ "Ceci impose l'interprétation des dates au sens strict selon le format de "
-#~ "dates du site. Vous devez indiquer aux utilisateurs le format à utiliser. "
-#~ "Ceci s'applique aussi aux dates utilisées dans les filtres du shortcode "
-#~ "[pdb_list]. Dans votre configuration actuelle voici à quoi ressemblent "
-#~ "les dates: <strong>%s</strong> %s"
-
-#~ msgid ""
-#~ "sets the user access level for adding, editing and listing records. "
-#~ "(fields management and plugin settings always require admin level access)"
-#~ msgstr ""
-#~ "fixe le niveau d'accès requis pour ajouter, éditer, et lister des "
-#~ "entrées. (la gestion des champs et la configuration du plugin nécessitent "
-#~ "toujours un admin)"
-
-#~ msgid ""
-#~ "after they singup, send them to this page for a thank you message. This "
-#~ "page is where you put the [pdb_signup_thanks] shortcode, but you don&#39;"
-#~ "t have to do that if you have them go back to the same page. You can also "
-#~ "use a Post ID for posts and custom post types."
-#~ msgstr ""
-#~ "après l'inscription, renvoyer à cette page pour un message de "
-#~ "remerciement. C'est la page où placer le shortcode [pdb_signup_thanks], "
-#~ "mais ce n'est pas nécessaire pour renvoyer à la même page. Vous pouvez "
-#~ "aussi employer le \"Post ID\" (par ex. pour un \"custom post type\")."
-
-#~ msgid "Your information has been updated:"
-#~ msgstr "Votre information a été mise à jour:"
-
-#~ msgid "new field name"
-#~ msgstr "nom du nouveau champ"
-
-#~ msgid "new group name"
-#~ msgstr "nom du nouveau groupe"
-
-#~ msgid "The %1$s was not added. Your new %1$s must have a unique name."
-#~ msgstr ""
-#~ "Le %1$s n'a pas été ajouté. Votre nouveau %1$s doit avoir un nom unique."
-
-#~ msgctxt "message to show if the plugin cannot find the template"
-#~ msgid "Missing Template"
-#~ msgstr "Template manquant"
-
-#~ msgid "You may only upload image files like JPEGs, GIFs or PNGs."
-#~ msgstr ""
-#~ "Vous pouvez seulement utiliser des fichiers images tels que JPEGs, GIFs "
-#~ "ou PNGs."
-
-#~ msgid ""
-#~ "The image you tried to upload is too large. The file must be smaller than "
-#~ "%sK."
-#~ msgstr ""
-#~ "L'image que vous avez voulu charger est trop volumineuse. Le fichier ne "
-#~ "doit pas faire plus de %sK."
-
-#~ msgid "1. Prepare a spreadsheet file with the correct format:"
-#~ msgstr "1. Préparez un fichier tableur au bon format:"
-
-#~ msgid "2. Upload the .csv file"
-#~ msgstr "2. Charger le fichier .csv"
+#~ msgid "uncheck this if PHP sessions are not working."
+#~ msgstr "debifați această opţiune dacă sesiunile PHP nu funcţionează."

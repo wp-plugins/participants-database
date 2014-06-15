@@ -181,8 +181,8 @@ class PDb_Base {
    */
   public static function _prepare_string_mysql($string)
   {
-
-    return htmlspecialchars(stripslashes($string), ENT_QUOTES, 'utf-8');
+    
+    return stripslashes($string);
   }
 
   /**
@@ -225,7 +225,7 @@ class PDb_Base {
 
     if (!file_exists($filename)) {
 
-      $filename = get_bloginfo('wpurl') . '/' . Participants_Db::$plugin_options['image_upload_location'] . basename($filename);
+      $filename = get_bloginfo('wpurl') . '/' . Participants_Db::plugin_setting('image_upload_location') . basename($filename);
     }
 
     return $filename;
@@ -251,6 +251,50 @@ class PDb_Base {
   }
 
   /**
+   * locate the translation file to use
+   * 
+   * @return string relative path to translation file
+   */
+  public static function translation_file_path($basepath = false) {
+    $filename = Participants_Db::PLUGIN_NAME . '-' . WPLANG . '.mo';
+    $basepath = !$basepath ? dirname( plugin_basename( __FILE__ ) ) : $basepath;
+    // first check for a custom translation file in the WP plugin root
+    if (is_file(WP_PLUGIN_DIR . '/languages/' . $filename)) {
+      return 'languages/';
+    } else {
+      return $basepath . '/languages/';
+    }
+  }
+  
+  /**
+   * provides a plugin setting
+   * 
+   * @param string $name setting name
+   * @param string|int|float $default a default value
+   * @return string the plugin setting value or provided default
+   */
+  public static function plugin_setting($name, $default = false) {
+    $setting = Participants_Db::$plugin_options[$name];
+    if (empty($setting) && $setting !== 0) {
+      $setting = $default;
+    }
+    return $setting;
+  }
+  /**
+   * provides a boolean plugin setting value
+   * 
+   * @param string $name of the setting
+   * @param bool the default value
+   * @return bool the setting value
+   */
+  public static function plugin_setting_is_true($name, $default = false) {
+    if (isset(Participants_Db::$plugin_options[$name])) {
+      return filter_var(Participants_Db::plugin_setting($name), FILTER_VALIDATE_BOOLEAN);
+    } else {
+      return (bool) $default;
+    }
+  }
+  /**
    * sets up an API filter
    * 
    * determines if a filter has been set for the given tag, then either filters 
@@ -262,9 +306,10 @@ class PDb_Base {
    * @param unknown $term the term to filter (passed by reference)
    * @return unknown the filtered or unfiltered term
    */
-  public static function set_filter($slug, &$term)
+  public static function set_filter($slug, $term)
   {
     $tag = Participants_Db::$prefix . $slug;
+    
     if (!has_filter($tag)) {
       return $term;
     }
@@ -301,7 +346,7 @@ class PDb_Base {
   public static function delete_file($filename)
   {
     $current_dir = getcwd(); // save the cirrent dir
-    chdir(ABSPATH . Participants_Db::$plugin_options['image_upload_location']); // set the plugin uploads dir
+    chdir(ABSPATH . Participants_Db::plugin_setting('image_upload_location')); // set the plugin uploads dir
     $result = unlink(basename($filename)); // delete the file
     chdir($current_dir); // change back to the previous directory
     return $result;
@@ -519,6 +564,16 @@ class PDb_Base {
   }
 
 /**
+   * gets the timezone
+   * 
+   * @return string
+   */
+  public static function get_timezone() {
+    $php_timezone = ini_get('date.timezone');
+    return empty($php_timezone) ? 'UTC' : $php_timezone;
+  } 
+
+/**
  * check a string for a shortcode
  *
  * modeled on the WP function of the same name
@@ -554,10 +609,15 @@ class PDb_Base {
    * @global object $post
    * @return array $posts
    */
-  public static function post_check_shortcode() {
+  public static function remove_rel_link() {
     global $post;
-    if (is_object($post) && self::has_shortcode($post->post_content)) {
-      self::$shortcode_present = true;
+    /*
+     * this is needed to prevent Firefox prefetching the next page and firing the damn shortcode
+     * 
+     * as per: http://www.ebrueggeman.com/blog/wordpress-relnext-and-firefox-prefetching
+     */
+    if ($post->post_type === 'page') {
+      remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
     }
   }
   /**
@@ -595,7 +655,13 @@ class PDb_Base {
    */
   public static function get_field_indices($fieldnames, $indices = true) {
     global $wpdb;
-    $sql = 'SELECT f.' . ($indices ? 'id' : 'name') . ' FROM ' . Participants_Db::$fields_table . ' f WHERE f.' . ($indices ? 'name' : 'id') . ' IN ("' . implode('","',$fieldnames) . '") ORDER BY FIELD("' . implode('","',$fieldnames) . '")';
+    $sql = 'SELECT f.' . ($indices ? 'id' : 'name') . ' FROM ' . Participants_Db::$fields_table . ' f ';
+    $sql .= 'WHERE f.' . ($indices ? 'name' : 'id') . ' ';
+    if (count($fieldnames) > 1) {
+      $sql .= 'IN ("' . implode('","',$fieldnames) . '") ORDER BY FIELD("' . implode('","',$fieldnames) . '")';
+    } else {
+      $sql .= '= "' . current($fieldnames) . '"';
+    }
     return $wpdb->get_col($sql);
   }
 
@@ -618,6 +684,149 @@ class PDb_Base {
   public static function get_shortcode_columns($ids) {
     return self::get_field_indices(explode('.',$ids), false);
   }
+  
+  /**
+   * provides a filter array for a search submission
+   * 
+   * filters a POST submission for displaying a list
+   * 
+   * @param bool $multi if true, filter a multi-field search submission
+   * @return array of filter parameters
+   */
+  public static function search_post_filter($multi = false) {
+    $array_filter = array(
+            'filter' => FILTER_SANITIZE_STRING,
+            'flags' => FILTER_FORCE_ARRAY
+        );
+    $multi_validation = $multi ? $array_filter : FILTER_SANITIZE_STRING;
+    return array (
+        'filterNonce' => FILTER_SANITIZE_STRING,
+        'postID' => FILTER_VALIDATE_INT,
+        'submit' => FILTER_SANITIZE_STRING,
+        'action' => FILTER_SANITIZE_STRING,
+        'instance_index' => FILTER_VALIDATE_INT,
+        'pagelink' => FILTER_SANITIZE_STRING,
+        'sortstring' => FILTER_SANITIZE_STRING,
+        'orderstring' => FILTER_SANITIZE_STRING,
+        'search_field' => $multi_validation,
+        'operator' => $multi_validation,
+        'value' => $multi_validation,
+        'logic' => $multi_validation,
+        'sortBy' => FILTER_SANITIZE_STRING,
+        'ascdesc' => FILTER_SANITIZE_STRING,
+     );
+  }
+  
+  /**
+   * attempts to prevent browser back-button caching in the middle of a multipage form
+   * 
+   * @param array $headers array of http headers
+   * @return array altered headers array
+   */
+  public static function control_caching($headers) {
+    $form_status = Participants_Db::$session->get('form_status');
+//    $headers['X-xnau-plugin'] = $headers['X-xnau-plugin'] . ' ' . Participants_Db::$plugin_title . '-' . Participants_Db::$plugin_version;
+    if ($form_status === 'multipage') {
+      $headers['Cache-Control'] = 'no-cache, max-age=0, must-revalidate, no-store';
+    }
+    return $headers;
+  }
+  
+  /**
+   * clears the shortcode session for the current page
+   * 
+   * shortcode sessions are used to provide asynchronous functions with the current 
+   * shortcode attributes
+   */
+  public static function reset_shortcode_session() {
+    global $post;
+    $current_session = Participants_Db::$session->get('shortcode_atts');
+    /*
+     * clear the current page's session
+     */
+    $current_session[$post->ID] = array();
+    Participants_Db::$session->set('shortcode_atts', $current_session);
+  }
+  
+  /**
+   * encodes or decodes a string using a simple XOR algorithm
+   * 
+   * @param string $string the tring to be encoded/decoded
+   * @param string $key the key to use
+   * @return string
+   */
+  public static function xcrypt($string, $key = false)
+  {
+    if ($key === false) {
+      $key = self::get_key();
+    }
+    $alphanum = self::get_alpha_set();
+    for ($i = 0; $i < strlen($string); $i++) {
+      $pos = $i % strlen($key);
+      if (array_search($string[$i], $alphanum) !== false) { // characters not included in the alpha set are skipped
+        $replace = array_search($string[$i], $alphanum) ^ array_search($key[$pos], $alphanum);
+        $string[$i] = $alphanum[$replace];
+      }
+    }
+
+    return $string;
+  }
+  /**
+   * supplies a random alphanumeric key
+   * 
+   * the key is stored in a transient which changes every day
+   * 
+   * @return null
+   */
+  public static function get_key() {
+    if (!$key = get_transient(Participants_Db::$prefix . 'captcha_key')) {
+      set_transient(Participants_Db::$prefix . 'captcha_key', self::generate_key(), (60 * 60 * 24));
+    }
+    $key = get_transient(Participants_Db::$prefix . 'captcha_key');
+    //error_log(__METHOD__.' get new key: '.$key);
+    return $key;
+  }
+  /**
+   * returns a random alphanumeric key
+   * 
+   * @param int $length number of characters in the random string
+   * @return string the randomly-generated alphanumeric key
+   */
+  private static function generate_key($length = 8) {
+    
+    $alphanum = self::get_alpha_set();
+    $key = '';
+    while ($length > 0) {
+      $key .= $alphanum[array_rand($alphanum)];
+      $length--;
+    }
+    return $key;
+  }
+  /**
+   * supplies an alphanumeric character set for encoding
+   * 
+   * characters that would mess up HTML are not included
+   * 
+   * @return array of valid characters
+   */
+  private static function get_alpha_set() {
+    return str_split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.{}[]_-=+!@#$%^&*()~`');
+  }
+  /**
+   * decodes the pdb_data_keys value
+   * 
+   * this provides a security measure by defining which fields to process in a form submission
+   * 
+   * @param string $datakey the pdb_data_key value
+   * 
+   * @return array of column names
+   */
+  public static function get_data_key_columns($datakey) {
+    
+    return self::get_indexed_names( explode('.', $datakey));
+//    return self::get_indexed_names( explode('.', self::xcrypt($datakey)));
+  }
+  
 }
 
 ?>

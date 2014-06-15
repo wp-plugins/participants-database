@@ -102,38 +102,34 @@ class PDb_Signup extends PDb_Shortcode {
 
     // define shortcode-specific attributes to use
     $shortcode_defaults = array(
-        'module' => 'signup'
+        'module' => 'signup',
+        'submit_button' => Participants_Db::plugin_setting('signup_button_text'),
+        'edit_record_page' => Participants_Db::plugin_setting('registration_page'),
     );
     
-    $sent = true; // start by assuming the notification email has been sent
-    /*
-     * this is set true if the form is a multi-page form. This is so a multi-page form 
-     * can't be completed by skipping back to the signup form, they must go to a page 
-     * with a thanks shortcode
-     */
-    //error_log(__METHOD__.' checking return: '.print_r($shortcode_atts,1));
-    $redirected = false;
-    if ($shortcode_atts['module'] != 'thanks' && ((isset($shortcode_atts['action']) && $shortcode_atts['action'] !== ''))) {
-      // this is set true if the signup form is supposed to be redirected after the submission
-      $redirected = true;
-    }
+   //Participants_Db::$session->clear('form_status');
+    
+    $form_status = Participants_Db::$session->get('form_status') ? Participants_Db::$session->get('form_status') : 'normal';
 
-    if ((isset($_GET['m']) && $_GET['m'] == 'r') || $shortcode_atts['module'] == 'retrieve') {
+    if (filter_input(INPUT_GET, 'm') === 'r' || $shortcode_atts['module'] == 'retrieve') {
       /*
        * we're proceesing a link retrieve request
        */
       $shortcode_atts['module'] = 'retrieve';
     } elseif ($this->participant_id = Participants_Db::$session->get('pdbid')) {
       /*
+       * if we arrive here, the form has been submitted and is complete or is a multipage 
+       * form and we've come back to the signup shortcode before the form was completed: 
+       * in which case we show the saved values from the record
+       */
+      $this->participant_values = Participants_Db::get_participant($this->participant_id);
+      if ($this->participant_values && ($form_status === 'normal' || ($shortcode_atts['module'] == 'thanks' && $form_status === 'multipage'))) {
+        /*
        * the submission is successful, clear the session
        */
       Participants_Db::$session->clear('pdbid');
       Participants_Db::$session->clear('captcha_vars');
       Participants_Db::$session->clear('captcha_result');
-      $this->participant_values = Participants_Db::get_participant($this->participant_id);
-      if ($this->participant_values && !$redirected) {
-        // check the notification sent status of the record
-        $sent = $this->check_sent_status($this->participant_id);
         $this->submitted = true;
         $shortcode_atts['module'] = 'thanks';
       }
@@ -143,18 +139,21 @@ class PDb_Signup extends PDb_Shortcode {
        * we're showing the signup form
        */
       $this->participant_values = Participants_Db::get_default_record();
+      $form_status = (isset($shortcode_atts['action']) && !empty($shortcode_atts['action'])) ? 'multipage' : 'normal';
+      Participants_Db::$session->set('form_status', $form_status);
+      
     } else {
       /*
-       * either there was no type set or it's a multi-page form and we've come back 
-       * to the signup form before completing all the pages.
+       * there was no type set.
        */
+      error_log(__METHOD__.' doing nothing');
       return;
     }
 
     // run the parent class initialization to set up the $shortcode_atts property
     parent::__construct($shortcode_atts, $shortcode_defaults);
 
-    $this->registration_page = Participants_Db::get_record_link($this->participant_values['private_id']);
+    $this->registration_page = Participants_Db::get_record_link($this->participant_values['private_id'], $this->shortcode_atts['edit_record_page']);
 
     // set up the signup form email preferences
     $this->_set_email_prefs();
@@ -166,6 +165,9 @@ class PDb_Signup extends PDb_Shortcode {
     $this->_setup_iteration();
 
     if ($this->submitted) {
+
+      // form has been submitted, close it
+      Participants_Db::$session->set('form_status', 'complete');
 
       /*
        * filter provides access to the freshly-stored record and the email and thanks message properties so user feedback can be altered.
@@ -181,18 +183,7 @@ class PDb_Signup extends PDb_Shortcode {
         apply_filters(Participants_Db::$prefix . 'before_signup_thanks', $signup_feedback);
       }
 
-      /*
-       * check to see if the thanks email has been sent and send it if it has not
-       */
-      if ($sent === false) {
-
         $this->_send_email();
-
-        // mark the record as sent
-        $this->update_sent_status($this->participant_id, true);
-      }
-      else
-        return false; // the thanks message and email have already been sent for this ID
     }
     // print the shortcode output
     $this->_print_from_template();
@@ -227,14 +218,14 @@ class PDb_Signup extends PDb_Shortcode {
    */
   private function _set_email_prefs() {
 
-    $this->send_reciept = $this->options['send_signup_receipt_email'];
-    $this->send_notification = $this->options['send_signup_notify_email'];
-    $this->notify_recipients = $this->options['email_signup_notify_addresses'];
-    $this->notify_subject = $this->options['email_signup_notify_subject'];
-    $this->notify_body = $this->options['email_signup_notify_body'];
-    $this->receipt_subject = $this->options['signup_receipt_email_subject'];
-    $this->receipt_body = $this->options['signup_receipt_email_body'];
-    $this->thanks_message = $this->options['signup_thanks'];
+    $this->send_reciept = Participants_Db::plugin_setting('send_signup_receipt_email');
+    $this->send_notification = Participants_Db::plugin_setting('send_signup_notify_email');
+    $this->notify_recipients = Participants_Db::plugin_setting('email_signup_notify_addresses');
+    $this->notify_subject = Participants_Db::plugin_setting('email_signup_notify_subject');
+    $this->notify_body = Participants_Db::plugin_setting('email_signup_notify_body');
+    $this->receipt_subject = Participants_Db::plugin_setting('signup_receipt_email_subject');
+    $this->receipt_body = Participants_Db::plugin_setting('signup_receipt_email_body');
+    $this->thanks_message = Participants_Db::plugin_setting('signup_thanks');
     $this->email_header = Participants_Db::$email_headers;
   }
 
@@ -251,8 +242,8 @@ class PDb_Signup extends PDb_Shortcode {
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
     }
     if (!$this->submission_page) {
-      if (isset($this->options['signup_thanks_page']) && $this->options['signup_thanks_page'] != 'none') { 
-      $this->submission_page = get_permalink($this->options['signup_thanks_page']);
+      if (Participants_Db::plugin_setting('signup_thanks_page', 'none') != 'none') { 
+      $this->submission_page = get_permalink(Participants_Db::plugin_setting('signup_thanks_page'));
       }
     }
     if (!$this->submission_page) {
@@ -271,12 +262,20 @@ class PDb_Signup extends PDb_Shortcode {
 
     echo $this->_print_form_head($hidden);
   }
+  /**
+   * prints the submit button
+   *
+   * @param string $class a classname for the submit button, defaults to 'button-primary'
+   * @param string $button_value submit button text
+   * 
+   */
+  public function print_submit_button($class = 'button-primary', $button_value = false) {
 
-  public function print_submit_button($class = 'button-primary', $value = false) {
+    $button_value = $button_value ? $button_value : $this->shortcode_atts['submit_button'];
 
     PDb_FormElement::print_element(array(
         'type' => 'submit',
-        'value' => ($value === false ? $this->options['signup_button_text'] : $value),
+        'value' => $button_value,
         'name' => 'submit_button',
         'class' => $class . ' pdb-submit',
         'module' => $this->module,
@@ -293,8 +292,8 @@ class PDb_Signup extends PDb_Shortcode {
     
     $linktext = empty($linktext) ? Participants_Db::$plugin_options['retrieve_link_text'] : $linktext;
     
-    if ($this->options['show_retrieve_link'] != 0) {
-      $retrieve_link = $this->options['link_retrieval_page'] !== 'none' ? get_permalink($this->options['link_retrieval_page']) : $_SERVER['REQUEST_URI'];
+    if (Participants_Db::plugin_setting_is_true('show_retrieve_link')) {
+      $retrieve_link = Participants_Db::plugin_setting('link_retrieval_page') !== 'none' ? get_permalink(Participants_Db::plugin_setting('link_retrieval_page')) : $_SERVER['REQUEST_URI'];
       echo $open_tag . '<a href="' . Participants_Db::add_uri_conjunction($retrieve_link) . 'm=r">' . $linktext . '</a>' . $close_tag;
     }
   }
@@ -360,7 +359,7 @@ class PDb_Signup extends PDb_Shortcode {
 
     $sql = 'SELECT v.' . implode(',v.', $columns) . ' 
             FROM ' . Participants_Db::$fields_table . ' v 
-            WHERE v.name = "' . $this->options['retrieve_link_identifier'] . '" 
+            WHERE v.name = "' . Participants_Db::plugin_setting('retrieve_link_identifier') . '" 
             ';
 
     return $wpdb->get_results($sql, OBJECT_K);
@@ -389,7 +388,7 @@ message:
 
     $this->current_body = $body;
 
-    if ($this->options['html_email'])
+    if (Participants_Db::plugin_setting('html_email'))
       add_action('phpmailer_init', array($this, 'set_alt_body'));
 
     $sent = wp_mail($recipients, $subject, $body, $this->email_header);
@@ -456,7 +455,9 @@ message:
     $check_sent = get_transient(Participants_Db::$prefix . 'signup-email-sent');
     if ($check_sent === false or !isset($check_sent[$id]) or $check_sent[$id] === false) {
       return false;
-    } else return true;
+    } else {
+      return true;
+    }
   }
 
 }

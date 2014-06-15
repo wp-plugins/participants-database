@@ -198,6 +198,8 @@ class PDb_Field_Item extends PDb_Template_Item {
     // for compatibility we are not prefixing the form element class name
     $this->print_CSS_class( $this->form_element, false );
     
+    if ($this->readonly) echo ' readonly-element';
+    
   }
   /**
    * prints a CSS classname based on the field name
@@ -256,7 +258,7 @@ class PDb_Field_Item extends PDb_Template_Item {
    */
   public function has_help_text() {
     
-    return ! empty( $this->help_text );
+    return ! empty( $this->help_text ) &&  $this->readonly !== '1' ;
   
   }
   
@@ -265,7 +267,7 @@ class PDb_Field_Item extends PDb_Template_Item {
    */
   public function print_help_text( ) {
     
-    if ( ! empty( $this->help_text ) ) {
+    if ( ! empty( $this->help_text )) {
       
       echo $this->prepare_display_value( $this->help_text );  
       

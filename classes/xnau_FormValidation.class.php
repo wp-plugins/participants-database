@@ -50,7 +50,7 @@ class xnau_FormValidation {
     $this->error_style = 'border: 1px solid red';
 
     // set the default error wrap HTML for the validation error feedback display
-    $this->error_html_wrap = array('<div class="%s">%s</div>', '<p>%s</p>');
+    $this->error_html_wrap = is_admin() ? array('<div class="error below-h2 %s">%s</div>', '<p>%s</p>') : array('<div class="%s">%s</div>', '<p>%s</p>');
   }
 
   /**
@@ -367,7 +367,7 @@ class xnau_FormValidation {
       //return self::_is_empty_array($string);
       $string = implode('', $string);
   }
-    return $string === '';
+    return trim($string) === '';
   }
 
   /*
@@ -410,7 +410,7 @@ class xnau_FormValidation {
   public function not_submitted($fieldname)
   {
 
-    return @$_POST[$fieldname] === NULL;
+    return is_null($_POST[$fieldname]);
   }
 
 

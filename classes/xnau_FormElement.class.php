@@ -33,7 +33,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, 2012, 2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.4
+ * @version    Release: 1.5.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -216,6 +216,7 @@ abstract class xnau_FormElement {
                       'size'         => false,
                       'container_id' => false,
                       'group'        => false,
+                      'value'        => ''
                       );
     $params = wp_parse_args( $parameters, $defaults );
     
@@ -556,6 +557,8 @@ abstract class xnau_FormElement {
    */
   protected function _text_line() {
     
+    $this->value = htmlspecialchars($this->value, ENT_QUOTES, 'UTF-8', false);
+    
     $this->_addline( $this->_input_tag() );
     
   }
@@ -652,11 +655,11 @@ abstract class xnau_FormElement {
         return NULL;
       } else {
         $title = $this->is_assoc( $this->options ) ? key( $this->options ) : false;
-        $checked_value = $this->options[0];
-        $unchecked_value = isset($this->options[1]) ? $this->options[1] : '';
+        $checked_value = current($this->options);
+        $unchecked_value = next($this->options);
+        if ($unchecked_value === false) $unchecked_value = '';
       }
 
-      
       if ( false !== $title ) {
         $this->_addline( '<label for="' . $this->name . '">' );
       }
@@ -808,7 +811,7 @@ abstract class xnau_FormElement {
     $this->attributes['class'] =  'otherfield';
     $value = $type == 'checkbox' ? $this->value['other'] : (!in_array($this->value, $this->options) ? $this->value : '' );
     $name = $value === '' ? 'temp' : $this->name . ($type == 'checkbox' ? '[other]' : '');
-    $this->_addline('<input type="text" id="' . $this->name . '_other" name="' . $name . '" value="' . $value . '" ' . $this->_attributes() . ' >');
+    $this->_addline('<input type="text" id="' . $this->name . '_other" name="' . $name . '" value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false) . '" ' . $this->_attributes() . ' >');
     
     // close the container
     $this->_addline('</div>', -1);
@@ -863,7 +866,7 @@ abstract class xnau_FormElement {
 		
 		$this->attributes['placeholder'] = $linktext_placeholder;
 		
-		$this->_addline( $this->_input_tag( 'text', $title, false ).'</div>' );
+		$this->_addline( $this->_input_tag( 'text', htmlspecialchars($title, ENT_QUOTES, 'UTF-8', false), false ).'</div>' );
 		
 	}
 																			
@@ -878,7 +881,7 @@ abstract class xnau_FormElement {
     
     $this->_addline('<div class="readonly-value-group">');
     
-    foreach((array)$this->value as $value) {
+    foreach((array)  maybe_unserialize($this->value) as $value) {
       
       if ($value !== '') {
         
@@ -923,6 +926,8 @@ abstract class xnau_FormElement {
    */
   protected function _selectbox() {
     
+    $this->_addline( $this->_input_tag( 'hidden', '' ) );
+    
     $this->_addline( $this->_input_tag( 'checkbox', $this->value, false ) );
     
   }
@@ -931,7 +936,6 @@ abstract class xnau_FormElement {
    * build a hidden field
    */
   protected function _hidden() {
-    
     $this->_addline( $this->_input_tag( 'hidden' ) );
     
   }
@@ -1033,7 +1037,9 @@ abstract class xnau_FormElement {
 			$this->classes = '';
 			}
     
-    $null_select = isset($this->options['null_select']) || $type == 'checkbox' ? $this->options['null_select'] : false;
+    // checkboxes are given a null select so an "unchecked" state is possible
+    $null_select = (isset($this->options['null_select'])) ? $this->options['null_select'] : ($type == 'checkbox' ? true : false);
+    
     if ($null_select !== false) {
       $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), false), 1);
     }
@@ -1048,7 +1054,7 @@ abstract class xnau_FormElement {
          * this is where we would implement some kind of grouping for display purposes
          */
       } else {
-        $this->attributes['id'] = $this->legal_name($this->name . '-' . trim(strtolower($option_value)));
+        $this->attributes['id'] = $this->legal_name($this->name . '-' . ($option_value === '' ? '_' : trim(strtolower($option_value))));
       $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
       $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
       $this->_addline($option_key . '</label>');
@@ -1112,7 +1118,7 @@ abstract class xnau_FormElement {
       
       if (($value === false or $value === 'false' or $value === 'optgroup') and !empty($key)) {
         $this->_add_options_divider($key);
-      } elseif($value == 'other') {
+      } elseif($value === 'other') {
         $otherlabel = $key;
       } elseif (!empty($value) or $value === 0) {
         $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . stripslashes($key) . '</option>', -1);
@@ -1350,22 +1356,31 @@ abstract class xnau_FormElement {
    * If $this->options['null_select'] is blank, a blank unselected null option will 
    * be added. 
    * If $this->options['null_select'] is false no null state option will be added.
-   * If the value is empty and no null select is defined, a blank one will be added
+   * 
+   * If the value is empty and no null select is defined, a blank null select option 
+   * will be added so that the current state of the field can be represented.
+   * 
+   * TODO: if there is a defined default value, and the current vlaue of the field 
+   * is not set, no null select should be added, the default value should be selected 
+   * in the control
    * 
    * @return null
    */
   protected function _set_null_select() {
     
-    $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : false;
+    /*
+     * if the null_select option is a string, use it as the name of the null select 
+     * option, unless it is the string 'false', then make it boolean false. If it is any 
+     * other value or not set at all, make it boolean false
+     */
+    $null_select = isset($this->options['null_select']) ? ($this->options['null_select'] === 'false' ? false : $this->options['null_select']) : false;
     // remove the null_select from the options array
     if (isset($this->options['null_select']))
       unset($this->options['null_select']);
-    /*
-     * the null select option is added if it is not canceled by a null select value 
-     * of false or 'false'
-     */
+    
     $null_select_label = is_string($null_select) ? $null_select : '';
-    if (($null_select !== false and $null_select !== 'false') || $this->value === '') {
+    
+    if (($null_select !== false) || $this->value === '') {
       $selected = $this->value === '' ? $this->_set_selected(true, true, 'selected') : '';
       $this->_addline('<option value="" ' . $selected . '  >' . $null_select_label . '</option>');
     }

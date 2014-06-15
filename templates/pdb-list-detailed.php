@@ -56,13 +56,14 @@ this is a more detailed template showing how the parts of the display can be cus
          *       need to alter the HTML directly. You will need to print the item for 
          *       it to be seen. If 'true', the function prints the selector dropdown.
          *    3. columns: supply an array of column names if you want to define the 
-         *       list of fields that can be used for searching: 'false' uses all displayed 
-         *       fields
+         *       list of fields that can be used for searching: 'false' uses all 
+         *       displayed fields
          *    4. sorting: you can choose to sort the list by 'column' (the order they 
          *       appear in the table), 'alpha' (alphabetical order), or 'order' which 
          *       uses the defined group/field order
+         *    5. multi-field mode: if true the value is submitted as an array element
          */
-        $this->column_selector( false, true, false, 'column' );
+        $this->column_selector( false, true, false, 'column', false );
       ?>
 
       <?php $this->search_form() ?>
@@ -167,13 +168,8 @@ this is a more detailed template showing how the parts of the display can be cus
                */
               $value = empty($value) ? $this->field->default : $value;
 							
-							// add the record ID to the single record link
-							$single_record_uri = Participants_Db::add_uri_conjunction($single_record_link) . 'pdb=' . $this->record->record_id;
-							
-							/*
-							 * print the opening tag of the single record link
-							 */
-							echo '<a class="single-record-link" href="' . $single_record_uri . '" >';
+							// add the record ID to the single record link and set the field's link property
+							$this->field->link = Participants_Db::add_uri_conjunction($single_record_link) . 'pdb=' . $this->record->record_id;
 							
             } ?>
 
@@ -190,6 +186,7 @@ this is a more detailed template showing how the parts of the display can be cus
                             'filename' => $value,
                             'mode' => 'image',
                             'module' => 'list',
+                            'relstring' => 'lightbox',
                       )
                         );
                 $image->print_image();
@@ -279,15 +276,11 @@ this is a more detailed template showing how the parts of the display can be cus
 								
 							} else {
 								
-								echo esc_html( $value );
+                echo PDb_FormElement::get_field_value_display($this->field);
 								
 							}
 
             endswitch; // switch by field type ?>
-            <?php // close the anchor tag if it's a link 
-						if ( $this->field->is_single_record_link() ) : ?>
-            	</a>
-            <?php endif ?>
             </td>
         
 			<?php endwhile; // fields ?>
@@ -331,7 +324,7 @@ this is a more detailed template showing how the parts of the display can be cus
 																		 'current_page_class'=>'currentpage',
 																		 'wrappers' => array(
 																												'wrap_tag' => 'div',
-																												'wrap_class' => '',
+																												'wrap_class' => 'pagination',
 																												'all_button_wrap_tag' => 'ul',
 																												'button_wrap_tag' => 'li',
 																												)

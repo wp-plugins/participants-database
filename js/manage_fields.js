@@ -1,7 +1,7 @@
 /*
  * Participants Database Plugin
  * 
- * version: 0.6
+ * version: 0.7
  * 
  * xnau webdesign xnau.com
  * 

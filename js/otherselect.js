@@ -1,5 +1,5 @@
 /**
- * js for handling dorpdown/other and multiselect/other form elements
+ * js for handling dropdown/other and multiselect/other form elements
  * 
  * @author Roland Barker, xnau webdesign
  * @version 0.1

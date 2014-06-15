@@ -30,8 +30,8 @@
 
       <?php while ( $this->have_groups() ) : $this->the_group(); ?>
 
-        <?php if ( $this->group->printing_title() ) : // are we printing group titles and descriptions? ?>
       <tbody class="field-group field-group-<?php echo $this->group->name ?>">
+        <?php if ( $this->group->printing_title() ) : // are we printing group titles and descriptions? ?>
         <tr class="signup-group">
           <td colspan="2">
         
@@ -41,7 +41,6 @@
           </td>
         </tr>
         <?php else : ?>
-      <tbody class="field-group">
         <?php endif; // end group title/description row ?>
 
         <?php while ( $this->have_fields() ) : $this->the_field(); ?>
@@ -64,9 +63,11 @@
   
         <?php endwhile; // fields ?>
         
-        </tbody><tbody class="field-group field-group-submit">
+        </tbody>
 
       <?php endwhile; // groups ?>
+      
+        <tbody class="field-group field-group-submit">
       
         <tr>
           <td class="submit-buttons">

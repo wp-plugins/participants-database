@@ -8,12 +8,12 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2013-12-24 17:40-1000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2014-05-23 13:32-1000\n"
+"Last-Translator: Roland Barker <webdesign@xnau.com>\n"
 "Language-Team: xnau <support@xnau.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: en\n"
-"X-Generator: Poedit 1.6.3\n"
+"X-Generator: Poedit 1.6.5\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: classes/PDb_FormElement.class.php:324
@@ -1472,7 +1472,7 @@ msgstr ""
 #: manage_fields.php:34
 msgctxt "column name"
 msgid "Display"
-msgstr ""
+msgstr "Public"
 
 #: manage_fields.php:35
 msgctxt "column name"

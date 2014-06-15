@@ -1,5 +1,20 @@
 <?php
 $CSV_import = new PDb_CSV_Import('csv_file_upload');
+$csv_params = get_transient(Participants_Db::$prefix . 'csv_import_params');
+if (!is_array($csv_params)) {
+  $csv_params = array(
+      'delimiter_character' => 'auto',
+      'enclosure_character' => 'auto'
+      );
+}
+if (isset($_POST['delimiter_character'])) {
+  $csv_params['delimiter_character'] = filter_input(INPUT_POST, 'delimiter_character', FILTER_SANITIZE_STRING);
+}
+if (isset($_POST['enclosure_character'])) {
+  $csv_params['enclosure_character'] = str_replace(array('"', "'"), array('&quot;', '&#39;'), filter_input(INPUT_POST, 'enclosure_character', FILTER_SANITIZE_STRING));
+}
+extract($csv_params);
+set_transient(Participants_Db::$prefix . 'csv_import_params', $csv_params);
 ?>
 <div class="wrap <?php echo Participants_Db::$prefix ?>csv-upload">
   <?php Participants_Db::admin_page_heading() ?>
@@ -58,6 +73,43 @@ $CSV_import = new PDb_CSV_Import('csv_file_upload');
       <div class="postbox">
         <h3><?php _e('Upload the .csv file', 'participants-database') ?></h3>
         <div class="inside">
+          <form enctype="multipart/form-data" action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="POST">
+            <input type="hidden" name="csv_file_upload" id="file_upload" value="true" />
+            <fieldset class="widefat inline-controls">
+              <p>
+            <label style="margin-left:0">
+            <?php _e('Enclosure character', 'participants-database');
+            $parameters = array(
+                'type' => 'dropdown',
+                'name' => 'enclosure_character',
+                'value' => $enclosure_character,
+                'options' => array(
+                    __('Auto',  'participants-database') => 'auto',
+                    '&quot;' => '&quot;',
+                    "&#39;" => "&#39;"
+                )
+            );
+            PDb_FormElement::print_element($parameters);
+            ?>
+            </label>
+            <label>
+              <?php _e('Delimiter character', 'participants-database');
+            $parameters = array(
+                'type' => 'dropdown',
+                'name' => 'delimiter_character',
+                'value' => $delimiter_character,
+                'options' => array(
+                    __('Auto', 'participants-database') => 'auto',
+                    ',' => ',',
+                    ';' => ';',
+                    __('tab', 'participants-database') => "\t"
+                )
+            );
+            PDb_FormElement::print_element($parameters);
+             ?>
+            </label>
+              </p>
+            </fieldset>
 
           <p><?php _e('<strong>Note:</strong> Depending on the "Duplicate Record Preference" setting, imported records are checked against existing records by the field set in the "Duplicate Record Check Field" setting. If a record matching an existing record is imported, one of three things can happen, based on the "Duplicate Record Preference" setting:', 'participants-database') ?></p>
           <h4 class="inset"><?php _e('Current Setting', 'participants-database') ?>: 
@@ -75,11 +127,7 @@ $CSV_import = new PDb_CSV_Import('csv_file_upload');
             endswitch
             ?></h4>
 
-          <form enctype="multipart/form-data" action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="POST">
 
-            <input type="hidden" name="csv_file_upload" id="file_upload" value="true" />
-
-            <?php /* _e( 'Enclosure Character', 'participants-database' ) ?> (&#39; or &quot;) <input name="eclosure" value="'" type="text" /><br /><?php */ ?>
             <?php _e('Choose .csv file to import:', 'participants-database') ?> <input name="uploadedfile" type="file" /><br />
             <input type="submit" class="button button-primary" value="<?php _e('Upload File', 'participants-database') ?>" />
           </form>

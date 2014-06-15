@@ -43,6 +43,16 @@ class xnau_Plugin_Settings {
   protected $submit_button;
 
   /**
+   * name of the option storing a running option version number
+   * 
+   * this is incremented every time the options are saved so that the includes can 
+   * be given a new version number
+   * 
+   * @var string
+   */
+  var $option_version;
+
+  /**
    * @var string type to use for text area settings; rich or plain text
    */
   var $textarea_type = 'text-area';
@@ -66,6 +76,8 @@ class xnau_Plugin_Settings {
     $this->WP_setting = $label;
 
     $this->settings_page = $this->WP_setting.'_settings_page';
+
+    $this->option_version = Participants_Db::$prefix.'option_version';
 
     // set up the HTML for the built-in display functions
     // these are generic settings to be modified by the subclass
@@ -145,6 +157,15 @@ class xnau_Plugin_Settings {
 
     return isset( $options[ $option_name ] ) ? $options[ $option_name ] : false;
 
+  }
+
+  protected function increment_option_version() {
+    
+//    error_log(__METHOD__.' incrementing version');
+    
+    $version = get_option($this->option_version, '0.0');
+    
+    update_option($this->option_version, floatval($version) + 0.1);
   }
 
   /*******************
@@ -288,6 +309,8 @@ class xnau_Plugin_Settings {
    * the plugin subclass will supply any validation if needed
    */
   public function validate( $input ) {
+
+    $this->increment_option_version();
 
     return $input;
 
