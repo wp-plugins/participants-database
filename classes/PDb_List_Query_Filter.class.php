@@ -1,12 +1,12 @@
 <?php
 
 /*
- * class description
+ * class defining methods and properties for a single query filter statement
  *
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2011 xnau webdesign
+ * @copyright  2014 xnau webdesign
  * @license    GPL2
  * @version    0.3
  * @link       http://xnau.com/wordpress-plugins/

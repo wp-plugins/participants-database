@@ -11,7 +11,7 @@
  */
 
 /*
- * Copyright 2011, 2012, 2013 Roland Barker xnau webdesign  (email : webdesign@xnau.com)
+ * Copyright 2011, 2012, 2013, 2014 Roland Barker xnau webdesign  (email : webdesign@xnau.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, version 2, as
@@ -35,9 +35,9 @@ spl_autoload_register('PDb_class_loader');
  * @category   WordPress Plugins
  * @package    wordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2011 - 2013 7th Veil, LLC
+ * @copyright  2011 - 2014 7th Veil, LLC
  * @license    http://www.gnu.org/licenses/gpl-2.0.txt GPL2
- * @version    Release: 1.5.2
+ * @version    Release: 1.5.5
  * 
  */
 class Participants_Db extends PDb_Base {
@@ -191,7 +191,7 @@ class Participants_Db extends PDb_Base {
   /**
    * the date format; defaults to the WP global setting, but can be changed within the plugin
    *
-   * @var string
+   * @var string PHP date formatting string
    */
   public static $date_format;
   /**

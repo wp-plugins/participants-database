@@ -85,7 +85,7 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * Italian: Mario Conte
 
-* Dutch: Bas van Erp
+* Dutch: At Voogt [www.wederzijdsgenoegen.nl](http://www.wederzijdsgenoegen.nl)
 
 * Polish: Piotr Kubala
 
@@ -237,6 +237,22 @@ You can define a "captcha" form element which will show a simple math question f
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.5.5 =
+
+* database optimizations for large data sets
+* scripts and stylesheets loaded only on active plugin pages
+* code support for multilingual sites
+* improvements to multi-page form handling
+* improvements to internationalized date handling
+* bug when using a single-field form fixed
+* plugin now supports custom translation files
+* CSV import now allows delimiters and enclosures to be set by the user
+* better support for values titles in search results
+* better support for custom search forms
+* new shortcode attributes for forms: "autocomplete", "edit_record_page" and "submit_button"
+* improved security on user input
+* tighter controls on secure functions
 
 = 1.5.4.9 =
 
@@ -567,7 +583,7 @@ User list searches now allow for the use of the '*' wildcard, so for instance, t
 There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
 
 It's also possible to perform a "search" on the list with parameters in the URL. This would be handy if you wanted to create a link to the list that would only show certain results. For instance, if you wanted to make a link to the list that showed only results from the city of Phoenix you would add these variables to the URL: 
-`?search_field=city&value=phoenix&submit=search` 
+`?search_field=city&value=phoenix&operator=LIKE&submit=Search` 
 The URL must include the 'submit' variable to perform the search when the link is opened. Add that to the end of a link to the page where the `[pdb_list]` shortcode is (replace the '?' with a '&' if the '?' is already there), and it will only show records with a city value of 'phoenix.' This also means you can create your own search functionality, the primary limitation being you can only do this for one field at a time.
 
 Please note that user list searching, sorting and pagination will not work properly if there is more than one list on a page. The shortcode filtering and sorting will work as expected, however.

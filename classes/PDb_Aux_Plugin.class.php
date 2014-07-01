@@ -10,9 +10,9 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2012 xnau webdesign
+ * @copyright  2014 xnau webdesign
  * @license    GPL2
- * @version    Release: 3.1
+ * @version    Release: 3.2
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if (!class_exists('PDb_Aux_Plugin')) :
