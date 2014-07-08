@@ -102,6 +102,7 @@ class PDb_List_Admin {
         "records" => __("Do you really want to delete the selected records?", 'participants-database' ),
     ));
     wp_enqueue_script(Participants_Db::$prefix.'list-admin');
+    wp_enqueue_script(Participants_Db::$prefix.'debounce');
 
     get_currentuserinfo();
 
@@ -558,9 +559,6 @@ class PDb_List_Admin {
               <input type="hidden" name="action" value="admin_list_filter">
               <table class="form-table">
                 <tbody><tr><td>
-                      <fieldset class="widefat inline-controls">
-                        <label for="list_filter_count"><?php _e('Number of filters to use: ', 'participants-database') ?><input id="list_filter_count" name="list_filter_count" class="number-entry single-digit" type="number" max="5" min="1" value="<?php echo $filter_count ?>"  onchange="this.form.submit()" /></label>
-                      </fieldset>
                         <?php
                         for ($i = 0; $i <= $filter_count - 1; $i++) :
                           $filter_set = self::$filter['search'][$i];
@@ -623,6 +621,9 @@ class PDb_List_Admin {
                       <fieldset class="widefat inline-controls">
             <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['filter'] ?>">
             <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['clear'] ?>">
+                      <div class="widefat inline-controls filter-count">
+                        <label for="list_filter_count"><?php _e('Number of filters to use: ', 'participants-database') ?><input id="list_filter_count" name="list_filter_count" class="number-entry single-digit" type="number" max="5" min="1" value="<?php echo $filter_count ?>"  /></label>
+                      </div>
           </fieldset>
                         </td></tr><tr><td>
           <fieldset class="widefat inline-controls">
@@ -759,11 +760,7 @@ class PDb_List_Admin {
                                   'mode' => (Participants_Db::plugin_setting_is_true('admin_thumbnails') ? 'image' : 'filename'),
                       );
 
-                    if (
-                                      $column->name == Participants_Db::plugin_setting('single_record_link_field') &&
-                                      !empty(Participants_Db::$plugin_options['single_record_page'])
-                    ) {
-
+                    if (Participants_Db::is_single_record_link($column)) {
                                 $page_link = get_permalink(Participants_Db::plugin_setting('single_record_page'));
                       $image_params['link'] = Participants_Db::add_uri_conjunction($page_link) . 'pdb=' . $value['id'];
                     }
@@ -805,22 +802,13 @@ class PDb_List_Admin {
 
                   case 'link':
 
-                    if (is_serialized($value[$column->name])) {
+                    $link_value = maybe_unserialize($value[$column->name]);
 
-                      $params = unserialize($value[$column->name]);
-
-                      if (empty($params))
-                        $page_link = array('', '');
-
-                      if (count($params) == 1)
-                        $params[1] = $params[0];
-                    } else {
-
-                      // in case we got old unserialized data in there
-                      $params = array_fill(0, 2, $value[$column->name]);
+                    if (count($link_value) === 1) {
+                      $link_value = array_fill(0, 2, current((array)$link_value));
                     }
 
-                    $display_value = Participants_Db::make_link($params[0], $params[1]);
+                    $display_value = Participants_Db::make_link($link_value[0], $link_value[1]);
 
                     break;
 
@@ -834,11 +822,7 @@ class PDb_List_Admin {
 
                   case 'text-line':
 
-                    if (
-                                      $column->name == Participants_Db::plugin_setting('single_record_link_field') &&
-                                      !empty(Participants_Db::$plugin_options['single_record_page'])
-                    ) {
-
+                    if (Participants_Db::is_single_record_link($column)) {
                                 $url = get_permalink(Participants_Db::plugin_setting('single_record_page'));
                       $template = '<a href="%1$s" >%2$s</a>';
                       $delimiter = false !== strpos($url, '?') ? '&' : '?';
@@ -849,29 +833,24 @@ class PDb_List_Admin {
 
                       $display_value = Participants_Db::make_link($value[$column->name]);
                     } else {
-
                                 $display_value = $value[$column->name] === '' ? $column->default : esc_html($value[$column->name]);
                     }
 
                     break;
 
                   case 'hidden':
-
                               $display_value = $value[$column->name] === '' ? '' : esc_html($value[$column->name]);
-
                     break;
 
                   default:
-
                               $display_value = $value[$column->name] === '' ? $column->default : esc_html($value[$column->name]);
                 }
 
-                if ($column->name == 'private_id')
-                  printf(
-                          $PID_pattern, $display_value, Participants_Db::get_record_link($display_value)
-                  );
-                else
+                if ($column->name === 'private_id') {
+                  printf($PID_pattern, $display_value, Participants_Db::get_record_link($display_value));
+                } else {
                   printf($col_pattern, $display_value);
+								}
               }
               ?>
                 </tr>

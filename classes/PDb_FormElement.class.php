@@ -158,7 +158,7 @@ class PDb_FormElement extends xnau_FormElement {
 
           $image = new PDb_Image(array(
               'filename' => $field->value,
-              'link' => $field->link,
+              'link' => isset($field->link) ? $field->link : false,
               'mode' => 'both',
               'module' => $field->module,
               ));
@@ -376,17 +376,20 @@ class PDb_FormElement extends xnau_FormElement {
    */
   public static function make_link($field, $template = false, $get = false) {
   
-    // AJAX requests are not really from the admin
+    /*
+     * determine if the current user is in the admin and not doing an AJAX call
+     */
     $in_admin = is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX);
 
     // clean up the provided string
     $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($field->value))));
-    // use the default value if present for the link text
-    $linktext = empty($field->value) ? $field->default : $field->value;
 
-    if (isset($field->link) and !empty($field->link)) {
-      // if the field is a single record link or other kind of defined link field
-      $URI = $field->link;
+    if (isset($field->link) && filter_var($field->link, FILTER_VALIDATE_URL)) {
+      /*
+       * if the field is a single record link or other field with the link property set
+       */
+      $URI = filter_var($field->link, FILTER_VALIDATE_URL);
+      $linktext = $field->value;
     } elseif (filter_var($URI, FILTER_VALIDATE_URL) && Participants_Db::$plugin_options['make_links']) {
 
       // convert the get array to a get string and add it to the URI
@@ -398,19 +401,18 @@ class PDb_FormElement extends xnau_FormElement {
       }
     } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && Participants_Db::$plugin_options['make_links']) {
 
+      if ($in_admin) {
       // in admin, emails are plaintext
-      if ($in_admin)
-        return esc_html($field->value);
-
-      if (Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email && ! $in_admin) {
+        return esc_html($URI);
+      } elseif (Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email) {
 
         // the email gets displayed in plaintext if javascript is disabled; a clickable link if enabled
         list( $URI, $linktext ) = explode('@', $URI, 2);
-        $template = '<a class="obfuscate" rel=\'{"name":"%1$s","domain":"%2$s"}\'>%1$s AT %2$s</a>';
+        $template = '<a class="obfuscate" data-email-values=\'{"name":"%1$s","domain":"%2$s"}\'>%1$s AT %2$s</a>';
       } else {
         $URI = 'mailto:' . $URI;
       }
-    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && ! Participants_Db::$plugin_options['make_links'] && Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email) {
+    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email) {
       
       // only obfuscating, not making links
       return vsprintf('%1$s AT %2$s', explode('@', $URI, 2));

@@ -1,14 +1,19 @@
 // participants-database admin support scripts
-jQuery(document).ready( function($) {
-  $('input[placeholder], textarea[placeholder]').placeholder();
-  $('.participants_db .ui-tabs-nav li').append($('<span class="mask"/>'));
-  $('.manage-fields-wrap').on('focus', '.manage-fields input[type="text"]:not([id*=other], .digit)', function() {
-    $(this).closest('td').addClass('focused');
-    $(this).addClass('focused');
-  }).on('blur', '.manage-fields input[type="text"]', function() {
-    $(this).closest('td').removeClass('focused');
-    $(this).removeClass('focused');
-  });
+PDbAdmin = (function($) {
+  return {
+    init: function() {
+      $('input[placeholder], textarea[placeholder]').placeholder();
+      $('.participants_db .ui-tabs-nav li').append($('<span class="mask"/>'));
+      $('.manage-fields-wrap').on('focus', '.manage-fields input[type="text"]:not([id*=other], .digit)', function() {
+        $(this).addClass('focused').closest('td').addClass('focused');
+      }).on('blur', '.manage-fields input[type="text"]', function() {
+        $(this).removeClass('focused').closest('td').removeClass('focused');
+      });
+    }
+  }
+})(jQuery);
+jQuery(function() {
+  PDbAdmin.init();
 });
 /*!
  *  jQuery version compare plugin
@@ -29,13 +34,13 @@ jQuery(document).ready( function($) {
  *
  *  Copyright (c) 2011, Nobu Funaki @zuzara
  */
-(function($){
-  $.versioncompare = function(version1, version2){
+(function($) {
+  $.versioncompare = function(version1, version2) {
     if ('undefined' === typeof version1) {
       throw new Error("$.versioncompare needs at least one parameter.");
     }
     version2 = version2 || $.fn.jquery;
-    if (version1 == version2) {
+    if (version1 === version2) {
       return 0;
     }
     var v1 = normalize(version1);
@@ -51,8 +56,8 @@ jQuery(document).ready( function($) {
     }
     return 0;
   };
-  function normalize(version){
-    return $.map(version.split('.'), function(value){
+  function normalize(version) {
+    return $.map(version.split('.'), function(value) {
       return parseInt(value, 10);
     });
   }

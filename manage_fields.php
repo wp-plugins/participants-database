@@ -12,15 +12,16 @@ $PDb_i18n = array(
     'update groups' => __('Update Groups', 'participants-database'),
     'add field' => __('Add Field', 'participants-database'),
     'add group' => __('Add Group', 'participants-database'),
-    'field' => __('field', 'participants-database'),
     'group' => __('group', 'participants-database'),
+    'field' => __('field', 'participants-database'),
     'new field title' => __('new field title', 'participants-database'),
     'new group title' => __('new group title', 'participants-database'),
+    'fields' => _x('Fields', 'column name', 'participants-database'),
+    'Group' => _x('Group', 'column name', 'participants-database'),
     'order' => _x('Order', 'column name', 'participants-database'),
     'name' => _x('Name', 'column name', 'participants-database'),
     'title' => _x('Title', 'column name', 'participants-database'),
     'default' => _x('Default', 'column name', 'participants-database'),
-    'group' => _x('Group', 'column name', 'participants-database'),
     'help_text' => _x('Help Text', 'column name', 'participants-database'),
     'form_element' => _x('Form Element', 'column name', 'participants-database'),
     'values' => _x('Values', 'column name', 'participants-database'),
@@ -35,7 +36,6 @@ $PDb_i18n = array(
     'admin' => _x('Admin', 'column name', 'participants-database'),
     'delete' => _x('Delete', 'column name', 'participants-database'),
     'display' => _x('Display', 'column name', 'participants-database'),
-    'fields' => _x('Fields', 'column name', 'participants-database'),
     'description' => _x('Description', 'column name', 'participants-database'),
 );
 // process form submission
@@ -273,7 +273,7 @@ foreach ($groups as $group) {
       ?>
       <div id="<?php echo $group ?>" class="manage-fields-wrap" >
         <form id="manage_<?php echo $group ?>_fields" method="post" autocomplete="off">
-          <h3><?php echo $group_titles[$group], ' ', __('Fields', 'participants-database') ?></h3>
+          <h3><?php echo $group_titles[$group], ' ', $PDb_i18n['fields'] ?></h3>
           <p>
             <?php
             if ('internal' !== $group) :
@@ -402,22 +402,6 @@ foreach ($groups as $group) {
               ?>
             </tbody>
           </table>
-  <?php // this javascript handles the drag-reordering of fields  ?>
-          <script type="text/javascript">
-            jQuery(document).ready(function($) {
-              $("#<?php echo $group ?>_fields").sortable({
-                helper: fixHelper,
-                update: function(event, ui) {
-                  var order = serializeList($(this));
-                  $.ajax({
-                    url: "<?php echo $_SERVER['REQUEST_URI'] ?>",
-                    type: "POST",
-                    data: order + '&action=reorder_fields'
-                  });
-                }
-              });
-            });
-          </script>
           <p class="submit">
             <?php
             PDb_FormElement::print_element(array(
@@ -547,21 +531,6 @@ foreach ($groups as $group) {
             ?>
           </tbody>
         </table>
-        <script type="text/javascript">
-          jQuery(document).ready(function($) {
-            $("#field_groups tbody").sortable({
-              helper: fixHelper,
-              update: function(event, ui) {
-                var order = serializeList($(this));
-                $.ajax({
-                  url: "<?php echo $_SERVER['REQUEST_URI'] ?>",
-                  type: "POST",
-                  data: order + '&action=reorder_groups'
-                });
-              }
-            });
-          });
-        </script>
         <p class="submit">
           <?php
           PDb_FormElement::print_element(array(

@@ -807,11 +807,15 @@ abstract class xnau_FormElement {
     
     $type == 'checkbox' ? $this->_add_checkbox_series($otherlabel) : $this->_add_radio_series($otherlabel);
     
+    $controltag = array_pop($this->output); // save the <span.othercontrol> close tag
+    $closetag = array_pop($this->output); // save the <span.checkbox-group> close tag
+    
     // add the text input element
     $this->attributes['class'] =  'otherfield';
     $value = $type == 'checkbox' ? $this->value['other'] : (!in_array($this->value, $this->options) ? $this->value : '' );
     $name = $value === '' ? 'temp' : $this->name . ($type == 'checkbox' ? '[other]' : '');
     $this->_addline('<input type="text" id="' . $this->name . '_other" name="' . $name . '" value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false) . '" ' . $this->_attributes() . ' >');
+    array_push($this->output, $controltag, $closetag); // replace the span close tags, enclosing the input element in it
     
     // close the container
     $this->_addline('</div>', -1);
@@ -1064,6 +1068,7 @@ abstract class xnau_FormElement {
       
       $value = $type == 'checkbox' ? (isset($this->value['other']) ? $this->value['other'] : '') : $this->value;
       $this->attributes['class'] =  'otherselect';
+      $this->_addline('<span class="othercontrol">');
       $this->_addline('<label ' . $class . ' for="' . $this->name . '_otherselect">');
       $this->_addline(sprintf('<input type="%s" id="%s_otherselect" name="%s"  value="%s" %s %s />', 
               $type, 
@@ -1076,6 +1081,7 @@ abstract class xnau_FormElement {
       //$this->_addline('<input type="' . $type . '" id="' . $this->name . '_otherselect" name="' . ($type == 'checkbox' ? 'temp' : $this->name) . '"  value="' . $otherlabel . '" ' . $this->_set_selected($this->options, ( $type == 'checkbox' ? $this->value['other'] : $this->value), 'checked', false) . ' ' . $this->_attributes() . ' />', 1);
       $this->_addline($otherlabel . ':');
       $this->_addline('</label>', -1);
+      $this->_addline('</span>', -1);
     }
     
     $this->_addline('</span>');

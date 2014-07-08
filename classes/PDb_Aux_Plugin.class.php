@@ -87,9 +87,9 @@ class PDb_Aux_Plugin {
 
     $this->plugin_path = plugin_basename($plugin_file);
     $this->connected = $this->check_connection();
+    register_activation_hook($plugin_file, array($this, '_activate_plugin'));
 
     if($this->connected) {
-      register_activation_hook($plugin_file, array($this, '_activate_plugin'));
       $this->plugin_data = get_plugin_data($plugin_file);
       $this->aux_plugin_settings = $this->aux_plugin_name;
       $this->subclass = $subclass;

@@ -142,11 +142,7 @@ class PDb_Field_Item extends PDb_Template_Item {
   private function _is_single_record_link() {
 
     return (
-            isset( Participants_Db::$plugin_options['single_record_link_field'] )
-            &&
-            $this->name == Participants_Db::$plugin_options['single_record_link_field']
-            &&
-            ! empty( Participants_Db::$plugin_options['single_record_page'] )
+            Participants_Db::is_single_record_link($this)
             &&
             ! in_array( $this->form_element, array('rich-text', 'link' ) )
             &&

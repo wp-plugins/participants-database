@@ -111,12 +111,14 @@ class PDb_Signup extends PDb_Shortcode {
     
     $form_status = Participants_Db::$session->get('form_status') ? Participants_Db::$session->get('form_status') : 'normal';
 
+    $this->participant_id = Participants_Db::$session->get('pdbid');
+
     if (filter_input(INPUT_GET, 'm') === 'r' || $shortcode_atts['module'] == 'retrieve') {
       /*
        * we're proceesing a link retrieve request
        */
       $shortcode_atts['module'] = 'retrieve';
-    } elseif ($this->participant_id = Participants_Db::$session->get('pdbid')) {
+    } elseif ($this->participant_id !== false) {
       /*
        * if we arrive here, the form has been submitted and is complete or is a multipage 
        * form and we've come back to the signup shortcode before the form was completed: 

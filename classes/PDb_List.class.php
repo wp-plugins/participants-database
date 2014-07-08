@@ -133,8 +133,6 @@ class PDb_List extends PDb_Shortcode {
 
     $this->list_page = Participants_Db::$list_page;
 
-    $this->_set_list_limit();
-
     $this->_set_page_nummber();
 
 //    error_log( __METHOD__.' $this->shortcode_atts:'.print_r( $this->shortcode_atts,1 ));
@@ -157,7 +155,7 @@ class PDb_List extends PDb_Shortcode {
 
       $ajax_params = array(
           'ajaxurl' => admin_url('admin-ajax.php'),
-          'filterNonce' => wp_create_nonce(Participants_Db::$prefix . 'list-filter-nonce'),
+          'filterNonce' => Participants_Db::$list_filter_nonce,
           'postID' => ( isset($wp_query->post) ? $wp_query->post->ID : '' ),
           'prefix' => Participants_Db::$prefix,
           'loading_indicator' => Participants_Db::get_loading_spinner(),
@@ -262,6 +260,8 @@ class PDb_List extends PDb_Shortcode {
     // get the number of records returned
     $this->num_records = $wpdb->get_var(preg_replace('#^SELECT.+FROM #', 'SELECT COUNT(*) FROM ', $list_query));
     
+    $this->_set_list_limit();
+    
     // set up the pagination object
     $pagination_defaults = array(
         'link' => $this->prepare_page_link( $this->shortcode_atts['filtering'] ? filter_input(INPUT_POST, 'pagelink') : $_SERVER['REQUEST_URI'] ),
@@ -328,6 +328,19 @@ class PDb_List extends PDb_Shortcode {
      * which is the data for a field
      */
     // error_log( __METHOD__.' all records:'.print_r( $this->records,1));
+  }
+  /**
+   * sets up the array of display columns
+   *
+   * @global object $wpdb
+   */
+  protected function _set_shortcode_display_columns() {
+    
+    if (empty($this->shortcode_atts['groups'])) {
+      $this->display_columns = $this->get_list_display_columns('display_column');
+    } else {
+      parent::_set_shortcode_display_columns();
+    }
   }
 
   /**
@@ -733,7 +746,7 @@ class PDb_List extends PDb_Shortcode {
   public function is_single_record_link($column) {
 
     return (
-            $column == Participants_Db::plugin_setting('single_record_link_field', '')
+            Participants_Db::is_single_record_link($column)
             &&
             false !== $this->single_record_url
             &&
@@ -1035,6 +1048,7 @@ class PDb_List extends PDb_Shortcode {
     } else {
       $this->page_list_limit = $limit;
     }
+    
   }
 
   /**

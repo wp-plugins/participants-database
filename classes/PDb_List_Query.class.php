@@ -127,7 +127,6 @@ class PDb_List_Query {
     } else {
       $this->_save_query_session();
     }
-    error_log(__METHOD__.' post: '.print_r($this->post_input,1));
   }
   /**
    * provides the completed mysql query

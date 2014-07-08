@@ -7,6 +7,9 @@
 [class*="pdb-"] .checkbox .helptext {
   display: inline;
 }
+[class*="pdb-"] .selectother + .helptext {
+  display: block;
+}
 .glyphicon {
   font: 400 20px/1 sans-serif;
 }
@@ -89,6 +92,12 @@
   color: #333333;
   height: 20em;
 }
+.edit-participant .mce-edit-area iframe {
+  border: 1px solid #dedede;
+}
+div.mce-panel {
+  background: none repeat scroll 0 0 #f5f5f5;
+}
 .file-delete {
 	display: inline;
   white-space: nowrap;
@@ -112,11 +121,14 @@
 .multicheckbox label,
 .file-delete label,
 .csv-export label,
-.radio-group label {
+.radio-group label,
+.othercontrol  {
   margin: 0 12px 0 0;
   width: auto;
-  line-height: 1;
   white-space: nowrap;
+}
+.othercontrol label {
+  margin-right: 0;
 }
 .inline-controls label {
   float: none;
@@ -124,7 +136,7 @@
 .selectother label input,
 .multicheckbox label input,
 .file-delete label input,
-.radio-group label input {
+.radio-group label input{
   float: none;
   margin:0 2px 0 0;
   vertical-align: inherit;
@@ -142,11 +154,19 @@
   overflow: auto;
   padding: 5px;
 }
-.selectother input[type=text] {
-  margin-right:0;
+.checkbox-group,
+.radio-group {
+  display: block;
+  line-height: 2;
+  margin: 0 4px;
+  width: auto;
+}
+.inline-controls .checkbox-group, .inline-controls .radio-group {
+    display: inline-block;
+}
+input.otherfield[type=text] {
 }
 .dropdown-other select {
-    float: left;
     margin-right: 10px;
 }
 .dropdown-other input[name=temp] {
@@ -351,18 +371,20 @@
 
 .pdb-error {
   display:inline-block;
-  padding:4px 7px;
-  background-color: #FFEBE8;
-  box-shadow:0 0 6px #CC0000 inset;
-  margin:0.5em 0;
+  background: none repeat scroll 0 0 #fff;
+  border-left: 4px solid #dd3d36;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+  padding: 1px 12px;
 }
 .pdb-error li {
   margin:0.5em 20px;
 }
 .pdb-message {
-  padding:4px 7px;
-  background-color: #C4F092;
-  box-shadow:0 0 6px #2DAA00 inset;
+  display:inline-block;
+  background-color: #fff;
+  border-left: 4px solid #7ad03a;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+  padding: 1px 12px;
 }
 .pdb-error p, .pdb-message p {
   margin:0;

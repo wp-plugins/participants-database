@@ -147,7 +147,7 @@ class PDb_Template_Item {
     
     $class_properties = get_class_vars( $class );
       
-    if (is_object(Participants_Db::$fields[$item->name])) {
+    if (isset(Participants_Db::$fields[$item->name]) && is_object(Participants_Db::$fields[$item->name])) {
       $field = clone Participants_Db::$fields[$item->name];
     }
     

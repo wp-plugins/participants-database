@@ -1,6 +1,8 @@
 @charset "UTF-8";
 
 /* Participants DB Admin CSS */
+
+/*** PARTICIPANT LIST ***/
 body[class*='participants-database'] .widefat td {
   vertical-align:middle;
 }
@@ -86,13 +88,27 @@ fieldset.widefat.inline-controls input,
 fieldset.widefat.inline-controls  select,
 fieldset.widefat.inline-controls label {
   margin: 0 5px;
-  vertical-align: middle;
+  vertical-align: baseline;
 }
 fieldset.widefat.inline-controls input:first-of-type,
 fieldset.widefat.inline-controls  select:first-of-type,
 fieldset.widefat.inline-controls label:first-of-type {
   margin-left: 0;
 }
+fieldset.widefat.inline-controls label {
+  padding-right: 15px;
+}
+.wp-core-ui .button, .wp-core-ui .button-primary, .wp-core-ui .button-secondary {
+    height: auto;
+    line-height: 24px;
+}
+.pdb-searchform .filter-count {
+  display: inline-block;
+  margin-left: 30px;
+  width: 50%;
+}
+
+/*** FOOTER ***/
 #PDb_footer {
   display: inline-block;
   background-color: rgba(245, 156, 0, 0.1);
@@ -154,6 +170,7 @@ body[class*='participants-database'] .form-table {
 .wp-admin .helptext {
   line-height: 1.5;
   color: #777777;
+  font-style: italic;
 }
 .wp-list-table th, .wp-list-table td, .form-table th, .form-table td {
   vertical-align: top;

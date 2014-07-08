@@ -42,6 +42,13 @@ class PDb_Session {
    */
   public $session_name;
 
+  /**
+   * true if the current user does not allow cookies
+   * 
+   * @var bool
+   */
+  public $no_user_cookie = false;
+
 
 	/**
 	 * construct the class
@@ -53,7 +60,9 @@ class PDb_Session {
 	 */
 	public function __construct() {
 
-		$this->use_php_sessions = (bool) Participants_Db::$plugin_options['use_php_sessions'];
+    $this->no_user_cookie = (bool) ! filter_input(INPUT_COOKIE, 'wordpress_test_cookie');
+
+		$this->use_php_sessions = Participants_Db::plugin_setting_is_true('use_php_sessions');
     
     $this->session_name = Participants_Db::$prefix . 'session';
 

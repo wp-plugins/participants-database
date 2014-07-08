@@ -144,6 +144,20 @@ class PDb_Base {
     return $permalink;
   }
   
+  /**
+   * determines if the field is the designated single record field
+   * 
+   * also checks that the single record page has been defined
+   * 
+   * @param object $field
+   * @return bool
+   */
+  public static function is_single_record_link($field) {
+    $name = is_object($field) ? $field->name : $field;
+    $page = Participants_Db::plugin_setting('single_record_page');
+    return $name === Participants_Db::plugin_setting('single_record_link_field') && !empty($page);
+  }
+  
   /*
    * prepares an array for storage in the database
    *
@@ -616,33 +630,9 @@ class PDb_Base {
      * 
      * as per: http://www.ebrueggeman.com/blog/wordpress-relnext-and-firefox-prefetching
      */
-    if ($post->post_type === 'page') {
+    if (is_object($post) && $post->post_type === 'page') {
       remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
     }
-  }
-  /**
-   * checks a template for an embedded shortcode
-   * 
-   * runs on the 'template_include' filter
-   * 
-   * @param type $template name of the template file in use
-   * @param string $tag the shortcode string to search for
-   * @return bool true if a shortcode matching the tag is present in the template
-   */
-  public static function template_check_shortcode($template)
-  {
-
-    if (file_exists($template)) {
-
-      $contents = file_get_contents($template);
-
-      if (self::has_shortcode($contents)) {
-
-        self::$shortcode_present = true;
-      }
-    }
-
-    return $template;
   }
   /**
    * provides an array of field indices corresponding, given a list of field names
@@ -740,12 +730,34 @@ class PDb_Base {
    */
   public static function reset_shortcode_session() {
     global $post;
-    $current_session = Participants_Db::$session->get('shortcode_atts');
-    /*
-     * clear the current page's session
-     */
-    $current_session[$post->ID] = array();
-    Participants_Db::$session->set('shortcode_atts', $current_session);
+    if (is_object($post)) {
+			$current_session = Participants_Db::$session->get('shortcode_atts');
+			/*
+			 * clear the current page's session
+			 */
+			$current_session[$post->ID] = array();
+			Participants_Db::$session->set('shortcode_atts', $current_session);
+		}
+  }
+  /**
+   * Remove slashes from strings, arrays and objects
+   * 
+   * @param    mixed   input data
+   * @return   mixed   cleaned input data
+   */
+  public static function deep_stripslashes($input)
+  {
+    if (is_array($input)) {
+      $input = array_map(array(__CLASS__,'deep_stripslashes'), $input);
+    } elseif (is_object($input)) {
+      $vars = get_object_vars($input);
+      foreach ($vars as $k => $v) {
+        $input->{$k} = deep_stripslashes($v);
+      }
+    } else {
+      $input = stripslashes($input);
+    }
+    return $input;
   }
   
   /**

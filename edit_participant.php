@@ -165,7 +165,7 @@ if ($participant_values) :
 
                   case 'image-upload':
 
-                    $column->value = empty($column->value) ? '' : $column->value;
+                   $column->value = '';
 
                     break;
 
