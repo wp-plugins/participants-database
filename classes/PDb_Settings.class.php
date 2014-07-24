@@ -465,6 +465,18 @@ class PDb_Settings extends xnau_Plugin_Settings {
         )
     );
     
+
+    $this->plugin_settings[] = array(
+        'name' => 'no_cookie_message',
+        'title' => __('No User Cookie Message', 'participants-database'),
+        'group' => 'pdb-signup',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('this plugin doesn\'t work if the user has cookies disabled. Show this message in place of the signup form if the user has cookies disabled.', 'participants-database'),
+            'value' => __('Please enable cookies in your browser to use this feature.', 'participants-database'),
+        )
+    );
+    
     /*******************************************************
      * 
      * link retrieval settings
@@ -1123,8 +1135,10 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     foreach ($columns as $column) {
 
-      if (in_array($column->form_element, array('text-line', 'image-upload', 'checkbox', 'placeholder')))
-        $columnlist[$column->title] = $column->name;
+      if (in_array($column->form_element, array('text-line', 'image-upload', 'checkbox', 'placeholder'))) {
+        $key = sprintf('%s (%s)', $column->title, $column->name);
+        $columnlist[$key] = $column->name;
+      }
     }
 
     return $columnlist;
@@ -1149,7 +1163,8 @@ class PDb_Settings extends xnau_Plugin_Settings {
     $columns = $wpdb->get_results($sql, OBJECT_K);
 
     foreach ($columns as $column) {
-        $columnlist[$column->title] = $column->name;
+        $key = sprintf('%s (%s)', $column->title, $column->name);
+        $columnlist[$key] = $column->name;
     }
 
     return $columnlist;

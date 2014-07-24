@@ -384,7 +384,8 @@ class PDb_List_Query {
    */
   private function _set_columns($columns) {
     if (is_array($columns)) {
-      $this->columns = array('id') + $columns;
+      array_unshift($columns, 'id');
+      $this->columns = $columns;
     }
   }
   /**
@@ -595,7 +596,7 @@ class PDb_List_Query {
         'field' => $column,
         'logic' => $logic,
         'shortcode' => $shortcode,
-        'term' => $search_term,
+        'term' => trim(urldecode($search_term)),
             )
     );
 

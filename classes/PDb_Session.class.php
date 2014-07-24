@@ -60,8 +60,6 @@ class PDb_Session {
 	 */
 	public function __construct() {
 
-    $this->no_user_cookie = (bool) ! filter_input(INPUT_COOKIE, 'wordpress_test_cookie');
-
 		$this->use_php_sessions = Participants_Db::plugin_setting_is_true('use_php_sessions');
     
     $this->session_name = Participants_Db::$prefix . 'session';
@@ -104,6 +102,8 @@ class PDb_Session {
       
 			$this->session = WP_Session::get_instance();
     }
+
+    $this->test_cookie();
 
 		return $this->session;
 	}
@@ -215,7 +215,20 @@ class PDb_Session {
       }
     return $c;
   }
+  /**
+   * tests for cookie access in the user's browser and sets the no_user_cookie property
+   * 
+   * we test for either the wordpress test cookie or the plugin session cookie
+   * 
+   * @return null
+   */
+  private function test_cookie()
+  {
+    $this->no_user_cookie = is_null(filter_input(INPUT_COOKIE, 'wordpress_test_cookie'));
+    if ($this->no_user_cookie) {
+      $this->no_user_cookie = is_null(filter_input(INPUT_COOKIE, Participants_Db::$prefix . 'wp_session'));
+     }
+  }
 }
-
 
 ?>

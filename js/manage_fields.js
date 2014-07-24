@@ -55,15 +55,13 @@ PDbManageFields = (function ($) {
       confirmationBox.dialog(dialogOptions, {
         buttons : {
           "Ok" : function () { //If the user choose to click on "OK" Button
+            parent.css('opacity', '0.3');
             $(this).dialog('close'); // Close the Confirmation Box
             $.ajax({//make the Ajax Request
               type : 'post',
               url : window.location.pathname + window.location.search,
               data : 'delete=' + row_id + '&action=delete_' + thing,
               beforeSend : function () {
-                parent.animate({
-                  'backgroundColor' : 'yellow'
-                }, 200);
               },
               success : function (response) {
                 parent.slideUp(600, function () { //remove the Table row .
@@ -92,18 +90,50 @@ PDbManageFields = (function ($) {
               row.find('td.sortable input[type=checkbox], td.CSV input[type=checkbox], td.persistent input[type=checkbox]').prop('checked', false);
             }
           },
-          set_changed_flag = function () {
+          saveState = function () {
+            var el = $(this);
+            el.data('initState', el.attr('value'));
+          },
+          setChangedFlag = function () {
             var
                     el = $(this),
-                    matches = el.closest('tr').attr('id').match(/(\d+)/);
-            $('#status_' + matches[1]).attr('value', 'changed');
+                    initState = el.data('initState') || '',
+                    matches = el.closest('tr').attr('id').match(/(\d+)/),
+                    flag = $('#status_' + matches[1]);
+            if (flag.attr('value') !== 'changed') {
+              flag.attr('value', 'changed');
+              setUnsavedChangesFlag(1);
+            } else if (el.attr('value') === initState) {
+              flag.attr('value', '');
+              setUnsavedChangesFlag(-1);
+            }
+          },
+          setUnsavedChangesFlag = function (op) {
+            var body = $('body'),
+                    unsavedChangesCount = body.data('unsavedChanges') || 0;
+            if (op === 1) {
+              unsavedChangesCount++;
+            } else if (op === -1) {
+              unsavedChangesCount--;
+            }
+            body.data('unsavedChanges', unsavedChangesCount);
+            if (unsavedChangesCount <= 0) {
+              clearUnsavedChangesWarning;
+            } else {
             window.onbeforeunload = confirmOnPageExit; // set up the unsaved changes warning
+            }
+          },
+          clearUnsavedChangesWarning = function () {
+              window.onbeforeunload = null;
           },
           fixHelper = function (e, ui) {
             ui.children().each(function () {
               jQuery(this).width(jQuery(this).width());
             });
             return ui;
+          },
+          enableNew = function () {
+            $(this).prev('input.button').removeClass('disabled').addClass('enabled').prop('disabled', false);
           },
           serializeList = function (container) {
             /*
@@ -184,23 +214,27 @@ PDbManageFields = (function ($) {
                   });
                 }
               };
-      // clear the unsaved changes warning
-      window.onbeforeunload = null;
+      clearUnsavedChangesWarning();
       // set up tabs
       tabcontrols.tabs(getTabSettings());
+      // save the initial state of all inputs
+      tabcontrols.find('table.manage-fields input, table.manage-fields textarea, table.manage-fields select, table.manage-fields input[type=checkbox]').each(saveState);
       // flag the row as changed for text inputs
-      tabcontrols.find('table.manage-fields input, table.manage-fields textarea').on('keyup', set_changed_flag);
+      tabcontrols.find('table.manage-fields input, table.manage-fields textarea').on('input', setChangedFlag);
       // flag the row as changed for dropdowns, checkboxes
-      tabcontrols.find('table.manage-fields select, table.manage-fields input[type=checkbox]').on('change', set_changed_flag);
+      tabcontrols.find('table.manage-fields select, table.manage-fields input[type=checkbox]').on('change', setChangedFlag);
       // defeat return key submit behavior
       tabcontrols.on("keypress", 'form', cancelReturn);
       // pre-set CAPTCHA settings
       $('.manage-fields-wrap').on('change', '.manage-fields tbody td.form_element select', captchaPreset);
       // set up the delete functionality
       tabcontrols.find('.manage-fields a.delete').click(deleteField);
+      // prevent empty submission
+      tabcontrols.find('input.add_field').on('input', enableNew);
       // set up the field sorting
       $("#field_groups tbody").sortable(sortConfig);
       $('[id$="_fields"]').sortable(sortConfig);
+      $('input.manage-fields-update').on('click', clearUnsavedChangesWarning);
     }
   };
 }(jQuery));

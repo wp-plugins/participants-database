@@ -343,7 +343,7 @@ class PDb_Signup extends PDb_Shortcode {
   private function _do_notify() {
 
     $this->_mail(
-            $this->notify_recipients, $this->_proc_tags($this->notify_subject), $this->_proc_tags($this->notify_body)
+            $this->notify_recipients, $this->_proc_tags($this->notify_subject), Participants_Db::process_rich_text($this->_proc_tags($this->notify_body))
     );
   }
 

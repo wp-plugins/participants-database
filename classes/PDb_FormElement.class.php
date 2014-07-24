@@ -384,13 +384,14 @@ class PDb_FormElement extends xnau_FormElement {
     // clean up the provided string
     $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($field->value))));
 
-    if (isset($field->link) && filter_var($field->link, FILTER_VALIDATE_URL)) {
+    if (isset($field->link) && !empty($field->link)) {
       /*
-       * if the field is a single record link or other field with the link property set
+       * the field is a single record link or other field with the link property 
+       * set, which becomes our href
        */
-      $URI = filter_var($field->link, FILTER_VALIDATE_URL);
+      $URI = $field->link;
       $linktext = $field->value;
-    } elseif (filter_var($URI, FILTER_VALIDATE_URL) && Participants_Db::$plugin_options['make_links']) {
+    } elseif (filter_var($URI, FILTER_VALIDATE_URL) !== false && Participants_Db::plugin_setting_is_true('make_links')) {
 
       // convert the get array to a get string and add it to the URI
       if (is_array($get)) {
@@ -399,20 +400,18 @@ class PDb_FormElement extends xnau_FormElement {
 
         $URI .= http_build_query($get);
       }
-    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && Participants_Db::$plugin_options['make_links']) {
+    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) !== false && Participants_Db::plugin_setting_is_true('make_links')) {
 
-      if ($in_admin) {
-      // in admin, emails are plaintext
-        return esc_html($URI);
-      } elseif (Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email) {
+      if (Participants_Db::plugin_setting_is_true('email_protect') && ! Participants_Db::$sending_email) {
 
         // the email gets displayed in plaintext if javascript is disabled; a clickable link if enabled
         list( $URI, $linktext ) = explode('@', $URI, 2);
         $template = '<a class="obfuscate" data-email-values=\'{"name":"%1$s","domain":"%2$s"}\'>%1$s AT %2$s</a>';
       } else {
+        $linktext = $URI;
         $URI = 'mailto:' . $URI;
       }
-    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email) {
+    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) !== false && Participants_Db::plugin_setting_is_true('email_protect') && ! Participants_Db::$sending_email) {
       
       // only obfuscating, not making links
       return vsprintf('%1$s AT %2$s', explode('@', $URI, 2));
@@ -509,7 +508,6 @@ class PDb_FormElement extends xnau_FormElement {
   {
     if (isset(Participants_Db::$fields[$fieldname])) {
       $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
-
     if (is_array($options_array)) {
       foreach ($options_array as $index => $option_value) {
         if (!is_string($index) or $index == 'other') {
@@ -532,13 +530,11 @@ class PDb_FormElement extends xnau_FormElement {
    * @return string the value that matches the title given
    */
   public static function get_title_value($title, $fieldname) {
+    $value = $title;
     if (isset(Participants_Db::$fields[$fieldname])) {
       $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
-
       if (is_array($options_array) && isset($options_array[$title])) {
         $value = $options_array[$title];
-      } else {
-        $value = $title;
       }
     }
     return $value;

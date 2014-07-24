@@ -22,7 +22,7 @@ class PDb_Aux_Plugin {
    * boolean true if the Participants Database plugin is found and active
    * @var bool
    */
-  var $connected = false;
+  var $connected = true;
   /**
    * the directory and path of the main plugin file
    * @var string
@@ -86,10 +86,6 @@ class PDb_Aux_Plugin {
   {
 
     $this->plugin_path = plugin_basename($plugin_file);
-    $this->connected = $this->check_connection();
-    register_activation_hook($plugin_file, array($this, '_activate_plugin'));
-
-    if($this->connected) {
       $this->plugin_data = get_plugin_data($plugin_file);
       $this->aux_plugin_settings = $this->aux_plugin_name;
       $this->subclass = $subclass;
@@ -98,8 +94,7 @@ class PDb_Aux_Plugin {
       add_action('admin_menu', array($this, 'add_settings_page'));
       add_action('admin_init', array($this, 'settings_api_init'));
       add_action('init', array(&$this, 'initialize_updater'));
-      add_action( 'plugins_loaded', array(&$this, 'load_textdomain'));
-    }
+    add_action('plugins_loaded', array(&$this, 'load_textdomain'));
   }
   
   /**
@@ -133,22 +128,6 @@ class PDb_Aux_Plugin {
   {
     $this->settings_page = Participants_Db::$plugin_page . '-' . $this->aux_plugin_name . '_settings';
     $this->aux_plugin_settings = $this->aux_plugin_shortname . '_settings';
-  }
-
-  /**
-   * provides a simple activation method
-   * 
-   * this mainly checks for the existence of the parent plugin and notifies the 
-   * user if it cannot be found
-   * 
-   */
-  function _activate_plugin()
-  {
-    if (WP_DEBUG) error_log(__METHOD__. ' ' . Participants_Db::$plugin_title . ' activating aux plugin: '. $subclass);
-    if(!$this->connected) {
-      deactivate_plugins($this->plugin_path);
-      $this->_trigger_error('The Participants Database plugin must be installed and activated for the ' . $this->aux_plugin_title . ' plugin to be activated.');
-    }
   }
 
   /**
@@ -273,9 +252,9 @@ class PDb_Aux_Plugin {
     
     $values[3] = htmlspecialchars($values[3]);
     $values[8] = $this->set_selectstring($setting['type']);
-    
-    if (is_callable(array($this, '_build_' . $setting['type']))) {
-      echo call_user_func(array($this, '_build_' . $setting['type']), $values);
+    $build_function = '_build_' . $setting['type'];
+    if (is_callable(array($this, $build_function))) {
+      echo call_user_func(array($this, $build_function), $values);
     }
   }
   

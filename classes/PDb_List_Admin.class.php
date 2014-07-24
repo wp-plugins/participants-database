@@ -25,84 +25,101 @@ class PDb_List_Admin {
    * @var string holds the main query for building the list
    */
   static $list_query;
+
   /**
    * @var string translations strings for buttons
    */
   static $i18n;
+
   /**
    * @var object holds the pagination object
    */
   static $pagination;
+
   /**
    * @var int holds the number of list items to show per page
    */
   static $page_list_limit;
+
   /**
    * @var string the name of the list page variable
    */
   static $list_page = 'listpage';
+
   /**
    * @var string name of the list anchor element
    */
   static $list_anchor = 'participants-list';
+
   /**
    *  @var string name of the list limit transient
    */
   static $user_settings = 'admin-user-settings';
+
   /**
    * @var int the number of records after filtering
    */
   static $num_records;
+
   /**
    * @var array all the records are held in this array
    */
   static $participants;
+
   /**
    * @var string holds the url of the registrations page
    */
   static $registration_page_url;
+
   /**
    * holds the columns to display in the list
    * 
    * @var array of field objects
    */
   static $display_columns;
+
   /**
    * @var array holds the list of sortable columns
    */
   static $sortables;
+
   /**
    * @var array holds the settings for the list filtering and sorting
    */
   static $filter;
+
   /**
    * 
    * @var string name of the filter transient
    */
   public static $filter_transient = 'admin_list_filter';
+
   /**
    * @var array set of values making up the default list filter
    */
   public static $default_filter;
+
   /**
    * @var bool holds the current parenthesis status used while building a query where clause
    */
   protected static $inparens = false;
+
   /**
    * initializes and outputs the list for the backend
    */
-  public static function initialize() {
+  public static function initialize()
+  {
 
     self::_setup_i18n();
 
-    wp_localize_script(Participants_Db::$prefix.'list-admin', 'list_adminL10n', array(
+    wp_localize_script(Participants_Db::$prefix . 'list-admin', 'list_adminL10n', array(
         'delete' => self::$i18n['delete_checked'],
         'cancel' => self::$i18n['change'],
-        "record" => __("Do you really want to delete the selected record?", 'participants-database' ),
-        "records" => __("Do you really want to delete the selected records?", 'participants-database' ),
+        "record" => __("Do you really want to delete the selected record?", 'participants-database'),
+        "records" => __("Do you really want to delete the selected records?", 'participants-database'),
     ));
-    wp_enqueue_script(Participants_Db::$prefix.'list-admin');
-    wp_enqueue_script(Participants_Db::$prefix.'debounce');
+    wp_enqueue_script(Participants_Db::$prefix . 'list-admin');
+    wp_enqueue_script(Participants_Db::$prefix . 'debounce');
 
     get_currentuserinfo();
 
@@ -117,7 +134,7 @@ class PDb_List_Admin {
 
     self::setup_display_columns();
 
-    self::$sortables = Participants_Db::get_sortables();
+    self::$sortables = Participants_Db::get_sortables(self::get_display_columns());
 
     // set up the basic values
     self::$default_filter = array(
@@ -246,7 +263,8 @@ class PDb_List_Admin {
    *
    * @return string the re-constituted URI
    */
-  public static function prepare_page_link($uri) {
+  public static function prepare_page_link($uri)
+  {
 
     $URI_parts = explode('?', $uri);
 
@@ -280,7 +298,8 @@ class PDb_List_Admin {
   /** 	
    * processes all the general list actions: delete and  set items-per-page
    */
-  private static function _process_general() {
+  private static function _process_general()
+  {
 
     global $wpdb;
 
@@ -523,7 +542,8 @@ class PDb_List_Admin {
   /**
    * top section for admin listing
    */
-  private static function _admin_top() {
+  private static function _admin_top()
+  {
     ?>
     <div  class="wrap participants_db">
     <a id="pdb-list-admin" name="pdb-list-admin"></a>
@@ -540,7 +560,8 @@ class PDb_List_Admin {
    * @param string $mode determines whether to print filter, sort, both or 
    *                     none of the two functions
    */
-  private static function _sort_filter_forms() {
+        private static function _sort_filter_forms()
+        {
 
     global $post;
           $filter_count = intval(self::$filter['list_filter_count']);
@@ -698,7 +719,8 @@ class PDb_List_Admin {
        *
        * @param string $mode dtermines the print mode: 'noheader' skips headers, (other choices to be determined)
        */
-      private static function _main_table($mode = '') {
+              private static function _main_table($mode = '')
+              {
         ?>
 
         <table class="wp-list-table widefat fixed pages pdb-list stuffbox" cellspacing="0" >
@@ -706,7 +728,7 @@ class PDb_List_Admin {
           $PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
           $head_pattern = '
 <th class="%2$s" scope="col">
-  <span><a href="' . $_SERVER['REQUEST_URI'] . '&column_sort=%2$s">%1$s%3$s</a></span>
+  <span><a href="' . self::sort_link_base_URI() . '&column_sort=%2$s">%1$s%3$s</a></span>
 </th>
 ';
           //template for outputting a column
@@ -805,7 +827,7 @@ class PDb_List_Admin {
                     $link_value = maybe_unserialize($value[$column->name]);
 
                     if (count($link_value) === 1) {
-                      $link_value = array_fill(0, 2, current((array)$link_value));
+                                $link_value = array_fill(0, 2, current((array) $link_value));
                     }
 
                     $display_value = Participants_Db::make_link($link_value[0], $link_value[1]);
@@ -831,7 +853,9 @@ class PDb_List_Admin {
                       $display_value = sprintf($template, $url, $value[$column->name]);
                               } elseif (Participants_Db::plugin_setting_is_true('make_links')) {
 
-                      $display_value = Participants_Db::make_link($value[$column->name]);
+                                $field = new stdClass();
+                                $field->value = $value[$column->name];
+                                $display_value = PDb_FormElement::make_link($field);
                     } else {
                                 $display_value = $value[$column->name] === '' ? $column->default : esc_html($value[$column->name]);
                     }
@@ -846,7 +870,7 @@ class PDb_List_Admin {
                               $display_value = $value[$column->name] === '' ? $column->default : esc_html($value[$column->name]);
                 }
 
-                if ($column->name === 'private_id') {
+                          if ($column->name === 'private_id' && Participants_Db::plugin_setting_is_set('registration_page')) {
                   printf($PID_pattern, $display_value, Participants_Db::get_record_link($display_value));
                 } else {
                   printf($col_pattern, $display_value);
@@ -875,7 +899,8 @@ class PDb_List_Admin {
             /**
              * prints the CSV export form
              */
-            private static function _print_export_form() {
+                private static function _print_export_form()
+                {
               ?>
 
       <div class="postbox">
@@ -912,7 +937,8 @@ class PDb_List_Admin {
     /**
      * prints a table header row
      */
-    private static function _print_header_row($head_pattern) {
+  private static function _print_header_row($head_pattern)
+  {
 
       
     $sorticon_class = strtolower(self::$filter['ascdesc']) === 'asc' ? 'dashicons-arrow-up' : 'dashicons-arrow-down';
@@ -937,11 +963,24 @@ class PDb_List_Admin {
             );
           }
         }
-
+  /**
+   * builds a column sort link
+   * 
+   * this just removes the 'column_sort' variable from the URI
+   * 
+   * @return string the base URI for the sort link
+   */
+  private static function sort_link_base_URI() {
+    $uri = parse_url($_SERVER['REQUEST_URI']);
+    parse_str($uri['query'], $query);
+    unset($query['column_sort']);
+    return $uri['path'] . '?' . http_build_query($query);
+  }
         /**
          * sets up the main list columns
          */
-        private static function setup_display_columns() {
+  private static function setup_display_columns()
+  {
           
           global $wpdb;
           $sql = '
@@ -956,7 +995,8 @@ class PDb_List_Admin {
         /**
          * sets the admin list limit value
          */
-        private static function set_list_limit() {
+  private static function set_list_limit()
+  {
 
     $limit_value = self::get_admin_user_setting('list_limit', Participants_Db::plugin_setting('list_limit'));
     $input_limit = filter_input(INPUT_GET, 'list_limit', FILTER_VALIDATE_INT, array('min_range' => 1));
@@ -1015,13 +1055,28 @@ class PDb_List_Admin {
   }
 
   /**
+   * supplies an array of display fields
+   * 
+   * @return array array of field names
+   */
+  public static function get_display_columns()
+  {
+    $display_columns = array();
+    foreach (self::$display_columns as $col) {
+      $display_columns[] = $col->name;
+    }
+    return $display_columns;
+  }
+
+  /**
    * gets a user preference
          * 
          * @param string $name name of the setting to get
          * @param string|bool $setting if there is no setting, supply this value instead
          * @return string|bool the setting value or false if not found
          */
-        public static function get_admin_user_setting($name, $setting = false) {
+  public static function get_admin_user_setting($name, $setting = false)
+  {
           
     return self::get_user_setting($name, $setting, self::$user_settings);
         }
@@ -1078,7 +1133,8 @@ class PDb_List_Admin {
         /**
          * sets up the internationalization strings
          */
-        private static function _setup_i18n() {
+  private static function _setup_i18n()
+  {
 
           /* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
           self::$i18n = array(

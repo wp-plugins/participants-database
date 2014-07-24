@@ -288,11 +288,20 @@ class PDb_Base {
    * @return string the plugin setting value or provided default
    */
   public static function plugin_setting($name, $default = false) {
-    $setting = Participants_Db::$plugin_options[$name];
-    if (empty($setting) && $setting !== 0) {
-      $setting = $default;
-    }
+    $setting = isset(Participants_Db::$plugin_options[$name]) ? Participants_Db::$plugin_options[$name] : $default;
     return $setting;
+  }
+  
+  /**
+   * checks a plugin setting for a value
+   * 
+   * returns false for empty string, true for 0
+   * 
+   * @param string $name setting name
+   * @return bool false for null or empty string, true for 0 or any string
+   */
+  public static function plugin_setting_is_set($name) {
+    return isset(Participants_Db::$plugin_options[$name]) && Participants_Db::plugin_setting($name) !== '';
   }
   /**
    * provides a boolean plugin setting value
@@ -588,6 +597,29 @@ class PDb_Base {
   } 
 
 /**
+ * collect a list of all the plugin shortcodes present in the content
+ *
+ * @global array $shortcode_tags
+ * @param string $content the content to test
+ * @param string $tag
+ * @return array of plugin shortcode tags
+ */
+  public static function get_plugin_shortcodes($content = '', $tag = '[pdb_') {
+    
+    $shortcodes = array();
+    // get all shortcodes
+    preg_match_all('/' . get_shortcode_regex() . '/s', $content, $matches, PREG_SET_ORDER);
+    
+    // none found
+    if (!empty($matches[0][0]) && false === strpos($matches[0][0], $tag))
+      return false;
+    // check each one for a plugin shortcode
+    foreach ($matches as $shortcode) {
+      $shortcodes[] = $shortcode[2] . '-shortcode';
+    }
+    return $shortcodes;
+  }
+/**
  * check a string for a shortcode
  *
  * modeled on the WP function of the same name
@@ -597,6 +629,7 @@ class PDb_Base {
  * the common prefix
  *
  * @global array $shortcode_tags
+ * @param string $content the content to test
  * @param string $tag
  * @return boolean
  */

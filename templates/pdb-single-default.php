@@ -20,7 +20,6 @@
 
 // define an array of fields to exclude here
 $exclude = array();
-
 ?>
 
 <div class="wrap <?php echo $this->wrap_class ?>">

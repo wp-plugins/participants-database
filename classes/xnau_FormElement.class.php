@@ -616,7 +616,7 @@ abstract class xnau_FormElement {
     
     wp_editor(
             htmlspecialchars_decode($value),
-            preg_replace( '#[0-9_-]#', '', $this->prefix . $this->name ),
+            preg_replace( array('#-#', '#[^a-z_]#'), array('_', ''), strtolower($this->prefix . $this->name) ),
             array(
                 'media_buttons' => false,
                 'textarea_name' => $this->name,
@@ -1033,7 +1033,7 @@ abstract class xnau_FormElement {
   {
     
     // checkboxes are grouped, radios are not
-    $this->group = $type == 'checkbox' ? true : false;
+    $this->group = $type === 'checkbox';
 		
 		$class = '';
     if (!empty($this->classes)) {
@@ -1220,7 +1220,7 @@ abstract class xnau_FormElement {
       // in admin, emails are plaintext
       if (is_admin())
         return esc_html($field->value);
-
+      $linktext = $URI;
       $URI = 'mailto:' . $URI;
     } else {
       return $field->value; // if it is neither URL nor email address nor defined link

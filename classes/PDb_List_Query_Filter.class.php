@@ -144,7 +144,7 @@ class PDb_List_Query_Filter {
    if ($term === 'null' || $term === ''  || is_null($term)) {
      $this->term = '';
    } else {
-     $this->term = filter_var($term, FILTER_SANITIZE_STRING);
+     $this->term = filter_var(PDb_FormElement::get_title_value($term, $this->field), FILTER_SANITIZE_STRING);
    }
   }
   /**

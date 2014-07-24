@@ -4,7 +4,7 @@ PDbAdmin = (function($) {
     init: function() {
       $('input[placeholder], textarea[placeholder]').placeholder();
       $('.participants_db .ui-tabs-nav li').append($('<span class="mask"/>'));
-      $('.manage-fields-wrap').on('focus', '.manage-fields input[type="text"]:not([id*=other], .digit)', function() {
+      $('.manage-fields-wrap').on('focus', '.manage-fields input[type="text"]:not([id*=other], .digit, [readonly])', function() {
         $(this).addClass('focused').closest('td').addClass('focused');
       }).on('blur', '.manage-fields input[type="text"]', function() {
         $(this).removeClass('focused').closest('td').removeClass('focused');

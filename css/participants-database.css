@@ -208,6 +208,9 @@ input.otherfield[type=text] {
 .pdb-searchform input[type=radio] {
   margin-left:5px;
 }
+.pdb-searchform .radio-group {
+  display: inline-block;
+}
 
 /* pagination */
 .pdb-list .pagination,

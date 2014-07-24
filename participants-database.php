@@ -118,11 +118,6 @@ class Participants_Db extends PDb_Base {
    */
   public static $plugin_path;
   /**
-   * URL for the plugin directory
-   * @var string 
-   */
-  public static $plugin_url;
-  /**
    * absolute path to the uploads directory
    * @var string 
    */
@@ -191,7 +186,7 @@ class Participants_Db extends PDb_Base {
   /**
    * the date format; defaults to the WP global setting, but can be changed within the plugin
    *
-   * @var string PHP date formatting string
+   * @var string
    */
   public static $date_format;
   /**
@@ -240,8 +235,7 @@ class Participants_Db extends PDb_Base {
     // define some locations
     self::$default_options = self::$prefix . 'default_options';
     self::$plugin_page = self::PLUGIN_NAME;
-    self::$plugin_path = dirname(__FILE__);
-    self::$plugin_url = WP_PLUGIN_URL . '/' . self::PLUGIN_NAME;
+    self::$plugin_path = plugin_dir_path(__FILE__);
     // this is relative to the WP install
     self::$uploads_path = 'wp-content/uploads/' . self::PLUGIN_NAME . '/';
 
@@ -1369,7 +1363,8 @@ class Participants_Db extends PDb_Base {
        * ID or a private ID to be stored, we let the plugin assign them so that they 
        * will be certain to be unique
        */
-      unset($post['id'], $post['private_id']);
+      unset($post['id']);
+      $post['private_id'] = '';
     }
     // set the insert status value
     self::$insert_status = $action;
@@ -2245,7 +2240,7 @@ class Participants_Db extends PDb_Base {
 
       case 'signup' :
         
-        $_POST['private_id'] = self::generate_pid();
+        $_POST['private_id'] = '';
         $columns[] = 'private_id';
         
         // route the $_POST data through a callback if defined
@@ -3029,8 +3024,14 @@ class Participants_Db extends PDb_Base {
     if (version_compare(get_bloginfo('version'), '3.8', '>=')) {
       $classes[] = 'has-dashicons';
     }
-    if (Participants_Db::$shortcode_present) {
+    global $post;
+    $shortcodes = self::get_plugin_shortcodes($post->post_content);
+    
+    if (!empty($shortcodes)) {
       $classes[] = 'participants-database-shortcode';
+      foreach ($shortcodes as $shortcode) {
+        $classes[] = $shortcode;
+      }
     }
     return $classes;
   }
@@ -3058,7 +3059,7 @@ class Participants_Db extends PDb_Base {
     ?>
     <div id="PDb_footer" class="widefat redfade postbox">
       <div class="section">
-        <h4><?php echo self::$plugin_title, ' ', self::$plugin_version ?><br /><?php _e('WordPress Plugin', 'participants-database') ?></h4>
+        <h4><?php echo 'Participants Database ', self::$plugin_version ?><br /><?php _e('WordPress Plugin', 'participants-database') ?></h4>
         <p><em><?php _e('Helping organizations manage their volunteers, members and participants.', 'participants-database') ?></em></p>
       </div>
       <div class="section">

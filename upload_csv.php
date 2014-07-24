@@ -116,7 +116,7 @@ set_transient(Participants_Db::$prefix . 'csv_import_params', $csv_params);
             <?php
             switch (Participants_Db::$plugin_options['unique_email']) :
               case 1:
-                printf(__('%sOverwrite%s an existing record with a matching %s will be updated with the data from the imported record. Blank or missing fields will not overwrite existing data.', 'participants-database'), '<span class="emphasized">', '</span>', '<em>' . Participants_Db::$plugin_options['unique_field'] . '</em>');
+                printf(__('%sOverwrite%s an existing record with a matching %s will be updated with the data from the imported record. Blank or missing fields will not overwrite existing data.', 'participants-database'), '<span class="emphasized">', '</span>', '<em>' . Participants_Db::$fields[Participants_Db::$plugin_options['unique_field']]->title . '</em>');
                 break;
               case 0 :
                 printf(__('%sCreate New%s adds all imported records as new records without checking for a match.', 'participants-database'), '<span class="emphasized">', '</span>', '</span>');

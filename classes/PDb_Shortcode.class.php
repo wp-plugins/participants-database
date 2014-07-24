@@ -308,12 +308,12 @@ abstract class PDb_Shortcode {
 
     if (!file_exists($template)) {
       
-      $template = Participants_Db::$plugin_path . '/templates/pdb-' . $this->module . '-' . $this->template_name . '.php';
+      $template = Participants_Db::$plugin_path . 'templates/pdb-' . $this->module . '-' . $this->template_name . '.php';
     }
 
     if (!file_exists($template)) {
 
-      $template = Participants_Db::$plugin_path . '/templates/pdb-' . $this->module . '-default.php';
+      $template = Participants_Db::$plugin_path . 'templates/pdb-' . $this->module . '-default.php';
     }
 
     if (!file_exists($template)) {

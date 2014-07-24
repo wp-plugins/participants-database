@@ -16,21 +16,21 @@ if (empty($this->shortcode_atts['fields'])) {
 } else {
 
   /*
-   * if the "fields" attribute is defined, we will be totaling values in the first 
-   * column named in the attribute
+   * if the "fields" attribute is defined, we will be totaling values from the named fields
    */
   $total = 0;
   /* 
-   * make an array of the fields attribute, although this implementation only uses 
-   * the first field listed
+   * make an array of the fields attribute, then total all the named fields from all the records
    * 
    */
   $fields = explode(',', str_replace(' ', '', $this->shortcode_atts['fields']));
   while ($this->have_records()) : $this->the_record();
     foreach ($this->record->values as $name => $value) {
-      if ($name == $fields[0]) {
-        $total = $total + floatval($value);
-      }
+      foreach ($fields as $field) {
+        if ($name == $field) {
+					$total = $total + floatval($value);
+				}
+			}
     }
   endwhile;
 
