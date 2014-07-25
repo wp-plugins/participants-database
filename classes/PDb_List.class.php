@@ -426,7 +426,7 @@ class PDb_List extends PDb_Shortcode {
 
       if ($this->_sort_filter_mode() == 'filter' || $this->_sort_filter_mode() == 'both') {
 
-        $output[] = '<fieldset class="widefat">';
+        $output[] = '<fieldset class="widefat inline-controls">';
 
         $output[] = sprintf('<legend>%s:</legend>', __('Search', 'participants-database'));
 
@@ -441,7 +441,7 @@ class PDb_List extends PDb_Shortcode {
               ( ! empty( $this->sortables ) and is_array( $this->sortables ) ) 
               ) {
 
-        $output[] = '<fieldset class="widefat">';
+        $output[] = '<fieldset class="widefat inline-controls">';
 
         $output[] = sprintf('<legend>%s:</legend>', __('Sort by', 'participants-database'));
 
