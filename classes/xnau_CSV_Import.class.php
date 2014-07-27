@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    0.1
+ * @version    0.2
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    zydev_parseCSV class
  *
@@ -21,28 +21,61 @@
 
 abstract class xnau_CSV_Import {
 
-  // array of all the valid column names in the receiving database
+  /**
+   * @var array all the valid column names in the receiving database
+   */
   var $column_names;
+  /**
+   *
+   * @var int number of valid columns
+   */
   var $column_count;
-  // holds the system path to the web root
+  /**
+   * @var string holds the system path to the web root
+   */
   var $root_path;
-  // holds the path to the target location for the uploaded file 
+  /**
+   * @var string holds the path to the target location for the uploaded file 
+   */
   var $upload_directory;
-  // holds the name of the $_POST element with the uploaded file name
+  /**
+   * @var string holds the name of the $_POST element with the uploaded file name
+   */
   var $file_field_name;
-  // holds any errors or confirmation messages
+  /**
+   * @var array holds any errors or confirmation messages
+   */
   var $errors;
-  // status of the error message
+  /**
+   *  @var string status of the error message
+   */
   var $error_status = 'updated';
-  // holds the number of inserted, skipped or updated records
+  /**
+   * @var int holds the number of inserted records
+   */
   var $insert_count = 0;
+  /**
+   * @var int holds the number of updated records
+   */
   var $update_count = 0;
+  /**
+   * @var int holds the number of skipped records
+   */
   var $skip_count = 0;
-  // holds the context string for the internationalization functions
+  /**
+   * @var string holds the context string for the internationalization functions
+   */
   var $i10n_context;
-  // the zydev_parseCSV instance
+  /**
+   * @var object the zydev_parseCSV instance
+   */
   var $CSV;
 
+  /**
+   * instantiates the object
+   * 
+   * @param type $file_field the name of the file upload POST array element
+   */
   function __construct($file_field) {
 
     $this->_set_root_path();
@@ -173,7 +206,11 @@ abstract class xnau_CSV_Import {
 
     foreach ($this->CSV->data as $csv_line) {
 
-      //error_log( __METHOD__.' csv line= '.print_r( $csv_line, true ) );
+      if (WP_DEBUG) error_log( __METHOD__.'
+        
+columns:'.implode(',',$this->column_names).'
+  
+csv line= '.print_r( $csv_line, true ) );
 
       $values = array();
 
@@ -214,7 +251,7 @@ abstract class xnau_CSV_Import {
    */
   protected function process_value($value) {
     global $wpdb;
-    return $wpdb->escape($this->_enclosure_trim($value, '', $this->CSV->enclosure));
+    return esc_sql($this->_enclosure_trim($value, '', $this->CSV->enclosure));
   }
 
   /**
@@ -229,9 +266,7 @@ abstract class xnau_CSV_Import {
    */
   public function _enclosure_trim(&$value, $key, $enclosure) {
 
-    $enclosure = preg_quote($enclosure);
-
-    $value = preg_replace("#^($enclosure?)(.*)\\1$#", '$2', $value);
+    $value = preg_replace("#^(" . preg_quote($enclosure) . ")(.*)\\1$#", '$2', $value);
 
     return $value;
   }

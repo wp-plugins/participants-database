@@ -7,7 +7,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.4
+ * @version    Release: 1.5.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -158,7 +158,7 @@ class PDb_FormElement extends xnau_FormElement {
 
           $image = new PDb_Image(array(
               'filename' => $field->value,
-              'link' => (isset($field->link) ? $field->link : ''),
+              'link' => isset($field->link) ? $field->link : false,
               'mode' => 'both',
               'module' => $field->module,
               ));
@@ -178,8 +178,6 @@ class PDb_FormElement extends xnau_FormElement {
             $return = $field->value;
           }
           
-          
-
         break;
         
       case 'file-upload' :
@@ -207,7 +205,7 @@ class PDb_FormElement extends xnau_FormElement {
         if (self::is_empty($field->value) === false) {
           $date = Participants_Db::parse_date($field->value, $field);
           $format = Participants_Db::$date_format;
-          if (Participants_Db::$plugin_options['show_time'] == '1' and $field->form_element == 'timestamp') {
+          if (Participants_Db::plugin_setting_is_true('show_time') and $field->form_element === 'timestamp') {
             $format .= ' ' . get_option('time_format');
           }
           $return = date_i18n($format, $date);
@@ -227,6 +225,7 @@ class PDb_FormElement extends xnau_FormElement {
         $multivalues = Participants_Db::unserialize_array($field->value);
         // remove empty elements and convert to string for display
         $multivalues = array_filter((array)$multivalues, array( __CLASS__, 'is_displayable'));
+        
         $titles = array();
         foreach($multivalues as $value) {
           $titles[] = self::get_value_title($value, $field->name);
@@ -236,7 +235,7 @@ class PDb_FormElement extends xnau_FormElement {
 
       case 'link' :
 
-        $linkdata = Participants_Db::unserialize_array($field->value);
+        $linkdata = maybe_unserialize($field->value);
 
         if (!is_array($linkdata)) {
 
@@ -277,9 +276,25 @@ class PDb_FormElement extends xnau_FormElement {
         $return = sprintf('<span class="textarea richtext">%s</span>', Participants_Db::process_rich_text($field->value));
         break;
       
+      case 'dropdown':
+      case 'radio':
+      case 'checkbox':
+      case 'dropdown-other':
+      case 'select-other':
+        
+        $return = sprintf('<span class="%s">%s</span>', $field->form_element, self::get_value_title($field->value, $field->name) );
+        break;
+      
+      case 'hidden':
+        
+        // error_log(__METHOD__.' comparing: '.$field->value . ' and '. $field->default);
+        
+        if ($field->value === $field->default) {
+          $field->value = '';
+        }
+      
       default :
 
-        $field->value = self::get_value_title($field->value, $field->name);
         $return = self::make_link($field);
 
       endswitch;
@@ -328,11 +343,15 @@ class PDb_FormElement extends xnau_FormElement {
 
     $this->_addline($this->print_hidden_fields(array('MAX_FILE_SIZE' => $max_size, $this->name => $this->value)));
 
+    if (!isset($this->attributes['readonly'])) {
+    
     $this->_addline($this->_input_tag('file'));
 
     // add the delete checkbox if there is a file defined
     if (!empty($this->value))
       $this->_addline('<span class="file-delete" ><label><input type="checkbox" value="delete" name="' . $this->name . '-deletefile" ' . $this->_attributes () . '>' . __('delete', 'participants-database') . '</label></span>');
+    
+    }
     
     $this->_addline('</div>');
   }
@@ -357,18 +376,22 @@ class PDb_FormElement extends xnau_FormElement {
    */
   public static function make_link($field, $template = false, $get = false) {
   
-    // AJAX requests are not really from the admin
+    /*
+     * determine if the current user is in the admin and not doing an AJAX call
+     */
     $in_admin = is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX);
 
     // clean up the provided string
     $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($field->value))));
-    // use the default value if present for the link text
-    $linktext = empty($field->value) ? $field->default : $field->value;
 
-    if (isset($field->link) and !empty($field->link)) {
-      // if the field is a single record link or other kind of defined link field
+    if (isset($field->link) && !empty($field->link)) {
+      /*
+       * the field is a single record link or other field with the link property 
+       * set, which becomes our href
+       */
       $URI = $field->link;
-    } elseif (filter_var($URI, FILTER_VALIDATE_URL) && Participants_Db::$plugin_options['make_links']) {
+      $linktext = $field->value;
+    } elseif (filter_var($URI, FILTER_VALIDATE_URL) !== false && Participants_Db::plugin_setting_is_true('make_links')) {
 
       // convert the get array to a get string and add it to the URI
       if (is_array($get)) {
@@ -377,21 +400,18 @@ class PDb_FormElement extends xnau_FormElement {
 
         $URI .= http_build_query($get);
       }
-    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && Participants_Db::$plugin_options['make_links']) {
+    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) !== false && Participants_Db::plugin_setting_is_true('make_links')) {
 
-      // in admin, emails are plaintext
-      if ($in_admin)
-        return esc_html($field->value);
-
-      if (Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email && ! $in_admin) {
+      if (Participants_Db::plugin_setting_is_true('email_protect') && ! Participants_Db::$sending_email) {
 
         // the email gets displayed in plaintext if javascript is disabled; a clickable link if enabled
         list( $URI, $linktext ) = explode('@', $URI, 2);
-        $template = '<a class="obfuscate" rel=\'{"name":"%1$s","domain":"%2$s"}\'>%1$s AT %2$s</a>';
+        $template = '<a class="obfuscate" data-email-values=\'{"name":"%1$s","domain":"%2$s"}\'>%1$s AT %2$s</a>';
       } else {
+        $linktext = $URI;
         $URI = 'mailto:' . $URI;
       }
-    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) && ! Participants_Db::$plugin_options['make_links'] && Participants_Db::$plugin_options['email_protect'] && ! Participants_Db::$sending_email) {
+    } elseif (filter_var($URI, FILTER_VALIDATE_EMAIL) !== false && Participants_Db::plugin_setting_is_true('email_protect') && ! Participants_Db::$sending_email) {
       
       // only obfuscating, not making links
       return vsprintf('%1$s AT %2$s', explode('@', $URI, 2));
@@ -421,7 +441,7 @@ class PDb_FormElement extends xnau_FormElement {
 
     if (Participants_Db::is_valid_timestamp($timestamp)) {
       
-      $format = Participants_Db::$date_format;
+      $format = Participants_Db::plugin_setting_is_true('strict_dates') ? Participants_Db::plugin_setting('input_date_format') : Participants_Db::$date_format;
       
       if ($time) {
         $format .= ' ' . get_option('time_format');
@@ -446,16 +466,48 @@ class PDb_FormElement extends xnau_FormElement {
    * the value is returned unchanged
    * 
    * @global object $wpdb
+   * @param array $values
+   * @param string $fieldname
+   * @return array of value=>title pairs
+   */
+  public static function get_value_titles($values, $fieldname)
+  {
+    $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
+    $return = array();
+    if (is_array($options_array)) {
+      $i = 0;
+      foreach ($options_array as $index => $option_value) {
+        if (!is_string($index) or $index == 'other') {
+          // we use the stored value
+          $return[$option_value] = $option_value;
+        } elseif ($option_value == $values[$i]) {
+          // grab the option title
+          $return[$option_value] = $index;
+        }
+        $i++;
+      }
+    }
+    return $return;
+  }
+ 
+  /**
+   * get the title that corresponds to a value from a value series
+   * 
+   * this func grabs the value and matches it to a title from a list of values set 
+   * for a particular field
+   * 
+   * if there is no title defined, or if the values is stored as a simple string, 
+   * the value is returned unchanged
+   * 
+   * @global object $wpdb
    * @param string $value
    * @param string $fieldname
    * @return string the title matching the value
    */
   public static function get_value_title($value, $fieldname)
   {
-    global $wpdb;
-    $sql = 'SELECT f.values FROM ' . Participants_Db::$fields_table . ' AS f WHERE f.name = "%s"';
-    $options_array = maybe_unserialize($wpdb->get_var($wpdb->prepare($sql, $fieldname)));
-
+    if (isset(Participants_Db::$fields[$fieldname])) {
+      $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
     if (is_array($options_array)) {
       foreach ($options_array as $index => $option_value) {
         if (!is_string($index) or $index == 'other') {
@@ -464,6 +516,25 @@ class PDb_FormElement extends xnau_FormElement {
           // grab the option title
           return $index;
         }
+      }
+    }
+    }
+    return $value;
+  }
+  
+  /**
+   * gets the value that corresponds to a value title
+   * 
+   * @param string $title the title of the value
+   * @param string $fieldname the name of the field
+   * @return string the value that matches the title given
+   */
+  public static function get_title_value($title, $fieldname) {
+    $value = $title;
+    if (isset(Participants_Db::$fields[$fieldname])) {
+      $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
+      if (is_array($options_array) && isset($options_array[$title])) {
+        $value = $options_array[$title];
       }
     }
     return $value;

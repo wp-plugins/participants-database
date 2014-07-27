@@ -21,8 +21,8 @@ class PDb_Record extends PDb_Shortcode {
     $add_atts = array(
         'module' => 'record',
         'class' => 'edit-participant ' . $this->wrap_class,
+        'submit_button' => Participants_Db::plugin_setting('save_changes_button'),
     );
-
     // run the parent class initialization to set up the parent methods 
     parent::__construct($shortcode_atts, $add_atts);
 
@@ -97,13 +97,16 @@ class PDb_Record extends PDb_Shortcode {
    * prints the submit button
    *
    * @param string $class a classname for the submit button, defaults to 'button-primary'
+   * @param string $button_value submit button text
    * 
    */
-  private function print_submit_button($class = 'button-primary') {
+  public function print_submit_button($class = 'button-primary', $button_value = false) {
+    
+    $button_value = $button_value ? $button_value : $this->shortcode_atts['submit_button'];
 
     $pattern = '<input class="%s pdb-submit" type="submit" value="%s" name="save" >';
 
-    printf($pattern, $class, $this->options['save_changes_button']);
+    printf($pattern, $class, $button_value);
   }
 
   /**
@@ -111,7 +114,7 @@ class PDb_Record extends PDb_Shortcode {
    */
   private function print_save_changes_label() {
 
-    echo $this->options['save_changes_label'];
+    echo Participants_Db::plugin_setting('save_changes_label');
   }
 
 }

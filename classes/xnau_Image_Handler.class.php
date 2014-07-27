@@ -94,6 +94,10 @@ abstract class xnau_Image_Handler {
    */
   var $defaultclass = 'default-image';
   /**
+   * @var string the "rel" attribute of the image
+   */
+  var $relstring;
+  /**
    * determines the display mode for the returned HTML:
    *    image - shows the image (default)
    *    filename - shows the filename
@@ -139,6 +143,7 @@ abstract class xnau_Image_Handler {
     $this->link = isset($config['link']) ? $config['link'] : '';
     $this->classname = isset($config['classname']) ? $config['classname'] : 'image-field-wrap';
     $this->display_mode = isset($config['mode']) ? $config['mode'] : 'image';
+    $this->relstring = isset($config['relstring']) ? $config['relstring'] : 'lightbox';
     $this->module = isset($config['module']) ? $config['module'] : '';
 
     $this->_file_setup();
@@ -188,7 +193,8 @@ abstract class xnau_Image_Handler {
             sprintf($this->image_wrap[0], 
                     $this->classname, 
                     $this->link, 
-                    basename($this->image_uri)
+                    basename($this->image_uri),
+                    $this->relstring
                     ), 
             $this->image_uri, 
             $this->image_wrap[1],

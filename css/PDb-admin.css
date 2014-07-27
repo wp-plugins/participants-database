@@ -1,6 +1,8 @@
 @charset "UTF-8";
 
 /* Participants DB Admin CSS */
+
+/*** PARTICIPANT LIST ***/
 body[class*='participants-database'] .widefat td {
   vertical-align:middle;
 }
@@ -11,13 +13,16 @@ body[class*='participants-database']  .widefat tr:nth-child(even) {
   width: 99%;
   max-width: 400px;
 }
-td.focused {
+.widefat.manage-fields td.focused {
   position: relative;
+  z-index: 10000;
+  overflow: visible;
 }
-input.focused {
+.widefat.manage-fields input.focused {
   position:absolute;
   margin-top:-1em;
   z-index: 200;
+  width: 400px;
 }
 .participants_db input.add_field {
   width: 250px;
@@ -25,6 +30,8 @@ input.focused {
 .manage-fields.widefat td,
 .manage-fields.widefat th {
     padding: 8px 5px;
+    position: relative;
+    z-index: 1;
 }
 .participants_db option[value='none'],
 .participants_db option[value='other'] {
@@ -37,6 +44,8 @@ input.focused {
 }
 .participants_db .manage-fields {
   z-index: 1;
+  position: relative;
+  zoom: 1;
 }
 .participants_db .manage-fields input[type="text"].digit {
   width: 30px;
@@ -48,33 +57,24 @@ input.focused {
 .participants_db .manage-fields textarea {
   width: 100%;
 }
+.pre-mp6 .participants_db fieldset.widefat {
+  border: none;
+}
 .pagination {
   margin-bottom: 20px;
 }
 .branch-3-7 .redfade,
-.branch-3-6 .redfade {
+.branch-3-6 .redfade,
+.branch-3-5 .redfade {
   box-shadow: 0 0 40px rgba(197, 99, 59, 0.3) inset;
   border-color: rgba(197, 99, 59, 0.5);
   background-color: rgb( 255,255,255);
 }
 [class*="pdb-"] p,
+[class*="pdb-"] h4,
 .multicheckbox,
 .selectother {
   max-width: 950px;
-}
-#PDb_footer {
-  display: inline-block;
-  background-color: rgba(245, 156, 0, 0.1);
-  border-color: rgba(245, 156, 0, 0.4);
-  padding:7px;
-  width:auto;
-  overflow:auto;
-}
-#PDb_footer .icon-xnau-glyph {
-  font-size: 275%;
-  margin-right: 0.5ex;
-  float: left;
-  background-color: #ffffff;
 }
 fieldset.widefat {
   width:100%;
@@ -88,7 +88,40 @@ fieldset.widefat.inline-controls input,
 fieldset.widefat.inline-controls  select,
 fieldset.widefat.inline-controls label {
   margin: 0 5px;
-  vertical-align: middle;
+  vertical-align: baseline;
+}
+fieldset.widefat.inline-controls input:first-of-type,
+fieldset.widefat.inline-controls  select:first-of-type,
+fieldset.widefat.inline-controls label:first-of-type {
+  margin-left: 0;
+}
+fieldset.widefat.inline-controls label {
+  padding-right: 15px;
+}
+.wp-core-ui .button, .wp-core-ui .button-primary, .wp-core-ui .button-secondary {
+    height: auto;
+    line-height: 24px;
+}
+.pdb-searchform .filter-count {
+  display: inline-block;
+  margin-left: 30px;
+  width: 50%;
+}
+
+/*** FOOTER ***/
+#PDb_footer {
+  display: inline-block;
+  background-color: rgba(245, 156, 0, 0.1);
+  border-color: rgba(245, 156, 0, 0.4);
+  padding:7px;
+  width:auto;
+  overflow:auto;
+}
+#PDb_footer .icon-xnau-glyph {
+  font-size: 275%;
+  margin-right: 0.5ex;
+  float: left;
+  background-color: #ffffff;
 }
 #PDb_footer .section {
   width:280px;
@@ -105,6 +138,10 @@ h4 .lowast {
   position: relative;
   top: -3px;
 }
+.admin-edit-participant .fieldnote {
+  color: #AAAAAA;
+  font-style: italic;
+}
 input[readonly] {
   border:none;
   background:none transparent;
@@ -112,6 +149,7 @@ input[readonly] {
 }
 input.focused[readonly] {
   background-color: #ffffff;
+  border: 1px solid #999;
 }
 body[class*='participants-database'] a.delete {
 /*  display:block;
@@ -132,6 +170,7 @@ body[class*='participants-database'] .form-table {
 .wp-admin .helptext {
   line-height: 1.5;
   color: #777777;
+  font-style: italic;
 }
 .wp-list-table th, .wp-list-table td, .form-table th, .form-table td {
   vertical-align: top;
@@ -181,6 +220,9 @@ label input[type="checkbox"] {
   /*  float: none;
     display: inline;
     margin-right:0;*/
+}
+.pdb-admin-edit-participant .pdb-upload input[type=file] {
+  vertical-align: middle;
 }
 #checkall {
   margin: 0;
@@ -237,7 +279,7 @@ body[class*='participants-database'] .text-block li {
 }
 #delete_button.armed {
   border: 1px solid rgba(204, 0, 0, 0.5);
-  box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;
+/*  box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;*/
 }
 #delete_button.armed:hover {
   box-shadow: 0 0 2px rgba(204, 0, 0, 0.1) inset;
@@ -270,6 +312,9 @@ body[class*='participants-database'] .text-block li {
   max-width: 150px;
   overflow: auto;
 }
+.number-entry.single-digit {
+  width: 4em;
+}
 /* set placeholder colors */
 ::-webkit-input-placeholder {
   color: #AAAAAA;
@@ -286,8 +331,14 @@ body[class*='participants-database'] .text-block li {
 :focus:-moz-placeholder {
   color: transparent !important;
 }
+.pdb-admin-edit-participant .fieldnote {
+  color: #AAAAAA;
+  display: inline-block;
+  margin-left: 10px;
+  font-weight: normal;
+}
 
-/* manage fields */
+/***  MANAGE FIELDS  ***/
 div.manage-fields-wrap {
   min-width:1100px;
 }
@@ -405,15 +456,18 @@ a.dragger {
   cursor: move;
 }
 .branch-3-7 .glyphicon.glyphicon-sort:after, 
-.branch-3-6 .glyphicon.glyphicon-sort:after {
+.branch-3-6 .glyphicon.glyphicon-sort:after, 
+.branch-3-5 .glyphicon.glyphicon-sort:after {
   content: "↕";
 }
 .branch-3-7 .glyphicon.glyphicon-remove:after, 
-.branch-3-6 .glyphicon.glyphicon-remove:after {
+.branch-3-6 .glyphicon.glyphicon-remove:after, 
+.branch-3-5 .glyphicon.glyphicon-remove:after {
   content: "☓";
 }
 .branch-3-7 .glyphicon.glyphicon-edit:after, 
-.branch-3-6 .glyphicon.glyphicon-edit:after {
+.branch-3-6 .glyphicon.glyphicon-edit:after, 
+.branch-3-5 .glyphicon.glyphicon-edit:after {
   content: "✎";
 }
 .glyphicon.glyphicon-sort:after {
@@ -467,7 +521,8 @@ a.dragger {
   z-index: 1000;
 }
 .branch-3-7 .mask,
-.branch-3-6 .mask  {
+.branch-3-6 .mask,
+.branch-3-5 .mask  {
   background-color: white;
 }
 .ui-tabs-nav .mask {
@@ -512,7 +567,8 @@ a.dragger {
   margin-bottom:0;
 }
 .branch-3-7 .participants_db .ui-tabs-nav li,
-.branch-3-6 .participants_db .ui-tabs-nav li {
+.branch-3-6 .participants_db .ui-tabs-nav li,
+.branch-3-5 .participants_db .ui-tabs-nav li {
   margin: 1px 0 2px;
 }
 .participants_db .ui-tabs-nav .ui-state-default a {
@@ -608,15 +664,15 @@ a.dragger {
   font-family: inherit;
   font-size:1.1em;
   /* css3 drop shadow */
-  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+/*  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);*/
   /* css3 border radius */
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
-  background:#FFFBCC;
-  border: 1px solid #E6DB55;
+  background:#FFFFFF;
+  border: 1px solid #D54E21;
   /* styling of the dialog box, i have a fixed dimension for this demo */
   width:328px;
   /* make sure it has the highest z-index */
@@ -682,6 +738,14 @@ a.dragger {
 }
 .ui-dialog .ui-state-hover {
   border: 1px solid #b3b3b3;
+}
+.ui-dialog .ui-icon {
+  vertical-align: middle;
+}
+.ui-dialog .ui-icon.dashicons[class*="no"] {
+  color: #D54E21;
+}
+.ui-dialog .ui-icon.dashicons[class*="yes"] {
 }
 #confirmation-dialog p{
 }

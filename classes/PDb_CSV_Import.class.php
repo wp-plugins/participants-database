@@ -31,13 +31,34 @@ class PDb_CSV_Import extends xnau_CSV_Import {
 
     foreach ( $columns as $column ) {
     
-      if ( $column->CSV ) $this->column_names[] = $column->name;
+      if ( $column->CSV != '0') $this->column_names[] = $column->name;
     
     }
     
     $this->column_count = count( $this->column_names );
         
     
+  }
+  
+  /**
+   * takes a raw title row from the CSV and sets the column names array with it
+   * if the imported row is different from the plugin's defined CSV columns
+   *
+   */
+  protected function import_columns() {
+
+    // build the column names from the CSV if it's there
+    if (!$this->CSV->error and is_array($this->CSV->titles) and $this->column_names != $this->CSV->titles) {
+
+      $this->column_names = $this->CSV->titles;
+
+      $this->errors[] = __('New columns imported from the CSV file.', 'participants-database');
+
+      // remove enclosure characters
+      array_walk($this->column_names, array($this, '_enclosure_trim'), $this->CSV->enclosure);
+
+      $this->column_count = count($this->column_names);
+    }
   }
   
   function _set_upload_dir() {
@@ -52,13 +73,11 @@ class PDb_CSV_Import extends xnau_CSV_Import {
   /**
    * applies conditioning and escaping to the incoming value, also allows for a filter callback
    * 
-   * @global object $wpdb
    * @param type $value
    * @return string
    */
   function process_value($value) {
-    global $wpdb;
-    return Participants_Db::set_filter('csv_import_value', $wpdb->escape($this->_enclosure_trim($value, '', $this->CSV->enclosure)));
+    return Participants_Db::set_filter('csv_import_value', esc_sql($this->_enclosure_trim($value, '', $this->CSV->enclosure)));
   }
   
   function store_record( $post ) {
@@ -84,5 +103,45 @@ class PDb_CSV_Import extends xnau_CSV_Import {
     }
     
   }
+  
+  /**
+   * detect an enclosure character
+   *
+   * @todo experiment with doing this with a regex using a backreference 
+   *       counting repetitions of first and last character matches
+   *
+   * @param string $csv_file path to a csv file to read and analyze
+   * @return string the best guess enclosure character
+   */
+  protected function _detect_enclosure($csv_file) {
+    $post_enclosure = filter_input(INPUT_POST, 'enclosure_character', FILTER_SANITIZE_STRING);
+    if (empty($post_enclosure) && $post_enclosure !== 'auto' ) {
+      return $post_enclosure;
+    } else {
+      return parent::_detect_enclosure($csv_file);
+    }
+  }
+
+  /**
+   * determines the delimiter character in the CSV file
+   * 
+   * @param string $csv_file the CSV file to scan for a delimiter
+   * @return string the delimiter
+   */
+  protected function _detect_delimiter($csv_file) {
+    $post_delimiter = filter_input(INPUT_POST, 'delimiter_character', FILTER_SANITIZE_STRING);
+    if (empty($post_delimiter) && $post_delimiter !== 'auto' ) {
+      return $post_delimiter;
+    } else {
+      return parent::_detect_delimiter($csv_file);
+    }
+  }
+  
+  /*
+   * provides the current matching record policy
+   * 
+   * @return string
+   */
+  
   
 }

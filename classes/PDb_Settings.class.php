@@ -316,7 +316,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             (
             'type' => 'dropdown',
             'help_text' => __('when a signup is submitted or CSV record is imported, this field is checked for a duplicate', 'participants-database'),
-            'options' => array_merge($this->_get_display_columns(), array('Record ID' => 'id')),
+            'options' => array_merge($this->_get_identifier_columns(), array('Record ID' => 'id')),
             'value' => 'email',
         )
     );
@@ -465,6 +465,18 @@ class PDb_Settings extends xnau_Plugin_Settings {
         )
     );
     
+
+    $this->plugin_settings[] = array(
+        'name' => 'no_cookie_message',
+        'title' => __('No User Cookie Message', 'participants-database'),
+        'group' => 'pdb-signup',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('this plugin doesn\'t work if the user has cookies disabled. Show this message in place of the signup form if the user has cookies disabled.', 'participants-database'),
+            'value' => __('Please enable cookies in your browser to use this feature.', 'participants-database'),
+        )
+    );
+    
     /*******************************************************
      * 
      * link retrieval settings
@@ -517,6 +529,17 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'help_text' => __('The field used to identify the user&#39;s account. This must be a unique identifier for the record', 'participants-database'),
             'options' => $this->_get_identifier_columns(false),
             'value' => 'email',
+        )
+    );
+   
+    $this->plugin_settings[] = array(
+        'name' => 'id_field_prompt',
+        'title' => __('ID Field Help Text', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('help text for the record identification field', 'participants-database'),
+            'value' => __("Type in your %s, your private link will be emailed to you.", 'participants-database'),
         )
     );
    
@@ -1007,6 +1030,32 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'options' => array(1, 0),
         ),
     );
+    $this->plugin_settings[] = array(
+        'name' => 'empty_search',
+        'title' => __('Allow Empty Search', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __("This allows frontend searches to find records with missing or blank data.", 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'use_php_sessions',
+        'title' => __('Use PHP Sessions', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('uncheck this if PHP sessions are not working.', 'participants-database'),
+            'value' => 1,
+            'options' => array(1, 0),
+        ),
+    );
+
 
     /******************************************************
      *
@@ -1049,12 +1098,12 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $pagelist = array();
     
-    if (!$with_blank) $pagelist['null_select'] = false;
+    if ($with_blank) $pagelist['null_select'] = '';
 
     if ($with_none)
       $pagelist[__('Same Page', 'participants-database')] = 'none';
 
-    $pages = get_pages(array());
+    $pages = get_posts(array('post_type' => 'page', 'post_status' => array('publish','private'), 'posts_per_page' => -1));
 
     foreach ($pages as $page) {
 
@@ -1086,8 +1135,10 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     foreach ($columns as $column) {
 
-      if (in_array($column->form_element, array('text-line', 'image-upload', 'checkbox', 'placeholder')))
-        $columnlist[$column->title] = $column->name;
+      if (in_array($column->form_element, array('text-line', 'image-upload', 'checkbox', 'placeholder'))) {
+        $key = sprintf('%s (%s)', $column->title, $column->name);
+        $columnlist[$key] = $column->name;
+      }
     }
 
     return $columnlist;
@@ -1106,12 +1157,14 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $columnlist = $null ? array() : array('null_select' => false);
 
-    $sql = 'SELECT v.*, g.order FROM ' . Participants_Db::$fields_table . ' v INNER JOIN ' . Participants_Db::$groups_table . ' g ON v.group = g.name AND v.form_element IN ("text-line","hidden") ORDER BY g.order, v.order';
+    $sql = 'SELECT v.name, v.title FROM ' . Participants_Db::$fields_table . ' v INNER JOIN ' . Participants_Db::$groups_table . ' g ON v.group = g.name AND v.form_element NOT IN ("rich-text","checkbox","radio","dropdown","date","dropdown-other","multi-checkbox","select-other","multi-select-other","link","image-upload","file-upload","hidden","password","captcha","placeholder","timestamp"   
+) ORDER BY g.order, v.order';
 
     $columns = $wpdb->get_results($sql, OBJECT_K);
 
     foreach ($columns as $column) {
-        $columnlist[$column->title] = $column->name;
+        $key = sprintf('%s (%s)', $column->title, $column->name);
+        $columnlist[$key] = $column->name;
     }
 
     return $columnlist;
@@ -1277,6 +1330,8 @@ class PDb_Settings extends xnau_Plugin_Settings {
    * @return array the sanitized array
    */
   public function validate($settings) {
+
+    $this->increment_option_version();
 
     foreach ($settings as $name => $value) {
 

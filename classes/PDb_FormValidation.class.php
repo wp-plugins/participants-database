@@ -238,35 +238,11 @@ class PDb_FormValidation extends xnau_FormValidation {
     $error_messages = array();
     $this->error_CSS = array();
 
-    foreach ($this->errors as $field => $error) :
+    foreach ($this->errors as $field => $error) {
 
-      $field_atts = Participants_Db::get_field_atts($field);
-
-      switch ($field_atts->form_element) {
-
-        case 'rich-text':
-        case 'text-area':
-        case 'textarea':
-          $element = 'textarea';
-          break;
-
-        case 'link':
-        case 'captcha':
-          $field_atts->name .= '[]';
-        case 'text':
-        case 'text-line':
-        case 'date':
-          $element = 'input';
-          break;
-
-        case 'image-upload':
-        case 'file-upload':
-          $element = 'input';
-          break;
-
-        default:
-          $element = false;
-      }
+      if ($field !== '') {
+      
+        $field_atts = clone Participants_Db::$fields[$field];
 
       $this->error_CSS[] = '[class*="'. Participants_Db::$prefix . '"] [name="' . $field_atts->name . '"]';
 
@@ -278,7 +254,12 @@ class PDb_FormValidation extends xnau_FormValidation {
         $this->error_class = empty($field) ? Participants_Db::$prefix . 'message' : Participants_Db::$prefix . 'error';
       }
 
-    endforeach; // $this->errors 
+      } else {
+        $error_messages[] = $error;
+        $this->error_class = Participants_Db::$prefix . 'message';
+      }
+
+    } // $this->errors 
 
     return $error_messages;
   }

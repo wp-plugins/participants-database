@@ -1,6 +1,6 @@
 <?php
 /*
- * this class is provided for backwards compatibility only since I prefixed all my class names
+ * this class is provided for backwards compatibility only
  * 
  * it won't work in environments where there is both a legacy call to the FormElement 
  * class and a conflicting class definition

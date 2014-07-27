@@ -2,7 +2,7 @@
 /*
  * plugin initialization class
  *
- * version 1.5
+ * version 1.5.4.6
  *
  * The way db updates will work is we will first set the "fresh install" db
  * initialization to the latest version's structure. Then, we add the "delta"
@@ -107,7 +107,8 @@ class PDb_Init
           INDEX  ( `group` ),
           PRIMARY KEY  ( `id` )
           )
-          DEFAULT CHARACTER SET utf8,
+          DEFAULT CHARACTER SET utf8
+          COLLATE utf8_unicode_ci
           AUTO_INCREMENT = 0
           ';
         $wpdb->query($sql);
@@ -125,6 +126,7 @@ class PDb_Init
           PRIMARY KEY ( `id` )
           )
           DEFAULT CHARACTER SET utf8
+          COLLATE utf8_unicode_ci
           AUTO_INCREMENT = 1
           ';
         $wpdb->query($sql);
@@ -132,7 +134,7 @@ class PDb_Init
         // create the main data table
         $sql = 'CREATE TABLE ' . Participants_Db::$participants_table . ' (
           `id` int(6) NOT NULL AUTO_INCREMENT,
-          `private_id` VARCHAR(6) NOT NULL,
+          `private_id` VARCHAR(6) NULL,
           ';
         foreach( array_keys( self::$field_groups ) as $group ) {
 
@@ -152,11 +154,12 @@ class PDb_Init
         }
 
         $sql .= '`date_recorded` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          `date_updated` TIMESTAMP NOT NULL,
-          `last_accessed` TIMESTAMP NOT NULL,
+          `date_updated` TIMESTAMP NULL DEFAULT NULL,
+          `last_accessed` TIMESTAMP NULL DEFAULT NULL,
           PRIMARY KEY  (`id`)
           )
           DEFAULT CHARACTER SET utf8
+          COLLATE utf8_unicode_ci
           ;';
 
         $wpdb->query($sql);
@@ -609,7 +612,13 @@ class PDb_Init
           
         } else {
           
-					$sql = 'ALTER TABLE ' . Participants_Db::$participants_table . ' MODIFY `' . implode('` BIGINT, MODIFY `', $fields) . '` BIGINT';
+          $results = $wpdb->get_results("SHOW COLUMNS FROM `" . Participants_Db::$participants_table . "`");
+          $columns = array();
+          foreach ($results as $result) {
+            $columns[] = $result->Field;
+          }
+          $fields = array_intersect($columns,$fields);
+					$sql = 'ALTER TABLE ' . Participants_Db::$participants_table . ' MODIFY COLUMN `' . implode('` BIGINT NULL, MODIFY COLUMN `', $fields) . '` BIGINT NULL';
 
 					if (false !== $wpdb->query($sql)) {
 						// set the version number this step brings the db to
@@ -631,6 +640,48 @@ class PDb_Init
             // set the version number this step brings the db to
             update_option( Participants_Db::$db_version_option, '0.9' );
           }
+        }
+      }
+      
+      if ('0.9' == get_option(Participants_Db::$db_version_option)) {
+        /*
+         * set TIMESTAMP fields to allow NULL and set the default to NULL
+         */
+        $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$participants_table . "` MODIFY COLUMN `date_updated` TIMESTAMP NULL DEFAULT NULL");
+        if ($success !== false)
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$participants_table . "` MODIFY COLUMN `last_accessed` TIMESTAMP NULL DEFAULT NULL");
+        /*
+         * set other "not null" columns to NULL so the empty default value won't trigger an error
+         */
+        if ($success !== false)
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$participants_table . "` MODIFY COLUMN `private_id` VARCHAR(6) NULL");
+        if ($success !== false)
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$fields_table . "` MODIFY COLUMN `name` VARCHAR(64) NULL");
+        if ($success !== false)
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$fields_table . "` MODIFY COLUMN `title` TINYTEXT NULL");
+        if ($success !== false)
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$fields_table . "` MODIFY COLUMN `group` VARCHAR(64) NULL");
+        if ($success !== false)
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$groups_table . "` MODIFY COLUMN `name` VARCHAR(64) NULL");
+        if ($success !== false)
+          $success = $wpdb->query("ALTER TABLE `" . Participants_Db::$groups_table . "` MODIFY COLUMN `title` TINYTEXT NULL");
+        //
+        if ($success !== false) {
+          $table_status = $wpdb->get_results("SHOW TABLE STATUS WHERE `name` = '" . Participants_Db::$participants_table . "'");
+          if (current($table_status)->Collation == 'utf8_general_ci') {
+            if ($success !== false)
+              $success = $wpdb->query("alter table `" . Participants_Db::$participants_table . "` convert to character set utf8 collate utf8_unicode_ci");
+            if ($success !== false)
+              $success = $wpdb->query("alter table `" . Participants_Db::$fields_table . "` convert to character set utf8 collate utf8_unicode_ci");
+            if ($success !== false)
+              $success = $wpdb->query("alter table `" . Participants_Db::$groups_table . "` convert to character set utf8 collate utf8_unicode_ci");
+          }
+        }
+
+        if ($success === false) {
+          error_log(__METHOD__ . ' database could not be updated: ' . $wpdb->last_error);
+        } else {
+          update_option(Participants_Db::$db_version_option, '1.0');
         }
       }
       

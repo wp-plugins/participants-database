@@ -20,13 +20,20 @@ $mode = isset($_POST['action']) && $_POST['action'] == 'success' ? 'success' : '
 
   <?php $this->print_form_head(); // this must be included before any fields are output ?>
   
-  <?php $this->field = new PDb_Field_Item( current($this->get_retrieve_field()) ); ?>
-    
     <table class="form-table pdb-signup">
 
-      <tbody>
+      <?php while ( $this->have_groups() ) : $this->the_group(); ?>
 
-        <tr class="<?php echo $this->field->form_element ?>">
+        
+      <tbody class="field-group">
+
+        <?php while ( $this->have_fields() ) : $this->the_field(); ?>
+        
+        <?php if ($this->field->name == Participants_Db::$plugin_options['retrieve_link_identifier']) {
+          $this->field->help_text = sprintf(Participants_Db::$plugin_options['id_field_prompt'], $this->field->title);
+        } ?>
+
+        <tr class="<?php $this->field->print_element_class() ?>">
 
           <th><?php $this->field->print_label(); // this function adds the required marker ?></th>
 
@@ -34,11 +41,19 @@ $mode = isset($_POST['action']) && $_POST['action'] == 'success' ? 'success' : '
 
             <?php $this->field->print_element(); ?>
 
-            <span class="helptext"><?php printf(__('Type in your %s, your private link will be emailed to you.','participants-database'),$this->field->title) ?></span>
+            <?php if ( $this->field->has_help_text() ) :?>
+            <span class="helptext"><?php $this->field->print_help_text() ?></span>
+            <?php endif ?>
             
           </td>
 
         </tr>
+  
+        <?php endwhile; // fields ?>
+        
+        </tbody><tbody class="field-group field-group-submit">
+
+      <?php endwhile; // groups ?>
         <tr>
           <td colspan="2" class="submit-buttons">
             

@@ -21,7 +21,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    1.5.4
+ * @version    1.5.5
  * @link       http://xnau.com/wordpress-plugins/
  *
  */
@@ -40,7 +40,7 @@ abstract class PDb_Shortcode {
    *
    * @var string a namespacing prefix
    */
-  var $prefix;
+  public $prefix;
   /**
    * @var string holds the name of the template
    */
@@ -54,11 +54,6 @@ abstract class PDb_Shortcode {
    */
   protected $output = '';
   /**
-   * TODO: eliminate the use of this; get the values from the base class
-   * @var array plugin options
-   */
-  protected $options;
-  /**
    * @var array default values for standard shortcode attributes
    */
   protected $shortcode_defaults;
@@ -69,7 +64,7 @@ abstract class PDb_Shortcode {
   /**
    * @var array a selected array of fields to display
    */
-  var $display_columns = false;
+  public $display_columns = false;
 	
   /**
 	 * holds the field groups array which will contain all the groups info and their fields
@@ -81,9 +76,10 @@ abstract class PDb_Shortcode {
   
 	/**
 	 * an array of all the hidden fields in a record, name=>value pairs
-	 * @var array
+   * 
+	 * @var array of defined hidden field names=>value pairs
 	 */
-	var $hidden_fields;
+	var $hidden_fields = array();
 	
   /**
 	 * holds the current record ID
@@ -160,11 +156,7 @@ abstract class PDb_Shortcode {
   /**
    * @var array all field objects used by the shortcode
    */
-  var $columns = array();
-  /**
-   * holds the current value of the "readonly_inputs" shortcode attribute
-   */
-  public static $readonly_inputs;
+  var $fields = array();
 
   /**
    * instantiates the shortcode object
@@ -176,13 +168,18 @@ abstract class PDb_Shortcode {
    */
   public function __construct($shortcode_atts, $subclass_shortcode_defaults = array()) {
     
-    // set the global shortcode flag
-    Participants_Db::$shortcode_present = true;
+    // increment the index each time this class is instantiated
+    Participants_Db::$instance_index++;
+    
+    // set the global shortcode flag and trigger the action on the first instantiation of this class
+    $this->plugin_shortcode_action();
+
+    Participants_Db::include_stylesheets();
+    Participants_Db::add_scripts();
 
     $this->prefix = Participants_Db::$prefix;
 
-    // increment the index each time this class is instantiated
-    Participants_Db::$instance_index++;
+    global $post;
 
     $this->shortcode_defaults = array(
         'title' => '',
@@ -193,9 +190,11 @@ abstract class PDb_Shortcode {
         'action' => '',
         'target_instance' => Participants_Db::$instance_index,
         'target_page' => '',
-        'readonly_inputs' => false,
         'record_id' => false,
         'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
+        'autocomplete' => 'off',
+        'submit_button' => Participants_Db::plugin_setting('signup_button_text'),
+        'post_id' => $post->ID,
     );
     
     // error_log(__METHOD__.' incoming shorcode atts:'.print_r($shortcode_atts,1));
@@ -205,7 +204,7 @@ abstract class PDb_Shortcode {
     
     $this->module = $this->shortcode_atts['module'];
     
-    self::$readonly_inputs = $this->shortcode_atts['readonly_inputs'];
+    $this->_setup_fields();
     
     /* 
      * save the shotcode attributes to the session array
@@ -214,15 +213,20 @@ abstract class PDb_Shortcode {
      * the actual values from the shortcode 
      */
     if ($this->shortcode_atts['filtering'] != 1) {
-    Participants_Db::$session->set($this->prefix . 'shortcode_atts', array( $this->module => array( Participants_Db::$instance_index => $this->shortcode_atts)));
+      static $clear = true;
+      if (is_null($clear) && filter_input(INPUT_GET,'shortcode_clear') === 'true') {
+        $clear = true;
+      }
+      if ($clear) {
+        Participants_Db::$session->clear('shortcode_atts');
+        $clear = false;
+      }
+      Participants_Db::$session->update('shortcode_atts', $this->shortcode_session());
     }
 
     $this->wrap_class = $this->prefix . $this->module . ' ' . $this->prefix . 'instance-' . Participants_Db::$instance_index;
 
-    //$this->module = $subclass->module;
-    $this->options = Participants_Db::$plugin_options;
-    
-    $this->display_groups = $this->_get_display_groups();
+    $this->_set_display_groups();
 
     $this->_set_display_columns();
 
@@ -242,6 +246,16 @@ abstract class PDb_Shortcode {
       $this->output = '<p class="alert alert-error">' . sprintf(_x('<%1$s>The template %2$s was not found.</%1$s> Please make sure the name is correct and the template file is in the correct location.', 'message to show if the plugin cannot find the template', 'participants-database'), 'strong', $this->template) . '</p>';
 
       return false;
+    }
+    /*
+     * don't show the signup form if cookies are disabled.
+     */
+    if ($this->module === 'signup' && Participants_Db::$session->no_user_cookie) {
+      $message = Participants_Db::plugin_setting('no_cookie_message');
+      if (!empty($message)) {
+        $this->output = '<p class="alert alert-error">' . $message . '</p>';
+        return false;
+      }
     }
 
     ob_start();
@@ -294,12 +308,12 @@ abstract class PDb_Shortcode {
 
     if (!file_exists($template)) {
       
-      $template = Participants_Db::$plugin_path . '/templates/pdb-' . $this->module . '-' . $this->template_name . '.php';
+      $template = Participants_Db::$plugin_path . 'templates/pdb-' . $this->module . '-' . $this->template_name . '.php';
     }
 
     if (!file_exists($template)) {
 
-      $template = Participants_Db::$plugin_path . '/templates/pdb-' . $this->module . '-default.php';
+      $template = Participants_Db::$plugin_path . 'templates/pdb-' . $this->module . '-default.php';
     }
 
     if (!file_exists($template)) {
@@ -339,7 +353,7 @@ abstract class PDb_Shortcode {
    */
   protected function _not_found() {
 
-    $this->output = empty($this->options['no_record_error_message']) ? '' : '<p class="alert alert-error">' . $this->options['no_record_error_message'] . '</p>';
+    $this->output = empty(Participants_Db::$plugin_options['no_record_error_message']) ? '' : '<p class="alert alert-error">' . Participants_Db::plugin_setting('no_record_error_message') . '</p>';
   }
 
   /**
@@ -460,8 +474,9 @@ abstract class PDb_Shortcode {
     /*
      * if pre-fill values for the signup form are present in the GET array, set them
      */
-    if (in_array($this->module, array('signup','retrieve')) and isset($_GET[$this->field->name])) {
-      $this->field->value = $_GET[$this->field->name];
+    $get_field_name = filter_input(INPUT_GET, $this->field->name, FILTER_SANITIZE_STRING);
+    if (in_array($this->module, array('signup','retrieve')) and !empty($get_field_name)) {
+      $this->field->value = $get_field_name;
     }
 
     $this->current_field_pointer++;
@@ -521,27 +536,18 @@ abstract class PDb_Shortcode {
 
     $this->record = new stdClass;
 
-    // get a list list of groups not displayed. We iterate through these because 
-    // we need to pick out the hidden fields
-    $skip_groups = $this->_get_display_groups(false);
+    $groups = Participants_Db::get_groups();
 
-    foreach (Participants_Db::get_groups('`title`,`name`,`description`') as $group) {
+    foreach ($this->display_groups as $group_name) {
 
-      if ($this->_has_group_fields($group['name'])) {
+      $group_fields = $this->_get_group_fields($group_name);
 
-        if (!in_array($group['name'], $skip_groups)) {
-          //add the group array as an object
-          $this->record->$group['name'] = (object) $group;
-          // create an object for the groups fields
-          $this->record->$group['name']->fields = new stdClass();
-        }
+      $this->record->$group_name = (object) $groups[$group_name];
+      $this->record->$group_name->fields = new stdClass();
 
-        //error_log ( __METHOD__.' group fields: '. print_r( $this->_get_group_fields( $group['name'] ), 1 )  );
+      $field_count = 0;
 
-        foreach ($this->_get_group_fields($group['name']) as $field) {
-
-          // add the module property
-          //$field->module = $this->module;
+      foreach ($group_fields as $field) {
 
           // set the current value of the field
           $this->_set_field_value($field);
@@ -550,22 +556,26 @@ abstract class PDb_Shortcode {
            * hidden fields are stored separately for modules that use them as
            * hidden input fields
            */
-          if ($field->form_element == 'hidden' and in_array($this->module, array('signup', 'record'))) {
+        if ($field->form_element == 'hidden' && in_array($field->name, $this->display_columns)) { // and in_array($this->module, array('signup', 'record'))
 
             $this->hidden_fields[$field->name] = $field->value;
-          } elseif (!in_array($group['name'], $skip_groups)) {
 
-            $this->_set_field_link($field);
+        } else {
 
-            // add the field to the list of fields
-            $this->columns[$field->name] = $field;
+          $this->_set_field_link($field);
 
             /*
              * add the field object to the record object
              */
-            $this->record->$group['name']->fields->{$field->name} = $field;
+          if (in_array($field->name, $this->display_columns)){
+            $field_count++;
+            $this->record->$group_name->fields->{$field->name} = $field;
+          }
           }
         }
+      if ($field_count === 0) {
+        // remove the empty group from the iterator
+        unset($this->record->$group_name);
       }
     }
 
@@ -580,23 +590,27 @@ abstract class PDb_Shortcode {
   /**
    *  gets the field attribues for named field
    * 
-   * @param string $field_name
+   * if given an array, returns an array of field objects
+   * 
+   * TODO: remove, looks unused
+   * 
+   * @param string|array $fields
    * @global object $wpdb
+   * @return single object or array of objects, indexed by field name
    */
-  protected function _get_record_field($field_name) {
+  protected function _get_record_field($fields) {
 
     global $wpdb;
-
     $columns = array('name', 'title', 'default', 'help_text', 'form_element', 'validation', 'readonly', 'values', 'persistent');
+    $field_objects = array();
 
-    $sql = 'SELECT v.' . implode(',v.', $columns) . ', "' . $this->module . '" AS "module" 
+    $sql = 'SELECT v.*, "' . $this->module . '" AS "module" 
             FROM ' . Participants_Db::$fields_table . ' v 
-            WHERE v.name = "' . $field_name . '" 
-            ';
+            WHERE v.name IN ("' . implode('","',(array)$fields) . '") 
+            ORDER BY v.order';
+    $result = $wpdb->get_results($sql, OBJECT_K);
 
-    $sql .= ' ORDER BY v.order';
-
-    return current($wpdb->get_results($sql, OBJECT_K));
+    return is_array($fields) ? $result : current($result);
   }
 
   /*   * **************
@@ -605,45 +619,44 @@ abstract class PDb_Shortcode {
 
   /**
    * gets the field attribues for all fields in a specified group
+   * 
+   * @var string $group the name of the group of fields to get
+   * @return array of field objects
    */
-  private function _get_group_fields($group) {
+  private function _get_group_fields($group)
+  {
 
-    global $wpdb;
-
-    $columns = array('name', 'title', 'default', 'help_text', 'form_element', 'validation', 'readonly', 'values', 'persistent');
-
-    $sql = 'SELECT v.' . implode(',v.', $columns) . ', "' . $this->module . '" AS "module" 
-            FROM ' . Participants_Db::$fields_table . ' v 
-            WHERE v.group = "' . $group . '" 
-            ';
+    $return = array();
+    foreach ($this->fields as $field) {
+      if ($field->group == $group) {
     switch ($this->module) {
 
       case 'signup':
       case 'thanks':
+          case 'retrieve':
 
-        if (!is_array($this->display_columns)) $sql .= ' AND v.signup = 1 AND v.form_element <> "placeholder"';
+            if ($field->form_element !== 'placeholder') {
+              $return[$field->name] = clone $field;
+            }
         break;
         
       case 'record':
 
-        if (!is_array($this->display_columns)) $sql .= ' AND v.form_element <> "placeholder"';
+            if ($field->form_element !== 'placeholder') {
+              $return[$field->name] = clone $field;
+            }
         break;
 
       default:
 
-        $sql .= ' AND v.form_element <> "captcha" AND v.form_element <> "placeholder"';
+            if (!in_array($field->form_element, array('placeholder', 'captcha'))) {
+              $return[$field->name] = clone $field;
+            }
+        }
+    }
     }
 
-    if (is_array($this->display_columns)) {
-      $sql .= ' AND v.name IN ("' . implode('","', $this->display_columns) . '")';
-    }
-
-    // this orders the hidden fields at the top of the list
-    $sql .= ' ORDER BY v.form_element = "hidden" DESC, v.order';
-
-    //error_log(__METHOD__.' query: '.$sql);
-
-    return $wpdb->get_results($sql, OBJECT_K);
+    return $return;
   }
 
   /**
@@ -654,26 +667,22 @@ abstract class PDb_Shortcode {
    */
   private function _has_group_fields($group) {
 
-    global $wpdb;
-
-    $sql = 'SELECT count(*)  
-            FROM ' . Participants_Db::$fields_table . ' v 
-            WHERE v.group = "%s" 
-            ';
+    foreach ($this->fields as $field) {
+      if ($field->group == $group) {
     switch ($this->module) {
-
       case 'signup':
       case 'thanks':
-
-        $sql .= ' AND v.signup = 1';
+            if ($field->signup > 0) {
+              return true;
+            }
         break;
+          default:
+            return true;  
     }
+      }
+    }
+    return false;
 
-    $sql .= ' ORDER BY v.order';
-
-    $result = $wpdb->get_var($wpdb->prepare($sql, $group));
-
-    return (bool) $result > 0;
   }
 
   /**
@@ -682,22 +691,35 @@ abstract class PDb_Shortcode {
    * first, attempts to get the list from the shortcode, then uses the defined as 
    * visible list from the database
    *
+   * if the "groups" attribute is used, it overrides the "display" group setting
+   *
    * @global object $wpdb
    * @param  bool $logic true to get display-enabled groups, false to get non-enabled groups
-   * @return array of group names
+   * @return null
    */
-  protected function _get_display_groups($logic = true)
+  protected function _set_display_groups($logic = true)
   {
 
     global $wpdb;
-    $return = array();
-    if (!empty($this->shortcode_atts['groups'])) {
+    $groups = array();
+    if (!empty($this->shortcode_atts['fields']) && $this->display_columns === false) {
+      
+      $this->_set_display_columns();
+      
+      foreach ($this->display_columns as $column) {
+        $column = $this->fields[$column];
+        $groups[$column->group] = true;
+      }
+      
+      $groups = array_keys($groups);
+      
+    } elseif (!empty($this->shortcode_atts['groups'])) {
 
       /*
        * process the shortcode groups attribute and get the list of groups defined
        */
       $list = array();
-      $groups_attribute = explode(',', $this->shortcode_atts['groups']);
+      $groups_attribute = explode(',', str_replace(array(' '), '', $this->shortcode_atts['groups']));
       foreach ($groups_attribute as $item) {
         if (Participants_Db::is_group($item))
           $list[] = trim($item);
@@ -712,24 +734,24 @@ abstract class PDb_Shortcode {
       $result = $wpdb->get_results($sql, ARRAY_N);
       foreach ($result as $group) {
         if (in_array(current($group), $list) === $logic) {
-          $return[] = current($group);
+            $groups[] = current($group);
         }
       }
     }
     }
-    if (count($return) === 0) {
+    if (count($groups) === 0) {
 
       $sql = 'SELECT g.name 
               FROM ' . Participants_Db::$groups_table . ' g
-              WHERE g.display = ' . ( $logic ? 1 : 0 );
+              WHERE g.display = "' . ( $logic ? '1' : '0' ) . '" ORDER BY g.order ASC';
 
       $result = $wpdb->get_results($sql, ARRAY_N);
 
       foreach ($result as $group) {
-        $return[] = current($group);
+        $groups[] = current($group);
       }
     }
-    return $return;
+    $this->display_groups = $groups;
   }
 
   /**
@@ -745,16 +767,15 @@ abstract class PDb_Shortcode {
    * @param object $field the current field object
    * @return string the value of the field
    */
-  protected function _set_field_value(&$field) {
+  protected function _set_field_value($field) {
 
     /*
      * get the value from the record; if it is empty, use the default value if the 
      * "persistent" flag is set.
      */
     $record_value = isset($this->participant_values[$field->name]) ? $this->participant_values[$field->name] : '';
-    $value = $this->_empty($record_value) ? ($this->_empty($field->default) ? '' : $field->default) : Participants_Db::unserialize_array($record_value);
-//    $value = $this->_empty($record_value) ? ($field->persistent == 1 && $this->module == 'record' ? $field->default : '') : Participants_Db::unserialize_array($record_value);
 
+    $value = $this->_empty($record_value) ? ($this->_empty($field->default) ? '' : $field->default) : $record_value;
     // replace it with the new value if provided, escaping the input
     if (in_array($this->module, array('record','signup','retrieve')) && isset($_POST[$field->name])) {
 
@@ -767,53 +788,27 @@ abstract class PDb_Shortcode {
     if (in_array($field->name, array('id', 'private_id'))) {
       $this->display_as_readonly($field);
     }
+    if ($field->form_element === 'hidden') {
 
-    switch ($field->form_element) {
-
-      case 'text-line':
-      case 'text':
-
-        // show the default value for empty read-only text-lines
-        if ($field->readonly == 1 and $this->module == 'list' and empty($value))
-          $value = $field->default;
-        break;
-
-      case 'multi-select-other':
-      case 'multi-checkbox':
-
-        $value = is_array($value) ? $value : explode(',', $value);
-
-        break;
-
-      case 'password':
-
-        $value = '';
-        break;
-
-      case 'timestamp':
-
-        /* set the timestamp value to current time
+      $value = $this->_empty($record_value) ? '' : $record_value;
+      /*
+       * use the dynamic value if no value has been set
          */
-        if ($this->module == 'signup' or ( empty($value) and $this->module == 'record' )) {
-          $value = date('Y-m-d h:i:s');
-        }
-        break;
-
-      case 'hidden':
-
-        /* use the dynamic value if the shortcode is signup, otherwise only use the dynamic 
-         * value in the record module if there is no previously set value
-         */
-        if ($this->module == 'signup' or ( empty($value) and $this->module == 'record' )) {
-          
+      if (in_array($this->module, array('signup', 'record', 'retrieve'))) {
+        if ($value === '') {
           $value = $this->get_dynamic_value($field->default);
+        }
+        /*
+         * add to the display columns if not already present so it will be processed 
+         * in the form submission
+         */
+        $this->display_columns += array($field->name);
         } else {
+        // show this one as a readonly field
           $this->display_as_readonly($field);
         }
-        break;
     }
 
-    // set the value property of the field object
     $field->value = $value;
   }
 
@@ -831,16 +826,12 @@ abstract class PDb_Shortcode {
     //check for single record link
     if (
             !in_array($this->module, array('single', 'signup')) &&
-            isset($this->options['single_record_link_field']) &&
-            $field->name == $this->options['single_record_link_field'] &&
-            !empty($this->options['single_record_page']) &&
+            Participants_Db::is_single_record_link($field) &&
             isset($this->participant_values['id'])
     ) {
-      $url = get_permalink($this->options['single_record_page']);
+      $url = get_permalink(Participants_Db::plugin_setting('single_record_page'));
       $link = Participants_Db::add_uri_conjunction($url) . 'pdb=' . $this->participant_values['id'];
     }
-
-    //error_log(__METHOD__.' setting the link to '.$link.' for '.$field->name.' if:'.$this->options['single_record_link_field'].' and '. $this->options['single_record_page'].' with id:'.$this->participant_values['id']);
 
     $field->link = $link;
   }
@@ -853,6 +844,9 @@ abstract class PDb_Shortcode {
    * can be used in a database query 
    */
   protected function _set_display_columns() {
+
+    // if this has already been set, we're done
+    if (is_array($this->display_columns)) return;
 
     $this->display_columns = array();
 
@@ -882,46 +876,40 @@ abstract class PDb_Shortcode {
   }
 
   /**
-   * gets an array of column names for a non-list shortcode
+   * sets up the array of display columns
    * 
-   * this comes into play if the 'fields' attribute is not defining the column list
+   *
    *
    * @global object $wpdb
    */
   protected function _set_shortcode_display_columns() {
     
-    if (in_array($this->module, array('list','search','total')) && empty($this->shortcode_atts['groups'])) {
-      $this->display_columns = $this->get_list_display_columns('display_column');
-      return;
+    if (empty($this->display_groups)) {
+      $this->_set_display_groups();
     }
     
-    if (empty($this->display_groups)) {
-      $groups = $this->module == 'signup' ? '' : 'group.display = 1';
-    } else {
-      $groups = $this->module == 'signup' ? 'AND ' : '';
-      $groups .= 'field.group IN ("' . implode('","',$this->display_groups) . '")';
-    }
+    $groups = 'field.group IN ("' . implode('","',$this->display_groups) . '")';
 
     global $wpdb;
     
     $where = '';
     switch($this->module) {
       
-        case 'list':
-        $where .= 'WHERE ' . $groups . ' AND field.form_element <> "captcha"';
-          break;
-        
         case 'signup':
-        $where .= 'WHERE field.signup = 1 ' . $groups . ' AND field.form_element <> "placeholder"';
+        $where .= 'WHERE field.signup = 1 AND ' . $groups . ' AND field.form_element NOT IN ("placeholder")';
         break;
       
-        case 'record':
       case 'retrieve':
-        $where .= 'WHERE ' . $groups . ' AND field.form_element <> "placeholder"';
+        $where .= 'WHERE field.name = "' . Participants_Db::plugin_setting('retrieve_link_identifier') . '"';
         break;
         
+      case 'record':
+        $where .= 'WHERE ' . $groups . ' AND field.form_element NOT IN ("captcha","placeholder","hidden")';
+        break;
+        
+      case 'list':
       default:
-        $where .= 'WHERE ' . $groups . ' AND field.form_element <> "captcha" AND field.form_element <> "placeholder"';
+        $where .= 'WHERE ' . $groups . ' AND field.form_element NOT IN ("captcha","placeholder")';
     }
 
     $sql = '
@@ -947,21 +935,24 @@ abstract class PDb_Shortcode {
     global $wpdb;
 
     $column_set = array();
-    $set = $set == 'admin_column' ? 'admin_column' : 'display_column';
+    // enforce the default value
+    $set = $set === 'display_column' ? $set : 'admin_column';
 
-    $sql = "
-      SELECT `name`,`" . $set . "`
-      FROM " . Participants_Db::$fields_table . "
-      WHERE `" . $set . "` > 0";
+    $sql = '
+      SELECT f.name, f.' . $set . '
+      FROM ' . Participants_Db::$fields_table . ' f 
+      WHERE f.' . $set . ' > 0';
 
     $columns = $wpdb->get_results($sql, ARRAY_A);
 
-    foreach ($columns as $column) {
+    if (is_array($columns) && !empty($columns)) {
+			foreach ($columns as $column) {
 
-      $column_set[$column[$set]] = $column['name'];
+				$column_set[$column[$set]] = $column['name'];
+			}
+
+			ksort($column_set);
     }
-
-    ksort($column_set);
 
     return $column_set;
   }
@@ -970,10 +961,11 @@ abstract class PDb_Shortcode {
    * get a single column object
    * 
    * @param string $name Name of the field to get
+   * @return object|bool the result set object or bool false
    */
   public static function get_column_atts($name) {
-    global $wpdb;
-    return $wpdb->get_row($wpdb->prepare('SELECT * FROM '.Participants_Db::$fields_table.' f WHERE f.name = %s',$name));
+    $result = clone Participants_Db::$fields[$name];
+    return is_object($result) ? $result : false;
   } 
 
   /**
@@ -983,7 +975,7 @@ abstract class PDb_Shortcode {
    */
   protected function _esc_submitted_value($value) {
 
-    $value = Participants_Db::unserialize_array($value);
+    $value = maybe_unserialize($value);
 
     if (is_array($value)) {
 
@@ -1032,6 +1024,8 @@ abstract class PDb_Shortcode {
    */
   public function get_dynamic_value($value) {
 
+    $dynamic_value = '';
+
     if (false !== strpos(html_entity_decode($value), '->')) {
       
       /*
@@ -1045,11 +1039,9 @@ abstract class PDb_Shortcode {
 
       $object = ltrim($object, '$');
 
-      $value = '';
-
       if (is_object($$object) && isset($$object->$property)) {
 
-        $value = $$object->$property;
+        $dynamic_value = $$object->$property;
       }
     } elseif (false !== strpos(html_entity_decode($value), ':')) {
       
@@ -1106,27 +1098,28 @@ abstract class PDb_Shortcode {
        * to two dimensions only. the only way that I know of to do this open-ended 
        * is to use eval, which I won't do
        */
-      if (isset($global[$name]) && !is_array($global[$name])) {
-        $value = $global[$name];
-      } elseif (isset($global[$name])) {
+      if (isset($global[$name])) {
+        if (is_string($global[$name])) {
+          $dynamic_value = $global[$name];
+        } elseif (is_array($global[$name]) || is_object($global[$name])) {
         
-        
-        $array = is_object($global[$name]) ? get_object_vars($global[$name]) : (array) $global[$name];
+          $array = is_object($global[$name]) ? get_object_vars($global[$name]) : $global[$name];
         switch (count($indexes)) {
         case 1:
-            $value = isset($array[$indexes[0]]) ? $array[$indexes[0]] : '';
+              $dynamic_value = isset($array[$indexes[0]]) ? $array[$indexes[0]] : '';
           break;
         case 2:
-            $value = isset($array[$indexes[0]][$indexes[1]]) ? $array[$indexes[0]][$indexes[1]] : '';
+              $dynamic_value = isset($array[$indexes[0]][$indexes[1]]) ? $array[$indexes[0]][$indexes[1]] : '';
           break;
         default:
             // if we don't have an index, grab the first value
-            $value = is_array($array) ? current($array) : '';
+              $dynamic_value = is_array($array) ? current($array) : '';
         }
       }
     }
+    }
 
-    return (string) $value;
+    return filter_var($dynamic_value, FILTER_SANITIZE_STRING);
   }
 
   /**
@@ -1141,23 +1134,20 @@ abstract class PDb_Shortcode {
     
     $uri_components = parse_url($_SERVER['REQUEST_URI']);
 
-    echo '<form method="post" enctype="multipart/form-data"  autocomplete="off" action="' . $_SERVER['REQUEST_URI'] . '" >';
+    echo '<form method="post" enctype="multipart/form-data"  autocomplete="' . $this->shortcode_atts['autocomplete'] . '" action="' . $_SERVER['REQUEST_URI'] . '" >';
     $default_hidden_fields = array(
         'action' => $this->module,
         'subsource' => Participants_Db::PLUGIN_NAME,
         'shortcode_page' => $uri_components['path'],
         'thanks_page' => $this->submission_page,
             'instance_index' => Participants_Db::$instance_index,
-        'pdb_data_keys' => implode('.', PDb_Base::get_field_indices($this->display_columns)),
+        'pdb_data_keys' => $this->_form_data_keys(),
     );
-    if (!$this->_empty($hidden)) {
-      $hidden_fields = $hidden + $default_hidden_fields;
-    } else {
-      $hidden_fields = $default_hidden_fields;
-    }
-    if (!$this->_empty($this->hidden_fields)) {
-      $hidden_fields = $hidden_fields + $this->hidden_fields;
-    }
+    if (WP_DEBUG) echo '<!-- DEBUG: process fields: ' . implode(', ',PDb_Base::get_data_key_columns($this->_form_data_keys())) . ' -->';
+    
+    $hidden = is_array($hidden) ? $hidden : array();
+    
+    $hidden_fields = $hidden + $this->hidden_fields + $default_hidden_fields;
     
     PDb_FormElement::print_hidden_fields($hidden_fields);
   }
@@ -1183,6 +1173,20 @@ abstract class PDb_Shortcode {
   }
 
   /**
+   * sets up the fields property, which contains all field objects
+   * 
+   */
+  protected function _setup_fields() {
+    
+    $this->fields = array();
+    foreach (Participants_Db::$fields as $column) {
+      $this->fields[$column->name] = clone $column;
+      $this->fields[$column->name]->module = $this->module;
+    }
+    
+  }
+
+  /**
    * replace the tags in text messages
    *
    * a tag contains the column name for the value to use: [column_name]
@@ -1200,7 +1204,7 @@ abstract class PDb_Shortcode {
 
     if (empty($values)) {
 
-      foreach ($this->columns as $column) {
+      foreach ($this->fields as $column) {
 
         $tags[] = '[' . $column->name . ']';
 
@@ -1236,6 +1240,23 @@ abstract class PDb_Shortcode {
     return vsprintf($pattern, $values);
   }
 
+  
+
+  /**
+   * prints the submit button
+   *
+   * @param string $class a classname for the submit button, defaults to 'button-primary'
+   * @param string $button_value submit button text
+   * 
+   * @return null
+   */
+  public function print_submit_button($class = 'button-primary', $button_value = '') {
+
+    $pattern = '<input class="%s pdb-submit" type="submit" value="%s" name="save" >';
+
+    printf($pattern, $class, $button_value);
+  }
+
   /**
    * closes the form tag
    */
@@ -1247,7 +1268,8 @@ abstract class PDb_Shortcode {
   /**
    * sets the form submission page
    */
-  protected function _set_submission_page() {
+  protected function _set_submission_page()
+  {
 
     if (!empty($this->shortcode_atts['action'])) {
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
@@ -1255,6 +1277,49 @@ abstract class PDb_Shortcode {
     if (!$this->submission_page) {
     $this->submission_page = $_SERVER['REQUEST_URI'];
   }
+  }
+
+  /**
+   * sets up the shortcode atts session save
+   * 
+   * @return array the shortcode atts session save
+   */
+  protected function shortcode_session() {
+    return array(
+        $this->shortcode_atts['post_id'] => array( 
+            $this->module => array( 
+                Participants_Db::$instance_index => $this->shortcode_atts
+                    )
+                )
+            );
+  }
+  
+  /**
+   * sets up the pdb_data_keys value
+   * 
+   * the purpose of this value is to tell the submission processor which fields 
+   * to process. This is a security measure so that trying to spoof the submission 
+   * by adding extra fields, editing readonly fields or deleting fields in the 
+   * browser HTML won't work.
+   * 
+   * readonly fields and hidden fields that have values set are not included in the 
+   * set because they are not processed in this context
+   * 
+   * @return string the value for the pdb_data_keys field
+   */
+  protected function _form_data_keys() {
+    
+    $displayed = array();
+    foreach ($this->display_columns as $column) {
+      $field = $this->fields[$column];
+      if ((!in_array($field->form_element, array('hidden')) && $field->readonly === '0') || $field->form_element === 'captcha') {
+        $displayed[] = $field->name;
+      }
+    }
+    
+    return implode('.', PDb_Base::get_field_indices(array_unique(array_merge($displayed, array_keys($this->hidden_fields)))));
+//    return PDb_Base::xcrypt(implode('.', PDb_Base::get_field_indices(array_unique(array_merge($displayed, array_keys($this->hidden_fields))))));
+    
   }
 
   /**
@@ -1293,6 +1358,15 @@ abstract class PDb_Shortcode {
 
     return $value === '';
   }
-  
+  /**
+   * triggers the shortcode present action the first time a plugin shortcode is instantiated
+   * 
+   */
+  public function plugin_shortcode_action() {
+    if (!Participants_Db::$shortcode_present) {
+      Participants_Db::$shortcode_present = true;
+      do_action(Participants_Db::$prefix . 'shortcode_active');
+    }
+  }
 
 }

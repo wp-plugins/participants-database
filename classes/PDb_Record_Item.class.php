@@ -19,24 +19,41 @@ class PDb_Record_Item extends PDb_Template_Item {
    *
    * @param object a object with all the field group's properties
    */
-  public function __construct( $fields, $id, $module = 'none' ) {
+  public function __construct( $record, $id, $module ) {
     
     $this->module = $module;
     
-    // set up the common properties
-    parent::__construct( $fields );
+    // set up the common properties (currently does nothing)
+    parent::__construct( $record );
     
     // get rid of unneeded properties
     unset( $this->name, $this->title );
     
     // add the record field objects
     // this needs to by typed as array for the iterators to work
-    $this->fields = (array) $fields;
+    $this->fields = (array) $record;
     
     $this->record_id = $id;
     
-    $this->values = Participants_Db::get_participant($id);
+    $this->setup_values();
     
+    
+//    $this->values = Participants_Db::get_participant($id);
+    
+  }
+  
+  /**
+   * sets up the values property
+   */
+  private function setup_values() {
+    foreach($this->fields as $name => $field) {
+    
+      // get the field attributes
+      $field = (object) array_merge((array)$field, (array)Participants_Db::$fields[$name]);
+      
+      if (isset($field->value)) $this->values[$name] = $field->value;
+    }
+    reset($this->fields);
   }
   
 }

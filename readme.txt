@@ -3,8 +3,8 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
-Tested up to: 3.8.1
-Stable tag: 1.5.4
+Tested up to: 3.9.1
+Stable tag: 1.5.4.9
 License: GPLv2
 
 Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
@@ -85,7 +85,7 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * Italian: Mario Conte
 
-* Dutch: Bas van Erp
+* Dutch: At Voogt [www.wederzijdsgenoegen.nl](http://www.wederzijdsgenoegen.nl)
 
 * Polish: Piotr Kubala
 
@@ -94,6 +94,12 @@ This plugin is fully compliant with WordPress Internationalization standards and
 * Slovak: Branco Radenovich [WebHostingGeeks.com](http://webhostinggeeks.com/blog/)
 
 * Norwegian: Anders Kleppe
+
+* Serbian: Cherry, NBG, [www.trade.in.rs](http://trade.in.rs/)
+
+* Romanian: Cornelia Năescu
+
+* Ukranian: Michael Yunat, [http://getvoip.com/blog](http://getvoip.com)
 
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
@@ -218,15 +224,11 @@ Therefore, this plugin is *absolutely not* for the storage of any kind of inform
 
 Yes, there is a plugin setting called "Make Links Clickable" that scans the fields looking for something that starts with "http" it will then wrap that in a link tag so it will be clickable. It will also render email addresses clickable.
 
-Even better than that, there is a new form field type called "link" that lets people fill in a URL and also give it a text label such as "My Website" that will click to the URL.
+There is also a form field type called "link" that lets people fill in a URL and also give it a text label such as "My Website" that will click to the URL.
 
 = Is a CAPTCHA available for the forms? =
 
 You can define a "captcha" form element which will show a simple math question for the user to answer.
-
-= I'm getting a blank page in the admin when I click on the plugin menu =
-
-This is a problem that crops up on MultiSite installations. It's not a serious error, it's just that that top item is not supposed to be a clickable link, and so it doesn't go anywhere. All the real pages in the admin are working, you just have to avoid clicking on that non-working top menu item. Someday when I have some spare time, I'll figure out how to fix this...so probably never.
 
 == Screenshots ==
 
@@ -235,6 +237,87 @@ This is a problem that crops up on MultiSite installations. It's not a serious e
 3. Import CSV File: page where CSV files can be imported, includes detailed instructions and a blank spreadsheet download
 
 == Changelog ==
+
+= 1.6 =
+
+* database optimizations for large data sets
+* scripts and stylesheets loaded only on active plugin pages
+* code support for multilingual sites
+* improvements to multi-page form handling
+* improvements to internationalized date handling
+* bug when using a single-field form fixed
+* plugin now supports custom translation files
+* CSV import now allows delimiters and enclosures to be set by the user
+* better support for values titles in search results
+* better support for custom search forms
+* new shortcode attributes for forms: "autocomplete", "edit_record_page" and "submit_button"
+* improved security on user input
+* improved security on admin functions
+* users with cookies disabled are shown a warning
+
+= 1.5.4.9 =
+
+* security patch for CSV download
+* added Ukranian translation
+
+= 1.5.4.8 =
+
+* compatibility with WP 3.9 and PHP 5.5
+* plugin admin menu visibility now controlled by plugin admin roles
+
+= 1.5.4.7 =
+
+* fixed checkbox lock bug
+
+= 1.5.4.6 =
+
+* fixed transaction errors when MySQL is in a strict mode
+* checkboxes may now use value titles
+* AJAX search response now uses template defined in the shortcode
+
+= 1.5.4.5 =
+
+* added otherselect.js to handle dropdown/other fields
+* fixed bug in dropdowns when value is numeric 0
+
+= 1.5.4.4 =
+
+* readonly displays for dropdowns, radios and multiselects
+* record updates leave private ID unchanged
+* new setting to enable alternative sessions management if PHP sessions is not working
+* fixed bug in PDbTemplate class that would return empty fields in a list
+
+= 1.5.4.3 =
+
+* undeclared property $readonly_fields error (this time for sure!)
+
+= 1.5.4.2 =
+
+bug fixes:
+
+* undeclared property $readonly_fields error
+* record updates not getting timestamp set
+* problem with list search results not coming in in some cases
+* readonly fields in form context now have "readonly" attribute instead of "disabled"
+* record form now shows captcha if named in the shortcode "fields" attribute
+* checkbox series now completely wrapped in checkbox group wrapper
+
+Added Serbian translation
+
+= 1.5.4.1 =
+
+* field group tabs use group name if no title is defined for the group
+* HTML entities can be used in all field option ("values") definitions
+* fixed long field/group name bug. Names can be up to the maximum 64 characters
+* cleaned up plugin function spillover into other admin pages
+* better compatibility with pre-3.8 WP installs
+* signup and record shortcodes won't try to validate unincluded fields
+* all form submissions are validated for all users except plugin admin in the admin section
+* in admin, last used settings now retained: sort field, sort order, search field, search operator
+* better support for multi-page forms, user can't complete form by going back to the first page
+* links and other HTML now allowed in field titles and help text
+* field option titles used in all contexts
+
 
 = 1.5.4 =
 
@@ -414,72 +497,11 @@ Taking defensive precautions against other plugins in the admin:
 * CSV export now requires admin privileges
 * improved handling of rich text content displays
 
-= 1.3.7 =
-* fixed potential problem with timestamp fields having their datatype changed
-* dates and arrays are now made readable for inclusion in emails
-* improved security on list searches: prevent unwanted records from appearing
-* records added in the backend are now properly timestamped
-
-= 1.3.6 =
-* better handling of search and sort functions, pagination in frontend record list
-* new "strict search" setting forces exact match in user (frontend) searches on `[pdb_list]`
-* fixed issue with select/other and multiselect/other fields not following user selects in some cases
-* fixed bug that duplicated records edited in the admin if unique emails checked, email not validated and blank
-
-= 1.3.5 =
-* fixed submit bug with webkit browsers
-* corrected de-capitalization of fields when auto-linking enabled
-* eliminated empty IMG tags for empty image fields
-* included "date_updated" and "date_recorded" fields in frontend list sorts
-* removed non-displayed fields from fronent list sorting dropdown
-* added "display_count" option to `[pdb_list]` display
-
-= 1.3.4 =
-* added sort and search field options to `[pdb_list]` shortcode
-* added new "hidden" field for adding extra data to signups
-* list shortcode filtering, sorting and display may now use internal fields
-* multi-select array fields may now be exported/imported
-* fixed bug in manage fields where backslashes were removed from regexes
-* uploading CSV files now properly handles missing upload directory
-* front-end edits no longer overwrite admin fields
-* improved handling of linked URL's and email addresses
-* prevent multiple submissions and multiple email notifications
-* "textarea" form element now uses "text" MySQL datatype
-
-= 1.3.3 =
-* HTML emails can be switched off in settings; possible confict with other plugins
-* fixed broken link to image on some systems
-* fixed plugin CSS affecting rich text fields on other admin pages
-* removed PHP short open code in list class file
-* group name (not title) is no longer changeable: it caused orphaned fields to disappear
-
-= 1.3.2 =
-* moved templates and image uploads defaults out of the plugin directory
-* updated instructions for using singe-record templates
-* image files are now stored as filenames only to allow portability; backward compatibility provided for
-
-
-= 1.3.1 =
-* fixed error in make_link method causing broken links in installations not using rewrites
-* added Italian translation by Mario of trevisoeasy.it
-* removed 'internal' from list of possible field group assignments
-* added 'like' operator to list filter
-* made it possible to place a single record link on an image field
-
-= 1.3 =
-* added individual record shortcode using template
-* several bugfixes: link element, textareas with links
-* better HTML on list display table
-* setting to add marker to title of required fields
-* added option to use WYSIWYG editor on text areas (for logged-in WP users only)
-* list shortcode can now specify which columns (fields) to show
-* dates before 1970 now work
-
 == Upgrade Notice ==
 
-= 1.5.4 =
-**BETA RELEASE**
-Bugfixes, API enhancements, bulletproofing.
+= 1.6 =
+
+major update; several new features, code optimizations
 
 == Using the Plugin ==
 
@@ -562,7 +584,7 @@ User list searches now allow for the use of the '*' wildcard, so for instance, t
 There are two search modes for the list: strict or not strict. If the "Strict User Searching" setting (this is in the plugin settings) is checked, the search term must match *exactly* the whole contents of the field in order to be found. If unchecked, the search will show any records where any part of the searched field contains the search term.
 
 It's also possible to perform a "search" on the list with parameters in the URL. This would be handy if you wanted to create a link to the list that would only show certain results. For instance, if you wanted to make a link to the list that showed only results from the city of Phoenix you would add these variables to the URL: 
-`?search_field=city&value=phoenix&submit=search` 
+`?search_field=city&value=phoenix&operator=LIKE&submit=Search` 
 The URL must include the 'submit' variable to perform the search when the link is opened. Add that to the end of a link to the page where the `[pdb_list]` shortcode is (replace the '?' with a '&' if the '?' is already there), and it will only show records with a city value of 'phoenix.' This also means you can create your own search functionality, the primary limitation being you can only do this for one field at a time.
 
 Please note that user list searching, sorting and pagination will not work properly if there is more than one list on a page. The shortcode filtering and sorting will work as expected, however.

@@ -33,7 +33,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2011, 2012, 2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.4
+ * @version    Release: 1.5.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -116,7 +116,7 @@ abstract class xnau_FormElement {
    *
    * @var array
    */
-	var $textarea_dims = array( 'rows'=> 2, 'cols'=> 40 );
+  var $textarea_dims = array('rows' => 2, 'cols' => 40);
   
   /**
    * element group status
@@ -141,6 +141,7 @@ abstract class xnau_FormElement {
   /**
    * @var string the linebreak character
    */
+
   const BR = PHP_EOL;
   
   /**
@@ -215,6 +216,7 @@ abstract class xnau_FormElement {
                       'size'         => false,
                       'container_id' => false,
                       'group'        => false,
+                      'value'        => ''
                       );
     $params = wp_parse_args( $parameters, $defaults );
     
@@ -555,6 +557,8 @@ abstract class xnau_FormElement {
    */
   protected function _text_line() {
     
+    $this->value = htmlspecialchars($this->value, ENT_QUOTES, 'UTF-8', false);
+    
     $this->_addline( $this->_input_tag() );
     
   }
@@ -612,7 +616,7 @@ abstract class xnau_FormElement {
     
     wp_editor(
             htmlspecialchars_decode($value),
-            preg_replace( '#[0-9_-]#', '', $this->prefix . $this->name ),
+            preg_replace( array('#-#', '#[^a-z_]#'), array('_', ''), strtolower($this->prefix . $this->name) ),
             array(
                 'media_buttons' => false,
                 'textarea_name' => $this->name,
@@ -651,11 +655,11 @@ abstract class xnau_FormElement {
         return NULL;
       } else {
         $title = $this->is_assoc( $this->options ) ? key( $this->options ) : false;
-        $checked_value = $this->options[0];
-        $unchecked_value = isset($this->options[1]) ? $this->options[1] : '';
+        $checked_value = current($this->options);
+        $unchecked_value = next($this->options);
+        if ($unchecked_value === false) $unchecked_value = '';
       }
 
-      
       if ( false !== $title ) {
         $this->_addline( '<label for="' . $this->name . '">' );
       }
@@ -690,6 +694,8 @@ abstract class xnau_FormElement {
       unset( $this->attributes['other'] );
     } else $otherlabel = $this->i18n['other'];
     
+    if (!isset($this->attributes['readonly'])) {
+    
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
 
@@ -721,6 +727,11 @@ abstract class xnau_FormElement {
       $this->_addline('<input type="text" class="otherfield" name="' . $this->name . '" value="' . ( $is_other ? $this->value : '' ) . '" ' . $this->_attributes() . ' >');
       $this->_addline('</div>');
     }
+      
+    } else {
+      // readonly display
+      $this->_addline('<input type="text" class="pdb-readonly" name="' . $this->name . '" value="' . $this->value . '" ' . $this->_attributes() . ' >');
+    }
   }
 
   /**
@@ -743,12 +754,17 @@ abstract class xnau_FormElement {
 
 		$this->value = (array) $this->value;
 
+    if (!isset($this->attributes['readonly'])) {
+
     $this->_addline( '<div class="multicheckbox"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . '>' );
     $this->indent++;
 
-    $this->_add_checkbox_series('checkbox');
+    $this->_add_checkbox_series();
 
     $this->_addline('</div>', -1);
+    } else {
+      $this->_readonly_multi();
+    }
   }
   
   /**
@@ -791,11 +807,15 @@ abstract class xnau_FormElement {
     
     $type == 'checkbox' ? $this->_add_checkbox_series($otherlabel) : $this->_add_radio_series($otherlabel);
     
+    $controltag = array_pop($this->output); // save the <span.othercontrol> close tag
+    $closetag = array_pop($this->output); // save the <span.checkbox-group> close tag
+    
     // add the text input element
     $this->attributes['class'] =  'otherfield';
     $value = $type == 'checkbox' ? $this->value['other'] : (!in_array($this->value, $this->options) ? $this->value : '' );
     $name = $value === '' ? 'temp' : $this->name . ($type == 'checkbox' ? '[other]' : '');
-    $this->_addline('<input type="text" id="' . $this->name . '_other" name="' . $name . '" value="' . $value . '" ' . $this->_attributes() . ' >');
+    $this->_addline('<input type="text" id="' . $this->name . '_other" name="' . $name . '" value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false) . '" ' . $this->_attributes() . ' >');
+    array_push($this->output, $controltag, $closetag); // replace the span close tags, enclosing the input element in it
     
     // close the container
     $this->_addline('</div>', -1);
@@ -806,8 +826,11 @@ abstract class xnau_FormElement {
    */
   protected function _select_other_multi()
   {
-    
+    if (!isset($this->attributes['readonly'])) {
     $this->_select_other('checkbox');
+    } else {
+      $this->_readonly_multi();
+    }
   }
 	
 	/**
@@ -847,9 +870,33 @@ abstract class xnau_FormElement {
 		
 		$this->attributes['placeholder'] = $linktext_placeholder;
 		
-		$this->_addline( $this->_input_tag( 'text', $title, false ).'</div>' );
+		$this->_addline( $this->_input_tag( 'text', htmlspecialchars($title, ENT_QUOTES, 'UTF-8', false), false ).'</div>' );
 		
 	}
+																			
+  /**
+   * produces the output for a read-only multi-select element
+   * 
+   */
+  protected function _readonly_multi() {
+    
+    $display = array();
+    $this->group = true;
+    
+    $this->_addline('<div class="readonly-value-group">');
+    
+    foreach((array)  maybe_unserialize($this->value) as $value) {
+      
+      if ($value !== '') {
+        
+        $display[] = $value;
+        $this->_addline( $this->_input_tag( 'hidden', $value ) );
+        
+      }
+    }
+    $this->_addline('<span class="pdb-readonly">' . implode(', ',$display) . '</span></div>');
+    
+  }
 																			
 		
 
@@ -883,6 +930,8 @@ abstract class xnau_FormElement {
    */
   protected function _selectbox() {
     
+    $this->_addline( $this->_input_tag( 'hidden', '' ) );
+    
     $this->_addline( $this->_input_tag( 'checkbox', $this->value, false ) );
     
   }
@@ -891,7 +940,6 @@ abstract class xnau_FormElement {
    * build a hidden field
    */
   protected function _hidden() {
-    
     $this->_addline( $this->_input_tag( 'hidden' ) );
     
   }
@@ -919,11 +967,13 @@ abstract class xnau_FormElement {
 
     $this->_addline($this->print_hidden_fields(array('MAX_FILE_SIZE' => $max_size, $this->name => $this->value)));
 
+    if (!isset($this->attributes['readonly'])) {
     $this->_addline($this->_input_tag('file'));
 
     // add the delete checkbox if there is a file defined
     if (!empty($this->value))
       $this->_addline('<span class="file-delete" ><label><input type="checkbox" value="delete" name="' . $this->name . '-deletefile">' . __('delete', 'participants-database') . '</label></span>');
+    }
     
     $this->_addline('</div>');
   }
@@ -983,7 +1033,7 @@ abstract class xnau_FormElement {
   {
     
     // checkboxes are grouped, radios are not
-    $this->group = $type == 'checkbox' ? true : false;
+    $this->group = $type === 'checkbox';
 		
 		$class = '';
     if (!empty($this->classes)) {
@@ -991,9 +1041,11 @@ abstract class xnau_FormElement {
 			$this->classes = '';
 			}
     
-    $null_select = isset($this->options['null_select']) ?  $this->options['null_select'] : false;
+    // checkboxes are given a null select so an "unchecked" state is possible
+    $null_select = (isset($this->options['null_select'])) ? $this->options['null_select'] : ($type == 'checkbox' ? true : false);
+    
     if ($null_select !== false) {
-      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), ''), 1);
+      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), false), 1);
     }
     unset($this->options['null_select']);
     
@@ -1006,26 +1058,30 @@ abstract class xnau_FormElement {
          * this is where we would implement some kind of grouping for display purposes
          */
       } else {
-      $this->attributes['id'] = $this->legal_name($this->name . '-' . strtolower($option_value));
+        $this->attributes['id'] = $this->legal_name($this->name . '-' . ($option_value === '' ? '_' : trim(strtolower($option_value))));
       $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
       $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
       $this->_addline($option_key . '</label>');
     }
     }
     if ($otherlabel) {
+      
+      $value = $type == 'checkbox' ? (isset($this->value['other']) ? $this->value['other'] : '') : $this->value;
       $this->attributes['class'] =  'otherselect';
+      $this->_addline('<span class="othercontrol">');
       $this->_addline('<label ' . $class . ' for="' . $this->name . '_otherselect">');
       $this->_addline(sprintf('<input type="%s" id="%s_otherselect" name="%s"  value="%s" %s %s />', 
               $type, 
               $this->name, 
               $type == 'checkbox' ? 'temp' : $this->name, 
               $otherlabel, 
-              $this->_set_selected($this->options, ( $type == 'checkbox' ? $this->value['other'] : $this->value), 'checked', false), 
+              $this->_set_selected($this->options, $value, 'checked', $value === ''), 
               $this->_attributes()
               ), 1);
       //$this->_addline('<input type="' . $type . '" id="' . $this->name . '_otherselect" name="' . ($type == 'checkbox' ? 'temp' : $this->name) . '"  value="' . $otherlabel . '" ' . $this->_set_selected($this->options, ( $type == 'checkbox' ? $this->value['other'] : $this->value), 'checked', false) . ' ' . $this->_attributes() . ' />', 1);
       $this->_addline($otherlabel . ':');
       $this->_addline('</label>', -1);
+      $this->_addline('</span>', -1);
     }
     
     $this->_addline('</span>');
@@ -1068,7 +1124,7 @@ abstract class xnau_FormElement {
       
       if (($value === false or $value === 'false' or $value === 'optgroup') and !empty($key)) {
         $this->_add_options_divider($key);
-      } elseif($value == 'other') {
+      } elseif($value === 'other') {
         $otherlabel = $key;
       } elseif (!empty($value) or $value === 0) {
         $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . stripslashes($key) . '</option>', -1);
@@ -1164,7 +1220,7 @@ abstract class xnau_FormElement {
       // in admin, emails are plaintext
       if (is_admin())
         return esc_html($field->value);
-
+      $linktext = $URI;
       $URI = 'mailto:' . $URI;
     } else {
       return $field->value; // if it is neither URL nor email address nor defined link
@@ -1273,7 +1329,7 @@ abstract class xnau_FormElement {
    */
   protected function _prep_comp_string( $string ) {
 
-    return is_string($string) ? html_entity_decode( $string, ENT_QUOTES, 'UTF-8') : $string;
+    return is_string($string) ? trim(html_entity_decode( $string, ENT_QUOTES, 'UTF-8')) : $string;
 
   }
 
@@ -1306,22 +1362,31 @@ abstract class xnau_FormElement {
    * If $this->options['null_select'] is blank, a blank unselected null option will 
    * be added. 
    * If $this->options['null_select'] is false no null state option will be added.
-   * If the value is empty and no null select is defined, a blank one will be added
+   * 
+   * If the value is empty and no null select is defined, a blank null select option 
+   * will be added so that the current state of the field can be represented.
+   * 
+   * TODO: if there is a defined default value, and the current vlaue of the field 
+   * is not set, no null select should be added, the default value should be selected 
+   * in the control
    * 
    * @return null
    */
   protected function _set_null_select() {
     
-    $null_select = isset($this->options['null_select']) ? $this->options['null_select'] : false;
+    /*
+     * if the null_select option is a string, use it as the name of the null select 
+     * option, unless it is the string 'false', then make it boolean false. If it is any 
+     * other value or not set at all, make it boolean false
+     */
+    $null_select = isset($this->options['null_select']) ? ($this->options['null_select'] === 'false' ? false : $this->options['null_select']) : false;
     // remove the null_select from the options array
     if (isset($this->options['null_select']))
       unset($this->options['null_select']);
-    /*
-     * the null select option is added if it is not canceled by a null select value 
-     * of false or 'false'
-     */
+    
     $null_select_label = is_string($null_select) ? $null_select : '';
-    if (($null_select !== false and $null_select !== 'false') || $this->value === '') {
+    
+    if (($null_select !== false) || $this->value === '') {
       $selected = $this->value === '' ? $this->_set_selected(true, true, 'selected') : '';
       $this->_addline('<option value="" ' . $selected . '  >' . $null_select_label . '</option>');
     }

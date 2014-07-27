@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    0.3
+ * @version    0.4
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    FormElement class, Shortcode class
  * 
@@ -42,20 +42,25 @@ class PDb_Session {
    */
   public $session_name;
 
+  /**
+   * true if the current user does not allow cookies
+   * 
+   * @var bool
+   */
+  public $no_user_cookie = false;
+
 
 	/**
 	 * construct the class
    * 
-   * the global PDB_USE_PHP_SESSIONS must be set to true to use PHP sessions, it's 
-   * not automatic because prior to PHP 5.4 it's difficult to determine if sessions 
-   * are working without a page load...and by then it's too late.
+   * we check the setting for using PHP session, if false, we use a WP Transient-based session
    * 
    * we are just using this alternate form of session mnagement instead of PHP 
    * sessions for now
 	 */
 	public function __construct() {
 
-		$this->use_php_sessions = defined( 'PDB_USE_PHP_SESSIONS' ) && PDB_USE_PHP_SESSIONS;
+		$this->use_php_sessions = Participants_Db::plugin_setting_is_true('use_php_sessions');
     
     $this->session_name = Participants_Db::$prefix . 'session';
 
@@ -97,6 +102,8 @@ class PDb_Session {
       
 			$this->session = WP_Session::get_instance();
     }
+
+    $this->test_cookie();
 
 		return $this->session;
 	}
@@ -143,6 +150,34 @@ class PDb_Session {
 
 		return $this->session[ $key ];
 	}
+
+	/**
+	 * update a session variable
+   * 
+   * if the incoming value is an array, it is merged with the stored value if it 
+   * is also an array; if not, it stores the value, overwriting the stored value
+	 *
+	 * @param $key Session key
+	 * @param $value Session variable
+	 * @return mixed Session variable
+	 */
+	public function update( $key, $value ) {
+    
+		$key = sanitize_key( $key );
+    $stored = $this->get($key);
+
+		if (is_array($value) && is_array($stored) )
+			$this->session[ $key ] = serialize(self::deep_merge($value, $stored));
+    elseif (is_array($value))
+			$this->session[ $key ] = serialize($value);
+		else
+			$this->session[ $key ] = $value;
+
+		if( $this->use_php_sessions )
+			$_SESSION[$this->session_name] = $this->session;
+
+		return $this->session[ $key ];
+	}
   /**
    * clears a session variable
    * 
@@ -151,10 +186,49 @@ class PDb_Session {
    */
   public function clear($name) {
     
-    $this->set($name, false);
+    unset($this->session[sanitize_key( $name )]);
 
 	}
+  /**
+   * merges two arrays recursively
+   * 
+   * returned array will include unmatched elements from both input arrays. If 
+   * there is an element key match, the element from $b will be present in the 
+   * return value
+   * 
+   * @param array $a
+   * @param array $b
+   * @return array
+   */
+  public static function deep_merge($a, $b) {
+    $a = (array)$a;
+    $b = (array)$b;
+    $c = $b;
+      foreach ($a as $k => $v) {
+        if (isset($b[$k])) {
+          if (is_array($v) && is_array($b[$k])) {
+            $c[$k] = self::deep_merge($v, $b[$k]);
+          }
+        } else {
+          $c[$k] = $v;
+        }
+      }
+    return $c;
+  }
+  /**
+   * tests for cookie access in the user's browser and sets the no_user_cookie property
+   * 
+   * we test for either the wordpress test cookie or the plugin session cookie
+   * 
+   * @return null
+   */
+  private function test_cookie()
+  {
+    $this->no_user_cookie = is_null(filter_input(INPUT_COOKIE, 'wordpress_test_cookie'));
+    if ($this->no_user_cookie) {
+      $this->no_user_cookie = is_null(filter_input(INPUT_COOKIE, Participants_Db::$prefix . 'wp_session'));
+     }
+  }
 }
-
 
 ?>

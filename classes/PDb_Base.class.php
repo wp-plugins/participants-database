@@ -6,13 +6,18 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2011 xnau webdesign
+ * @copyright  2014 xnau webdesign
  * @license    GPL2
- * @version    0.6
+ * @version    0.7
  * @link       http://xnau.com/wordpress-plugins/
  */
 
 class PDb_Base {
+  /**
+   * set if a shortcode is called on a page
+   * @var bool
+   */
+  public static $shortcode_present = false;
   /**
    * parses a list shortcode filter string into an array
    * 
@@ -139,6 +144,20 @@ class PDb_Base {
     return $permalink;
   }
   
+  /**
+   * determines if the field is the designated single record field
+   * 
+   * also checks that the single record page has been defined
+   * 
+   * @param object $field
+   * @return bool
+   */
+  public static function is_single_record_link($field) {
+    $name = is_object($field) ? $field->name : $field;
+    $page = Participants_Db::plugin_setting('single_record_page');
+    return $name === Participants_Db::plugin_setting('single_record_link_field') && !empty($page);
+  }
+  
   /*
    * prepares an array for storage in the database
    *
@@ -176,8 +195,8 @@ class PDb_Base {
    */
   public static function _prepare_string_mysql($string)
   {
-
-    return htmlspecialchars(stripslashes($string), ENT_QUOTES, 'utf-8');
+    
+    return stripslashes($string);
   }
 
   /**
@@ -220,12 +239,84 @@ class PDb_Base {
 
     if (!file_exists($filename)) {
 
-      $filename = get_bloginfo('wpurl') . '/' . Participants_Db::$plugin_options['image_upload_location'] . basename($filename);
+      $filename = get_bloginfo('wpurl') . '/' . Participants_Db::plugin_setting('image_upload_location') . basename($filename);
     }
 
     return $filename;
   }
 
+  /**
+   * processes an incoming timestamp
+   * 
+   * timestamps are usually handled by the plugin automatically, but when records 
+   * are being imported via CSV, they should be imported
+   * 
+   * @var string $timestamp a timestamp value, could be unix timestamp or text date
+   * @return bool|string if the timestamp is valid, a MySQL timestamp is returns; 
+   *                     bool false otherwise
+   */
+  public static function import_timestamp($timestamp) {
+    
+    $post_date = $timestamp !== null ? Participants_Db::parse_date($timestamp) : false;
+    $new_value = $post_date !== false ? date('Y-m-d H:i:s', $post_date) : false;
+    
+    return $new_value;
+    
+  }
+
+  /**
+   * locate the translation file to use
+   * 
+   * @return string relative path to translation file
+   */
+  public static function translation_file_path($basepath = false) {
+    $filename = Participants_Db::PLUGIN_NAME . '-' . WPLANG . '.mo';
+    $basepath = !$basepath ? dirname( plugin_basename( __FILE__ ) ) : $basepath;
+    // first check for a custom translation file in the WP plugin root
+    if (is_file(WP_PLUGIN_DIR . '/languages/' . $filename)) {
+      return 'languages/';
+    } else {
+      return $basepath . '/languages/';
+    }
+  }
+  
+  /**
+   * provides a plugin setting
+   * 
+   * @param string $name setting name
+   * @param string|int|float $default a default value
+   * @return string the plugin setting value or provided default
+   */
+  public static function plugin_setting($name, $default = false) {
+    $setting = isset(Participants_Db::$plugin_options[$name]) ? Participants_Db::$plugin_options[$name] : $default;
+    return $setting;
+  }
+  
+  /**
+   * checks a plugin setting for a value
+   * 
+   * returns false for empty string, true for 0
+   * 
+   * @param string $name setting name
+   * @return bool false for null or empty string, true for 0 or any string
+   */
+  public static function plugin_setting_is_set($name) {
+    return isset(Participants_Db::$plugin_options[$name]) && Participants_Db::plugin_setting($name) !== '';
+  }
+  /**
+   * provides a boolean plugin setting value
+   * 
+   * @param string $name of the setting
+   * @param bool the default value
+   * @return bool the setting value
+   */
+  public static function plugin_setting_is_true($name, $default = false) {
+    if (isset(Participants_Db::$plugin_options[$name])) {
+      return filter_var(Participants_Db::plugin_setting($name), FILTER_VALIDATE_BOOLEAN);
+    } else {
+      return (bool) $default;
+    }
+  }
   /**
    * sets up an API filter
    * 
@@ -238,9 +329,10 @@ class PDb_Base {
    * @param unknown $term the term to filter (passed by reference)
    * @return unknown the filtered or unfiltered term
    */
-  public static function set_filter($slug, &$term)
+  public static function set_filter($slug, $term)
   {
     $tag = Participants_Db::$prefix . $slug;
+    
     if (!has_filter($tag)) {
       return $term;
     }
@@ -277,7 +369,7 @@ class PDb_Base {
   public static function delete_file($filename)
   {
     $current_dir = getcwd(); // save the cirrent dir
-    chdir(ABSPATH . Participants_Db::$plugin_options['image_upload_location']); // set the plugin uploads dir
+    chdir(ABSPATH . Participants_Db::plugin_setting('image_upload_location')); // set the plugin uploads dir
     $result = unlink(basename($filename)); // delete the file
     chdir($current_dir); // change back to the previous directory
     return $result;
@@ -495,6 +587,39 @@ class PDb_Base {
   }
 
 /**
+   * gets the timezone
+   * 
+   * @return string
+   */
+  public static function get_timezone() {
+    $php_timezone = ini_get('date.timezone');
+    return empty($php_timezone) ? 'UTC' : $php_timezone;
+  } 
+
+/**
+ * collect a list of all the plugin shortcodes present in the content
+ *
+ * @global array $shortcode_tags
+ * @param string $content the content to test
+ * @param string $tag
+ * @return array of plugin shortcode tags
+ */
+  public static function get_plugin_shortcodes($content = '', $tag = '[pdb_') {
+    
+    $shortcodes = array();
+    // get all shortcodes
+    preg_match_all('/' . get_shortcode_regex() . '/s', $content, $matches, PREG_SET_ORDER);
+    
+    // none found
+    if (!empty($matches[0][0]) && false === strpos($matches[0][0], $tag))
+      return false;
+    // check each one for a plugin shortcode
+    foreach ($matches as $shortcode) {
+      $shortcodes[] = $shortcode[2] . '-shortcode';
+    }
+    return $shortcodes;
+  }
+/**
  * check a string for a shortcode
  *
  * modeled on the WP function of the same name
@@ -504,6 +629,7 @@ class PDb_Base {
  * the common prefix
  *
  * @global array $shortcode_tags
+ * @param string $content the content to test
  * @param string $tag
  * @return boolean
  */
@@ -530,35 +656,16 @@ class PDb_Base {
    * @global object $post
    * @return array $posts
    */
-  public static function post_check_shortcode() {
+  public static function remove_rel_link() {
     global $post;
-    if (is_object($post) && self::has_shortcode($post->post_content)) {
-      self::$shortcode_present = true;
+    /*
+     * this is needed to prevent Firefox prefetching the next page and firing the damn shortcode
+     * 
+     * as per: http://www.ebrueggeman.com/blog/wordpress-relnext-and-firefox-prefetching
+     */
+    if (is_object($post) && $post->post_type === 'page') {
+      remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
     }
-  }
-  /**
-   * checks a template for an embedded shortcode
-   * 
-   * runs on the 'template_include' filter
-   * 
-   * @param type $template name of the template file in use
-   * @param string $tag the shortcode string to search for
-   * @return bool true if a shortcode matching the tag is present in the template
-   */
-  public static function template_check_shortcode($template)
-  {
-
-    if (file_exists($template)) {
-
-      $contents = file_get_contents($template);
-
-      if (self::has_shortcode($contents)) {
-
-        self::$shortcode_present = true;
-      }
-    }
-
-    return $template;
   }
   /**
    * provides an array of field indices corresponding, given a list of field names
@@ -566,12 +673,18 @@ class PDb_Base {
    * or vice versa
    * 
    * @param array $fieldnames the array of field names
-   * @param bool  $indices if true returns array of indices, if flase returns array of fieldnames
+   * @param bool  $indices if true returns array of indices, if false returns array of fieldnames
    * @return array an array of integers
    */
   public static function get_field_indices($fieldnames, $indices = true) {
     global $wpdb;
-    $sql = 'SELECT f.' . ($indices ? 'id' : 'name') . ' FROM ' . Participants_Db::$fields_table . ' f WHERE f.' . ($indices ? 'name' : 'id') . ' IN ("' . implode('","',$fieldnames) . '") ORDER BY FIELD("' . implode('","',$fieldnames) . '")';
+    $sql = 'SELECT f.' . ($indices ? 'id' : 'name') . ' FROM ' . Participants_Db::$fields_table . ' f ';
+    $sql .= 'WHERE f.' . ($indices ? 'name' : 'id') . ' ';
+    if (count($fieldnames) > 1) {
+      $sql .= 'IN ("' . implode('","',$fieldnames) . '") ORDER BY FIELD("' . implode('","',$fieldnames) . '")';
+    } else {
+      $sql .= '= "' . current($fieldnames) . '"';
+    }
     return $wpdb->get_col($sql);
   }
 
@@ -585,6 +698,180 @@ class PDb_Base {
   public static function get_indexed_names($ids) {
     return self::get_field_indices($ids, false);
   }
+  /**
+   * gets a list of column names from a dot-separated string of ids
+   * 
+   * @param string $ids the string of ids
+   * @return array of field names
+   */
+  public static function get_shortcode_columns($ids) {
+    return self::get_field_indices(explode('.',$ids), false);
+  }
+  
+  /**
+   * provides a filter array for a search submission
+   * 
+   * filters a POST submission for displaying a list
+   * 
+   * @param bool $multi if true, filter a multi-field search submission
+   * @return array of filter parameters
+   */
+  public static function search_post_filter($multi = false) {
+    $array_filter = array(
+            'filter' => FILTER_SANITIZE_STRING,
+            'flags' => FILTER_FORCE_ARRAY
+        );
+    $multi_validation = $multi ? $array_filter : FILTER_SANITIZE_STRING;
+    return array (
+        'filterNonce' => FILTER_SANITIZE_STRING,
+        'postID' => FILTER_VALIDATE_INT,
+        'submit' => FILTER_SANITIZE_STRING,
+        'action' => FILTER_SANITIZE_STRING,
+        'instance_index' => FILTER_VALIDATE_INT,
+        'pagelink' => FILTER_SANITIZE_STRING,
+        'sortstring' => FILTER_SANITIZE_STRING,
+        'orderstring' => FILTER_SANITIZE_STRING,
+        'search_field' => $multi_validation,
+        'operator' => $multi_validation,
+        'value' => $multi_validation,
+        'logic' => $multi_validation,
+        'sortBy' => FILTER_SANITIZE_STRING,
+        'ascdesc' => FILTER_SANITIZE_STRING,
+     );
+  }
+  
+  /**
+   * attempts to prevent browser back-button caching in the middle of a multipage form
+   * 
+   * @param array $headers array of http headers
+   * @return array altered headers array
+   */
+  public static function control_caching($headers) {
+    $form_status = Participants_Db::$session->get('form_status');
+//    $headers['X-xnau-plugin'] = $headers['X-xnau-plugin'] . ' ' . Participants_Db::$plugin_title . '-' . Participants_Db::$plugin_version;
+    if ($form_status === 'multipage') {
+      $headers['Cache-Control'] = 'no-cache, max-age=0, must-revalidate, no-store';
+    }
+    return $headers;
+  }
+  
+  /**
+   * clears the shortcode session for the current page
+   * 
+   * shortcode sessions are used to provide asynchronous functions with the current 
+   * shortcode attributes
+   */
+  public static function reset_shortcode_session() {
+    global $post;
+    if (is_object($post)) {
+			$current_session = Participants_Db::$session->get('shortcode_atts');
+			/*
+			 * clear the current page's session
+			 */
+			$current_session[$post->ID] = array();
+			Participants_Db::$session->set('shortcode_atts', $current_session);
+		}
+  }
+  /**
+   * Remove slashes from strings, arrays and objects
+   * 
+   * @param    mixed   input data
+   * @return   mixed   cleaned input data
+   */
+  public static function deep_stripslashes($input)
+  {
+    if (is_array($input)) {
+      $input = array_map(array(__CLASS__,'deep_stripslashes'), $input);
+    } elseif (is_object($input)) {
+      $vars = get_object_vars($input);
+      foreach ($vars as $k => $v) {
+        $input->{$k} = deep_stripslashes($v);
+      }
+    } else {
+      $input = stripslashes($input);
+    }
+    return $input;
+  }
+  
+  /**
+   * encodes or decodes a string using a simple XOR algorithm
+   * 
+   * @param string $string the tring to be encoded/decoded
+   * @param string $key the key to use
+   * @return string
+   */
+  public static function xcrypt($string, $key = false)
+  {
+    if ($key === false) {
+      $key = self::get_key();
+    }
+    $alphanum = self::get_alpha_set();
+    for ($i = 0; $i < strlen($string); $i++) {
+      $pos = $i % strlen($key);
+      if (array_search($string[$i], $alphanum) !== false) { // characters not included in the alpha set are skipped
+        $replace = array_search($string[$i], $alphanum) ^ array_search($key[$pos], $alphanum);
+        $string[$i] = $alphanum[$replace];
+      }
+    }
+
+    return $string;
+  }
+  /**
+   * supplies a random alphanumeric key
+   * 
+   * the key is stored in a transient which changes every day
+   * 
+   * @return null
+   */
+  public static function get_key() {
+    if (!$key = get_transient(Participants_Db::$prefix . 'captcha_key')) {
+      set_transient(Participants_Db::$prefix . 'captcha_key', self::generate_key(), (60 * 60 * 24));
+    }
+    $key = get_transient(Participants_Db::$prefix . 'captcha_key');
+    //error_log(__METHOD__.' get new key: '.$key);
+    return $key;
+  }
+  /**
+   * returns a random alphanumeric key
+   * 
+   * @param int $length number of characters in the random string
+   * @return string the randomly-generated alphanumeric key
+   */
+  private static function generate_key($length = 8) {
+    
+    $alphanum = self::get_alpha_set();
+    $key = '';
+    while ($length > 0) {
+      $key .= $alphanum[array_rand($alphanum)];
+      $length--;
+    }
+    return $key;
+  }
+  /**
+   * supplies an alphanumeric character set for encoding
+   * 
+   * characters that would mess up HTML are not included
+   * 
+   * @return array of valid characters
+   */
+  private static function get_alpha_set() {
+    return str_split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.{}[]_-=+!@#$%^&*()~`');
+  }
+  /**
+   * decodes the pdb_data_keys value
+   * 
+   * this provides a security measure by defining which fields to process in a form submission
+   * 
+   * @param string $datakey the pdb_data_key value
+   * 
+   * @return array of column names
+   */
+  public static function get_data_key_columns($datakey) {
+    
+    return self::get_indexed_names( explode('.', $datakey));
+//    return self::get_indexed_names( explode('.', self::xcrypt($datakey)));
+  }
+  
 }
 
 ?>

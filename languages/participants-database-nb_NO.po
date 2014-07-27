@@ -1,17 +1,17 @@
-﻿# This file is distributed under the same license as the Participants Database package.
+# This file is distributed under the same license as the Participants Database package.
 msgid ""
 msgstr ""
 "Project-Id-Version: Participants Database 1.5.3 nb_NO 1.5 WP3.8 compatible\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/participants-database\n"
-"POT-Creation-Date: 2013-12-16 20:51:51+00:00\n"
+"POT-Creation-Date: 2013-12-27 17:36:25+00:00\n"
+"PO-Revision-Date: 2014-06-01 16:07-1000\n"
+"Last-Translator: Roland Barker <webdesign@xnau.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: nb_NO\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2013-12-19 21:45+0100\n"
-"Last-Translator: Anders Kleppe <anders.kleppe@alumni.nhh.no>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: nb_NO\n"
-"X-Generator: Poedit 1.6.3\n"
+"X-Generator: Poedit 1.6.5\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -20,246 +20,238 @@ msgstr ""
 msgid "delete"
 msgstr "slett"
 
-#: classes/PDb_FormElement.class.php:430
+#: classes/PDb_FormElement.class.php:433
 msgid "Text-line"
 msgstr "Tekstlinje"
 
-#: classes/PDb_FormElement.class.php:431
+#: classes/PDb_FormElement.class.php:434
 msgid "Text Area"
 msgstr "Tekstboks"
 
-#: classes/PDb_FormElement.class.php:432
+#: classes/PDb_FormElement.class.php:435
 msgid "Rich Text"
 msgstr "Rik-tekst"
 
-#: classes/PDb_FormElement.class.php:433
+#: classes/PDb_FormElement.class.php:436
 msgid "Checkbox"
 msgstr "Avkrysningsboks"
 
-#: classes/PDb_FormElement.class.php:434
+#: classes/PDb_FormElement.class.php:437
 msgid "Radio Buttons"
 msgstr "Radioknapper"
 
-#: classes/PDb_FormElement.class.php:435
+#: classes/PDb_FormElement.class.php:438
 msgid "Dropdown List"
 msgstr "Nedtrekksliste"
 
-#: classes/PDb_FormElement.class.php:436
+#: classes/PDb_FormElement.class.php:439
 msgid "Date Field"
 msgstr "Datofelt"
 
-#: classes/PDb_FormElement.class.php:437
+#: classes/PDb_FormElement.class.php:440
 msgid "Dropdown/Other"
 msgstr "Nedtrekksliste/Annen"
 
-#: classes/PDb_FormElement.class.php:438
+#: classes/PDb_FormElement.class.php:441
 msgid "Multiselect Checkbox"
 msgstr "Flervalgs Avkryssingsboks"
 
-#: classes/PDb_FormElement.class.php:439
+#: classes/PDb_FormElement.class.php:442
 msgid "Radio Buttons/Other"
 msgstr "Radioknapper/Annen"
 
-#: classes/PDb_FormElement.class.php:440
+#: classes/PDb_FormElement.class.php:443
 msgid "Multiselect/Other"
 msgstr "Flervalgs/Annen"
 
-#: classes/PDb_FormElement.class.php:441
+#: classes/PDb_FormElement.class.php:444
 msgid "Link Field"
 msgstr "Lenkefelt"
 
-#: classes/PDb_FormElement.class.php:442
+#: classes/PDb_FormElement.class.php:445
 msgid "Image Upload Field"
 msgstr "Bildeopplastingsfelt"
 
-#: classes/PDb_FormElement.class.php:443
+#: classes/PDb_FormElement.class.php:446
 msgid "File Upload Field"
 msgstr "Filopplastingsfelt"
 
-#: classes/PDb_FormElement.class.php:444
+#: classes/PDb_FormElement.class.php:447
 msgid "Hidden Field"
 msgstr "Skjult felt"
 
-#: classes/PDb_FormElement.class.php:445
+#: classes/PDb_FormElement.class.php:448
 msgid "Password Field"
 msgstr "Passordfelt"
 
-#: classes/PDb_FormElement.class.php:446
+#: classes/PDb_FormElement.class.php:449
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
-#: classes/PDb_Init.class.php:694
+#: classes/PDb_Init.class.php:700
 msgid "Participant Info"
 msgstr "Deltakerinformasjon"
 
-#: classes/PDb_Init.class.php:695
+#: classes/PDb_Init.class.php:701
 msgid "Personal Info"
 msgstr "Personlig informasjon"
 
-#: classes/PDb_Init.class.php:696
+#: classes/PDb_Init.class.php:702
 msgid "Administrative Info"
 msgstr "Administrativ informasjon"
 
-#: classes/PDb_Init.class.php:697
+#: classes/PDb_Init.class.php:703
 msgid "Record Info"
 msgstr "Post informasjon"
 
-#: classes/PDb_List.class.php:787 templates/pdb-list-bootstrap.php:34
+#: classes/PDb_List.class.php:786 templates/pdb-list-bootstrap.php:34
 #: templates/pdb-list-detailed.php:31 templates/pdb-search-default.php:22
 msgid "Please select a column to search in."
 msgstr "Velg en kolonne å søke i."
 
-#: classes/PDb_List.class.php:788 templates/pdb-list-bootstrap.php:35
+#: classes/PDb_List.class.php:787 templates/pdb-list-bootstrap.php:35
 #: templates/pdb-list-detailed.php:32 templates/pdb-search-default.php:23
 msgid "Please type in something to search for."
 msgstr "Skriv inn det du vil søke etter."
 
-#: classes/PDb_List.class.php:796 templates/pdb-list-bootstrap.php:45
+#: classes/PDb_List.class.php:795 templates/pdb-list-bootstrap.php:45
 #: templates/pdb-list-detailed.php:47 templates/pdb-search-default.php:35
 msgid "Search"
 msgstr "Søk"
 
-#: classes/PDb_List.class.php:811 classes/PDb_List_Admin.class.php:488
+#: classes/PDb_List.class.php:810 classes/PDb_List_Admin.class.php:491
 #: templates/pdb-list-bootstrap.php:62 templates/pdb-list-detailed.php:75
 #: templates/pdb-search-default.php:63
 msgid "Sort by"
 msgstr "Sorter etter"
 
-#: classes/PDb_List.class.php:886
+#: classes/PDb_List.class.php:881
 msgid "select"
 msgstr "velg"
 
-#: classes/PDb_List.class.php:957 classes/PDb_List_Admin.class.php:503
+#: classes/PDb_List.class.php:952 classes/PDb_List_Admin.class.php:506
 #: classes/PDb_Settings.class.php:810 classes/PDb_Settings.class.php:836
 msgid "Ascending"
 msgstr "Stigende"
 
-#: classes/PDb_List.class.php:958 classes/PDb_List_Admin.class.php:504
+#: classes/PDb_List.class.php:953 classes/PDb_List_Admin.class.php:507
 #: classes/PDb_Settings.class.php:810 classes/PDb_Settings.class.php:836
 msgid "Descending"
 msgstr "Synkende"
 
 #. translators: the following 5 strings are used in logic matching, please test
 #. after translating in case special characters cause problems
-#: classes/PDb_List.class.php:1390 classes/PDb_List_Admin.class.php:850
+#: classes/PDb_List.class.php:1385 classes/PDb_List_Admin.class.php:857
 msgctxt "submit button label"
 msgid "Delete Checked"
 msgstr "Slett merkede"
 
-#: classes/PDb_List.class.php:1391 classes/PDb_List_Admin.class.php:851
+#: classes/PDb_List.class.php:1386 classes/PDb_List_Admin.class.php:858
 msgctxt "submit button label"
 msgid "Change"
 msgstr "Endre"
 
-#: classes/PDb_List.class.php:1392 classes/PDb_List_Admin.class.php:852
+#: classes/PDb_List.class.php:1387 classes/PDb_List_Admin.class.php:859
 msgctxt "submit button label"
 msgid "Sort"
 msgstr "Sorter"
 
-#: classes/PDb_List.class.php:1393 classes/PDb_List_Admin.class.php:853
+#: classes/PDb_List.class.php:1388 classes/PDb_List_Admin.class.php:860
 msgctxt "submit button label"
 msgid "Filter"
 msgstr "Filter"
 
-#: classes/PDb_List.class.php:1394 classes/PDb_List_Admin.class.php:854
+#: classes/PDb_List.class.php:1389 classes/PDb_List_Admin.class.php:861
 msgctxt "submit button label"
 msgid "Clear"
 msgstr "Fjern"
 
-#: classes/PDb_List.class.php:1395 classes/PDb_List_Admin.class.php:855
+#: classes/PDb_List.class.php:1390 classes/PDb_List_Admin.class.php:862
 msgctxt "search button label"
 msgid "Search"
 msgstr "Søk"
-
-#: classes/PDb_List_Admin.class.php:109
-msgctxt "noun; page number indicator"
-msgid "Page"
-msgstr "Side"
 
 #: classes/PDb_List_Admin.class.php:199
 msgid "Record delete successful."
 msgstr "Posten er slettet."
 
-#: classes/PDb_List_Admin.class.php:357 participants-database.php:504
+#: classes/PDb_List_Admin.class.php:360 participants-database.php:508
 msgid "Do you really want to delete the selected record?"
 msgstr "Vil du virkelig slette den valgte posten?"
 
-#: classes/PDb_List_Admin.class.php:358 participants-database.php:505
+#: classes/PDb_List_Admin.class.php:361 participants-database.php:509
 msgid "Do you really want to delete the selected records?"
 msgstr "Vil du virkelig slette de valgte postene?"
 
-#: classes/PDb_List_Admin.class.php:423 participants-database.php:412
-#: participants-database.php:413
+#: classes/PDb_List_Admin.class.php:426 participants-database.php:416
+#: participants-database.php:417
 msgid "List Participants"
 msgstr "Liste over deltakere"
 
-#: classes/PDb_List_Admin.class.php:424
-msgid "%s record found, sorted by:"
-msgid_plural "%s records found, sorted by:"
+#: classes/PDb_List_Admin.class.php:427
+#, fuzzy
+msgid "%s record found, sorted by: %s"
+msgid_plural "%s records found, sorted by: %s"
 msgstr[0] "%s post funnet. Sortert etter:"
 msgstr[1] "%s poster funnet. Sortert etter:"
 
-#: classes/PDb_List_Admin.class.php:444
+#: classes/PDb_List_Admin.class.php:447
 msgid "Show only records with"
 msgstr "Vis bare poster med"
 
-#: classes/PDb_List_Admin.class.php:447
+#: classes/PDb_List_Admin.class.php:450
 msgid "show all"
 msgstr "vis alle"
 
-#: classes/PDb_List_Admin.class.php:472
+#: classes/PDb_List_Admin.class.php:475
 msgid "is"
 msgstr "er"
 
-#: classes/PDb_List_Admin.class.php:473
+#: classes/PDb_List_Admin.class.php:476
 msgid "is not"
 msgstr "er ikke"
 
-#: classes/PDb_List_Admin.class.php:474
+#: classes/PDb_List_Admin.class.php:477
 msgid "contains"
 msgstr "inneholder"
 
-#: classes/PDb_List_Admin.class.php:475
+#: classes/PDb_List_Admin.class.php:478
 msgid "doesn&#39;t contain"
 msgstr "inneholder ikke"
 
-#: classes/PDb_List_Admin.class.php:476
+#: classes/PDb_List_Admin.class.php:479
 msgid "is greater than"
 msgstr "er større enn"
 
-#: classes/PDb_List_Admin.class.php:477
+#: classes/PDb_List_Admin.class.php:480
 msgid "is less than"
 msgstr "er mindre enn"
 
-#: classes/PDb_List_Admin.class.php:540
+#: classes/PDb_List_Admin.class.php:546
 msgid "Show %s items per page."
 msgstr "Vis %s poster per side"
 
-#: classes/PDb_List_Admin.class.php:608
-msgid "Edit"
-msgstr "Rediger"
-
-#: classes/PDb_List_Admin.class.php:753
+#: classes/PDb_List_Admin.class.php:760
 msgid "No records found"
 msgstr "Ingen poster funnet"
 
-#: classes/PDb_List_Admin.class.php:771
+#: classes/PDb_List_Admin.class.php:778
 msgid "Export CSV"
 msgstr "Eksporter CSV"
 
-#: classes/PDb_List_Admin.class.php:784
+#: classes/PDb_List_Admin.class.php:791
 msgid "File Name"
 msgstr "Filnavn"
 
-#: classes/PDb_List_Admin.class.php:786
+#: classes/PDb_List_Admin.class.php:793
 msgid "Download CSV for this list"
 msgstr "Last ned CSV for denne listen"
 
-#: classes/PDb_List_Admin.class.php:787
+#: classes/PDb_List_Admin.class.php:794
 msgid "Include field titles"
 msgstr "Inkluder felttitler"
 
-#: classes/PDb_List_Admin.class.php:790
+#: classes/PDb_List_Admin.class.php:797
 msgid ""
 "This will download the whole list of participants that match your search "
 "terms, and in the order specified by the sort. The export will include "
@@ -271,24 +263,19 @@ msgstr ""
 "vil inneholde poster på alle listesider. Feltene som er inkludert i eksport "
 "er definert i \"CSV \"-kolonnen på Administrer Databasefelt siden."
 
-#. translators: uses the check symbol in a phrase that means "check all"
-#: classes/PDb_List_Admin.class.php:811
-msgid "all"
-msgstr "merk alle"
-
-#: classes/PDb_Pagination.class.php:356
+#: classes/PDb_Pagination.class.php:355
 msgid "First"
 msgstr "Første"
 
-#: classes/PDb_Pagination.class.php:365 participants-database.php:2817
+#: classes/PDb_Pagination.class.php:365 participants-database.php:2820
 msgid "Previous"
 msgstr "Forrige"
 
-#: classes/PDb_Pagination.class.php:381 participants-database.php:2816
+#: classes/PDb_Pagination.class.php:382 participants-database.php:2819
 msgid "Next"
 msgstr "Neste"
 
-#: classes/PDb_Pagination.class.php:392
+#: classes/PDb_Pagination.class.php:394
 msgid "Last"
 msgstr "Siste"
 
@@ -373,11 +360,12 @@ msgid "File Upload Location"
 msgstr "Filsti for opplasting av filer"
 
 #: classes/PDb_Settings.class.php:86
+#, fuzzy
 msgid ""
 "This defines where the uploaded files will go, relative to the WordPress "
-"root. The default location is '/wp-content/uploads/participants-database'<br/"
-">Don't put it in the plugin folder, the images and files could get deleted "
-"when the plugin is updated."
+"root. The default location is '/wp-content/uploads/participants-"
+"database'<br />Don't put it in the plugin folder, the images and files could "
+"get deleted when the plugin is updated."
 msgstr ""
 "Dette definerer hvor de opplastede filer vil plasseres i forhold til "
 "WordPressroten. Standardplasseringen er '/wp-content/uploads/participants-"
@@ -690,11 +678,54 @@ msgstr ""
 "Emnelinje for e-post med registreringskvittering. Plassholdermerke kan "
 "brukes (se under)."
 
+#: classes/PDb_Settings.class.php:393
+#, fuzzy
+msgid "You've just signed up on %s"
+msgstr "Ny registrering på %s"
+
+#: classes/PDb_Settings.class.php:399
+#, fuzzy
+msgid "Signup Response Email"
+msgstr "Send e-postsvar etter registrering"
+
+#: classes/PDb_Settings.class.php:403
+msgid ""
+"Body of the email a visitor gets when they sign up. It includes a link "
+"([record_link]) back to their record so they can fill it out. Can include "
+"HTML, placeholders:[first_name],[last_name],[email],[record_link]. You can "
+"only use placeholders for fields that are present in the signup form, "
+"including hidden fields."
+msgstr ""
+
 #. translators: the %s will be the name of the website
-#: classes/PDb_Settings.class.php:393 classes/PDb_Settings.class.php:399
-#: classes/PDb_Settings.class.php:403 classes/PDb_Settings.class.php:405
-#: classes/PDb_Settings.class.php:411 classes/PDb_Settings.class.php:415
-#: classes/PDb_Settings.class.php:416 classes/PDb_Settings.class.php:422
+#: classes/PDb_Settings.class.php:405
+msgid ""
+"<p>Thank you, [first_name], for signing up with %s.</p><p>You may complete "
+"your registration with additional information or update your information by "
+"visiting this private link at any time: <a href="
+"\"[record_link]\">[record_link]</a>.</p>"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:411
+#, fuzzy
+msgid "Signup Thanks Message"
+msgstr "Registrering takkeside"
+
+#: classes/PDb_Settings.class.php:415
+msgid ""
+"Note to display on the web page after someone has submitted a signup form. "
+"Can include HTML and placeholders (see above)"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:416
+msgid ""
+"<p>Thank you, [first_name] for signing up!</p><p>You will receive an email "
+"acknowledgement shortly. You may complete your registration with additional "
+"information or update your information by visiting the link provided in the "
+"email.</p>"
+msgstr ""
+
+#: classes/PDb_Settings.class.php:422
 msgid "Send Signup Notification Email"
 msgstr "Send e-postvarsel etter registrering"
 
@@ -1323,12 +1354,16 @@ msgstr "Redaktør"
 msgid "Admin"
 msgstr "Administrator"
 
-#: classes/PDb_Settings.class.php:1216 participants-database.php:448
-#: participants-database.php:449
+#: classes/PDb_Settings.class.php:1216 participants-database.php:452
+#: participants-database.php:453 participants-database.php:2979
 msgid "Settings"
 msgstr "Innstillinger"
 
-#: classes/PDb_Shortcode.class.php:219
+#: classes/PDb_Settings.class.php:1306
+msgid "Only numeric values can be used for the \"%s\" setting."
+msgstr ""
+
+#: classes/PDb_Shortcode.class.php:235
 msgctxt "message to show if the plugin cannot find the template"
 msgid ""
 "<%1$s>The template %2$s was not found.</%1$s> Please make sure the name is "
@@ -1388,15 +1423,17 @@ msgid "Error occured while trying to add the data to the database"
 msgstr "En feil oppstod når data ble forsøkt overført til databasen."
 
 #: classes/xnau_CSV_Import.class.php:142
+#, fuzzy
 msgid ""
-"Input file does not exist or path is incorrect.<br/>Attempted to load: %s"
+"Input file does not exist or path is incorrect.<br />Attempted to load: %s"
 msgstr ""
 "Inndatafilen eksisterer ikke, eller filstien stemmer ikke.<br/>Forsøkte å "
 "laste: %s."
 
 #: classes/xnau_CSV_Import.class.php:188
+#, fuzzy
 msgid ""
-"The number of items in line %s is incorrect.<br/>There are %s and there "
+"The number of items in line %s is incorrect.<br />There are %s and there "
 "should be %s."
 msgstr ""
 "Antall elementer i linje %s er ikke riktig.<br/> Det er %s, men burde være "
@@ -1446,7 +1483,7 @@ msgstr "skjult"
 msgid "read only"
 msgstr "skrivebeskyttet"
 
-#: edit_participant.php:226
+#: edit_participant.php:223
 msgid "Save the Record"
 msgstr "Lagre posten"
 
@@ -1603,8 +1640,8 @@ msgstr "Kan ikke legge til et felt med det navnet."
 msgid "This name is reserved; please choose another. Reserved names are"
 msgstr "Dette navnet er reservert. Velg et annet. Reserverte navn er"
 
-#: manage_fields.php:236 participants-database.php:430
-#: participants-database.php:431
+#: manage_fields.php:236 participants-database.php:434
+#: participants-database.php:435
 msgid "Manage Database Fields"
 msgstr "Database admin"
 
@@ -1984,108 +2021,108 @@ msgstr ""
 "administrator."
 
 #. Plugin Name of the plugin/theme
-#: participants-database.php:334
+#: participants-database.php:338
 msgid "Participants Database"
 msgstr "Deltakerdatabase"
 
-#: participants-database.php:421 participants-database.php:422
+#: participants-database.php:425 participants-database.php:426
 msgid "Add Participant"
 msgstr "Legg til deltaker"
 
-#: participants-database.php:439 participants-database.php:440
+#: participants-database.php:443 participants-database.php:444
 #: upload_csv.php:8
 msgid "Import CSV File"
 msgstr "Importer CSV-fil"
 
-#: participants-database.php:457 participants-database.php:458
+#: participants-database.php:461 participants-database.php:462
 msgid "Setup Guide"
 msgstr "Oppsettveiviser"
 
-#: participants-database.php:466 participants-database.php:467
+#: participants-database.php:470 participants-database.php:471
 msgid "Edit Record"
 msgstr "Rediger post"
 
 #. translators: don't translate the words in brackets {}
-#: participants-database.php:516
+#: participants-database.php:520
 msgid "You must remove all fields from the {name} group before deleting it."
 msgstr "Du må fjerne alle feltene fra gruppen {name} før du sletter den."
 
-#: participants-database.php:517
+#: participants-database.php:521
 msgid "Delete the \"{name}\" {thing}?"
 msgstr "Slett \"{name}\" {thing}?"
 
-#: participants-database.php:2380
+#: participants-database.php:2383
 msgid ""
 "There is something wrong with the file you tried to upload. Try another."
 msgstr "Det er noe galt med filen du prøvde å laste opp. Prøv en annen."
 
-#: participants-database.php:2396 participants-database.php:2424
+#: participants-database.php:2399 participants-database.php:2427
 msgid "For \"%s\", you may only upload image files like JPEGs, GIFs or PNGs."
 msgstr ""
 "For \"%s\", kan du bare laste opp bildefiler med filetternavnene JPEG, GIF "
 "eller PNG."
 
-#: participants-database.php:2398
+#: participants-database.php:2401
 msgid "The file selected for \"%s\" must be one of these types: %s. "
 msgstr "Den valgte filen for \"%s\" må være en av følgende filtyper: %s."
 
-#: participants-database.php:2430
+#: participants-database.php:2433
 msgid ""
 "The file you tried to upload is too large. The file must be smaller than %sK."
 msgstr "Filen du prøver å laste opp er for stor. Filen må være mindre enn %sK."
 
-#: participants-database.php:2437
+#: participants-database.php:2440
 msgid "The file could not be saved."
 msgstr "Filen kunne ikke lagres."
 
-#: participants-database.php:2465
+#: participants-database.php:2468
 msgid "The uploads directory (%s) could not be created."
 msgstr "Opplastingsmappen (%s) kunne ikke lages."
 
-#: participants-database.php:2724
+#: participants-database.php:2727
 msgid ""
 "The date for \"%s\" was invalid. Please input the date with the exact format "
 "shown"
 msgstr ""
 "Datoen for \"%s\" er ugyldig. Legg inn data på eksakt samme form som vist"
 
-#: participants-database.php:2814 templates/pdb-retrieve-default.php:45
+#: participants-database.php:2817 templates/pdb-retrieve-default.php:45
 msgid "Submit"
 msgstr "Send"
 
-#: participants-database.php:2815
+#: participants-database.php:2818
 msgid "Apply"
 msgstr "Legg til"
 
-#: participants-database.php:2818
+#: participants-database.php:2821
 msgid "The record has been updated."
 msgstr "Posten har blitt oppdatert."
 
-#: participants-database.php:2819
+#: participants-database.php:2822
 msgid "The new record has been added."
 msgstr "Den nye posten er lagt til."
 
-#: participants-database.php:2846
+#: participants-database.php:2940
 msgid "WordPress Plugin"
 msgstr "WordPress utvidelse"
 
-#: participants-database.php:2847
+#: participants-database.php:2941
 msgid ""
 "Helping organizations manage their volunteers, members and participants."
 msgstr "Hjelper organisasjoner å styre frivillige, medlemmer og deltakere."
 
-#: participants-database.php:2850
+#: participants-database.php:2944
 msgid "Developed by"
 msgstr "Utviklet av"
 
-#: participants-database.php:2851
+#: participants-database.php:2945
 msgid ""
 "Suggestions or crticisms of this plugin? I&#39;d love to hear them: email "
 msgstr ""
 "Forslag eller kritikk av denne utvidelsen? Jeg setter veldig stor pris på å "
 "høre dem: e-post"
 
-#: participants-database.php:2854
+#: participants-database.php:2948
 msgid ""
 "Please consider contributing to the continued support and development of "
 "this software by visiting %1$sthis plugin&#39;s page,%3$s giving the plugin "
@@ -2254,3 +2291,13 @@ msgstr "Roland Barker"
 #. Author URI of the plugin/theme
 msgid "http://xnau.com"
 msgstr "http://xnau.com"
+
+#~ msgctxt "noun; page number indicator"
+#~ msgid "Page"
+#~ msgstr "Side"
+
+#~ msgid "Edit"
+#~ msgstr "Rediger"
+
+#~ msgid "all"
+#~ msgstr "merk alle"

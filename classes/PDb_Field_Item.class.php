@@ -142,11 +142,7 @@ class PDb_Field_Item extends PDb_Template_Item {
   private function _is_single_record_link() {
 
     return (
-            isset( Participants_Db::$plugin_options['single_record_link_field'] )
-            &&
-            $this->name == Participants_Db::$plugin_options['single_record_link_field']
-            &&
-            ! empty( Participants_Db::$plugin_options['single_record_page'] )
+            Participants_Db::is_single_record_link($this)
             &&
             ! in_array( $this->form_element, array('rich-text', 'link' ) )
             &&
@@ -198,6 +194,8 @@ class PDb_Field_Item extends PDb_Template_Item {
     // for compatibility we are not prefixing the form element class name
     $this->print_CSS_class( $this->form_element, false );
     
+    if ($this->readonly) echo ' readonly-element';
+    
   }
   /**
    * prints a CSS classname based on the field name
@@ -218,9 +216,9 @@ class PDb_Field_Item extends PDb_Template_Item {
 
     if ($this->readonly && !in_array($this->form_element, array('captcha'))) {
 
-      if (PDb_Shortcode::$readonly_inputs && !in_array($this->form_element, array('rich-text'))) {
+      if (!in_array($this->form_element, array('rich-text'))) {
         
-        $this->attributes['disabled'] = 'disabled';
+        $this->attributes['readonly'] = 'readonly';
         $this->_print();
       } else {
 
@@ -256,7 +254,7 @@ class PDb_Field_Item extends PDb_Template_Item {
    */
   public function has_help_text() {
     
-    return ! empty( $this->help_text );
+    return ! empty( $this->help_text ) &&  $this->readonly !== '1' ;
   
   }
   
@@ -265,7 +263,7 @@ class PDb_Field_Item extends PDb_Template_Item {
    */
   public function print_help_text( ) {
     
-    if ( ! empty( $this->help_text ) ) {
+    if ( ! empty( $this->help_text )) {
       
       echo $this->prepare_display_value( $this->help_text );  
       
