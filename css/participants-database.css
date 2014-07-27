@@ -11,7 +11,7 @@
   display: block;
 }
 .glyphicon {
-  font: 400 20px/1 sans-serif;
+  font: 400 20px/1 dashicons, sans-serif;
 }
 .has-dashicons .glyphicon {
   font: 400 20px/1 dashicons;

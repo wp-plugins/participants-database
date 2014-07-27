@@ -238,7 +238,7 @@ You can define a "captcha" form element which will show a simple math question f
 
 == Changelog ==
 
-= 1.5.5 =
+= 1.6 =
 
 * database optimizations for large data sets
 * scripts and stylesheets loaded only on active plugin pages
@@ -252,7 +252,8 @@ You can define a "captcha" form element which will show a simple math question f
 * better support for custom search forms
 * new shortcode attributes for forms: "autocomplete", "edit_record_page" and "submit_button"
 * improved security on user input
-* tighter controls on secure functions
+* improved security on admin functions
+* users with cookies disabled are shown a warning
 
 = 1.5.4.9 =
 
@@ -498,9 +499,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.5.4.9 =
+= 1.6 =
 
-security update
+major update; several new features, code optimizations
 
 == Using the Plugin ==
 
