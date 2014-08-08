@@ -282,7 +282,8 @@ class PDb_FormElement extends xnau_FormElement {
       case 'dropdown-other':
       case 'select-other':
         
-        $return = sprintf('<span class="%s">%s</span>', $field->form_element, self::get_value_title($field->value, $field->name) );
+        $field->value = self::get_value_title($field->value, $field->name);
+        $return = sprintf('<span class="%s">%s</span>', $field->form_element,  self::make_link($field));
         break;
       
       case 'hidden':

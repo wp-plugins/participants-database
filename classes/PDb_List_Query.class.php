@@ -671,7 +671,7 @@ class PDb_List_Query {
            * serialized array), we must prepare a special statement to search 
            * for the double quotes surrounding the value in the serialization
            */
-          if (in_array($field_atts->form_element, array('multi-checkbox', 'multi-select-other'))) {
+          if (in_array($field_atts->form_element, array('multi-checkbox', 'multi-select-other', 'link', 'array'))) {
             $delimiter = array('\'%"', '"%\'');
             $operator = 'LIKE';
             /* 

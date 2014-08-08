@@ -117,10 +117,15 @@ fieldset.widefat.inline-controls label {
   width:auto;
   overflow:auto;
 }
-#PDb_footer .icon-xnau-glyph {
-  font-size: 275%;
-  margin-right: 0.5ex;
+#PDb_footer .glyph-link {    
+  display: block;
   float: left;
+  font-size: 36px;
+  height: 36px;
+  overflow: hidden;
+} 
+#PDb_footer .icon-xnau-glyph {
+  margin-right: 0.5ex;
   background-color: #ffffff;
 }
 #PDb_footer .section {

@@ -1153,6 +1153,10 @@ class PDb_Settings extends xnau_Plugin_Settings {
    */
   private function _get_identifier_columns($null = true) {
 
+    $columnlist = wp_cache_get('id_columns');
+    
+    if ($columnlist === false) {
+
     global $wpdb;
 
     $columnlist = $null ? array() : array('null_select' => false);
@@ -1165,6 +1169,10 @@ class PDb_Settings extends xnau_Plugin_Settings {
     foreach ($columns as $column) {
         $key = sprintf('%s (%s)', $column->title, $column->name);
         $columnlist[$key] = $column->name;
+    }
+
+      wp_cache_set('id_columns', $columnlist);
+      
     }
 
     return $columnlist;

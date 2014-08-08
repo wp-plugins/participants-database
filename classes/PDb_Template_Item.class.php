@@ -50,6 +50,11 @@ class PDb_Template_Item {
   var $values;
   
   /**
+   * @var array holds an array of class strings
+   */
+  var $class = array();
+  
+  /**
    * constructs a Template Item object
    *
    * @param object $properties an object with the item's properties
@@ -166,6 +171,13 @@ class PDb_Template_Item {
       
     }
     
+  }
+  
+  /**
+   * prints an HTML class value
+   */
+  public function print_class() {
+    echo implode(' ', $this->class);
   }
   
 }

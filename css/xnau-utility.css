@@ -10,8 +10,8 @@
 	font-style: normal;
 }
 
-#participants-database [class^="icon-"]:before, 
-#participants-database [class*=" icon-"]:before {
+[class^="icon-xnau"]:before, 
+[class*=" icon-xnau"]:before {
 	font-family: 'xnau-utility';
 	speak: none;
 	font-style: normal;

@@ -281,14 +281,14 @@ class Participants_Db extends PDb_Base {
     add_action('wp_ajax_nopriv_pdb_list_filter', array(__CLASS__, 'pdb_list_filter'));
 
     // define our shortcodes
-    add_shortcode('pdb_record',        array(__CLASS__, 'print_record_edit_form'));
-    add_shortcode('pdb_signup',        array(__CLASS__, 'print_signup_form'));
-    add_shortcode('pdb_signup_thanks', array(__CLASS__, 'print_signup_thanks_form'));
-    add_shortcode('pdb_request_link',  array(__CLASS__, 'print_retrieval_form'));
-    add_shortcode('pdb_list',          array(__CLASS__, 'print_list'));
-    add_shortcode('pdb_single',        array(__CLASS__, 'print_single_record'));
-    add_shortcode('pdb_search',        array(__CLASS__, 'print_search_form'));
-    add_shortcode('pdb_total',         array(__CLASS__, 'print_total'));
+    add_shortcode('pdb_record',        array(__CLASS__, 'print_shortcode'));
+    add_shortcode('pdb_signup',        array(__CLASS__, 'print_shortcode'));
+    add_shortcode('pdb_signup_thanks', array(__CLASS__, 'print_shortcode'));
+    add_shortcode('pdb_request_link',  array(__CLASS__, 'print_shortcode'));
+    add_shortcode('pdb_list',          array(__CLASS__, 'print_shortcode'));
+    add_shortcode('pdb_single',        array(__CLASS__, 'print_shortcode'));
+    add_shortcode('pdb_search',        array(__CLASS__, 'print_shortcode'));
+    add_shortcode('pdb_total',         array(__CLASS__, 'print_shortcode'));
 
     /*
      * sets up the update notification
@@ -725,6 +725,46 @@ class Participants_Db extends PDb_Base {
   public static function set_record_access($id) {
 
     self::_record_access($id);
+  }
+
+  /**
+   * common function for printing all shortcodes
+   * 
+   * @param array $params array of paramters passed in from the shortcode
+   * @param string $content the content of the enclosure (empty string; we don't use enclosure tags)
+   * @param string $tag the shortcode identification string
+   * @return null 
+   */
+  public static function print_shortcode($params, $content, $tag) {
+    
+    $shortcode_parameters = self::set_filter('shortcode_call_' . $tag, $params);
+    
+    switch ($tag) {
+      case 'pdb_record':
+        return self::print_record_edit_form($shortcode_parameters);
+        break;
+      case 'pdb_signup':
+        return self::print_signup_form($shortcode_parameters);
+        break;
+      case 'pdb_signup_thanks':
+        return self::print_signup_thanks_form($shortcode_parameters);
+        break;
+      case 'pdb_request_link':
+        return self::print_retrieval_form($shortcode_parameters);
+        break;
+      case 'pdb_list':
+        return self::print_list($shortcode_parameters);
+        break;
+      case 'pdb_single':
+        return self::print_single_record($shortcode_parameters);
+        break;
+      case 'pdb_search':
+        return self::print_search_form($shortcode_parameters);
+        break;
+      case 'pdb_total':
+        return self::print_total($shortcode_parameters);
+        break;
+    }
   }
 
 
@@ -1250,6 +1290,8 @@ class Participants_Db extends PDb_Base {
    *                 submission does not validate
    */
   public static function process_form($post, $action, $participant_id = false, $column_names = false) {
+
+    if (!isset($action) || !in_array($action, array('insert','update')) || $post['subsource'] !== Participants_Db::PLUGIN_NAME) return false;
 
     global $wpdb;
 
@@ -2550,7 +2592,7 @@ class Participants_Db extends PDb_Base {
      * extension
      */
     $extensions = empty($field_atts->values) ? self::$plugin_options['allowed_file_types'] : implode(',', self::unserialize_array($field_atts->values));
-    $test = preg_match('#^(.+)\.(' . implode('|', array_map('trim', explode(',', strtolower($extensions)))) . ')$#', strtolower($file['name']), $matches);
+    $test = preg_match('#^(.+)\.(' . implode('|', array_map('trim', explode(',', str_replace('.', '', strtolower($extensions))))) . ')$#', strtolower($file['name']), $matches);
 
     //error_log(__METHOD__.' ext:'.$extensions.' test:'. $test.' matches:'.print_r($matches,1));
 
@@ -3063,7 +3105,7 @@ class Participants_Db extends PDb_Base {
         <p><em><?php _e('Helping organizations manage their volunteers, members and participants.', 'participants-database') ?></em></p>
       </div>
       <div class="section">
-        <h4><a href="http://xnau.com"><span class="icon-xnau-glyph"></span></a><?php _e('Developed by', 'participants-database') ?><br /><a href="http://xnau.com">xn<span class="lowast">&lowast;</span>au webdesign</a></h4>
+        <h4><a class="glyph-link" href="http://xnau.com"><span class="icon-xnau-glyph"></span></a><?php _e('Developed by', 'participants-database') ?><br /><a href="http://xnau.com">xn<span class="lowast">&lowast;</span>au webdesign</a></h4>
         <p><?php _e('Suggestions or crticisms of this plugin? I&#39;d love to hear them: email ', 'participants-database') ?><a href="mailto:support@xnau.com">support@xnau.com.</a>
       </div>
       <div class="section">
