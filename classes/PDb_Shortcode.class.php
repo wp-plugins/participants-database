@@ -546,6 +546,7 @@ abstract class PDb_Shortcode {
       $this->record->$group_name->fields = new stdClass();
 
       $field_count = 0;
+      $all_empty_fields = true; 
 
       foreach ($group_fields as $field) {
 
@@ -557,9 +558,7 @@ abstract class PDb_Shortcode {
            * hidden input fields
            */
         if ($field->form_element == 'hidden' && in_array($field->name, $this->display_columns)) { // and in_array($this->module, array('signup', 'record'))
-
             $this->hidden_fields[$field->name] = $field->value;
-
         } else {
 
           $this->_set_field_link($field);
@@ -567,8 +566,9 @@ abstract class PDb_Shortcode {
             /*
              * add the field object to the record object
              */
-          if (in_array($field->name, $this->display_columns)){
+          if (in_array($field->name, $this->display_columns)) {
             $field_count++;
+            if (!$this->_empty($field->value)) $all_empty_fields = false;
             $this->record->$group_name->fields->{$field->name} = $field;
           }
           }
@@ -576,6 +576,8 @@ abstract class PDb_Shortcode {
       if ($field_count === 0) {
         // remove the empty group from the iterator
         unset($this->record->$group_name);
+      } elseif ($all_empty_fields) {
+        $this->record->$group_name->class[] = 'empty-field-group';
       }
     }
 
@@ -1161,7 +1163,7 @@ abstract class PDb_Shortcode {
    */
   public function template_basename() {
     if (WP_DEBUG) {
-      $path = stristr($this->template, 'wp-content');
+      $path = $this->template;
     } else {
       $path = '';
       $paths = explode('/', $this->template);

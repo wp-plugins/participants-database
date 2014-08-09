@@ -3,15 +3,9 @@
 
 template for participants list shortcode output
 
-this is the default template which formats the list of records as a table
+this template demonstrates a "table-less" layout for the list of records
 
 */
-/* 
- * this adds the default plugin stylesheet
- * you can specify your own here, just put in the filename of your 
- * stylesheet (located in your theme directory) as the argument
- */
-//$this->add_stylesheet();
 ?>
 <div class="wrap <?php echo $this->wrap_class ?>">
 <a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
@@ -61,8 +55,6 @@ this is the default template which formats the list of records as a table
   </div>
   <?php endif ?>
 
-<?php /* LIST DISPLAY */?>
-
 <?php 
 /* print the count if enabled in the shortcode
  * 
@@ -70,51 +62,54 @@ this is the default template which formats the list of records as a table
  */
 $this->print_list_count('<h5>'); 
 ?>
+<?php // this is an example of a way to style the records, delete this or edit as needed ?>
+<style type="text/css">
+  section {
+    margin: 1.5em 0;
+  }
+  section p {
+    margin: 0;
+  }
+</style>
 
-
-  <table class="table pdb-list list-container" >
+<div class="table pdb-list list-container" >
   
     
     <?php if ( $record_count > 0 ) : ?>
 
-    <thead>
-      <tr>
-        <?php /*
-         * this function prints headers for all the fields
-         * replacement codes:
-         * %2$s is the form element type identifier
-         * %1$s is the title of the field
-         */
-        $this->print_header_row( '<th class="%2$s" >%1$s</th>' );
-        ?>
-      </tr>
-    </thead>
-    <?php // print the table footer row if there is a long list
-      if ( $records_per_page > 30 ) : ?>
-    <tfoot>
-      <tr>
-        <?php $this->print_header_row( '<th class="%2$s">%1$s</th>' ) ?>
-      </tr>
-    </tfoot>
-    <?php endif ?>
-
-    <tbody>
     <?php while ( $this->have_records() ) : $this->the_record(); // each record is one row ?>
-      <tr>
+      <section id="record-<?php echo $this->record->record_id ?>">
         <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
 
           <?php $value = $this->field->value;
           if ( ! $this->field->is_empty( $value ) ) : ?>
-          <td>
+        <p>
+        <strong><?php echo $this->field->title ?>:&nbsp;</strong>
           	<?php 
-						// wrap the item in a link if it's enabled for this field
+						/* wrap the item in a single record link if it's enabled for this field:
+						 * this uses the global setting. If you want to customize the field on
+						 * which to place the link to the record detail page, change the "test"
+						 * to something like this:
+						 * if ( $this->field->name == 'field_name' ) {
+						 *
+						 * if you do this, check out the case below where we make a clickable
+						 * link: it does the same test so we don't duplicate the field. You'll
+						 * have to modify that in the same way
+						 */
 						if ( $this->field->is_single_record_link() ) {
-              echo Participants_Db::make_link(
-                $single_record_link,             // URL of the single record page
-                $value,                          // field value
-                '<a href="%1$s" title="%2$s" >', // template for building the link
-                array( 'pdb' => $this->field->record_id )    // record ID to get the record
-              );
+              
+              /*
+               * normally, when a value is empty, nothing is shown...but if the field 
+               * has been designated as the single record link, we must have something 
+               * to click on, so, we use the default value of the field if there is no 
+               * stored value. This makes it possible to create a 'static' link to the 
+               * single record by defining a read-only field with a default value
+               */
+              $value = empty($value) ? $this->field->default : $value;
+							
+							// add the record ID to the single record link and set the field's link property
+							$this->field->link = Participants_Db::add_uri_conjunction($single_record_link) . 'pdb=' . $this->record->record_id;
+							
             } ?>
 
             <?php /*
@@ -123,13 +118,14 @@ $this->print_list_count('<h5>');
             */
             switch ( $this->field->form_element ) :
 
-							case 'image-upload':
-
+							case 'image-upload': 
+                
                 $image = new PDb_Image(
                         array(
                             'filename' => $value,
                             'mode' => 'image',
                             'module' => 'list',
+                            'relstring' => 'lightbox',
                       )
                         );
                 $image->print_image();
@@ -140,7 +136,7 @@ $this->print_list_count('<h5>');
 								/*
 								 * if you want to specify a format, include it as the second 
 								 * argument in this function; otherwise, it will default to 
-								 * the site setting
+								 * the site setting. See PHP date() for formatting codes
 								 */
 								$this->show_date( $value, false );
 								
@@ -151,7 +147,7 @@ $this->print_list_count('<h5>');
 						
 							/*
 							 * this function shows the values as a comma separated list
-							 * you can customize the glue that joins the array elements
+							 * you can customize the glue string that joins the array elements
 							 */
 							$this->show_array( $value, $glue = ', ' );
 							
@@ -172,8 +168,36 @@ $this->print_list_count('<h5>');
 						case 'rich-text':
 							
 							printf(
+										 /* we wrap long text in this span so we can control it's size
+										  * when presented in a list
+										  */
 										 '<span class="%s">%s</span>',
-										 $this->field->form_element == 'rich-text' ? 'textarea richtext' : 'textarea',
+										 
+										 // this adds our CSS class
+										 'textarea richtext',
+										 
+										 /*
+											* here, we process the rich text output through wpautop. This is needed
+											* to automatically create paragraphs in rich text. You can take this out
+											* if you don't want to use WP auto-paragraphs. See 
+											* http://codex.wordpress.org/Function_Reference/wpautop
+											*/
+										 wpautop($value)
+										 
+										 );
+							
+              break;
+						
+						case 'text-area':
+							
+							printf(
+										 /* we wrap long text in this span so we can control it's size
+										  * when presented in a list
+										  */
+										 '<span class="%s">%s</span>',
+										 // the CSS class
+										 'textarea',
+										 // the text
 										 $value
 										 );
 							
@@ -182,43 +206,47 @@ $this->print_list_count('<h5>');
 						case 'text-line':
 						default:
 						
-							if ( Participants_Db::$plugin_options['make_links'] && ! $this->field->is_single_record_link() ) {
+							/*
+							 * if the make links setting is enabled, try to make a link out of the field
+							 */
+							if (
+                      Participants_Db::$plugin_options['make_links'] 
+                      && 
+                      ! $this->field->is_single_record_link() 
+                      && 
+                      filter_var($value, FILTER_VALIDATE_EMAIL) !== false
+                      && 
+                      filter_var($value, FILTER_VALIDATE_URL) !== false       
+                 ) {
 								
 								$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
 								
 							} else {
 								
-								echo esc_html( $value );
+                echo PDb_FormElement::get_field_value_display($this->field);
 								
 							}
 
-            endswitch; // switch by field type 
-            ?>
-            </td>
+            endswitch; // switch by field type ?>
+            </p>
             <?php // close the anchor tag if it's a link 
 						if ( $this->field->is_single_record_link() ) : ?>
             	</a>
             <?php endif ?>
             
         <?php else : // if the field is empty ?>
-        <td></td>
         <?php endif ?>
         
 			<?php endwhile; // each field ?>
-      </tr>
+      </section>
     <?php endwhile; // each record ?>
-    </tbody>
     
     <?php else : // if there are no records ?>
 
-    <tbody>
-      <tr>
-        <td><?php if ($this->is_search_result === true)  echo Participants_Db::$plugin_options['no_records_message'] ?></td>
-      </tr>
-    </tbody>
+    <h4><?php if ($this->is_search_result === true)  echo Participants_Db::$plugin_options['no_records_message'] ?></h4>
 
     <?php endif; // $record_count > 0 ?>
-	</table>
+	</div>
   <?php
 	// set up the bootstrap pagination classes and wrappers
 

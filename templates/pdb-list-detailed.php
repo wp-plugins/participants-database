@@ -270,7 +270,15 @@ this is a more detailed template showing how the parts of the display can be cus
 							/*
 							 * if the make links setting is enabled, try to make a link out of the field
 							 */
-							if ( Participants_Db::$plugin_options['make_links'] && ! $this->field->is_single_record_link() ) {
+							if (
+                      Participants_Db::$plugin_options['make_links'] 
+                      && 
+                      ! $this->field->is_single_record_link() 
+                      && 
+                      filter_var($value, FILTER_VALIDATE_EMAIL) !== false
+                      && 
+                      filter_var($value, FILTER_VALIDATE_URL) !== false       
+                 ) {
 								
 								$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
 								

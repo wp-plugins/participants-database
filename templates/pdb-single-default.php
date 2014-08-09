@@ -27,7 +27,7 @@ $exclude = array();
 	
   <?php while ( $this->have_groups() ) : $this->the_group(); ?>
   
-  <div class="section" id="<?php echo Participants_Db::$prefix.$this->group->name ?>">
+  <div class="section <?php $this->group->print_class() ?>" id="<?php echo Participants_Db::$prefix.$this->group->name ?>">
   
     <?php $this->group->print_title( '<h2>', '</h2>' ) ?>
     

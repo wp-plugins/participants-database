@@ -79,7 +79,7 @@ Records can also be mass-imported with a CSV file, allowing you to use existing 
 
 This plugin is fully compliant with WordPress Internationalization standards and includes several translations, some of which are incomplete at the moment. All of the front-end text is user-customizable, so even if a translation isn't available for your language, your users will be able to use the plugin in their language.
 
-*Translation Credits*
+= Translation Credits =
 
 * French: Dominique Chapelle
 
@@ -101,7 +101,15 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * Ukranian: Michael Yunat, [http://getvoip.com/blog](http://getvoip.com)
 
+* Spanish: Cristhofer Chávez
+
+* German: Christian von Bock
+
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
+
+Please note that several of these translations are out of date. If your language is in this list and you'd like to help me provide the latest translation, please contact me.
+
+The latest POT file is always available [here.](http://plugins.svn.wordpress.org/participants-database/trunk/participants-database.pot)
 
 == Installation ==
 
@@ -148,6 +156,10 @@ An individual record can be edited on the frontend of your website by someone wh
 
 OK, just assign all the fields you want them to fill out to the signup form (this is done in the "manage fields" page). That form can be as big as you want. Then, remove the private link from the email they get when they sign up.
 
+= How do I change the text "Participant Info" seen at the top of the single record page? =
+
+This is a group title. Groups are defined on the Manage Database Fields page under the "Field Groups" tab. You will see that each group has a title and a description that you can use to organize and label the ouput of the plugin.
+
 = How do I let people upload an image or file? =
 
 Go to the "manage database fields" page and create a new field for your image. Give it a descriptive name like "avatar" or something. Click "add field" and when your new field appears, set the "field type" to "image upload" for images and "file-upload" for other types of file. Be sure to check "signup" if you want it to appear in the signup form. When the form is presented to the user, they will be allowed to upload an image.
@@ -165,6 +177,8 @@ Each file upload field can have it's allowed files determined in the "values" fi
 No, these signups and records are separate from people who can register on your site as users. If there are things only registered users can do (such as a forum or comments), they will have to register or sign in as usual.
 
 The idea is to use the database as a roster of volunteers, supporters, etc. for the organization, not the website.
+
+If you are interested in having this plugin work with WordPress users, read this article: [Using Participants Database with WordPress Users](http://xnau.com/using-participants-database-with-wordpress-users/).
 
 = People are signing up, but emails are not getting sent =
 

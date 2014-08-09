@@ -331,7 +331,9 @@ class PDb_Base {
    */
   public static function set_filter($slug, $term)
   {
-    $tag = Participants_Db::$prefix . $slug;
+    if (strpos($slug, Participants_Db::$prefix) === false) {
+			$tag = Participants_Db::$prefix . $slug;
+    }
     
     if (!has_filter($tag)) {
       return $term;

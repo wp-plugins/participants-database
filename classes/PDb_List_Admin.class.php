@@ -572,7 +572,10 @@ class PDb_List_Admin {
           if (in_array($column->name, array('id', 'private_id')))
             continue;
 
-          $filter_columns[$column->title] = $column->name;
+          // add the field name if a field with the same title is already in the list
+          $select_title = isset($filter_columns[$column->title]) ? $column->title . ' (' . $column->name . ')' : $column->title;
+          
+          $filter_columns[$select_title] = $column->name;
         }
           ?>
           <div class="pdb-searchform">

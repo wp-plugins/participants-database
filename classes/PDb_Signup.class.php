@@ -325,15 +325,15 @@ class PDb_Signup extends PDb_Shortcode {
   // sends a receipt email
   private function _do_receipt() {
     
-    $email_field = Participants_Db::$plugin_options['primary_email_address_field'];
+    $recipient = @$this->participant_values[Participants_Db::$plugin_options['primary_email_address_field']];
 
-    if (!isset($this->participant_values[$email_field]) || empty($this->participant_values[$email_field])) {
-      error_log(__METHOD__.' no valid email address was found, mail could not be sent.');
+    if (filter_var($recipient, FILTER_VALIDATE_EMAIL) === false) {
+      error_log(__METHOD__.' no valid email address was found for the user receipt email, mail could not be sent.');
       return NULL;
     }
 
     $this->_mail(
-            $this->participant_values[$email_field], 
+            $recipient, 
             $this->_proc_tags($this->receipt_subject), 
             Participants_Db::process_rich_text($this->_proc_tags($this->receipt_body))
     );

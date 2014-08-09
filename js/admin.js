@@ -1,5 +1,16 @@
 // participants-database admin support scripts
 PDbAdmin = (function($) {
+  $.fn.PDb_email_obfuscate = function () {
+    var address, link,
+            el = this;
+    try {
+      address = jQuery.parseJSON(el.attr('data-email-values'));
+    } catch (e) {
+      return;
+    }
+    link = ''.concat(address.name, '@', address.domain);
+    el.attr('href', 'mailto:' + link).html(link).addClass('obfuscated');
+  }
   return {
     init: function() {
       $('input[placeholder], textarea[placeholder]').placeholder();
@@ -8,6 +19,10 @@ PDbAdmin = (function($) {
         $(this).addClass('focused').closest('td').addClass('focused');
       }).on('blur', '.manage-fields input[type="text"]', function() {
         $(this).removeClass('focused').closest('td').removeClass('focused');
+      });
+      // place email obfuscation
+      $('a.obfuscate[data-email-values]').each(function () {
+        $(this).PDb_email_obfuscate();
       });
     }
   }
