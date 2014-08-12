@@ -1273,12 +1273,36 @@ abstract class PDb_Shortcode {
   protected function _set_submission_page()
   {
 
+    $form_status = 'normal';
     if (!empty($this->shortcode_atts['action'])) {
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
+      $form_status = 'multipage';
     }
     if (!$this->submission_page) {
     $this->submission_page = $_SERVER['REQUEST_URI'];
   }
+    $this->set_form_status($form_status);
+  }
+  
+  /**
+   * sets the current form status
+   * 
+   * this is used to determine the submission status of a form; primarily to determine 
+   * if a nulti-page form in ins process
+   * 
+   * @param string $status the new status string or null
+   */
+  public function set_form_status($status = 'normal') {
+    Participants_Db::$session->set('form_status', $status);
+  }
+  
+  /**
+   * gets the current form status
+   * 
+   * @return string the status string: normal, multipage, or complete
+   */
+  public function get_form_status() {
+    return Participants_Db::$session->get('form_status', 'normal');
   }
 
   /**

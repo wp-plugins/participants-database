@@ -123,11 +123,12 @@ class PDb_Session {
 	 * get a session variable
    * 
 	 * @param string $key Session key
-	 * @return string Session variable
+   * @param string|array|bool $default the value to return if none is found in the session
+	 * @return string Session variable or $default value
 	 */
-	public function get( $key ) {
+	public function get( $key, $default = false ) {
 		$key = sanitize_key( $key );
-		return isset( $this->session[ $key ] ) ? maybe_unserialize( $this->session[ $key ] ) : false;
+		return isset( $this->session[ $key ] ) ? maybe_unserialize( $this->session[ $key ] ) : $default;
 	}
 
 	/**

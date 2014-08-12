@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.6
+  Version: 1.6 beta 3
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -1322,10 +1322,17 @@ class Participants_Db extends PDb_Base {
      * 1 - update matching record
      * 2 - show validation error
      */
+    if (isset($_POST['csv_file_upload'])) {
+      // a CSV upload brings in it's own match preference
+      $duplicate_record_preference = filter_input(INPUT_POST, 'match_preference', FILTER_SANITIZE_STRING);
+      $match_field = filter_input(INPUT_POST, 'match_field', FILTER_SANITIZE_STRING);
+    } else {
     $duplicate_record_preference = self::plugin_setting('unique_email', '0');
-    if (is_admin() && filter_var($post['subsource'], FILTER_SANITIZE_STRING) === Participants_Db::PLUGIN_NAME) {
+      $match_field = self::plugin_setting('unique_field','id');
+    }
+    if (is_admin() && !isset($_POST['csv_file_upload'])) {
       /*
-       * set the preference to 0 if in the admin and editing/adding a record
+       * set the preference to 0 if in the admin and not importing a CSV
        * 
        * this allows administrators to create new records without being affected 
        * by the duplicate record preference
@@ -1334,7 +1341,6 @@ class Participants_Db extends PDb_Base {
     }
     if ($action == 'insert' and $duplicate_record_preference !== '0') {
 
-      $match_field = self::plugin_setting('unique_field','id');
       $match_field_value = filter_var($post[$match_field], FILTER_SANITIZE_STRING);
 
       if ($match_field_value !== '' && self::field_value_exists($match_field_value, $match_field)) {
@@ -2110,12 +2116,20 @@ class Participants_Db extends PDb_Base {
          *   b) a user is updating their record on the frontend
          *   c) an admin is updating a record
          *
+         * signups are processed in the case 'signup' section
+         * 
          * set the raw post array filters. We pass in the $_POST array, expecting 
          * a possibly altered copy of it to be returned
          */
         $post_data = self::set_filter('before_submit_' . ($post_input['action'] == 'insert' ? 'add' : 'update'), $_POST);
 
-        $id = isset($_POST['id']) ? filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, array('min_range' => 1)) : ( isset($_GET['id']) ? filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('min_range' => 1)) : false );
+        if (isset($_POST['id'])) {
+          $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, array('min_range' => 1));
+        } elseif (isset($_GET['id'])) {
+          $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('min_range' => 1));
+        } else {
+          $id = false;
+        }
 
         $participant_id = self::process_form($post_data, $post_input['action'], $id, $columns);
 
@@ -2145,7 +2159,7 @@ class Participants_Db extends PDb_Base {
             
           self::$validation_errors->add_error('', self::$plugin_options['record_updated_message']);
 
-          if (self::$plugin_options['send_record_update_notify_email']) {
+          if (self::$plugin_options['send_record_update_notify_email'] && Participants_Db::$session->get('form_status') !== 'multipage') {
 
             $sent = wp_mail(
                     self::$plugin_options['email_signup_notify_addresses'],
@@ -2161,7 +2175,9 @@ class Participants_Db extends PDb_Base {
           
             self::$session->set('pdbid', $post_data['id']);
 
-            wp_redirect($post_data['thanks_page']); // self::add_uri_conjunction($post_data['thanks_page']) . 'pdbid=' . $post_data['id']
+            $redirect = $post_input['action'] == 'insert' ? $post_data['thanks_page'] : self::add_uri_conjunction($post_data['thanks_page']) . 'action=update';
+
+            wp_redirect($redirect);
             
             exit;
           }

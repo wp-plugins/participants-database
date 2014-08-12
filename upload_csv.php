@@ -1,20 +1,33 @@
 <?php
+if (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) exit;
 $CSV_import = new PDb_CSV_Import('csv_file_upload');
-$csv_params = get_transient(Participants_Db::$prefix . 'csv_import_params');
-if (!is_array($csv_params)) {
-  $csv_params = array(
+$csv_paramdefaults = array(
       'delimiter_character' => 'auto',
-      'enclosure_character' => 'auto'
+      'enclosure_character' => 'auto',
+      'match_field' => Participants_Db::plugin_setting('unique_field'),
+      'match_preference' => Participants_Db::plugin_setting('unique_email')
       );
+$csv_options = get_option(Participants_Db::$prefix . 'csv_import_params');
+if ($csv_options === false) {
+  $csv_params = $csv_paramdefaults;
+} else {
+  $csv_params = array_merge($csv_paramdefaults, $csv_options);
 }
-if (isset($_POST['delimiter_character'])) {
-  $csv_params['delimiter_character'] = filter_input(INPUT_POST, 'delimiter_character', FILTER_SANITIZE_STRING);
-}
-if (isset($_POST['enclosure_character'])) {
-  $csv_params['enclosure_character'] = str_replace(array('"', "'"), array('&quot;', '&#39;'), filter_input(INPUT_POST, 'enclosure_character', FILTER_SANITIZE_STRING));
+foreach (array_keys($csv_paramdefaults) as $param) {
+  $new_value = '';
+  if (isset($_POST[$param])) {
+    switch ($param) {
+      case 'enclosure_character':
+        $new_value = str_replace(array('"', "'"), array('&quot;', '&#39;'), filter_input(INPUT_POST, 'enclosure_character', FILTER_SANITIZE_STRING));
+        break;
+      default:
+        $new_value = filter_input(INPUT_POST, $param, FILTER_SANITIZE_STRING);
+    }
+    $csv_params[$param] = $new_value;
+	}
 }
 extract($csv_params);
-set_transient(Participants_Db::$prefix . 'csv_import_params', $csv_params);
+update_option(Participants_Db::$prefix . 'csv_import_params', $csv_params);
 ?>
 <div class="wrap <?php echo Participants_Db::$prefix ?>csv-upload">
   <?php Participants_Db::admin_page_heading() ?>
@@ -111,20 +124,49 @@ set_transient(Participants_Db::$prefix . 'csv_import_params', $csv_params);
               </p>
             </fieldset>
 
+            <fieldset class="widefat inline-controls">
+              <p>
+                <label style="margin-left:0">
+                 <?php  echo __('Duplicate Record Preference', 'participants-database') . ': ';
+                 $parameters = array(
+                     'type' => 'dropdown',
+                     'name' => 'match_preference',
+                     'value' => $match_preference,
+                     'options' => array(
+                        __('Create a new record with the submission', 'participants-database') => 0,
+                        __('Overwrite matching record with new data', 'participants-database') => 1,
+                        __('Show a validation error message', 'participants-database') => 2,
+                        'null_select' => false,
+                      )
+                 );
+                 PDb_FormElement::print_element($parameters);
+                 ?>
+                </label>
+                <label>
+              <?php echo __('Duplicate Record Check Field', 'participants-database') . ': ';
+            $parameters = array(
+                'type' => 'dropdown',
+                'name' => 'match_field',
+                'value' => $match_field,
+                'options' => array_merge(PDb_Settings::_get_identifier_columns(), array('Record ID' => 'id')),
+            );
+            PDb_FormElement::print_element($parameters);
+             ?>
+            </label>
+              </p>
+            </fieldset>
           <p><?php _e('<strong>Note:</strong> Depending on the "Duplicate Record Preference" setting, imported records are checked against existing records by the field set in the "Duplicate Record Check Field" setting. If a record matching an existing record is imported, one of three things can happen, based on the "Duplicate Record Preference" setting:', 'participants-database') ?></p>
-          <h4 class="inset"><?php _e('Current Setting', 'participants-database') ?>: 
+          <h4 class="inset" id="match-preferences"><?php _e('Current Setting', 'participants-database') ?>: 
             <?php
-            switch (Participants_Db::$plugin_options['unique_email']) :
-              case 1:
-                printf(__('%sOverwrite%s an existing record with a matching %s will be updated with the data from the imported record. Blank or missing fields will not overwrite existing data.', 'participants-database'), '<span class="emphasized">', '</span>', '<em>' . Participants_Db::$fields[Participants_Db::$plugin_options['unique_field']]->title . '</em>');
-                break;
-              case 0 :
-                printf(__('%sCreate New%s adds all imported records as new records without checking for a match.', 'participants-database'), '<span class="emphasized">', '</span>', '</span>');
-                break;
-              case 2 :
-                printf(__('%sDon&#39;t Import%s does not import the new record if it matches the %s of an existing one.', 'participants-database'), '<span class="emphasized">', '</span>', '<em>' . Participants_Db::$plugin_options['unique_field'] . '</em>');
-                break;
-            endswitch
+            $preferences = array(
+                '0' => sprintf(__('%sCreate New%s adds all imported records as new records without checking for a match.', 'participants-database'), '<span class="emphasized">', '</span>', '</span>'),
+                '1' => sprintf(__('%sOverwrite%s an existing record with a matching %s will be updated with the data from the imported record. Blank or missing fields will not overwrite existing data.', 'participants-database'), '<span class="emphasized">', '</span>', '<em class="match-field">' . Participants_Db::$fields[$match_field]->title . '</em>'),
+                '2' => sprintf(__('%sDon&#39;t Import%s does not import the new record if it matches the %s of an existing one.', 'participants-database'), '<span class="emphasized">', '</span>', '<em class="match-field">' . Participants_Db::$fields[$match_field]->title . '</em>'),
+            );
+            foreach($preferences as $i => $preference) {
+              $hide = $i == $match_preference ? '' : 'style="display:none"';
+              printf('<span class="preference" %s data-index="%s" >%s</span>', $hide, $i, $preference);
+            }
             ?></h4>
 
 
@@ -136,3 +178,41 @@ set_transient(Participants_Db::$prefix . 'csv_import_params', $csv_params);
     </div>
   </div>
 </div>
+<script type="text/javascript">
+  UploadCSV = (function($) {
+    var 
+          prefs,
+          matchfield,
+          set_visible_pref = function (i) {
+            hide_prefs();
+            show_pref(i);
+          },
+          hide_prefs = function() {
+            prefs.find('.preference').hide();
+          },
+          show_pref = function (i) {
+            prefs.find('.preference[data-index=' + i + ']').show();
+          },
+          set_pref = function () {
+            set_visible_pref($(this).val());
+          },
+          set_match_field_text = function (f) {
+            matchfield.text(f);
+          },
+          set_match_field = function () {
+            set_match_field_text($(this).find('option:selected').text());
+          };
+    return {
+      run: function () {
+        prefs = $('#match-preferences');
+        matchfield = prefs.find('.match-field');
+        $('#match_preference_select').change(set_pref);
+        $('#match_field_select').change(set_match_field);
+      }
+    }
+  }(jQuery));
+jQuery(function() {
+  "use strict";
+  UploadCSV.run();
+});
+</script>

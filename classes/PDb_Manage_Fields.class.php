@@ -80,16 +80,7 @@ class PDb_Manage_Fields {
     <div class="wrap participants_db">
       <?php Participants_Db::admin_page_heading() ?>
       <h3><?php _e('Manage Database Fields', 'participants-database') ?></h3>
-        <?php
-        if (!empty($this->error_msgs)) :
-          ?>
-        <div class="error settings-error">
-        <?php
-        foreach ($this->error_msgs as $error)
-          echo '<p>' . $error . '</p>';
-        ?>
-        </div>
-          <?php endif; ?>
+      <?php Participants_Db::admin_message(); ?>
       <h4><?php _e('Field Groups', 'participants-database') ?>:</h4>
       <div id="fields-tabs">
         <ul>
@@ -482,7 +473,6 @@ class PDb_Manage_Fields {
       global $wpdb;
       
       // process form submission
-      $this->error_msgs = array();
       $action = filter_input(INPUT_POST, 'action');
 
       switch ($action) {
@@ -606,22 +596,21 @@ class PDb_Manage_Fields {
           // if they're trying to use a reserved name, stop them
           if (in_array($atts['name'], Participants_Db::$reserved_names)) {
 
-            $this->error_msgs[] = sprintf(
-                    '<h3>%s</h3> %s:<br />%s', __('Cannot add a field with that name', 'participants-database'), __('This name is reserved; please choose another. Reserved names are', 'participants-database'), implode(', ', Participants_Db::$reserved_names)
-            );
+            Participants_Db::set_admin_message( sprintf(
+                    '<h3>%s</h3> %s:<br />%s', __('Cannot add a field with that name', 'participants-database'), __('This name is reserved; please choose another. Reserved names are', 'participants-database'), implode(', ', Participants_Db::$reserved_names)), 'error');
             break;
           }
           // prevent name from beginning with a number
           if (preg_match('/^(\d)/', $atts['name'])) {
 
-            $this->error_msgs[] = sprintf(
+            Participants_Db::set_admin_message( sprintf(
                     '<h3>%s</h3> %s', __('The name cannot begin with a number', 'participants-database'), __('Please choose another.', 'participants-database')
-            );
+            ), 'error');
             break;
           }
           $result = Participants_Db::add_blank_field($atts);
           if (false === $result)
-            $this->error_msgs[] = $this->parse_db_error($wpdb->last_error, $action);
+            Participants_Db::set_admin_message( $this->parse_db_error($wpdb->last_error, $action), 'error');
           break;
 
         // add a new blank field
@@ -639,7 +628,7 @@ class PDb_Manage_Fields {
           $wpdb->insert(Participants_Db::$groups_table, $atts);
 
           if ($wpdb->last_error)
-            $this->error_msgs[] = $this->parse_db_error($wpdb->last_error, $action);
+            Participants_Db::set_admin_message( $this->parse_db_error($wpdb->last_error, $action), 'error');
           break;
 
         case 'delete_field':
@@ -667,6 +656,10 @@ class PDb_Manage_Fields {
           break;
 
         default:
+          $action = '';
+      }
+      if (!empty($action) && empty(Participants_Db::$admin_message)) {
+        Participants_Db::set_admin_message($action . __('Your information has been updated','participants-database'), 'updated');
       }
     }
 
@@ -730,7 +723,7 @@ class PDb_Manage_Fields {
        */
       $has_labels = strpos($values, '::') !== false;
       $array = array();
-      $a = explode(',', $values);
+      $a = explode(',', stripslashes($values));
       if ($has_labels) {
         foreach ($a as $e) {
           if (strpos($e, '::') !== false) {

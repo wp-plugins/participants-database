@@ -316,7 +316,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             (
             'type' => 'dropdown',
             'help_text' => __('when a signup is submitted or CSV record is imported, this field is checked for a duplicate', 'participants-database'),
-            'options' => array_merge($this->_get_identifier_columns(), array('Record ID' => 'id')),
+            'options' => array_merge(self::_get_identifier_columns(), array('Record ID' => 'id')),
             'value' => 'email',
         )
     );
@@ -527,7 +527,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'options' => array(
             'type' => 'dropdown',
             'help_text' => __('The field used to identify the user&#39;s account. This must be a unique identifier for the record', 'participants-database'),
-            'options' => $this->_get_identifier_columns(false),
+            'options' => self::_get_identifier_columns(false),
             'value' => 'email',
         )
     );
@@ -927,7 +927,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'type' => 'dropdown',
             'help_text' => __('this field is the primary email address for the record', 'participants-database'),
             'value' => 'email',
-            'options' => $this->_get_identifier_columns(),
+            'options' => self::_get_identifier_columns(),
         ),
     );
 
@@ -1151,7 +1151,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
    * @global object $wpdb
    * @return array of fields as $title => $value
    */
-  private function _get_identifier_columns($null = true) {
+  public static function _get_identifier_columns($null = true) {
 
     $columnlist = wp_cache_get('id_columns');
     
@@ -1167,7 +1167,8 @@ class PDb_Settings extends xnau_Plugin_Settings {
     $columns = $wpdb->get_results($sql, OBJECT_K);
 
     foreach ($columns as $column) {
-        $key = sprintf('%s (%s)', $column->title, $column->name);
+          $pattern = isset($columnlist[$column->title]) ? '%s (%s)' : '%s';
+          $key = sprintf($pattern, $column->title, $column->name);
         $columnlist[$key] = $column->name;
     }
 

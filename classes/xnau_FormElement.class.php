@@ -1051,18 +1051,29 @@ abstract class xnau_FormElement {
     
     $this->_addline('<span class="' . $type . '-group" >');
        
+    $optgroup = false;
+       
     foreach ($this->_make_assoc($this->options) as $option_key => $option_value) {
       
+      $option_key = stripslashes($option_key);
+      
       if (($option_value === false or $option_value === 'false' or $option_value === 'optgroup') and !empty($option_key)) {
-        /*
-         * this is where we would implement some kind of grouping for display purposes
-         */
+        if ($optgroup) {
+          $this->_addline('</fieldset>');
+        }
+        $id = $this->legal_name($this->name . '-' . ($option_value === '' ? '_' : trim(strtolower($option_key))));
+        $this->_addline('<fieldset class="' . $type . '-subgroup ' . $this->name . '-subgroup" id="' . $id . '"><legend>' . $option_key . '</legend>');
+        $optgroup = true;
       } else {
         $this->attributes['id'] = $this->legal_name($this->name . '-' . ($option_value === '' ? '_' : trim(strtolower($option_value))));
       $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
       $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
       $this->_addline($option_key . '</label>');
     }
+    }
+    if ($optgroup) {
+      $this->_addline('</fieldset>');
+      $optgroup = false;
     }
     if ($otherlabel) {
       

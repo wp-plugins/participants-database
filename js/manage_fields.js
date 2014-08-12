@@ -92,19 +92,23 @@ PDbManageFields = (function ($) {
           },
           saveState = function () {
             var el = $(this);
-            el.data('initState', el.attr('value'));
+            if (el.is('[type=checkbox]')) {
+              el.data('initState', el.is(':checked'));
+            } else {
+              el.data('initState', el.attr('value'));
+            }
           },
           setChangedFlag = function () {
             var
                     el = $(this),
-                    initState = el.data('initState') || '',
+                    initState = el.data('initState'),
                     matches = el.closest('tr').attr('id').match(/(\d+)/),
-                    flag = $('#status_' + matches[1]);
-            if (flag.attr('value') !== 'changed') {
+                    flag = $('#status_' + matches[1]),
+                    check = el.is('[type=checkbox]') ? el.is(':checked') : el.attr('value');
+            if (check !== initState) {
               flag.attr('value', 'changed');
               setUnsavedChangesFlag(1);
-            } else if (el.attr('value') === initState) {
-              flag.attr('value', '');
+            } else {
               setUnsavedChangesFlag(-1);
             }
           },
@@ -203,7 +207,7 @@ PDbManageFields = (function ($) {
     init : function () {
       var
               tabcontrols = $("#fields-tabs"),
-              sortConfig = {
+              sortFields = {
                 helper : PDbManageFields.fixHelper,
                 update : function (event, ui) {
                   var order = PDbManageFields.serializeList($(this));
@@ -213,12 +217,23 @@ PDbManageFields = (function ($) {
                     data : order + '&action=reorder_fields'
                   });
                 }
+              },
+              sortGroups = {
+                helper : PDbManageFields.fixHelper,
+                update : function (event, ui) {
+                  var order = PDbManageFields.serializeList($(this));
+                  $.ajax({
+                    url : manageFields.uri,
+                    type : "POST",
+                    data : order + '&action=reorder_groups'
+                  });
+                }
               };
       clearUnsavedChangesWarning();
       // set up tabs
       tabcontrols.tabs(getTabSettings());
       // save the initial state of all inputs
-      tabcontrols.find('table.manage-fields input, table.manage-fields textarea, table.manage-fields select, table.manage-fields input[type=checkbox]').each(saveState);
+      tabcontrols.find('table.manage-fields input[type=text], table.manage-fields textarea, table.manage-fields select, table.manage-fields input[type=checkbox]').each(saveState);
       // flag the row as changed for text inputs
       tabcontrols.find('table.manage-fields input, table.manage-fields textarea').on('input', setChangedFlag);
       // flag the row as changed for dropdowns, checkboxes
@@ -232,8 +247,8 @@ PDbManageFields = (function ($) {
       // prevent empty submission
       tabcontrols.find('input.add_field').on('input', enableNew);
       // set up the field sorting
-      $("#field_groups tbody").sortable(sortConfig);
-      $('[id$="_fields"]').sortable(sortConfig);
+      $("#field_groups tbody").sortable(sortGroups);
+      $('[id$="_fields"]').sortable(sortFields);
       $('input.manage-fields-update').on('click', clearUnsavedChangesWarning);
     }
   };

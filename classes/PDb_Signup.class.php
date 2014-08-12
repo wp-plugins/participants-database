@@ -107,10 +107,6 @@ class PDb_Signup extends PDb_Shortcode {
         'edit_record_page' => Participants_Db::plugin_setting('registration_page'),
     );
     
-   //Participants_Db::$session->clear('form_status');
-    
-    $form_status = Participants_Db::$session->get('form_status') ? Participants_Db::$session->get('form_status') : 'normal';
-
     $this->participant_id = Participants_Db::$session->get('pdbid');
 
     if (filter_input(INPUT_GET, 'm') === 'r' || $shortcode_atts['module'] == 'retrieve') {
@@ -124,6 +120,7 @@ class PDb_Signup extends PDb_Shortcode {
        * form and we've come back to the signup shortcode before the form was completed: 
        * in which case we show the saved values from the record
        */
+      $form_status = $this->get_form_status();
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
       if ($this->participant_values && ($form_status === 'normal' || ($shortcode_atts['module'] == 'thanks' && $form_status === 'multipage'))) {
         /*
@@ -141,8 +138,6 @@ class PDb_Signup extends PDb_Shortcode {
        * we're showing the signup form
        */
       $this->participant_values = Participants_Db::get_default_record();
-      $form_status = (isset($shortcode_atts['action']) && !empty($shortcode_atts['action'])) ? 'multipage' : 'normal';
-      Participants_Db::$session->set('form_status', $form_status);
       
     } else {
       /*
@@ -168,9 +163,6 @@ class PDb_Signup extends PDb_Shortcode {
 
     if ($this->submitted) {
 
-      // form has been submitted, close it
-      Participants_Db::$session->set('form_status', 'complete');
-
       /*
        * filter provides access to the freshly-stored record and the email and thanks message properties so user feedback can be altered.
        */
@@ -186,6 +178,9 @@ class PDb_Signup extends PDb_Shortcode {
       }
 
         $this->_send_email();
+
+      // form has been submitted, close it
+      $this->set_form_status('complete');
     }
     // print the shortcode output
     $this->_print_from_template();
@@ -311,24 +306,37 @@ class PDb_Signup extends PDb_Shortcode {
   }
 
   /**
-   * sends the notification and receipt emails for a signup submission
+   * sends the notification and receipt emails
+   * 
+   * this handles both signups and updates using multi-page forms
    *
    */
   private function _send_email() {
 
-    if ($this->send_notification)
-      $this->_do_notify();
-    if ($this->send_reciept)
-      $this->_do_receipt();
+    if (filter_input(INPUT_GET, 'action') === 'update') {
+
+      if ($this->send_notification) {
+        $this->_do_update_notify();
+      }
+    } else {
+      if ($this->send_notification) {
+				$this->_do_notify();
+      }
+      if ($this->send_reciept) {
+				$this->_do_receipt();
+			}
+    }
   }
 
-  // sends a receipt email
+  /**
+   * sends a user receipt email
+   */
   private function _do_receipt() {
     
     $recipient = @$this->participant_values[Participants_Db::$plugin_options['primary_email_address_field']];
 
     if (filter_var($recipient, FILTER_VALIDATE_EMAIL) === false) {
-      error_log(__METHOD__.' no valid email address was found for the user receipt email, mail could not be sent.');
+      error_log(Participants_Db::$plugin_title.': no valid email address was found for the user receipt email, mail could not be sent.');
       return NULL;
     }
 
@@ -339,11 +347,25 @@ class PDb_Signup extends PDb_Shortcode {
     );
   }
 
-  // sends a notification email
+  /**
+   * sends a new signup notification email to the admin
+   */
   private function _do_notify() {
 
     $this->_mail(
             $this->notify_recipients, $this->_proc_tags($this->notify_subject), Participants_Db::process_rich_text($this->_proc_tags($this->notify_body))
+    );
+  }
+
+  /**
+   * sends a new signup notification email to the admin
+   */
+  private function _do_update_notify() {
+
+    $this->_mail(
+            $this->notify_recipients, 
+            $this->_proc_tags(Participants_Db::$plugin_options['record_update_email_subject']), 
+            Participants_Db::process_rich_text($this->_proc_tags(Participants_Db::$plugin_options['record_update_email_body']))
     );
   }
 
