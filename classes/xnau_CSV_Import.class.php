@@ -88,7 +88,7 @@ abstract class xnau_CSV_Import {
 
         if (false !== move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
 
-          $this->set_error(sprintf(__('The file %s has been uploaded.', 'participants-database'), $_FILES['uploadedfile']['name']), false);
+          $this->set_error(sprintf(__('The file %s has been uploaded.', 'participants-database'), '<strong>' . $_FILES['uploadedfile']['name'] . '</strong>'), false);
 
           $this->insert_from_csv($target_path);
 
@@ -208,7 +208,7 @@ abstract class xnau_CSV_Import {
 
       if (WP_DEBUG) error_log( __METHOD__.'
         
-columns:'.implode(',',$this->column_names).'
+columns:'.implode(', ',$this->column_names).'
   
 csv line= '.print_r( $csv_line, true ) );
 

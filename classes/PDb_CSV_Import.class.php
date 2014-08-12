@@ -82,6 +82,9 @@ class PDb_CSV_Import extends xnau_CSV_Import {
   
   function store_record( $post ) {
     
+    $post['csv_file_upload'] = 'true';
+    $post['subsource'] = Participants_Db::PLUGIN_NAME;
+    
     // add the record data to the database
 		$id = Participants_Db::process_form( $post, 'insert' );
 		
