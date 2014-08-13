@@ -659,7 +659,7 @@ class PDb_Manage_Fields {
           $action = '';
       }
       if (!empty($action) && empty(Participants_Db::$admin_message)) {
-        Participants_Db::set_admin_message($action . __('Your information has been updated','participants-database'), 'updated');
+        Participants_Db::set_admin_message(__('Your information has been updated','participants-database'), 'updated');
       }
     }
 
