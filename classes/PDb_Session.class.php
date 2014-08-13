@@ -225,10 +225,10 @@ class PDb_Session {
    */
   private function test_cookie()
   {
-    $this->no_user_cookie = is_null(filter_input(INPUT_COOKIE, 'wordpress_test_cookie'));
+    $this->no_user_cookie = ((bool) filter_input(INPUT_COOKIE, 'wordpress_test_cookie')) === false;
     if ($this->no_user_cookie) {
-      $this->no_user_cookie = is_null(filter_input(INPUT_COOKIE, Participants_Db::$prefix . 'wp_session'));
-     }
+      $this->no_user_cookie = ((bool) filter_input(INPUT_COOKIE, WP_SESSION_COOKIE)) === false;
+    }
   }
 }
 
