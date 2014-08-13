@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.6 beta 3
+  Version: 1.6 beta 4
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -392,6 +392,11 @@ class Participants_Db extends PDb_Base {
       self::$plugin_options = array_merge($default_options, (array) get_option(self::$participants_db_options));
     }
     /*
+     * writes the custom CSS setting to the custom css file
+     */
+    self::_set_custom_css();
+    
+    /*
      * set the plugin date display format; uses the blog setting, which is localized
      * 
      * since version 1.5.5 we have not used the "strict date format" becuase that 
@@ -602,7 +607,7 @@ class Participants_Db extends PDb_Base {
     $option_version = get_option(self::$Settings->option_version, '0.0');
 
     wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
-    wp_register_style('custom_plugin_css', plugins_url('/css/custom_css.php', __FILE__), null, $option_version);
+    wp_register_style('custom_plugin_css', plugins_url('/css/PDb-custom.css', __FILE__), null, $option_version);
 
     wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));

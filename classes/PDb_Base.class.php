@@ -361,6 +361,21 @@ class PDb_Base {
   }
 
   /**
+   * writes the custom CSS setting to the custom css file
+   * 
+   */
+  protected static function _set_custom_css() {
+    $css_file = Participants_Db::$plugin_path . '/css/PDb-custom.css';
+    $file_contents = file_get_contents($css_file);
+    $custom_css = Participants_Db::$plugin_options['custom_css'];
+    if ($file_contents === $custom_css) {
+      // error_log(__METHOD__.' CSS settings are unchanged; do nothing');
+    } else {
+      file_put_contents($css_file, $custom_css);
+    }
+  }
+
+  /**
    * deletes a file
    * 
    * this looks in the fie upload directory and deletes $filename if found
