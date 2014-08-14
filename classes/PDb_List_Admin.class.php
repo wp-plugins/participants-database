@@ -870,7 +870,8 @@ class PDb_List_Admin {
                     break;
 
                   default:
-                              $display_value = $value[$column->name] === '' ? $column->default : esc_html($value[$column->name]);
+                              $column->value = $value[$column->name];
+                              $display_value = PDb_FormElement::get_field_value_display($column, false);
                 }
 
                           if ($column->name === 'private_id' && Participants_Db::plugin_setting_is_set('registration_page')) {

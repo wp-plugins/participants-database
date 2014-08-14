@@ -1397,7 +1397,7 @@ abstract class xnau_FormElement {
     
     $null_select_label = is_string($null_select) ? $null_select : '';
     
-    if (($null_select !== false) || $this->value === '') {
+    if ($null_select !== false) {
       $selected = $this->value === '' ? $this->_set_selected(true, true, 'selected') : '';
       $this->_addline('<option value="" ' . $selected . '  >' . $null_select_label . '</option>');
     }
