@@ -74,6 +74,12 @@ class PDb_Aux_Plugin {
    */
   var $Updater;
   /**
+   * status of the settings API
+   * 
+   * @var bool true if the settings API is in use
+   */
+  var $settings_API_status = true;
+  /**
    * 
    * this is typically instantiated in the child class with: 
    * parent::__construct(__CLASS__, __FILE__);
@@ -91,6 +97,7 @@ class PDb_Aux_Plugin {
       $this->subclass = $subclass;
       $this->set_settings_containers();
       $this->plugin_options = get_option($this->aux_plugin_settings);
+    
       add_action('admin_menu', array($this, 'add_settings_page'));
       add_action('admin_init', array($this, 'settings_api_init'));
       add_action('init', array(&$this, 'initialize_updater'));
@@ -150,21 +157,27 @@ class PDb_Aux_Plugin {
   /*********************************
    * plugin options section
    */
-  function settings_api_init() {}
+  /**
+   * initializes the settings API
+   */
+  function settings_api_init() {
+  }
   
   /**
    * sets up the plugin settings page
    */
   function add_settings_page() {
-    // create the submenu page
-    add_submenu_page(
-            Participants_Db::PLUGIN_NAME, 
-            $this->aux_plugin_title . ' Settings', 
-            $this->aux_plugin_title, 
-            'manage_options', 
-            $this->settings_page, 
-            array($this,'render_settings_page')
-            );
+    if ($this->settings_API_status) {
+			// create the submenu page
+			add_submenu_page(
+							Participants_Db::PLUGIN_NAME, 
+							$this->aux_plugin_title . ' Settings', 
+							$this->aux_plugin_title, 
+							'manage_options', 
+							$this->settings_page, 
+							array($this,'render_settings_page')
+							);
+		}
   }
   
   function _add_settings_sections($sections) {
