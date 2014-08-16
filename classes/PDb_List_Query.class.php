@@ -116,7 +116,6 @@ class PDb_List_Query {
      */
     $this->_add_filter_from_get();
     $this->_add_filter_from_post();
-    $this->_set_clause_count();
     
     /*
      * if we're getting a paginated set of records, get the stored session, if not, 
@@ -137,6 +136,7 @@ class PDb_List_Query {
     $query = 'SELECT ' . $this->_column_select() . ' FROM ' . Participants_Db::$participants_table . ' p';
     $query .= $this->_where_clause();
     $query .= ' ORDER BY ' . $this->_order_clause();
+    
     return $query;
   }
   /**
@@ -250,14 +250,29 @@ class PDb_List_Query {
    * @param string $term the search term used (optional)
    * @param string $logic the AND|OR logic to use
    */
-  public function add_filter($field, $operator, $term, $logic = 'AND') {
+  public function add_filter($field, $operator, $term, $logic = 'AND', $group = 0) {
     
     $this->_add_single_statement(
             filter_var($field, FILTER_SANITIZE_STRING),
             $this->_sanitize_operator($operator),
             filter_var($term, FILTER_SANITIZE_STRING),
-            ($logic === 'OR' ? 'OR' : 'AND')
+            ($logic === 'OR' ? 'OR' : 'AND'),
+            false,
+            $group
             );
+  }
+  /**
+   * removes background clauses from the where clauses for fields that have incoming searches
+   * 
+   * @var string $field the field name
+   * @return null
+   */
+  public function clear_background_clauses($field) {
+    foreach ($this->where_clauses[$field] as $index => $clause) {
+      if ($clause->is_shortcode()) {
+        unset($this->where_clauses[$field][$index]);
+      }
+    }
   }
   /**
    * adds where clauses and sort from the GET array
@@ -311,6 +326,8 @@ class PDb_List_Query {
    */
   private function _where_clause() {
     
+    $this->_set_up_clauses();
+    
     $query = '';
     if ($this->suppress && !$this->is_search_result) {
       $query .= ' WHERE p.id = "0"';
@@ -326,27 +343,31 @@ class PDb_List_Query {
    */
   private function _build_where_clause() {
     $subquery = '';
+    $inparens = false;
     $i = $this->clause_count;
+    $last_group = 0;
     foreach ($this->where_clauses as $clauses) {
       foreach ($clauses as $clause) {
-        if (!$this->inparens && $clause->is_or()) {
+        $this_group = $clause->get_group();
+        if ($this_group !== $last_group) {
           $subquery .= ' (';
-          $this->inparens = true;
+          $inparens = true;
         }
         $subquery .= $clause->statement();
-        if ($this->inparens && !$clause->is_or()) {
+        if ($clause->is_last_of_group() && $inparens) {
           $subquery .= ') ';
-          $this->inparens = false;
+          $inparens = false;
         }
         if ($i === 1) {
           // this is the last clause
-          if ($this->inparens) {
+          if ($inparens) {
             $subquery .= ') ';
-            $this->inparens = false;
+            $inparens = false;
           }
         } else {
           $subquery .= ' ' . $clause->logic() . ' ';
         }
+        $last_group = $this_group;
         $i--;
       }
     }
@@ -570,7 +591,7 @@ class PDb_List_Query {
    * @param bool   $shortcode   true if the current filter is from the shortcode
    * @return null
    */
-  private function _add_single_statement($column, $operator, $search_term = '', $logic = 'AND', $shortcode = false) {
+  private function _add_single_statement($column, $operator, $search_term = '', $logic = 'AND', $shortcode = false, $group = 0) {
     /*
      * don't add an 'id = 0' clause if there is a user search. This gives us a 
      * way to create a "search results only" list if the shortcode contains 
@@ -597,6 +618,7 @@ class PDb_List_Query {
         'logic' => $logic,
         'shortcode' => $shortcode,
         'term' => trim(urldecode($search_term)),
+        'group' => $group
             )
     );
 
@@ -715,16 +737,74 @@ class PDb_List_Query {
    * 
    * @return null
    */
-  private function _set_clause_count() {
+  private function _set_up_clauses() {
     $count = 0;
+    $grouped = false;
     foreach($this->where_clauses as $field) {
       if (is_array($field)) {
         foreach ($field as $clause) {
+          if ($clause->get_group() !== 0) {
+            $grouped = true;
+          }
           $count++;
         }
       }
     }
     $this->clause_count = $count;
+    if (!$grouped) {
+      $this->_set_clause_grouping();
+    }
+    $this->_set_last_of_group_clauses();
+  }
+  
+  /**
+   * sets up the clause grouping
+   * 
+   * this is only needed if grouping is not handled by the calling class, and is 
+   * based on the placement of "OR" statements such that "OR" statments are grouped 
+   * and "AND" statements are not
+   */
+  private function _set_clause_grouping() {
+    $i = $this->clause_count;
+    $group = 0;
+    $inparens = false;
+    foreach ($this->where_clauses as $clauses) {
+      foreach ($clauses as $clause) {
+        if (!$inparens && $clause->is_or()) {
+          $group++;
+          $inparens = true;
+        }
+        if ($inparens && !$clause->is_or()) {
+          $group--;
+          $inparens = false;
+        }
+        if ($i === 1) {
+          // this is the last clause
+          if ($inparens) {
+            $inparens = false;
+          }
+        }
+        $clause->set_group($group);
+        $i--;
+      }
+    }
+  }
+  
+  /**
+   * defines the last-of-group clauses
+   * 
+   * @return null
+   */
+  private function _set_last_of_group_clauses() {
+    $inparens = false;
+    foreach ($this->where_clauses as $clauses) {
+      foreach ($clauses as $clause_index => $clause) {
+        end($clauses);
+        if ($clause_index === key($clauses)) {
+          $clause->set_last_of_group();
+        }
+      }
+    }
   }
   
   /**

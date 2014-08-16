@@ -223,6 +223,42 @@ class PDb_Template {
     $detail_page = empty($page) ? $this->detail_page : Participants_Db::find_permalink($page);
     return $detail_page . (strpos($detail_page, '?') !== false ? '&' : '?') . 'pdb=' . $this->get_value('id');
   }
+  
+  /**
+   * provides the field's form element
+   * 
+   * @var string $name the field name
+   * @return string HTML
+   */
+  public function get_form_element($name) {
+    if (property_exists($this->fields, $name)) {
+      $field = $this->fields->{$name};
+      if (!property_exists($this->fields, 'attributes') ) {
+        $field->attributes = array();
+      }
+      $element = array(
+          'type' => $field->form_element,
+          'name' => $field->name,
+          'value' => $field->value,
+          'options' => $field->values,
+          'class' => Participants_Db::$prefix . $field->form_element,
+          'attributes' => $field->attributes,
+      );
+      return PDb_FormElement::get_element($element);
+    }
+  }
+  
+  /**
+   * prints a field form element
+   * 
+   * @var string $name
+   * @return null
+   */
+  public function print_form_element($name) {
+    echo $this->get_form_element($name);
+  }
+  
+  
   /**
    * adds a link value to a field object
    * 
