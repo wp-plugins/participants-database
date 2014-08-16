@@ -37,6 +37,16 @@ class PDb_List_Query_Filter {
    */
   private $term = '';
   /**
+   * this gives us a way to control parenthesized groups of clauses
+   * 
+   * @var int the current group membership of the object
+   */
+  private $group = 0;
+  /**
+   * @var bool true if clause is last of a group
+   */
+  private $last = false;
+  /**
    * @var bool true if the filter is a "background" filter
    * 
    * a background filter is one that is set in the shortcode and is therefore a 
@@ -56,6 +66,7 @@ class PDb_List_Query_Filter {
    * 'logic'     => $logic
    * 'term'      => $search_term
    * 'shortcode' => $shortcode
+   * 'group'     => $group
    */
   public function __construct($params = array())
   {
@@ -133,6 +144,41 @@ class PDb_List_Query_Filter {
     if (isset($params['term'])) {
       $this->set_search_term($params['term']);
     }
+    if (isset($params['group'])) {
+      $this->set_group($params['group']);
+    }
+  }
+  /**
+   * gets the group value
+   * 
+   * @return int $group
+   */
+  public function get_group() {
+    return $this->group;
+  }
+  /**
+   * sets the group value
+   * 
+   * @var int $group
+   */
+  public function set_group($group = 0) {
+    $this->group = $group;
+  }
+  /**
+   * sets the last property
+   * 
+   * @param bool $state
+   */
+  public function set_last_of_group($state = true) {
+    $this->last = $state;
+  }
+  /**
+   * gets the last-of-group state
+   * 
+   * @return bool true if the clause is the last of a group
+   */
+  public function is_last_of_group() {
+    return $this->last;
   }
   /**
    * sets the search term property

@@ -696,17 +696,21 @@ abstract class xnau_FormElement {
     
     if (!isset($this->attributes['readonly'])) {
     
+      $name = $this->name . ($this->group === true ? '[]' : '');
+    
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
+
+    $this->_addline( $this->print_hidden_fields(array($this->name => ''), false) );
 
     if ($other) {
       $this->_addline('<div class="dropdown-other-control-group" name="' . $this->name . '" rel="' . $otherlabel . '">');
       $this->add_class('otherselect');
-      $this->_addline('<select name="' . $this->name . '" ' . $this->_attributes() . ' >');
+      $this->_addline('<select name="' . $name . '" ' . $this->_attributes() . ' >');
       //$this->_addline('<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >');
     } else {
       $id = isset($this->attributes['id']) ? $this->attributes['id'] : $js_prefix . '_select';
-      $this->_addline('<select id="' . $id . '" name="' . $this->name . '" ' . $this->_attributes() . ' >');
+      $this->_addline('<select id="' . $id . '" name="' . $name . '" ' . $this->_attributes() . ' >');
     }
 
     $this->indent++;
@@ -1047,7 +1051,7 @@ abstract class xnau_FormElement {
     if ($null_select !== false) {
       $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), false), 1);
     }
-    unset($this->options['null_select']);
+    if (isset($this->options['null_select'])) unset($this->options['null_select']);
     
     $this->_addline('<span class="' . $type . '-group" >');
        
