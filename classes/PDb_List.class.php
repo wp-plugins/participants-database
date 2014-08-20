@@ -484,9 +484,9 @@ class PDb_List extends PDb_Shortcode {
     
     $action = $target !== false ? $target : get_permalink($post->ID)  . '#' . $this->list_anchor;
     
-    $class_att = $class ? 'class="' . $class . '"' : '';
+    $class_att = $class ? $class : '';
     
-    $output[] = '<form method="post" class="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
+    $output[] = '<form method="post" class="sort_filter_form ' . $class_att . '" action="' . $action . '" ref="' . $ref . '" >';
     $hidden_fields = array(
         'action' => 'pdb_list_filter',
         'instance_index' => $this->shortcode_atts['target_instance'],

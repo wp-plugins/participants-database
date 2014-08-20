@@ -103,7 +103,7 @@ class PDb_Session {
 			$this->session = WP_Session::get_instance();
     }
 
-    $this->test_cookie();
+    //$this->test_cookie();
 
 		return $this->session;
 	}
