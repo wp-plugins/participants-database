@@ -1049,7 +1049,7 @@ abstract class xnau_FormElement {
     $null_select = (isset($this->options['null_select'])) ? $this->options['null_select'] : ($type == 'checkbox' ? true : false);
     
     if ($null_select !== false) {
-      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), false), 1);
+      $this->_addline('<input name="' . $this->name . '" ' . $this->_attributes() . ' value="' . (is_string($null_select)?$null_select:'') . '" type="hidden">', 1);
     }
     if (isset($this->options['null_select'])) unset($this->options['null_select']);
     

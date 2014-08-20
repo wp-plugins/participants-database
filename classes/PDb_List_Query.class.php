@@ -268,11 +268,13 @@ class PDb_List_Query {
    * @return null
    */
   public function clear_background_clauses($field) {
+    if (isset($this->where_clauses[$field]) && is_array($this->where_clauses[$field])) {
     foreach ($this->where_clauses[$field] as $index => $clause) {
       if ($clause->is_shortcode()) {
         unset($this->where_clauses[$field][$index]);
       }
     }
+  }
   }
   /**
    * adds where clauses and sort from the GET array
@@ -327,7 +329,6 @@ class PDb_List_Query {
   private function _where_clause() {
     
     $this->_set_up_clauses();
-    
     $query = '';
     if ($this->suppress && !$this->is_search_result) {
       $query .= ' WHERE p.id = "0"';
