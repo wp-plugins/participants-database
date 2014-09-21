@@ -544,7 +544,7 @@ class PDb_Manage_Fields {
               /*
                * enforce the values for a captcha field
                */
-              if ($row['form_element'] == 'captcha') {
+              if (isset($row['form_element']) && $row['form_element'] === 'captcha') {
                 $row['validation'] = 'captcha';
                 foreach (array('display_column', 'admin_column', 'CSV', 'persistent', 'sortable') as $c)
                   $row[$c] = 0;
@@ -552,7 +552,7 @@ class PDb_Manage_Fields {
               }
 
               foreach (array('title', 'help_text', 'default') as $field) {
-                $row[$field] = stripslashes($row[$field]);
+                if (isset($row[$field])) $row[$field] = stripslashes($row[$field]);
               }
 
               // remove the fields we won't be updating

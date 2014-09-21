@@ -130,7 +130,7 @@ class PDb_List_Query_Filter {
   public function update_parameters($params) {
     
     if (isset($params['field'])) {
-      $this->field = filter_var($params['field'], FILTER_SANITIZE_STRING);
+      $this->field = $params['field'];
     }
     if (isset($params['statement'])) {
       $this->sql = $this->sanitize_sql($params['statement']);
@@ -190,7 +190,7 @@ class PDb_List_Query_Filter {
    if ($term === 'null' || $term === ''  || is_null($term)) {
      $this->term = '';
    } else {
-     $this->term = filter_var(PDb_FormElement::get_title_value($term, $this->field), FILTER_SANITIZE_STRING);
+     $this->term = PDb_FormElement::get_title_value($term, $this->field);
    }
   }
   /**
@@ -257,6 +257,6 @@ class PDb_List_Query_Filter {
    * @return string the sanitized statement
    */
   public static function sanitize_sql($sql) {
-    return stripslashes(mysql_real_escape_string($sql));
+    return stripslashes(esc_sql($sql));
   }
 }

@@ -123,7 +123,7 @@ class PDb_List_Query {
      */
     if (!empty($this->get_input[Participants_Db::$list_page])) {
       $this->_restore_query_session();
-    } else {
+    } elseif (filter_input(INPUT_POST, 'action') === 'pdb_list_filter') {
       $this->_save_query_session();
     }
   }
@@ -249,13 +249,14 @@ class PDb_List_Query {
    * @param string $operator the filter operator
    * @param string $term the search term used (optional)
    * @param string $logic the AND|OR logic to use
+   * @param int $group group identifier (for creating parenthesized expressions)
    */
   public function add_filter($field, $operator, $term, $logic = 'AND', $group = 0) {
     
     $this->_add_single_statement(
-            filter_var($field, FILTER_SANITIZE_STRING),
+            filter_var($field, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES),
             $this->_sanitize_operator($operator),
-            filter_var($term, FILTER_SANITIZE_STRING),
+            filter_var($term, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES),
             ($logic === 'OR' ? 'OR' : 'AND'),
             false,
             $group
@@ -346,13 +347,14 @@ class PDb_List_Query {
     $subquery = '';
     $inparens = false;
     $i = $this->clause_count;
-    $last_group = 0;
+    static $last_group = 1;
     foreach ($this->where_clauses as $clauses) {
       foreach ($clauses as $clause) {
         $this_group = $clause->get_group();
         if ($this_group !== $last_group) {
           $subquery .= ' (';
           $inparens = true;
+          $last_group = $this_group;
         }
         $subquery .= $clause->statement();
         if ($clause->is_last_of_group() && $inparens) {
@@ -368,7 +370,6 @@ class PDb_List_Query {
         } else {
           $subquery .= ' ' . $clause->logic() . ' ';
         }
-        $last_group = $this_group;
         $i--;
       }
     }
@@ -618,7 +619,7 @@ class PDb_List_Query {
         'field' => $column,
         'logic' => $logic,
         'shortcode' => $shortcode,
-        'term' => trim(urldecode($search_term)),
+        'term' => $search_term,
         'group' => $group
             )
     );
@@ -711,12 +712,14 @@ class PDb_List_Query {
           
         case 'gt':
         case '>':
+        case '>=':
           
           $operator = '>=';
           break;
         
         case 'lt':
         case '<':
+        case '<=':
           
           $operator = '<';
           break;
@@ -798,12 +801,31 @@ class PDb_List_Query {
    */
   private function _set_last_of_group_clauses() {
     $inparens = false;
-    foreach ($this->where_clauses as $clauses) {
+    $group = false;
+    $previous_clause = false;
+    foreach ($this->where_clauses as $where_clauses_index => $clauses) {
+      end($this->where_clauses);
+      $end_key = key($this->where_clauses);
       foreach ($clauses as $clause_index => $clause) {
-        end($clauses);
-        if ($clause_index === key($clauses)) {
-          $clause->set_last_of_group();
+        $clause->set_last_of_group(true);
+        $current_group = $clause->get_group();
+        if ($group === false) {
+          $clause->set_last_of_group(false);
+          $group = $current_group;
+        } elseif ($current_group === $group) {
+          if ($previous_clause) {
+            $previous_clause->set_last_of_group(false);
+          }
+          $group = $current_group;
+        } elseif ($current_group !== $group) {
+          $group = $current_group;
+          $clause->set_last_of_group(false);
         }
+        end($clauses);
+        if ($where_clauses_index === $end_key) {
+          $clause->set_last_of_group(true);
+        }
+        $previous_clause = $clause;
       }
     }
   }
@@ -854,6 +876,12 @@ class PDb_List_Query {
         'clause_count' => $this->clause_count,
         'is_search' => $this->is_search_result
     ));
+  }
+  /**
+   * public method for saving the query session
+   */
+  public function save_query_session() {
+    $this->_save_query_session();
   }
 
   /**
@@ -922,8 +950,15 @@ class PDb_List_Query {
       case '=':
         $operator = '=';
         break;
+      case '>':
       case 'gt':
+        $operator = '>';
+        break;
+      case '>=':
         $operator = '>=';
+        break;
+      case '<=':
+        $operator = '<=';
         break;
       case 'lt':
       case '<':

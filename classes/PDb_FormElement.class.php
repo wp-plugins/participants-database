@@ -147,8 +147,13 @@ class PDb_FormElement extends xnau_FormElement {
     
     $return = '';
     
-    if (has_filter(Participants_Db::$prefix . 'before_display_field'))
+    
+    if (has_filter(Participants_Db::$prefix . 'before_display_form_element')) {
             $return = Participants_Db::set_filter('before_display_field', $return, $field);
+    } elseif (has_filter(Participants_Db::$prefix . 'before_display_field')) {
+      // provided for backward-compatibility
+      $return = Participants_Db::set_filter('before_display_field', $return, $field->value, $field->form_element);
+    }
     
     if (empty($return)) {
 
