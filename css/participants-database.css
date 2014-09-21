@@ -284,8 +284,8 @@ input.otherfield[type=text] {
 .pdb-list .pagination .glyphicon,
 .pdb-pagination .glyphicon  {
   font-size: 80%;
-  line-height: inherit;
-  vertical-align: middle;
+  line-height: normal;
+  vertical-align: inherit;
 }
 .wp-admin .pdb-list .pagination .glyphicon {
   vertical-align: top;
