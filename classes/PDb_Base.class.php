@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2014 xnau webdesign
  * @license    GPL2
- * @version    0.7
+ * @version    0.8
  * @link       http://xnau.com/wordpress-plugins/
  */
 
@@ -115,6 +115,34 @@ class PDb_Base {
     $return['relation'] = $relation;
     
     return $return;
+  }
+  
+  /**
+   * determines if an incoming set of data matches an existing record
+   * 
+   * @param array|string $columns column name, comma-separated series, or array of 
+   *                              column names to check for matching data
+   * @param array $data the incoming data to test: name => value
+   * @global object $wpdb
+   * @return int|bool record ID if the incoming data matches an existing record, 
+   *                  bool false if no match
+   */
+  public static function find_record_match($columns, $data) {
+    global $wpdb;
+    $values = array();
+    $where = array();
+    $columns = strpos($columns,',') !== false ? explode(',',  str_replace(' ', '', $columns)) : (array)$columns;
+    foreach($columns as $column) {
+      if (isset($data[$column])) {
+        $values[] = $data[$column];
+        $where[] = ' r.' . $column . ' = %s';
+      } else {
+        $where[] = ' (r.' . $column . ' IS NULL OR r.' . $column . ' = "")';
+      }
+    }
+    $sql = 'SELECT r.id FROM ' . Participants_Db::$participants_table . ' r WHERE ' . implode(', ', $where);
+    $match = $wpdb->get_var($wpdb->prepare($sql, $values));
+    return is_numeric($match) ? (int)$match : false;
   }
   
   /**
@@ -246,6 +274,131 @@ class PDb_Base {
   }
 
   /**
+   * parses the value string and obtains the corresponding dynamic value
+   *
+   * the object property pattern is 'object->property' (for example 'curent_user->name'),
+   * and the presence of the  '->'string identifies it.
+   * 
+   * the superglobal pattern is 'global_label:value_name' (for example 'SERVER:HTTP_HOST')
+   *  and the presence of the ':' identifies it.
+   *
+   * if there is no indicator, the field is treated as a constant
+   *
+   * @param string $value the current value of the field as read from the
+   *                      database or in the $_POST array
+   *
+   */
+  public static function get_dynamic_value($value) {
+
+    $dynamic_value = '';
+
+    if (strpos(html_entity_decode($value), '->') > 0) {
+      
+      /*
+       * here, we can get values from one of several WP objects
+       * 
+       * so far, that is only $post amd $current_user
+       */
+      global $post, $current_user;
+
+      list( $object, $property ) = explode('->', html_entity_decode($value));
+
+      $object = ltrim($object, '$');
+
+      if (is_object($$object) && isset($$object->$property)) {
+
+        $dynamic_value = $$object->$property;
+      }
+    } elseif (strpos(html_entity_decode($value), ':') > 0) {
+      
+      /*
+       * here, we are attempting to access a value from a PHP superglobal
+       */
+
+      list( $global, $name ) = explode(':', html_entity_decode($value));
+      
+      /*
+       * if the value refers to an array element by including [index_name] or 
+       * ['index_name'] we extract the indices
+       */
+      $indexes = array();
+      if (strpos($name, '[') !== false) {
+        $count = preg_match("#^([^]]+)(?:\['?([^]']+)'?\])?(?:\['?([^]']+)'?\])?$#", stripslashes($name), $matches);
+        $match = array_shift($matches); // discarded
+        $name = array_shift($matches);
+        $indexes = count($matches) > 0 ? $matches : array();
+      }
+
+      // clean this up in case someone puts $_SERVER instead of just SERVER
+      $global = preg_replace('#^[$_]{1,2}#', '', $global);
+
+      /*
+       * for some reason getting the superglobal array directly with the string
+       * is unreliable, but this bascially works as a whitelist, so that's
+       * probably not a bad idea.
+       */
+      switch (strtoupper($global)) {
+
+        case 'SERVER':
+          $global = $_SERVER;
+          break;
+        case 'SESSION':
+          $global = $_SESSION;
+          break;
+        case 'REQUEST':
+          $global = $_REQUEST;
+          break;
+        case 'COOKIE':
+          $global = $_COOKIE;
+          break;
+        case 'POST':
+          $global = $_POST;
+          break;
+        case 'GET':
+          $global = $_GET;
+      }
+
+      /*
+       * we attempt to evaluate the named value from the superglobal, which includes 
+       * the possiblity that it will be referring to an array element. We take that 
+       * to two dimensions only. the only way that I know of to do this open-ended 
+       * is to use eval, which I won't do
+       */
+      if (isset($global[$name])) {
+        if (is_string($global[$name])) {
+          $dynamic_value = $global[$name];
+        } elseif (is_array($global[$name]) || is_object($global[$name])) {
+        
+          $array = is_object($global[$name]) ? get_object_vars($global[$name]) : $global[$name];
+	        switch (count($indexes)) {
+		        case 1:
+		              $dynamic_value = isset($array[$indexes[0]]) ? $array[$indexes[0]] : '';
+		          break;
+		        case 2:
+		              $dynamic_value = isset($array[$indexes[0]][$indexes[1]]) ? $array[$indexes[0]][$indexes[1]] : '';
+		          break;
+		        default:
+		            // if we don't have an index, grab the first value
+		              $dynamic_value = is_array($array) ? current($array) : '';
+	        }
+	      }
+	    }
+    }
+
+    return filter_var($dynamic_value, FILTER_SANITIZE_STRING);
+  }
+  
+  /**
+   * determines if the field default value string is a dynamic value
+   * 
+   * @param string $value the value to test
+   * @return bool true if the value is to be parsed as dynamic
+   */
+  public static function is_dynamic_value($value) {
+  	return strpos(html_entity_decode($value), '->') > 0 || strpos(html_entity_decode($value), ':') > 0;
+  }
+
+  /**
    * processes an incoming timestamp
    * 
    * timestamps are usually handled by the plugin automatically, but when records 
@@ -270,7 +423,8 @@ class PDb_Base {
    * @return string relative path to translation file
    */
   public static function translation_file_path($basepath = false) {
-    $filename = Participants_Db::PLUGIN_NAME . '-' . WPLANG . '.mo';
+    
+    $filename = Participants_Db::PLUGIN_NAME . '-' . self::get_locale() . '.mo';
     $basepath = !$basepath ? dirname( plugin_basename( __FILE__ ) ) : $basepath;
     // first check for a custom translation file in the WP plugin root
     if (is_file(WP_PLUGIN_DIR . '/languages/' . $filename)) {
@@ -279,6 +433,26 @@ class PDb_Base {
       return $basepath . '/languages/';
     }
   }
+  /**
+   * determines the language setting
+   * 
+   * this is to remain compatible with pre-4.0 WP installs
+   * 
+   * @global string $locale
+   * @return string language designator
+   */
+  public static function get_locale() {
+    global $locale;
+    if (empty($locale)) {
+      if (defined('WPLANG')) {
+        $locale = WPLANG;
+      } else {
+        $locale = get_option('WPLANG', 'en_EN');
+      }
+    }
+    return $locale;
+  }
+
   
   /**
    * provides a plugin setting
@@ -293,12 +467,12 @@ class PDb_Base {
   }
   
   /**
-   * checks a plugin setting for a value
+   * checks a plugin setting for a saved value
    * 
    * returns false for empty string, true for 0
    * 
    * @param string $name setting name
-   * @return bool false for null or empty string, true for 0 or any string
+   * @return bool false true if the setting has been saved by the user
    */
   public static function plugin_setting_is_set($name) {
     return isset(Participants_Db::$plugin_options[$name]) && Participants_Db::plugin_setting($name) !== '';
@@ -311,6 +485,7 @@ class PDb_Base {
    * @return bool the setting value
    */
   public static function plugin_setting_is_true($name, $default = false) {
+    
     if (isset(Participants_Db::$plugin_options[$name])) {
       return filter_var(Participants_Db::plugin_setting($name), FILTER_VALIDATE_BOOLEAN);
     } else {
@@ -327,36 +502,18 @@ class PDb_Base {
    * 
    * @param string $slug the base slug of the plugin API filter
    * @param unknown $term the term to filter (passed by reference)
+   * @param unknown $var1 extra variable
+   * @param unknown $var2 extra variable
    * @return unknown the filtered or unfiltered term
    */
-  public static function set_filter($slug, $term)
+  public static function set_filter($slug, $term, $var1 = NULL, $var2 = NULL)
   {
     if (strpos($slug, Participants_Db::$prefix) === false) {
 			$tag = Participants_Db::$prefix . $slug;
     }
-    
     if (!has_filter($tag)) {
       return $term;
     }
-    $var1 = '';
-    $var2 = '';
-    $args = func_get_args();
-    if (count($args) > 2) {
-      $var1 = $args[2];
-      $var2 = isset($args[3]) ? $args[3] : '';
-    }
-//    if (WP_DEBUG) {
-//      ob_start();
-//      var_dump($term);
-//      $dump = ob_get_clean();
-//      error_log(__METHOD__.' applying filter "'.$tag.'" to
-//      
-//term: '. $dump .'
-//arg count: '.count($args). '
-//args: '. print_r($args,1) . '
-//var1: '.print_r($var1,1).'
-//var2: '.$var2);
-//    }
     return apply_filters($tag, $term, $var1, $var2);
   }
 
@@ -401,13 +558,40 @@ class PDb_Base {
     return str_replace(' ', '', preg_replace('#^[0-9]*#', '', strtolower($title)));
   }
 
-  // returns boolean to question of whether the user is authorized to see / edit 
-  // administrative fields
-  public static function backend_user()
-  {
+  /**
+   * check the current users plugin role
+   * 
+   * the plugin has two roles: editor and admin
+   * 
+   * @param string $role optional string to test a specific role. If omitted, tests for either role
+   * @return bool true if current user has the role tested
+   */
+  public static function current_user_has_plugin_role($role = 'either') {
+    switch ($role) {
+      case 'admin':
+        return current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']);
+        break;
+      case 'editor':
+        return current_user_can(Participants_Db::$plugin_options['record_edit_capability']);
+        break;
+      default:
+        return current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) || current_user_can(Participants_Db::$plugin_options['record_edit_capability']);
+    }
+  }
 
-    // contributor and above
-    return current_user_can('edit_posts') ? true : false;
+  /**
+   * checks if the current user's form submissions are to be validated
+   * 
+   * @return bool true if the form should be validated 
+   */
+  public static function is_form_validated() {
+    
+    if (is_admin()) {
+      return self::current_user_has_plugin_role('admin') === false;
+    } else {
+      return true;
+    }
+    
   }
 
   /**
@@ -469,6 +653,8 @@ class PDb_Base {
    * Unsupported date formats : S, n, t, L, B, G, u, e, I, P, Z, c, r 
    * Unsupported strftime formats : %U, %W, %C, %g, %r, %R, %T, %X, %c, %D, %F, %x 
    * 
+   * Props: http://php.net/manual/en/function.strftime.php#96424
+   * 
    * @param string $dateFormat a date format 
    * @return string 
    */
@@ -499,7 +685,7 @@ class PDb_Base {
    * translates date format strings from PHP to other formats
    *
    * @param string $dateformat the PHP-style date format string
-   * @param string $format_type selected the format type to translate to: 'ICU', 'jQuery'
+   * @param string $format_type selected the format type to translate to: 'ICU', 'jQuery', 'strftime'
    * @return string the translated format string
    */
   static function translate_date_format($dateformat, $format_type)
@@ -523,6 +709,9 @@ class PDb_Base {
         'y'  //numeric year: 2 digit
     );
     switch ($format_type) {
+      case 'strftime':
+        return self::dateFormatToStrftime($dateformat);
+        break;
       case 'ICU':
         $replace = array(
             'dd', 'd', 'EEEE', 'EEEE', 'D',
@@ -687,7 +876,7 @@ class PDb_Base {
   /**
    * provides an array of field indices corresponding, given a list of field names
    * 
-   * or vice versa
+   * or vice versa if $indices is false
    * 
    * @param array $fieldnames the array of field names
    * @param bool  $indices if true returns array of indices, if false returns array of fieldnames
@@ -698,7 +887,7 @@ class PDb_Base {
     $sql = 'SELECT f.' . ($indices ? 'id' : 'name') . ' FROM ' . Participants_Db::$fields_table . ' f ';
     $sql .= 'WHERE f.' . ($indices ? 'name' : 'id') . ' ';
     if (count($fieldnames) > 1) {
-      $sql .= 'IN ("' . implode('","',$fieldnames) . '") ORDER BY FIELD("' . implode('","',$fieldnames) . '")';
+      $sql .= 'IN ("' . implode('","',$fieldnames) . '") ORDER BY FIELD(f.name, "' . implode('","',$fieldnames) . '")';
     } else {
       $sql .= '= "' . current($fieldnames) . '"';
     }

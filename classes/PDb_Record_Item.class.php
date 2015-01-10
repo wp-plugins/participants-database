@@ -46,13 +46,12 @@ class PDb_Record_Item extends PDb_Template_Item {
    * sets up the values property
    */
   private function setup_values() {
-    
-    $this->values = Participants_Db::get_participant($this->record_id);
     foreach($this->fields as $name => $field) {
     
       // get the field attributes
       $field = (object) array_merge((array)$field, (array)Participants_Db::$fields[$name]);
-//    if (isset($field->value)) $this->values[$name] = $field->value;
+      
+      if (isset($field->value)) $this->values[$name] = $field->value;
     }
     reset($this->fields);
   }

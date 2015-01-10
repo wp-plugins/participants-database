@@ -165,7 +165,7 @@ class PDb_List_Admin {
     /*
      * save the query in a transient so it can be used by the export CSV functionality
      */
-    if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) {
+    if (Participants_Db::current_user_has_plugin_role('admin')) {
       global $current_user;
       set_transient(Participants_Db::$prefix . 'admin_list_query' . $current_user->ID, self::$list_query, 3600 * 24);
     }
@@ -207,8 +207,9 @@ class PDb_List_Admin {
     // output the pagination controls
     echo '<div class="pdb-list">' . self::$pagination->links() . '</div>';
 
-    // print the CSV export form (admin users only)
-    if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability')))
+    // print the CSV export form (authorized users only)
+    $csv_role = Participants_Db::plugin_setting_is_true('editor_allowed_csv_export') ? 'editor' : 'admin';
+    if (Participants_Db::current_user_has_plugin_role($csv_role))
       self::_print_export_form();
 
     // print the plugin footer
@@ -347,7 +348,9 @@ class PDb_List_Admin {
     switch ($submit) {
 
       case self::$i18n['clear'] :
-        self::$filter['search'] = self::$default_filter['search'];
+        for ($i = 0; $i < self::$filter['list_filter_count']; $i++) {
+          self::$filter['search'][$i] = self::$default_filter['search'][0];
+        }
         self::save_filter(self::$filter);
       case self::$i18n['sort']:
       case self::$i18n['filter']:
@@ -435,18 +438,13 @@ class PDb_List_Admin {
 
       case 'NOT LIKE':
       case '!=':
+      case 'LIKE':
+      default:
 
         $operator = esc_sql($filter_set['operator']);
-        if ($filter_set['value'] === '') {
-          $filter_set['value'] = 'null';
-          $operator = '<>';
+        if (stripos($operator, 'LIKE') !== false) {
+        	$delimiter = array('"%', '%"');
         }
-
-      default:
-      case 'LIKE':
-
-        $operator = 'LIKE';
-        $delimiter = array('"%', '%"');
         if ($filter_set['value'] === '') {
           $filter_set['value'] = 'null';
           $operator = '<>';
@@ -585,7 +583,7 @@ class PDb_List_Admin {
                 <tbody><tr><td>
                         <?php
                         for ($i = 0; $i <= $filter_count - 1; $i++) :
-                          $filter_set = self::$filter['search'][$i];
+                        $filter_set = self::get_filter_set($i);
                           ?>
                         <fieldset class="widefat inline-controls">
                           <?php if ($i === 0): ?>
@@ -617,7 +615,7 @@ class PDb_List_Admin {
     );
     PDb_FormElement::print_element($element);
     ?>
-                          <input id="participant_search_term" type="text" name="value[<?php echo $i ?>]" value="<?php echo @$filter_set['value'] ?>">
+                          <input id="participant_search_term_<?php echo $i ?>" type="text" name="value[<?php echo $i ?>]" value="<?php echo htmlspecialchars($filter_set['value']) ?>">
                           <?php
                           if ($i < $filter_count - 1) {
                             echo '<br />';
@@ -905,6 +903,8 @@ class PDb_List_Admin {
              */
                 private static function _print_export_form()
                 {
+
+          $base_filename = self::get_admin_user_setting('csv_base_filename', Participants_Db::PLUGIN_NAME);
               ?>
 
       <div class="postbox">
@@ -917,7 +917,7 @@ class PDb_List_Admin {
           <input type="hidden" name="query" value="<?php echo rawurlencode(self::$list_query) ?>" />
           <?php
           $date_string = str_replace(array('/', '#', '.', '\\', ', ', ',', ' '), '-', date_i18n(Participants_Db::$date_format));
-          $suggested_filename = Participants_Db::PLUGIN_NAME . '-' . $date_string . '.csv';
+                $suggested_filename = $base_filename . self::filename_datestamp() . '.csv';
           $namelength = round(strlen($suggested_filename) * 0.9);
           ?>
           <fieldset class="inline-controls">
@@ -967,6 +967,7 @@ class PDb_List_Admin {
             );
           }
         }
+
   /**
    * builds a column sort link
    * 
@@ -974,12 +975,14 @@ class PDb_List_Admin {
    * 
    * @return string the base URI for the sort link
    */
-  private static function sort_link_base_URI() {
+  private static function sort_link_base_URI()
+  {
     $uri = parse_url($_SERVER['REQUEST_URI']);
     parse_str($uri['query'], $query);
     unset($query['column_sort']);
     return $uri['path'] . '?' . http_build_query($query);
   }
+
         /**
          * sets up the main list columns
          */
@@ -1059,6 +1062,24 @@ class PDb_List_Admin {
   }
 
   /**
+   * gets a search array from the filter
+   * 
+   * provides a blank array if there is no defined filter at the index given
+   * 
+   * @param int $index filter array index to get
+   * 
+   * @return array
+   */
+  public static function get_filter_set($index)
+  {
+    if (isset(self::$filter['search'][$index]) && is_array(self::$filter['search'][$index])) {
+      return self::$filter['search'][$index];
+    } else {
+      return self::$default_filter['search'][0];
+    }
+  }
+
+  /**
    * supplies an array of display fields
    * 
    * @return array array of field names
@@ -1135,6 +1156,16 @@ class PDb_List_Admin {
         }
 
         /**
+   * supplies the second part of a download filename
+   * 
+   * this is usually appended to the end of the base fielname for a plugin-generated file
+   * 
+   * @return string a filename-compatible datestamp
+   */
+  public static function filename_datestamp() {
+    return '-' . str_replace(array('/', '#', '.', '\\', ', ', ',', ' '), '-', date_i18n(Participants_Db::$date_format));
+  } 
+  /**
          * sets up the internationalization strings
          */
   private static function _setup_i18n()

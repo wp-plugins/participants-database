@@ -2,8 +2,9 @@
 /*
  * add / edit / delete fields and field groups and their attributes
  * 
- * ver. 1.5.5
+ * ver. 1.6
  */
-if (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) exit;
+if (!Participants_Db::current_user_has_plugin_role('admin')) exit;
+
 new PDb_Manage_Fields();
   ?>

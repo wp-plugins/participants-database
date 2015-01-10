@@ -22,7 +22,7 @@ class xnau_Plugin_Settings {
   // all registered sections
   protected $sections;
   // descriptions for each section as needed;
-  static $section_description;
+  protected $section_description;
 
   // all individual settings
   protected $plugin_settings;

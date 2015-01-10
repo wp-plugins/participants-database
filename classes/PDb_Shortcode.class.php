@@ -93,10 +93,6 @@ abstract class PDb_Shortcode {
 	 */
   var $participant_values;
   /**
-   * @var string holds the URL to the participant record page
-   */
-  var $registration_page;
-  /**
    *
    * @var string|bool permalink to the page the form submits to
    */
@@ -271,7 +267,22 @@ abstract class PDb_Shortcode {
     echo '<!-- end template: ' . $this->template_basename($this->template) . ' -->';
     }
 
-    $this->output = ob_get_clean();
+    $this->output = $this->strip_linebreaks(ob_get_clean());
+  }
+  
+  /**
+   * conditionally removes line breaks from a buffered output
+   * 
+   * @param string $input the buffer input
+   * @return string processed string
+   */
+  protected function strip_linebreaks($input) {
+    
+    if (Participants_Db::plugin_setting_is_true('strip_linebreaks')) {
+      
+      $input = str_replace(PHP_EOL, '', $input);
+    }
+    return $input;
   }
 
   /**
@@ -1020,108 +1031,15 @@ abstract class PDb_Shortcode {
    *
    * if there is no indicator, the field is treated as a constant
    *
+   * @version 1.6 moved to Base class
+   *
    * @param string $value the current value of the field as read from the
    *                      database or in the $_POST array
    *
    */
   public function get_dynamic_value($value) {
 
-    $dynamic_value = '';
-
-    if (false !== strpos(html_entity_decode($value), '->')) {
-      
-      /*
-       * here, we can get values from one of several WP objects
-       * 
-       * so far, that is only $post amd $current_user
-       */
-      global $post, $current_user;
-
-      list( $object, $property ) = explode('->', html_entity_decode($value));
-
-      $object = ltrim($object, '$');
-
-      if (is_object($$object) && isset($$object->$property)) {
-
-        $dynamic_value = $$object->$property;
-      }
-    } elseif (false !== strpos(html_entity_decode($value), ':')) {
-      
-      /*
-       * here, we are attempting to access a value from a PHP superglobal
-       */
-
-      list( $global, $name ) = explode(':', html_entity_decode($value));
-      
-      /*
-       * if the value refers to an array element by including [index_name] or 
-       * ['index_name'] we extract the indices
-       */
-      $indexes = array();
-      if (strpos($name, '[') !== false) {
-        $count = preg_match("#^([^]]+)(?:\['?([^]']+)'?\])?(?:\['?([^]']+)'?\])?$#", stripslashes($name), $matches);
-        $match = array_shift($matches); // discarded
-        $name = array_shift($matches);
-        $indexes = count($matches) > 0 ? $matches : array();
-      }
-
-      // clean this up in case someone puts $_SERVER instead of just SERVER
-      $global = preg_replace('#^[$_]{1,2}#', '', $global);
-
-      /*
-       * for some reason getting the superglobal array directly with the string
-       * is unreliable, but this bascially works as a whitelist, so that's
-       * probably not a bad idea.
-       */
-      switch (strtoupper($global)) {
-
-        case 'SERVER':
-          $global = $_SERVER;
-          break;
-        case 'SESSION':
-          $global = $_SESSION;
-          break;
-        case 'REQUEST':
-          $global = $_REQUEST;
-          break;
-        case 'COOKIE':
-          $global = $_COOKIE;
-          break;
-        case 'POST':
-          $global = $_POST;
-          break;
-        case 'GET':
-          $global = $_GET;
-      }
-
-      /*
-       * we attempt to evaluate the named value from the superglobal, which includes 
-       * the possiblity that it will be referring to an array element. We take that 
-       * to two dimensions only. the only way that I know of to do this open-ended 
-       * is to use eval, which I won't do
-       */
-      if (isset($global[$name])) {
-        if (is_string($global[$name])) {
-          $dynamic_value = $global[$name];
-        } elseif (is_array($global[$name]) || is_object($global[$name])) {
-        
-          $array = is_object($global[$name]) ? get_object_vars($global[$name]) : $global[$name];
-        switch (count($indexes)) {
-        case 1:
-              $dynamic_value = isset($array[$indexes[0]]) ? $array[$indexes[0]] : '';
-          break;
-        case 2:
-              $dynamic_value = isset($array[$indexes[0]][$indexes[1]]) ? $array[$indexes[0]][$indexes[1]] : '';
-          break;
-        default:
-            // if we don't have an index, grab the first value
-              $dynamic_value = is_array($array) ? current($array) : '';
-        }
-      }
-    }
-    }
-
-    return filter_var($dynamic_value, FILTER_SANITIZE_STRING);
+    return Participants_Db::get_dynamic_value($value);
   }
 
   /**
@@ -1195,15 +1113,16 @@ abstract class PDb_Shortcode {
    *
    * also processes the [record_link] tag
    *
-   * @param string $text   the unporcessed text with tags
-   * @param array  $values the values to replace the tags with
-   * @param array  $tags   the tags to look for in the text
+   * @param string $text   the unprocessed text with tags
    *
    * @return string the text with the replacements made
    *
    */
-  protected function _proc_tags($text, $values = array(), $tags = array()) {
+  protected function _proc_tags($text) {
+    
+    return Participants_Db::replace_tags($text, $this->participant_values, $this->fields);
 
+    /*
     if (empty($values)) {
 
       foreach ($this->fields as $column) {
@@ -1240,6 +1159,7 @@ abstract class PDb_Shortcode {
 
     // replace the variables with strings
     return vsprintf($pattern, $values);
+     */
   }
 
   
@@ -1276,7 +1196,7 @@ abstract class PDb_Shortcode {
     $form_status = 'normal';
     if (!empty($this->shortcode_atts['action'])) {
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
-      $form_status = 'multipage';
+      if ($this->submission_page !== false) $form_status = 'multipage';
     }
     if (!$this->submission_page) {
     $this->submission_page = $_SERVER['REQUEST_URI'];

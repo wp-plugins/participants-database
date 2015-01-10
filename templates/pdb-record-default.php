@@ -30,10 +30,10 @@
       
       <tr class="<?php $this->field->print_element_class() ?>">
       
-        <th><?php $this->field->print_label() ?></th>
-        <td id="<?php $this->field->print_element_id() ?>">
+        <th for="<?php $this->field->print_element_id() ?>"><?php $this->field->print_label() ?></th>
+        <td>
         
-          <?php $this->field->print_element(); ?>
+          <?php $this->field->print_element_with_id(); ?>
           
               <?php if ($this->field->has_help_text()) : ?>
           <span class="helptext"><?php $this->field->print_help_text() ?></span>

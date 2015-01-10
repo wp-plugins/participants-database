@@ -15,9 +15,9 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2012 xnau webdesign
+ * @copyright  2012 - 2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.5
+ * @version    Release: 1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 class PDb_List extends PDb_Shortcode {
@@ -484,9 +484,9 @@ class PDb_List extends PDb_Shortcode {
     
     $action = $target !== false ? $target : get_permalink($post->ID)  . '#' . $this->list_anchor;
     
-    $class_att = $class ? $class : '';
+    $class_att = $class ? 'class="' . $class . '"' : '';
     
-    $output[] = '<form method="post" class="sort_filter_form ' . $class_att . '" action="' . $action . '" ref="' . $ref . '" >';
+    $output[] = '<form method="post" class="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
     $hidden_fields = array(
         'action' => 'pdb_list_filter',
         'instance_index' => $this->shortcode_atts['target_instance'],
@@ -576,13 +576,40 @@ class PDb_List extends PDb_Shortcode {
 
     $output[] = '<input name="operator" type="hidden" class="search-item" value="LIKE" />';
     $output[] = '<input id="participant_search_term" type="text" name="value" class="search-item" value="' . $this->list_query->current_filter('search_term') . '">';
-    $output[] = '<input name="submit_button" type="submit" value="' . $this->i18n['search'] . '">';
-    $output[] = '<input name="submit_button" type="submit" value="' . $this->i18n['clear'] . '">';
+    $output[] = $this->search_submit_buttons();
 
     if ($print)
       echo $this->output_HTML($output);
     else
       return $this->output_HTML($output);
+  }
+  /**
+   * supplies a search form submit and clear button with optional button text strings
+   * 
+   * the $values array can supply a locally-defined button text value, for example:
+   * $values = array( 'submit' => 'Search Records', 'clear' => 'Clear the Search Parameters' );
+   * 
+   * @param array $values array of strings to set the "value" attribute
+   * @return string the HTML
+   */
+  public function print_search_submit_buttons($values = '') {
+    $submit_text = isset($values['submit']) ? $values['submit'] : $this->i18n['search'];
+    $clear_text = isset($values['clear']) ? $values['clear'] : $this->i18n['clear'];
+  	$output = array();
+  	$output[] = '<input name="submit_button" class="search-form-submit" type="submit" value="' . $submit_text . '">';
+    $output[] = '<input name="submit_button" class="search-form-clear" type="submit" value="' . $clear_text . '">';
+    print $this->output_HTML($output);
+  }
+  /**
+   * supplies a search form submit and clear button
+   * 
+   * @return string the HTML
+   */
+  public function search_submit_buttons() {
+  	$output = array();
+  	$output[] = '<input name="submit_button" class="search-form-submit" type="submit" value="' . $this->i18n['search'] . '">';
+    $output[] = '<input name="submit_button" class="search-form-clear" type="submit" value="' . $this->i18n['clear'] . '">';
+    return $this->output_HTML($output);
   }
   /**
    * 
@@ -699,7 +726,7 @@ class PDb_List extends PDb_Shortcode {
   }
 
   /**
-   * prints the pagination controls to the template
+   * echoes the pagination controls to the template
    *
    * this does nothing if filtering is taking place
    *
@@ -731,6 +758,8 @@ class PDb_List extends PDb_Shortcode {
   /**
    * get the column form element type
    *
+   * @return string the form element type
+   *
    */
   public function get_field_type($column) {
 
@@ -741,7 +770,8 @@ class PDb_List extends PDb_Shortcode {
 
   /**
    * are we setting the single record link?
-   * returns boolean
+   * 
+   * @return bool true if the current field is the designated single record link field
    */
   public function is_single_record_link($column) {
 
@@ -755,7 +785,12 @@ class PDb_List extends PDb_Shortcode {
   }
 
   /**
-   * create a date/time string
+   * print a date string from a UNIX timestamp
+   * 
+   * @param int|string $value timestamp or date string
+   * @param string $format format to use to override plugin settings
+   * @param bool $print if true, echo the output
+   * @return string formatted date value
    */
   public function show_date($value, $format = false, $print = true) {
 
@@ -769,9 +804,17 @@ class PDb_List extends PDb_Shortcode {
       return date_i18n($dateformat, $time);
   }
 
+  /**
+   * converts an array value to a readable string
+   * 
+   * @param array $value
+   * @param string $glue string to use for concatenation
+   * @param bool $print if true, echo the output
+   * @return string HTML
+   */
   public function show_array($value, $glue = ', ', $print = true) {
 
-    $array = array_filter(Participants_Db::unserialize_array($value), array( 'PDb_FormElement', 'is_displayable'));
+    $array = array_filter((array)Participants_Db::unserialize_array($value), array( 'PDb_FormElement', 'is_displayable'));
 
     $output = implode($glue, $array);
 
@@ -781,21 +824,38 @@ class PDb_List extends PDb_Shortcode {
       return $output;
   }
 
+  /**
+   * returns a concatenated string from an array of HTML lines
+   * 
+   * @version 1.6 added option to assemble HTML without linebreaks
+   * 
+   * @param array $output
+   * @return type
+   */
   public function output_HTML($output = array()) {
-    return implode('', $output);
+    $glue = Participants_Db::plugin_setting_is_true('strip_linebreaks') ? '' : PHP_EOL;
+    return implode($glue, $output);
   }
 
+  /**
+   * sets up an anchored value
+   * 
+   * this uses any relevant plugin settings
+   * 
+   * @param array|string $value
+   * @param string       $template for the link HTML (optional)
+   * @param bool         $print    if true, HTML is echoed
+   * @return string HTML
+   */
   public function show_link($value, $template = false, $print = false) {
 
-    if (is_serialized($value)) {
+    $params = maybe_unserialize($value);
 
-      $params = unserialize($value);
+    if ( is_array($params)) {
 
       if (count($params) < 2)
         $params[1] = $params[0];
-    } elseif ( is_array($value)) {
       
-      list($params[0],$params[1]) = $value;
     } else {
 
       // in case we got old unserialized data in there

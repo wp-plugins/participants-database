@@ -6,9 +6,9 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2011 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.3
+ * @version    1.0
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Participants_Db class
  * 
@@ -74,6 +74,15 @@ class PDb_List_Query {
    * @var bool true if current query is a search result
    */
   private $is_search_result = false;
+  /**
+   * each clause, as it's added to the where_clauses property, is given a sequential 
+   * index. This index is used to reconstruct the filters into their original sequence 
+   * so parenthesization will follow from the original filter sequence
+   * @version 1.6
+   * 
+   * @var int index number for a clause
+   */
+  private $clause_index = 0;
   /**
    * @var object the instantiating List class instance
    */
@@ -249,17 +258,15 @@ class PDb_List_Query {
    * @param string $operator the filter operator
    * @param string $term the search term used (optional)
    * @param string $logic the AND|OR logic to use
-   * @param int $group group identifier (for creating parenthesized expressions)
    */
-  public function add_filter($field, $operator, $term, $logic = 'AND', $group = 0) {
+  public function add_filter($field, $operator, $term, $logic = 'AND') {
     
     $this->_add_single_statement(
-            filter_var($field, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES),
+            filter_var($field, FILTER_SANITIZE_STRING),
             $this->_sanitize_operator($operator),
-            filter_var($term, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES),
+            filter_var($term, FILTER_SANITIZE_STRING),
             ($logic === 'OR' ? 'OR' : 'AND'),
-            false,
-            $group
+            false
             );
   }
   /**
@@ -339,41 +346,65 @@ class PDb_List_Query {
     return $query;
   }
   /**
-   * provides a mysql where clause drawn from the where_clause property
+   * provides a mysql where clause drawn from the where_clauses property
    * 
    * @return string
    */
   private function _build_where_clause() {
+    
+    
     $subquery = '';
     $inparens = false;
-    $i = $this->clause_count;
-    static $last_group = 1;
-    foreach ($this->where_clauses as $clauses) {
-      foreach ($clauses as $clause) {
-        $this_group = $clause->get_group();
-        if ($this_group !== $last_group) {
-          $subquery .= ' (';
+    $clause_sequence = $this->_build_clause_sequence();
+    //error_log(__METHOD__.' '.print_r($clause_sequence,1));
+    /*
+     * each element in the where_clauses property array is an array of statements 
+     * acting on a single field; The key is the name of the field.
+     */
+    foreach ($clause_sequence as $clause) {
+      $last_clause = $clause->index() === count($clause_sequence) - 1;
+      /*
+       * each element in the field clauses array is a PDb_List_Query_Filter object 
+       * representing a statment acting on a particular field
+       */
+      if ($clause->is_or() && !$inparens) {
+        $subquery .= '(';
           $inparens = true;
-          $last_group = $this_group;
         }
         $subquery .= $clause->statement();
-        if ($clause->is_last_of_group() && $inparens) {
-          $subquery .= ') ';
-          $inparens = false;
+      if ($clause->is_or() && !$last_clause) {
+        $subquery .= ' OR ';
         }
-        if ($i === 1) {
-          // this is the last clause
-          if ($inparens) {
-            $subquery .= ') ';
+      if ($inparens && (!$clause->is_or() || $last_clause)) {
+        $subquery .= ')';
             $inparens = false;
           }
-        } else {
-          $subquery .= ' ' . $clause->logic() . ' ';
-        }
-        $i--;
+      if (!$clause->is_or() && !$last_clause) {
+        $subquery .= ' AND ';
       }
     }
     return $subquery;
+  }
+  /**
+   * takes the where_clauses property and builds a sequence of clauses for processing
+   * 
+   * the where_clauses property is organized by field so that we can override the 
+   * filters that are applied to a specific field, but the order in which the filters 
+   * were submitted is important to correctly parenthesizing the resulting SQL, so 
+   * before assembling the where clause SQL, we build a re-sequenced array of clauses 
+   * according to how they were originally submitted
+   * 
+   * @return array a sequence of filter objects
+   */
+  private function _build_clause_sequence() {
+    $sequence = array();
+    foreach ($this->where_clauses as $field_clauses) {
+      foreach ($field_clauses as $clause) {
+        $sequence[$clause->index()] = $clause;
+      }
+    }
+    ksort($sequence);
+    return $sequence;
   }
   /**
    * provides an order clause
@@ -425,10 +456,11 @@ class PDb_List_Query {
   /**
    * adds a filter statement from an input array
    * 
-   * @param array $input
+   * @param array $input from GET or POST array
    * @return null
    */
   private function  _add_filter_from_input($input) {
+    
     $this->_reset_filters();
     if (empty($input['sortstring'])) {
       $input['sortstring'] = $input['sortBy'];
@@ -533,28 +565,16 @@ class PDb_List_Query {
     
     if (!empty($filter_string)) {
 
-      $statements = explode('&', html_entity_decode($filter_string));
-
-      foreach ($statements as $statement) {
+      $statements = preg_split('/([&|])/', html_entity_decode($filter_string), -1, PREG_SPLIT_DELIM_CAPTURE);
+      $logic = 'AND';
         
-        if ( false !== strpos($statement, '|') ) { // check for OR clause
+      for ($i = 0;$i < count($statements);$i = $i + 2) {
           
-          $or_statements = explode('|', $statement);
-          
-          $or_clause = array();
-          $i = count($or_statements);
-          foreach ( $or_statements as $or_statement ) {
-            
-            $logic = $i === 1 ? 'AND' : 'OR';
-            $this->_add_statement_from_filter_string($or_statement, $logic);
-            $i--;
+        if (isset($statements[$i+1])) {
+          $logic = $statements[$i+1] === '|' ? 'OR' : 'AND';
           }
           
-        } else {
-          
-          $this->_add_statement_from_filter_string($statement);
-          
-        }
+        $this->_add_statement_from_filter_string($statements[$i], $logic);
         
       }// each $statement
       
@@ -593,7 +613,8 @@ class PDb_List_Query {
    * @param bool   $shortcode   true if the current filter is from the shortcode
    * @return null
    */
-  private function _add_single_statement($column, $operator, $search_term = '', $logic = 'AND', $shortcode = false, $group = 0) {
+  private function _add_single_statement($column, $operator, $search_term = '', $logic = 'AND', $shortcode = false) {
+    
     /*
      * don't add an 'id = 0' clause if there is a user search. This gives us a 
      * way to create a "search results only" list if the shortcode contains 
@@ -619,10 +640,13 @@ class PDb_List_Query {
         'field' => $column,
         'logic' => $logic,
         'shortcode' => $shortcode,
-        'term' => $search_term,
-        'group' => $group
+        'term' => trim(urldecode($search_term)),
+        'index' => $this->clause_index,
             )
     );
+
+    // increment the index value
+    $this->clause_index++;
 
     $statement = false;
 
@@ -643,7 +667,8 @@ class PDb_List_Query {
 
       $operator = in_array($operator, array('>','<')) ? $operator : '=';
       if ($field_atts->form_element == 'timestamp') {
-        $statement = 'DATE(p.' . $column . ') ' . $operator . ' CONVERT_TZ(FROM_UNIXTIME(' . $search_term . '), @@session.time_zone, "+00:00") ';
+        //$statement = 'DATE(p.' . $column . ') ' . $operator . ' CONVERT_TZ(FROM_UNIXTIME(' . $search_term . '), @@session.time_zone, "+00:00") ';
+        $statement = 'DATE(p.' . $column . ') ' . $operator . ' DATE(FROM_UNIXTIME(' . $search_term . ')) ';
       } else {
         $statement = 'p.' . $column . ' ' . $operator . ' CAST(' . $search_term . ' AS SIGNED)';
       }
@@ -653,11 +678,14 @@ class PDb_List_Query {
       if ($operator === 'NOT LIKE' or $operator === '!') {
         $pattern = '(p.%1$s IS NOT NULL AND p.%1$s <> "")';
       } else {
-        $pattern = '(p.%1$s IS NULL AND p.%1$s = "")';
+        $pattern = '(p.%1$s IS NULL OR p.%1$s = "")';
       }
       $statement = sprintf($pattern, $column);
       
     } else {
+    
+    	if ($operator === NULL)
+    		$operator = 'LIKE';
     
       $delimiter = array('"', '"');
 
@@ -712,14 +740,12 @@ class PDb_List_Query {
           
         case 'gt':
         case '>':
-        case '>=':
           
           $operator = '>=';
           break;
         
         case 'lt':
         case '<':
-        case '<=':
           
           $operator = '<';
           break;
@@ -732,6 +758,7 @@ class PDb_List_Query {
     }
     if ($statement) {
       $filter->update_parameters(array('statement' => $statement));
+      
       $this->where_clauses[$column][] = $filter;
     }
   }
@@ -743,91 +770,14 @@ class PDb_List_Query {
    */
   private function _set_up_clauses() {
     $count = 0;
-    $grouped = false;
     foreach($this->where_clauses as $field) {
       if (is_array($field)) {
         foreach ($field as $clause) {
-          if ($clause->get_group() !== 0) {
-            $grouped = true;
-          }
           $count++;
         }
       }
     }
     $this->clause_count = $count;
-    if (!$grouped) {
-      $this->_set_clause_grouping();
-    }
-    $this->_set_last_of_group_clauses();
-  }
-  
-  /**
-   * sets up the clause grouping
-   * 
-   * this is only needed if grouping is not handled by the calling class, and is 
-   * based on the placement of "OR" statements such that "OR" statments are grouped 
-   * and "AND" statements are not
-   */
-  private function _set_clause_grouping() {
-    $i = $this->clause_count;
-    $group = 0;
-    $inparens = false;
-    foreach ($this->where_clauses as $clauses) {
-      foreach ($clauses as $clause) {
-        if (!$inparens && $clause->is_or()) {
-          $group++;
-          $inparens = true;
-        }
-        if ($inparens && !$clause->is_or()) {
-          $group--;
-          $inparens = false;
-        }
-        if ($i === 1) {
-          // this is the last clause
-          if ($inparens) {
-            $inparens = false;
-          }
-        }
-        $clause->set_group($group);
-        $i--;
-      }
-    }
-  }
-  
-  /**
-   * defines the last-of-group clauses
-   * 
-   * @return null
-   */
-  private function _set_last_of_group_clauses() {
-    $inparens = false;
-    $group = false;
-    $previous_clause = false;
-    foreach ($this->where_clauses as $where_clauses_index => $clauses) {
-      end($this->where_clauses);
-      $end_key = key($this->where_clauses);
-      foreach ($clauses as $clause_index => $clause) {
-        $clause->set_last_of_group(true);
-        $current_group = $clause->get_group();
-        if ($group === false) {
-          $clause->set_last_of_group(false);
-          $group = $current_group;
-        } elseif ($current_group === $group) {
-          if ($previous_clause) {
-            $previous_clause->set_last_of_group(false);
-          }
-          $group = $current_group;
-        } elseif ($current_group !== $group) {
-          $group = $current_group;
-          $clause->set_last_of_group(false);
-        }
-        end($clauses);
-        if ($where_clauses_index === $end_key) {
-          $clause->set_last_of_group(true);
-        }
-        $previous_clause = $clause;
-      }
-    }
   }
   
   /**
@@ -870,6 +820,7 @@ class PDb_List_Query {
   private function _save_query_session()
   {
     $this->_clear_query_session();
+    
     Participants_Db::$session->set($this->query_session, array(
         'where_clauses' => serialize($this->where_clauses),
         'sort' => serialize($this->sort),
@@ -898,7 +849,9 @@ class PDb_List_Query {
    * @return bool true is valid session was found
    */
   private function _restore_query_session() {
+    
     $data = Participants_Db::$session->get($this->query_session);
+    
     $where_clauses = maybe_unserialize($data['where_clauses']);
     $sort = maybe_unserialize($data['sort']);
     $this->clause_count = $data['clause_count'];
@@ -950,15 +903,8 @@ class PDb_List_Query {
       case '=':
         $operator = '=';
         break;
-      case '>':
       case 'gt':
-        $operator = '>';
-        break;
-      case '>=':
         $operator = '>=';
-        break;
-      case '<=':
-        $operator = '<=';
         break;
       case 'lt':
       case '<':
@@ -976,12 +922,14 @@ class PDb_List_Query {
    */
   public static function single_search_input_filter() {
     return array(
-        'value' => FILTER_SANITIZE_STRING,
+        'value' => array(
+            'filter' => FILTER_SANITIZE_STRING,
+            'flags' => FILTER_FLAG_NO_ENCODE_QUOTES
+            ),
         'search_field' => array(
             'filter' => FILTER_CALLBACK,
             'options' => array( __CLASS__, 'sanitize_search_field')
         ),
-//        'search_field' => FILTER_SANITIZE_STRING,
         'operator' => FILTER_SANITIZE_STRING,
         'submit' => FILTER_SANITIZE_STRING,
         'submit_button' => FILTER_SANITIZE_STRING,
@@ -1001,7 +949,7 @@ class PDb_List_Query {
   public static function multi_search_input_filter() {
     $array_filter = array(
             'filter' => FILTER_SANITIZE_STRING,
-            'flags' => FILTER_FORCE_ARRAY
+            'flags' => FILTER_FLAG_NO_ENCODE_QUOTES
         );
     return array(
         'value' => $array_filter,

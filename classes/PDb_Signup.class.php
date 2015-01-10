@@ -150,8 +150,6 @@ class PDb_Signup extends PDb_Shortcode {
     // run the parent class initialization to set up the $shortcode_atts property
     parent::__construct($shortcode_atts, $shortcode_defaults);
 
-    $this->registration_page = Participants_Db::get_record_link($this->participant_values['private_id'], $this->shortcode_atts['edit_record_page']);
-
     // set up the signup form email preferences
     $this->_set_email_prefs();
 
@@ -180,7 +178,8 @@ class PDb_Signup extends PDb_Shortcode {
         $this->_send_email();
 
       // form has been submitted, close it
-      $this->set_form_status('complete');
+      Participants_Db::$session->clear('form_status');
+//      $this->set_form_status('complete');
     }
     // print the shortcode output
     $this->_print_from_template();

@@ -6,9 +6,9 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2014 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.3
+ * @version    0.5
  * @link       http://xnau.com/wordpress-plugins/
  */
 
@@ -22,9 +22,9 @@ class PDb_List_Query_Filter {
   /**
    * @var string the name of the field the filter is to be applied to
    */
-  private $field;
+  var $field;
   /**
-   * @var string the mysql query fragment that effects the filter
+   * @var string the filter expressed as a mysql query fragment
    */
   private $sql;
   /**
@@ -35,17 +35,11 @@ class PDb_List_Query_Filter {
   /**
    * @var string the term used in the filter 
    */
-  private $term = '';
+  var $term = '';
   /**
-   * this gives us a way to control parenthesized groups of clauses
-   * 
-   * @var int the current group membership of the object
+   * @var int a unique sequential index for the filter
    */
-  private $group = 0;
-  /**
-   * @var bool true if clause is last of a group
-   */
-  private $last = false;
+  private $index;
   /**
    * @var bool true if the filter is a "background" filter
    * 
@@ -66,7 +60,6 @@ class PDb_List_Query_Filter {
    * 'logic'     => $logic
    * 'term'      => $search_term
    * 'shortcode' => $shortcode
-   * 'group'     => $group
    */
   public function __construct($params = array())
   {
@@ -130,7 +123,8 @@ class PDb_List_Query_Filter {
   public function update_parameters($params) {
     
     if (isset($params['field'])) {
-      $this->field = $params['field'];
+      $this->field = Participants_Db::$fields[$params['field']];
+      if (!$this->field) $this->field = ''; // blank it if the field name is invalid
     }
     if (isset($params['statement'])) {
       $this->sql = $this->sanitize_sql($params['statement']);
@@ -144,41 +138,9 @@ class PDb_List_Query_Filter {
     if (isset($params['term'])) {
       $this->set_search_term($params['term']);
     }
-    if (isset($params['group'])) {
-      $this->set_group($params['group']);
-    }
-  }
-  /**
-   * gets the group value
-   * 
-   * @return int $group
-   */
-  public function get_group() {
-    return $this->group;
-  }
-  /**
-   * sets the group value
-   * 
-   * @var int $group
-   */
-  public function set_group($group = 0) {
-    $this->group = $group;
-  }
-  /**
-   * sets the last property
-   * 
-   * @param bool $state
-   */
-  public function set_last_of_group($state = true) {
-    $this->last = $state;
-  }
-  /**
-   * gets the last-of-group state
-   * 
-   * @return bool true if the clause is the last of a group
-   */
-  public function is_last_of_group() {
-    return $this->last;
+    if (isset($params['index'])) {
+      $this->index = $params['index'];
+  	}
   }
   /**
    * sets the search term property
@@ -190,7 +152,8 @@ class PDb_List_Query_Filter {
    if ($term === 'null' || $term === ''  || is_null($term)) {
      $this->term = '';
    } else {
-     $this->term = PDb_FormElement::get_title_value($term, $this->field);
+     global $wpdb;
+     $this->term = $wpdb->esc_like(PDb_FormElement::get_title_value($term, $this->field->name));
    }
   }
   /**
@@ -226,7 +189,8 @@ class PDb_List_Query_Filter {
    */
   public function get_term() {
     if ($this->wildcard_present() || $this->like_term === true) {
-      return str_replace(array('*', '?'), array('%', '_'), like_escape($this->term));
+    	global $wpdb;
+      return str_replace(array('*', '?'), array('%', '_'), $wpdb->esc_like($this->term));
     } else {
       return esc_sql($this->term);
     }
@@ -249,6 +213,14 @@ class PDb_List_Query_Filter {
    */
   public function is_string_search() {
     return is_string($this->term) && trim($this->term) !== '';
+  }
+  /**
+   * supplies the current index
+   * 
+   * @return int the index
+   */
+  public function index() {
+    return $this->index;
   }
   /**
    * sanitizes an SQL statement

@@ -2,7 +2,7 @@
 /*
  * single table-based template for the [pdb_record] shortcode for editing a record on the frontend
  *
- * this template is design to match the formatting and layout of the pdb-signup-default template
+ * this template is designed to match the formatting and layout of the pdb-signup-default template
  */
 ?>
 <div class="wrap <?php echo $this->wrap_class ?>">
@@ -38,10 +38,10 @@
 
           <tr class="<?php $this->field->print_element_class() ?>">
 
-            <th><?php $this->field->print_label() ?></th>
-            <td id="<?php $this->field->print_element_id() ?>">
+            <th for="<?php $this->field->print_element_id() ?>"><?php $this->field->print_label() ?></th>
+            <td>
 
-              <?php $this->field->print_element(); ?>
+              <?php $this->field->print_element_with_id(); ?>
 
               <?php if ($this->field->has_help_text()) : ?>
                 <span class="helptext"><?php $this->field->print_help_text() ?></span>

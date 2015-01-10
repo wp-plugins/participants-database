@@ -171,7 +171,7 @@ class PDb_FormElement extends xnau_FormElement {
           if ($html) {
             if (isset($field->module) and in_array($field->module, array('single','list'))) {
               $image->display_mode = 'image';
-            } elseif (isset($field->module) and in_array($field->module, array('signup','admin-edit'))) {
+            } elseif (isset($field->module) and in_array($field->module, array('signup'))) {
               $image->display_mode = $image->image_defined ? 'both' : 'none';
               $image->link = false;
             }
@@ -193,8 +193,8 @@ class PDb_FormElement extends xnau_FormElement {
             $field->link = false;
             $return = $field->value;
           } else {
-            $field->link =  xnau_Image_Handler::concatenate_directory_path(get_bloginfo('url'), Participants_Db::$plugin_options['image_upload_location']) . $field->value;
-            $return = self::make_link($field);
+            $field->link = xnau_Image_Handler::concatenate_directory_path(site_url(), Participants_Db::plugin_setting('image_upload_location')) . $field->value;
+             $return = self::make_link($field);
           }
           break;
         } else {
@@ -291,12 +291,18 @@ class PDb_FormElement extends xnau_FormElement {
         $return = sprintf('<span class="%s">%s</span>', $field->form_element,  self::make_link($field));
         break;
       
-      case 'hidden':
+      case 'placeholder':
         
-        // error_log(__METHOD__.' comparing: '.$field->value . ' and '. $field->default);
+      	$field->value = $field->default;
+        $return = self::make_link($field);
+        break;
+      
+      case 'hidden':
         
         if ($field->value === $field->default) {
           $field->value = '';
+        } elseif (!Participants_Db::is_dynamic_value($field->default)) {
+        	$field->value = $field->default;
         }
       
       default :
@@ -388,7 +394,8 @@ class PDb_FormElement extends xnau_FormElement {
     $in_admin = is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX);
 
     // clean up the provided string
-    $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($field->value))));
+   $URI = str_replace('mailto:', '', trim(strip_tags($field->value)));
+
 
     if (isset($field->link) && !empty($field->link)) {
       /*

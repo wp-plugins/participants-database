@@ -415,7 +415,6 @@ $html .= "\n" . '</div>';
         'options' => '',
         'style' => '',
         'class' => '',
-        'section' => $this->aux_plugin_shortname . '_setting_section'
     );
     $params = shortcode_atts($default, $atts);
 
@@ -424,7 +423,7 @@ $html .= "\n" . '</div>';
             $params['title'],
             array($this, 'setting_callback_function'),
             $this->aux_plugin_name,
-            $params['section'],
+            $this->aux_plugin_shortname . '_setting_section',
             array(
                 'type'  => $params['type'],
                 'name'  => $params['name'],

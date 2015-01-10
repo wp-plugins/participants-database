@@ -3,7 +3,7 @@
 
 template for participants list shortcode output
 
-this is the default template which formats the list of records as a table
+this template demonstrates a "table-less" reponsive layout for the list of records
 
 */
 ?>
@@ -22,15 +22,16 @@ this is the default template which formats the list of records as a table
     <?php $this->search_sort_form_top( false, 'form-horizontal' ); ?>
 
     <?php if ( $filter_mode == 'filter' || $filter_mode == 'both' ) : ?>
-
     
-			
       <div class="control-group">
       	<label class="control-label"><?php _e('Search', 'participants-database' )?>:</label>
       	<div class="controls">
         
 				<?php
-          // you can replace "false" with your own text for the "all columns" value
+          /* 
+           * you can replace "false" with your own text for the "all columns" value
+           * for more info on using the column_selector method, see pdb-list-detailed.php
+           */
           $this->column_selector( false );
         ?>
 			
@@ -55,8 +56,6 @@ this is the default template which formats the list of records as a table
   </div>
   <?php endif ?>
 
-<?php /* LIST DISPLAY */?>
-
 <?php 
 /* print the count if enabled in the shortcode
  * 
@@ -64,63 +63,47 @@ this is the default template which formats the list of records as a table
  */
 $this->print_list_count('<h5>'); 
 ?>
+<?php // this is an example of a way to style the records, delete this or edit as needed ?>
+<style type="text/css">
+  section {
+    margin: 1.5em 0;
+  }
+  .pdb-field-title {
+    font-weight: bold;
+    padding-right: 15px;
+  }
+  .pdb-field-title:after {
+    content: ':';
+  }
+</style>
 
-
-  <table class="table pdb-list list-container" >
+<div class="pdb-list list-container" >
   
     
     <?php if ( $record_count > 0 ) : ?>
 
-    <thead>
-      <tr>
-        <?php /*
-         * this function prints headers for all the fields
-         * replacement codes:
-         * %2$s is the form element type identifier
-         * %1$s is the title of the field
-         */
-        $this->print_header_row( '<th class="%2$s" >%1$s</th>' );
-        ?>
-      </tr>
-    </thead>
-    <?php // print the table footer row if there is a long list
-      if ( $records_per_page > 30 ) : ?>
-    <tfoot>
-      <tr>
-        <?php $this->print_header_row( '<th class="%2$s">%1$s</th>' ) ?>
-      </tr>
-    </tfoot>
-    <?php endif ?>
-
-    <tbody>
     <?php while ( $this->have_records() ) : $this->the_record(); // each record is one row ?>
-      <tr>
+      <section id="record-<?php echo $this->record->record_id ?>">
         <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
 
-          <?php if ( ! $this->field->is_empty( $this->field->value ) ) : ?>
-          <td>
-          	<?php echo PDb_FormElement::get_field_value_display($this->field); ?>
-            </td>
-            
+        <?php if ( ! $this->field->is_empty($this->field->value) ) : ?>
+        <div class="pdb-field">
+          <span class="pdb-field-title"><?php echo $this->field->title ?></span>
+          <span class="pdb-field-data"><?php echo PDb_FormElement::get_field_value_display($this->field); ?></span>
+        </div>
         <?php else : // if the field is empty ?>
-        <td></td>
         <?php endif ?>
         
 			<?php endwhile; // each field ?>
-      </tr>
+      </section>
     <?php endwhile; // each record ?>
-    </tbody>
     
     <?php else : // if there are no records ?>
 
-    <tbody>
-      <tr>
-        <td><?php if ($this->is_search_result === true)  echo Participants_Db::$plugin_options['no_records_message'] ?></td>
-      </tr>
-    </tbody>
+    <h4><?php if ($this->is_search_result === true)  echo Participants_Db::$plugin_options['no_records_message'] ?></h4>
 
     <?php endif; // $record_count > 0 ?>
-	</table>
+	</div>
   <?php
 	// set up the bootstrap pagination classes and wrappers
 

@@ -134,7 +134,7 @@ class PDb_Init
         // create the main data table
         $sql = 'CREATE TABLE ' . Participants_Db::$participants_table . ' (
           `id` int(6) NOT NULL AUTO_INCREMENT,
-          `private_id` VARCHAR(6) NULL,
+          `private_id` VARCHAR(9) NULL,
           ';
         foreach( array_keys( self::$field_groups ) as $group ) {
 
@@ -702,13 +702,6 @@ class PDb_Init
      */
     private static function set_database_real_version() {
       
-      /* don't bother if the value is set, we only do this if the db version can't 
-       * be determined
-       */
-      if (get_option(Participants_Db::$db_version_option)) {
-        return;
-      }
-
       global $wpdb;
 
       // set up the option starting with the first version
@@ -756,6 +749,8 @@ class PDb_Init
       
       // check for version 0.7
       $column_test = $wpdb->get_results('SHOW COLUMNS FROM ' . Participants_Db::$groups_table . ' LIKE "admin"');
+      
+      
       if (!empty($column_test))
         update_option(Participants_Db::$db_version_option, '0.7');
       else return;

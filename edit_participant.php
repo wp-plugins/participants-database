@@ -6,7 +6,7 @@
  * admin_init action
  *
  */
-if (!current_user_can(Participants_Db::$plugin_options['record_edit_capability'])) exit;
+if (!Participants_Db::current_user_has_plugin_role()) exit;
 
 $input_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('min_range' => 1));
 if (!isset($participant_id)) {
@@ -106,7 +106,7 @@ if ($participant_values) :
               $add_title = sprintf($fieldnote_pattern, __('hidden', 'participants-database'));
             } elseif (in_array($column->name, $readonly_columns) or $column->form_element == 'timestamp') {
               $attributes['class'] = 'readonly-field';
-              if (!current_user_can(Participants_Db::$plugin_options['record_edit_capability'])) {
+              if (!Participants_Db::current_user_has_plugin_role()) {
               $attributes['readonly'] = 'readonly';
               }
               $add_title = sprintf($fieldnote_pattern, __('read only', 'participants-database'));
@@ -160,12 +160,6 @@ if ($participant_values) :
                       //$column->value = xnau_FormElement::get_field_value_display($column);
                       $column->value = Participants_Db::parse_date($column->value);
                     }
-
-                    break;
-
-                  case 'image-upload':
-
-                   $column->value = '';
 
                     break;
 

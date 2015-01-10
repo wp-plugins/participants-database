@@ -57,7 +57,9 @@ this is a more detailed template showing how the parts of the display can be cus
          *       it to be seen. If 'true', the function prints the selector dropdown.
          *    3. columns: supply an array of column names if you want to define the 
          *       list of fields that can be used for searching: 'false' uses all 
-         *       displayed fields
+         *       displayed fields. If you want to set a default value, you must define 
+         *       the array of allowed fields and use your default field as the first 
+         *       element in the array.
          *    4. sorting: you can choose to sort the list by 'column' (the order they 
          *       appear in the table), 'alpha' (alphabetical order), or 'order' which 
          *       uses the defined group/field order
@@ -65,8 +67,25 @@ this is a more detailed template showing how the parts of the display can be cus
          */
         $this->column_selector( false, true, false, 'column', false );
       ?>
-
-      <?php $this->search_form() ?>
+			<input name="operator" type="hidden" class="search-item" value="LIKE" />
+			<?php
+			/*
+			 * the following text input is where the user types in the search term
+			 * if you want to add a placeholder value, add it as a placeholder attribute to the tag
+       * 
+       * you can also replace this with a dropdown or other type of input
+			 */
+			 ?>
+			<input id="participant_search_term" type="text" name="value" class="search-item" value="<?php echo $this->list_query->current_filter('search_term') ?>">
+      <?php 
+      /*
+       * this method places the submit buttons
+       * 
+       * you can optionally set the button text for each one by supplying them 
+       * in a config array...for example:
+       * $values = array( 'submit' => 'Search Records', 'clear' => 'Clear the Search Parameters' );
+       */
+      $this->print_search_submit_buttons(); ?>
       
     </fieldset>
     <?php endif ?>
@@ -146,149 +165,7 @@ this is a more detailed template showing how the parts of the display can be cus
 
           <?php $value = $this->field->value; // we do this just to make the variable name shorter ?>
           <td>
-          	<?php 
-						/* wrap the item in a single record link if it's enabled for this field:
-						 * this uses the global setting. If you want to customize the field on
-						 * which to place the link to the record detail page, change the "test"
-						 * to something like this:
-						 * if ( $this->field->name == 'field_name' ) {
-						 *
-						 * if you do this, check out the case below where we make a clickable
-						 * link: it does the same test so we don't duplicate the field. You'll
-						 * have to modify that in the same way
-						 */
-						if ( $this->field->is_single_record_link() ) {
-              
-              /*
-               * normally, when a value is empty, nothing is shown...but if the field 
-               * has been designated as the single record link, we must have something 
-               * to click on, so, we use the default value of the field if there is no 
-               * stored value. This makes it possible to create a 'static' link to the 
-               * single record by defining a read-only field with a default value
-               */
-              $value = empty($value) ? $this->field->default : $value;
-							
-							// add the record ID to the single record link and set the field's link property
-							$this->field->link = Participants_Db::add_uri_conjunction($single_record_link) . 'pdb=' . $this->record->record_id;
-							
-            } ?>
-
-            <?php /*
-            * here is where we determine how each field value is presented,
-            * depending on what kind of field it is
-            */
-            switch ( $this->field->form_element ) :
-
-							case 'image-upload': 
-                
-                $image = new PDb_Image(
-                        array(
-                            'filename' => $value,
-                            'mode' => 'image',
-                            'module' => 'list',
-                            'relstring' => 'lightbox',
-                      )
-                        );
-                $image->print_image();
-                break;
-								
-							case 'date':
-							
-								/*
-								 * if you want to specify a format, include it as the second 
-								 * argument in this function; otherwise, it will default to 
-								 * the site setting. See PHP date() for formatting codes
-								 */
-								$this->show_date( $value, false );
-								
-								break;
-								
-						case 'multi-select-other':
-						case 'multi-checkbox':
-						
-							/*
-							 * this function shows the values as a comma separated list
-							 * you can customize the glue string that joins the array elements
-							 */
-							$this->show_array( $value, $glue = ', ' );
-							
-							break;
-							
-						case 'link' :
-							
-							/*
-							 * prints a link (anchor tag with link text)
-							 * for the template:
-							 * %1$s is the URL
-							 * %2$s is the linked text
-							 */
-							$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
-							
-							break;
-							
-						case 'rich-text':
-							
-							printf(
-										 /* we wrap long text in this span so we can control it's size
-										  * when presented in a list
-										  */
-										 '<span class="%s">%s</span>',
-										 
-										 // this adds our CSS class
-										 'textarea richtext',
-										 
-										 /*
-											* here, we process the rich text output through wpautop. This is needed
-											* to automatically create paragraphs in rich text. You can take this out
-											* if you don't want to use WP auto-paragraphs. See 
-											* http://codex.wordpress.org/Function_Reference/wpautop
-											*/
-										 wpautop($value)
-										 
-										 );
-							
-              break;
-						
-						case 'text-area':
-							
-							printf(
-										 /* we wrap long text in this span so we can control it's size
-										  * when presented in a list
-										  */
-										 '<span class="%s">%s</span>',
-										 // the CSS class
-										 'textarea',
-										 // the text
-										 $value
-										 );
-							
-              break;
-							
-						case 'text-line':
-						default:
-						
-							/*
-							 * if the make links setting is enabled, try to make a link out of the field
-							 */
-							if (
-                      Participants_Db::$plugin_options['make_links'] 
-                      && 
-                      ! $this->field->is_single_record_link() 
-                      && 
-                      filter_var($value, FILTER_VALIDATE_EMAIL) !== false
-                      && 
-                      filter_var($value, FILTER_VALIDATE_URL) !== false       
-                 ) {
-								
-								$this->show_link( $value, $template = '<a href="%1$s" >%2$s</a>', true );
-								
-							} else {
-								
-                echo PDb_FormElement::get_field_value_display($this->field);
-								
-							}
-
-            endswitch; // switch by field type ?>
+          	<?php echo PDb_FormElement::get_field_value_display($this->field); ?>
             </td>
         
 			<?php endwhile; // fields ?>

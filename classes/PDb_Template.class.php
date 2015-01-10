@@ -78,28 +78,15 @@ class PDb_Template {
     $this->_setup_fields($object);
     $this->set_edit_page(Participants_Db::$plugin_options['registration_page']);
     $this->set_detail_page(Participants_Db::$plugin_options['single_record_page']);
-    
   }
   
   /**
    * 
    * prints a formatted field value
    * 
-   * @var string $name name of the field to print
-   */
-  public function _print($name) {
-    if (isset($this->fields->{$name})) {
-      echo PDb_FormElement::get_field_value_display($this->fields->{$name});
-    }
-  }
-  
-  /**
+   * public alias for _print()
    * 
-   * prints a formatted field value
-   * 
-   * alias for _print()
-   * 
-   * @var string $name name of the field to print
+   * @param string $name name of the field to print
    */
   public function print_field($name) {
     $this->_print($name);
@@ -111,7 +98,7 @@ class PDb_Template {
    * 
    * alias for print_field()
    * 
-   * @var string $name name of the field to print
+   * @param string $name name of the field to print
    */
   public function print_value($name) {
     $this->_print($name);
@@ -120,7 +107,7 @@ class PDb_Template {
   /**
    * prints a field title
    * 
-   * @var string $name
+   * @param string $name
    */
   public function print_title($name) {
     
@@ -131,8 +118,8 @@ class PDb_Template {
   /**
    * prints a field property
    * 
-   * @var string $name the fields name
-   * @var string $prop the field property to get
+   * @param string $name the fields name
+   * @param string $prop the field property to get
    * @return string
    */
   public function print_field_prop($name, $prop) {
@@ -142,17 +129,28 @@ class PDb_Template {
   /**
    * prints a group title given it's name
    * 
-   * @var string $name
+   * @param string $name
    * @return string
    */
   public function print_group_title($name) {
     echo $this->get_group_prop($name, 'title');
   }
+  /**
+   * determines if the named group has a defined description
+   * 
+   * @param string $name the groups name
+   * 
+   * @return bool true if the group description is non-empty
+   */
+  public function has_group_description($name) {
+  	$description = $this->get_group_prop($name, 'description');
+  	return !empty($description);
+  }
   
   /**
    * prints a group title given it's name
    * 
-   * @var string $name
+   * @param string $name
    * @return string
    */
   public function print_group_description($name) {
@@ -162,8 +160,8 @@ class PDb_Template {
   /**
    * prints a value wrapped in an anchor tag with an href value
    * 
-   * @var string $name of the field
-   * @var string $href the href value
+   * @param string $name of the field
+   * @param string $href the href value
    * @return null
    */
   public function print_with_link($name, $href) {
@@ -174,19 +172,10 @@ class PDb_Template {
   }
   
   /**
-   * checks a field for a value to show
-   * 
-   * @var string $name name of the field to check
-   */
-  public function has_content($name) {
-    return $this->fields->{$name}->value !== '';
-  }
-  
-  /**
    * gets a field property
    * 
-   * @var string $name the fields name
-   * @var string $prop the field property to get
+   * @param string $name the fields name
+   * @param string $prop the field property to get
    * @return string|array
    */
   public function get_field_prop($name, $prop) {
@@ -196,8 +185,8 @@ class PDb_Template {
   /**
    * gets a group property
    * 
-   * @var string $name
-   * @var string $prop
+   * @param string $name
+   * @param string $prop
    * @return string
    */
   public function get_group_prop($name, $prop) {
@@ -211,7 +200,7 @@ class PDb_Template {
    */
   public function get_edit_link($page = '') {
     $edit_page = empty($page) ? $this->edit_page : Participants_Db::find_permalink($page);
-    return $edit_page . (strpos($edit_page, '?') !== false ? '&' : '?') . 'pid=' . $this->get_value('private_id');
+    return $this->_cat_url_var($edit_page, 'pid', $this->_value('private_id'));
   }
   
   /**
@@ -221,49 +210,104 @@ class PDb_Template {
    */
   public function get_detail_link($page = '') {
     $detail_page = empty($page) ? $this->detail_page : Participants_Db::find_permalink($page);
-    return $detail_page . (strpos($detail_page, '?') !== false ? '&' : '?') . 'pdb=' . $this->get_value('id');
+    return $this->_cat_url_var($detail_page, 'pdb', $this->_value('id'));
   }
   
   /**
-   * provides the field's form element
+   * sets the edit page property
    * 
-   * @var string $name the field name
-   * @return string HTML
+   * it is assumed the [pdb_record] shortcode is on that page
+   * 
+   * @param string|int $page the page slug, path or ID
    */
-  public function get_form_element($name) {
-    if (property_exists($this->fields, $name)) {
-      $field = $this->fields->{$name};
-      if (!property_exists($this->fields, 'attributes') ) {
-        $field->attributes = array();
-      }
-      $element = array(
-          'type' => $field->form_element,
-          'name' => $field->name,
-          'value' => $field->value,
-          'options' => $field->values,
-          'class' => Participants_Db::$prefix . $field->form_element,
-          'attributes' => $field->attributes,
-      );
-      return PDb_FormElement::get_element($element);
+  public function set_edit_page($page) {
+    $this->edit_page = Participants_Db::find_permalink($page);
+    }
+  /**
+   * sets the detail page property
+   * 
+   * it is assumed the [pdb_single] shortcode is on that page
+   * 
+   * @param string|int $page the page slug, path or ID
+   */
+  public function set_detail_page($page) {
+    $this->detail_page = Participants_Db::find_permalink($page);
+  }
+  
+  /**
+   * gets an individual value from the raw values array
+   * 
+   * @param string $name the name of the value to get
+   * @return mixed the value
+   */
+  public function get_value($name) {
+  	return $this->_value($name);
+  }
+  
+  /**
+   * checks a field for a value to show
+   * 
+   * @param string $name name of the field to check
+   * @return bool true if field value is non-empty
+   */
+  public function has_content($name) {
+  	$value = $this->fields->{$name}->value;
+    return !empty($value) or $value !== 0;
+  }
+  /**
+   * determines if a group has any fields with non-empty content
+   * 
+   * typically, this is used to determine if a group should be shown or not
+   * 
+   * @param string $group name of the group
+   * @return bool true if at least one of the group's fields have content
+   */
+  public function group_has_content($group) {
+  	if ($this->base_type === 'PDb_List') {
+  		return true;
+  	} else {
+  		if (is_array($this->groups[$group]->fields)) {
+  			foreach ($this->groups[$group]->fields as $field_name) {
+  				if ($this->has_content($field_name)) {
+  					return true;
+  				}
+  			}
+  		}
+  		return false;
+  	}
+  }
+  /**
+   * returns the named value
+   * 
+   * @param string $name of the property
+   * 
+   * @return mixed
+   */
+  protected function _value($name) {
+    switch($this->base_type) {
+      case 'Record_Item':
+        return isset($this->record->values[$name]) ? $this->record->values[$name] : '';
+      case 'PDb_Single':
+      default:
+        return isset($this->values[$name]) ? $this->values[$name] : '';
     }
   }
-  
   /**
-   * prints a field form element
    * 
-   * @var string $name
-   * @return null
+   * prints a formatted field value
+   * 
+   * @param string $name name of the field to print
    */
-  public function print_form_element($name) {
-    echo $this->get_form_element($name);
+  protected function _print($name) {
+    if (isset($this->fields->{$name})) {
+      echo PDb_FormElement::get_field_value_display($this->fields->{$name});
+    }
   }
-  
-  
   /**
    * adds a link value to a field object
    * 
-   * @var string $name
-   * @var string $href
+   * @param string $name
+   * @param string $href
    */
   private function _set_link($name, $href) {
     $linkable_field_types = array(
@@ -274,7 +318,7 @@ class PDb_Template {
         'checkbox',
         'radio',
         );
-    if (in_array($this->fields->{$name}->form_element, $linkable_field_types))
+    if (in_array($this->fields->{$name}->form_element, $linkable_field_types)) {
     switch ($this->base_type) {
       case 'PDb_List':
         $this->fields->{$name}->link = $href;
@@ -287,6 +331,7 @@ class PDb_Template {
         $field = $this->record->{$group}->fields->{$name}->link = $href;
     }
   }
+  }
   
 
   /**
@@ -294,7 +339,7 @@ class PDb_Template {
    * 
    * this will use a different method for each type of object used to instantiate the class
    *
-   * @var object $object the instantiating object
+   * @param object $object the instantiating object
    */
   private function _setup_fields(&$object) {
     $this->base_type = get_class($object);
@@ -338,11 +383,16 @@ class PDb_Template {
           }
         }
         reset($this->values);
-        foreach($this->record as $name => $values) {
-          $this->groups[$name] = new stdClass();
-          $this->groups[$name]->name = $name;
-          $this->groups[$name]->title = $values->title;
-          $this->groups[$name]->description = $values->description;
+        foreach($this->record as $name => $group) {
+          $this->groups[$name] = $this_group = new stdClass();
+          $this_group->name = $name;
+          $this_group->title = $group->title;
+          $this_group->description = $group->description;
+          $this_group->fields = array();
+          foreach ($group->fields as $group_field) {
+          	$this_group->fields[] = $group_field->name;
+          }
+          reset($group->fields);
         }
         reset($this->record);
         break;
@@ -350,40 +400,17 @@ class PDb_Template {
     //unset($this->record->options);
   }
   /**
-   * gets a permalink for a page or post for editing a record
+   * adds a value to an url
    * 
-   * it is assumed the [pdb_record] shortcode is on that page
+   * @param string $url
+   * @param string $name of the variable
+   * @param string $value
    * 
-   * @var string|int $page the page slug, path or ID
+   * @return string the concatenated url
    */
-  public function set_edit_page($page) {
-    $this->edit_page = Participants_Db::find_permalink($page);
-  }
-  /**
-   * gets a permalink for a page or post for displaying a record
-   * 
-   * it is assumed the [pdb_single] shortcode is on that page
-   * 
-   * @var string|int $page the page slug, path or ID
-   */
-  public function set_detail_page($page) {
-    $this->detail_page = Participants_Db::find_permalink($page);
-  }
-  
-  /**
-   * gets an individual value from the raw values array
-   * 
-   * @var string $name the name of the value to get
-   * @return mixed the value
-   */
-  public function get_value($name) {
-    switch($this->base_type) {
-      case 'Record_Item':
-        return isset($this->record->values[$name]) ? $this->record->values[$name] : '';
-      case 'PDb_Single':
-      default:
-        return isset($this->values[$name]) ? $this->values[$name] : '';
-    }
+  private function _cat_url_var($url, $name, $value) {
+  	$op = strpos($url, '?') === false ? '?' : '&';
+  	return $url . $op . $name . '=' . urlencode($value);
   }
 }
 ?>

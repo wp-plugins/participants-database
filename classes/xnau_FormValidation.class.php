@@ -12,7 +12,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5
+ * @version    Release: 1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 class xnau_FormValidation {
@@ -155,6 +155,15 @@ class xnau_FormValidation {
   {
 
     $this->_add_error($name, $message, $overwrite);
+  }
+
+  /**
+   * clears errors associated with a field
+   * 
+   * @param string $field name of the field to clear the error on
+   */
+  public function clear_field_error($field) {
+    unset($this->errors[$field]);
   }
 
   /**

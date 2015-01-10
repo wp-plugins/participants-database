@@ -48,6 +48,22 @@ class PDb_Field_Group_Item extends PDb_Template_Item {
   }
   
   /**
+   * prints the title of the group
+   *
+   * @param string $start_tag the opening tag for the title wrapper
+   * @param string $end_tag   the closing tag for the title wrapper
+   */
+  public function print_title( $start_tag = '<h3 class="pdb-group-title">', $end_tag = '</h3>', $echo = true ) {
+    
+    if ( $this->printing_title() ) {
+      $output = $start_tag.$this->title.$end_tag;
+      if ( $echo ) echo $output;
+      else return $output;
+    }
+    
+  }
+  
+  /**
    * prints a group description
    *
    * @param array  $wrap  tags to wrap the description in; first element is
@@ -55,13 +71,9 @@ class PDb_Field_Group_Item extends PDb_Template_Item {
    * @param bool   $echo  if true, echo the description (defaults to true)
    *
    */
-  public function print_description(  $start_tag = '<p class="pdb_group-description">', $end_tag = '</p>' , $echo = true ) {
+  public function print_description(  $start_tag = '<p class="pdb-group-description">', $end_tag = '</p>', $echo = true ) {
     
-    // 'show_group_descriptions' for record shortcode
-    // 'signup_show_group_descriptions' for signup
-    $optionname = $this->module == 'signup' ? 'signup_show_group_descriptions' :'show_group_descriptions';
-    
-    if ( Participants_Db::$plugin_options[$optionname] and ! empty( $this->description ) ) {
+    if ( $this->printing_groups() and ! empty( $this->description ) ) {
       
       $output = $start_tag.$this->prepare_display_value( $this->description ).$end_tag;
       
@@ -73,25 +85,37 @@ class PDb_Field_Group_Item extends PDb_Template_Item {
   }
   
   /**
-   * indicates whether group titles or descriptions shold be shown
+   * indicates whether group titles should be shown
    * 
    * @return bool 
    */
   public function printing_title() {
     
-    return (bool) Participants_Db::$plugin_options['signup_show_group_descriptions'] and ! empty( $this->title );
+    return (bool) $this->printing_groups() and ! empty( $this->title );
   }
   
   /**
-   * prints the title of the group
+   * indicates whether groups are to be printed in the form
    *
-   * @param string $start_tag the opening tag for the title wrapper
-   * @param string $end_tag   the closing tag for the title wrapper
+   * signup and record forms print group titles/descriptions only if the setting for that form is true
+   * all other shortcodes always print groups, but they're really only seen in single record displays
+   * 
+   * @return bool true if groups are to be printed
    */
-  public function print_title( $start_tag = '<h3 class="pdb-group-title">', $end_tag = '</h3>' ) {
+  public function printing_groups() {
     
-    if ( ! empty( $this->title ) ) echo $start_tag.$this->title.$end_tag;
+    switch ($this->module) {
+      case 'signup':
+        $optionname = 'signup_show_group_descriptions';
+        break;
+      case 'record':
+        $optionname = 'show_group_descriptions';
+        break;
+      default:
+        return true;
+    }
     
+    return Participants_Db::plugin_setting_is_true($optionname);
   }
   
 }
