@@ -1,5 +1,6 @@
 <?php
-if (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) exit;
+if (!Participants_Db::current_user_has_plugin_role('admin')) exit;
+
 $CSV_import = new PDb_CSV_Import('csv_file_upload');
 $csv_paramdefaults = array(
       'delimiter_character' => 'auto',

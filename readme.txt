@@ -3,7 +3,7 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
-Tested up to: 4.0
+Tested up to: 3.9.1
 Stable tag: 1.5.4.9
 License: GPLv2
 
@@ -83,7 +83,7 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * French: Dominique Chapelle
 
-* Italian: Mario Conte
+* Italian: Michele Balderi
 
 * Dutch: At Voogt [www.wederzijdsgenoegen.nl](http://www.wederzijdsgenoegen.nl)
 

@@ -1,0 +1,13 @@
+.two_columns_50_50 .column1, .two_columns_50_50 .column2 {
+width:50%;
+margin: 10px 0;
+float: left;
+}
+.full-width {
+width: 96%;
+clear: both;
+}
+#respond input[type="text"], 
+#respond textarea {
+border: none;
+}

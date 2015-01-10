@@ -1,13 +1,13 @@
 /* stylesheet for participants-database plugin */
 
-[class*="pdb-"] .helptext {
+[class|="pdb"] .helptext {
   display: inline-block;
   margin: 0 5px;
 }
-[class*="pdb-"] .checkbox .helptext {
+[class|="pdb"] .checkbox .helptext {
   display: inline;
 }
-[class*="pdb-"] .selectother + .helptext {
+[class|="pdb"] .selectother + .helptext {
   display: block;
 }
 .glyphicon {
@@ -111,8 +111,8 @@ div.mce-panel {
   vertical-align: text-bottom;
 }
 
-.wrap[class^="pdb-"] td,
-.wrap[class^="pdb-"] th {
+.wrap[class|="pdb"] td,
+.wrap[class|="pdb"] th {
   vertical-align: middle;
 }
 
@@ -122,10 +122,14 @@ div.mce-panel {
 .file-delete label,
 .csv-export label,
 .radio-group label,
+.radio-subgroup label,
 .othercontrol  {
   margin: 0 12px 0 0;
   width: auto;
   white-space: nowrap;
+}
+.edit-participant .form-table td .radio-subgroup label {
+  margin: 0 12px 0 0;
 }
 .othercontrol label {
   margin-right: 0;
@@ -136,7 +140,8 @@ div.mce-panel {
 .selectother label input,
 .multicheckbox label input,
 .file-delete label input,
-.radio-group label input{
+.radio-group label input,
+.radio-subgroup label input {
   float: none;
   margin:0 2px 0 0;
   vertical-align: inherit;
@@ -160,6 +165,15 @@ div.mce-panel {
   line-height: 2;
   margin: 0 4px;
   width: auto;
+}
+.checkbox-group legend,
+.radio-group legend {
+  font-weight: bold;
+  margin-top: 15px
+}
+.checkbox-group fieldset:first-of-type legend,
+.radio-group fieldset:first-of-type legend {
+  margin-top: 0;
 }
 .inline-controls .checkbox-group, .inline-controls .radio-group {
     display: inline-block;

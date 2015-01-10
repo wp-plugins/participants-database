@@ -32,7 +32,7 @@ class PDb_Image extends xnau_Image_Handler {
     
     $this->classname .= ' ' . Participants_Db::$prefix . 'image image-field-wrap';
     
-    if ($this->link === '') {
+    if (empty($this->link)) {
       $this->link = $this->image_defined && Participants_Db::plugin_setting_is_true('image_link') ? $this->image_uri : '';
     }
     

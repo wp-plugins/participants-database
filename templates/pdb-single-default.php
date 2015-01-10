@@ -29,9 +29,9 @@ $exclude = array();
   
   <div class="section <?php $this->group->print_class() ?>" id="<?php echo Participants_Db::$prefix.$this->group->name ?>">
   
-    <?php $this->group->print_title( '<h2>', '</h2>' ) ?>
+    <?php $this->group->print_title( '<h2 class="pdb-group-title">', '</h2>' ) ?>
     
-    <?php $this->group->print_description( '<p>', '</p>' ) ?>
+    <?php $this->group->print_description() ?>
     
     
       <?php while ( $this->have_fields() ) : $this->the_field();

@@ -11,7 +11,7 @@
  * @version    Release: 1.5.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
-if (!current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']))
+if (!Participants_Db::current_user_has_plugin_role('admin'))
   exit;
 
 class PDb_Manage_Fields {
@@ -224,7 +224,6 @@ class PDb_Manage_Fields {
 
                       // preserve backslashes in regex expressions
                       if ($attribute_column == 'validation') {
-                        $database_row[$attribute_column] = str_replace('\\', '&#92;', $database_row[$attribute_column]);
                         if ($database_row['name'] == 'email' && $database_row[$attribute_column] == 'email')
                           $database_row[$attribute_column] = 'email-regex';
                       }
@@ -233,7 +232,7 @@ class PDb_Manage_Fields {
 
                       $element_atts = array_merge($edit_field_type, array(
                           'name' => 'row_' . $database_row['id'] . '[' . $attribute_column . ']',
-                          'value' => $this->prep_value($value, (bool) ( $attribute_column == 'validation' )),
+                          'value' => $this->prep_value($value, in_array($attribute_column, array('title', 'description'))),
                       ));
                       ?>
                       <td class="<?php echo $attribute_column ?>"><?php PDb_FormElement::print_element($element_atts) ?></td>
@@ -367,7 +366,7 @@ class PDb_Manage_Fields {
                       }
                       $element_atts = array(
                           'name' => ( empty($name) ? $group . '[' . $column . ']' : $name ),
-                          'value' => htmlspecialchars(stripslashes($value), ENT_QUOTES, "UTF-8", false),
+                          'value' => htmlspecialchars(stripslashes($value)),
                           'type' => $type,
                       );
                       if (!empty($attributes))
@@ -571,6 +570,10 @@ class PDb_Manage_Fields {
 
           foreach ($_POST as $name => $row) {
 
+	          foreach (array('title', 'description') as $field) {
+	            if (isset($row[$field])) $row[$field] = stripslashes($row[$field]);
+	          }
+
             // make sure name is legal
             //$row['name'] = $this->make_name( $row['name'] );
 
@@ -728,7 +731,14 @@ class PDb_Manage_Fields {
         foreach ($a as $e) {
           if (strpos($e, '::') !== false) {
             list($key, $value) = explode('::', $e);
-            $array[trim($key)] = $this->prep_value(trim($value), true);
+            /*
+             * @version 1.6
+             * this is to allow for an optgroup label that is the same as a value label...
+             * with an admittedly funky hack: adding a space to the end of the key for the 
+             * optgroup label. In most cases it will be unnoticed.
+             */
+            $array_key = in_array($value, array('false','optgroup',false)) ? trim($key) . ' ' : trim($key);
+            $array[$array_key] = $this->prep_value(trim($value), true);
           } else {
             $array[$this->prep_value($e, true)] = $this->prep_value($e, true);
           }

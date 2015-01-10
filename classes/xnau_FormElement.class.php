@@ -31,13 +31,13 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2011, 2012, 2013 xnau webdesign
+ * @copyright  2011, 2012, 2013, 2014 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.5
+ * @version    Release: 1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
-/*  Copyright 2011, 2012 Roland Barker xnau webdesign  (email : webdesign@xnau.com)
+/*
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
@@ -141,7 +141,6 @@ abstract class xnau_FormElement {
   /**
    * @var string the linebreak character
    */
-
   const BR = PHP_EOL;
   
   /**
@@ -232,8 +231,8 @@ abstract class xnau_FormElement {
     
     if ( NULL !== $params['options'] || ! empty( $params['options'] ) ) {
       
-      // is_serialized is a utility function in WordPress
-      $this->options = is_serialized( $params['options'] ) ? unserialize( $params['options'] ) : $params['options'];
+      // this value is stored as a serialized array, but the class could be called with an array for this value
+      $this->options = maybe_unserialize($params['options']);
       
     }
     
@@ -696,21 +695,17 @@ abstract class xnau_FormElement {
     
     if (!isset($this->attributes['readonly'])) {
     
-      $name = $this->name . ($this->group === true ? '[]' : '');
-    
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
-
-    $this->_addline( $this->print_hidden_fields(array($this->name => ''), false) );
 
     if ($other) {
       $this->_addline('<div class="dropdown-other-control-group" name="' . $this->name . '" rel="' . $otherlabel . '">');
       $this->add_class('otherselect');
-      $this->_addline('<select name="' . $name . '" ' . $this->_attributes() . ' >');
+      $this->_addline('<select name="' . $this->name . '" ' . $this->_attributes() . ' >');
       //$this->_addline('<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >');
     } else {
       $id = isset($this->attributes['id']) ? $this->attributes['id'] : $js_prefix . '_select';
-      $this->_addline('<select id="' . $id . '" name="' . $name . '" ' . $this->_attributes() . ' >');
+      $this->_addline('<select id="' . $id . '" name="' . $this->name . '" ' . $this->_attributes() . ' >');
     }
 
     $this->indent++;
@@ -1049,9 +1044,9 @@ abstract class xnau_FormElement {
     $null_select = (isset($this->options['null_select'])) ? $this->options['null_select'] : ($type == 'checkbox' ? true : false);
     
     if ($null_select !== false) {
-      $this->_addline('<input name="' . $this->name . '" ' . $this->_attributes() . ' value="' . (is_string($null_select)?$null_select:'') . '" type="hidden">', 1);
+      $this->_addline($this->_input_tag('hidden', (is_string($null_select)?$null_select:''), false), 1);
     }
-    if (isset($this->options['null_select'])) unset($this->options['null_select']);
+    unset($this->options['null_select']);
     
     $this->_addline('<span class="' . $type . '-group" >');
        
@@ -1084,8 +1079,8 @@ abstract class xnau_FormElement {
       $value = $type == 'checkbox' ? (isset($this->value['other']) ? $this->value['other'] : '') : $this->value;
       $this->attributes['class'] =  'otherselect';
       $this->_addline('<span class="othercontrol">');
-      $this->_addline('<label ' . $class . ' for="' . $this->name . '_otherselect">');
-      $this->_addline(sprintf('<input type="%s" id="%s_otherselect" name="%s"  value="%s" %s %s />', 
+      $this->_addline('<label ' . $class . ' for="' . $this->name . '_other">');
+      $this->_addline(sprintf('<input type="%s" id="%s_other" name="%s"  value="%s" %s %s />', 
               $type, 
               $this->name, 
               $type == 'checkbox' ? 'temp' : $this->name, 
@@ -1215,7 +1210,7 @@ abstract class xnau_FormElement {
   
 
     // clean up the provided link string
-    $URI = str_replace('mailto:', '', strtolower(trim(strip_tags($field->value))));
+    $URI = str_replace('mailto:', '', trim(strip_tags($field->value)));
     $linktext = empty($field->value) ? $field->default : $field->value;
 
     if (isset($field->link) and !empty($field->link)) {

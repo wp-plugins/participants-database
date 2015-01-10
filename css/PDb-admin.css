@@ -147,6 +147,12 @@ h4 .lowast {
   color: #AAAAAA;
   font-style: italic;
 }
+.pdb-upload {
+  display: inline-block;
+  border: 1px solid #DDD;
+  overflow: auto;
+  padding: 5px;
+}
 input[readonly] {
   border:none;
   background:none transparent;
@@ -171,6 +177,12 @@ body[class*='participants-database'] .form-table {
 .pdb-list .image-field-wrap img {
   height: 30px;
   width: auto;
+}
+.image-field-wrap img {
+  vertical-align: middle;
+}
+.image-field-wrap.file-notfound {
+  text-decoration: line-through;
 }
 .wp-admin .helptext {
   line-height: 1.5;

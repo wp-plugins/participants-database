@@ -21,8 +21,8 @@
 
       <fieldset class="field-group field-group-<?php echo $this->group->name ?>">
 
-        <?php $this->group->print_title(array('<legend>','</legend>')) ?>
-        <?php $this->group->print_description(array('<p>','</p>')) ?>
+        <?php $this->group->print_title('<legend>','</legend>') ?>
+        <?php $this->group->print_description() ?>
 
         <?php
         // step through the fields in the current group
@@ -34,8 +34,8 @@
             <label for="<?php $this->field->print_element_id() ?>">
               <?php $this->field->print_label() ?>
             </label>
-            <div class="input-group" id="<?php $this->field->print_element_id() ?>">
-              <?php $this->field->print_element(); ?>
+            <div class="input-group" >
+              <?php $this->field->print_element_with_id(); ?>
             </div>
             <?php if ($this->field->has_help_text()) : ?>
               <p class="help-block helptext"><?php $this->field->print_help_text() ?></p>

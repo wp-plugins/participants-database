@@ -207,6 +207,16 @@ class PDb_Field_Item extends PDb_Template_Item {
   }
   
   /**
+   * prints the field element with an id
+   * 
+   */
+  public function print_element_with_id() {
+    
+    $this->attributes['id'] = $this->prepare_CSS_class();
+    $this->print_element();
+  }
+  
+  /**
    * prints the field element
    *
    */

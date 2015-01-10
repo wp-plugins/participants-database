@@ -27,10 +27,10 @@
         
         <?php $feedback_class = $this->field->has_error() ? 'error' : ''; ?>
 
-        <div id="<?php $this->field->print_element_id() ?>" class="<?php $this->field->print_element_class() ?> control-group <?php echo $feedback_class ?>">
+        <div class="<?php $this->field->print_element_class() ?> control-group <?php echo $feedback_class ?>">
 
-          <label class="control-label" for="<?php echo $this->field->name?>"><?php $this->field->print_label(); // this function adds the required marker ?></label>
-          <div class="controls"><?php $this->field->print_element(); ?>
+          <label class="control-label" for="<?php $this->field->print_element_id() ?>" <?php $this->field->print_label(); // this function adds the required marker ?></label>
+          <div class="controls"><?php $this->field->print_element_with_id(); ?>
 
 						<?php if ( $this->field->has_help_text() ) :?>
               <p class="help-block">

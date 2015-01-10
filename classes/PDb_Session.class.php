@@ -84,7 +84,7 @@ class PDb_Session {
 		if ( empty( $this->session ) && ! $this->use_php_sessions ) {
 			add_action( 'plugins_loaded', array( $this, 'init' ), -1 );
 		} else {
-			add_action( 'init', array( $this, 'init' ), -1 );
+			add_action( 'plugins_loaded', array( $this, 'init' ), -1 ); /// formerly 'init'
 		}
 	}
 
@@ -103,7 +103,7 @@ class PDb_Session {
 			$this->session = WP_Session::get_instance();
     }
 
-    //$this->test_cookie();
+    $this->test_cookie();
 
 		return $this->session;
 	}
@@ -141,9 +141,6 @@ class PDb_Session {
 	public function set( $key, $value ) {
 		$key = sanitize_key( $key );
 
-		if ( is_array( $value ) )
-			$this->session[ $key ] = serialize( $value );
-		else
 			$this->session[ $key ] = $value;
 
 		if( $this->use_php_sessions )
@@ -168,9 +165,7 @@ class PDb_Session {
     $stored = $this->get($key);
 
 		if (is_array($value) && is_array($stored) )
-			$this->session[ $key ] = serialize(self::deep_merge($value, $stored));
-    elseif (is_array($value))
-			$this->session[ $key ] = serialize($value);
+			$this->session[ $key ] = self::deep_merge($value, $stored);
 		else
 			$this->session[ $key ] = $value;
 

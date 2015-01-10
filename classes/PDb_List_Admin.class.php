@@ -127,7 +127,7 @@ class PDb_List_Admin {
     global $user_ID;
     self::$user_settings = Participants_Db::$prefix . self::$user_settings . '-' . $user_ID;
     self::$filter_transient = Participants_Db::$prefix . self::$filter_transient . '-' . $user_ID;
-    
+
     self::set_list_limit();
 
     self::$registration_page_url = get_bloginfo('url') . '/' . Participants_Db::plugin_setting('registration_page', '');
@@ -141,7 +141,7 @@ class PDb_List_Admin {
         'search' => array(
             0 => array(
                 'search_field' => 'none',
-								'value' => '',
+                'value' => '',
                 'operator' => 'LIKE',
                 'logic' => 'AND'
             )
@@ -165,7 +165,7 @@ class PDb_List_Admin {
     /*
      * save the query in a transient so it can be used by the export CSV functionality
      */
-    if (current_user_can(Participants_Db::$plugin_options['plugin_admin_capability'])) {
+    if (Participants_Db::current_user_has_plugin_role('admin')) {
       global $current_user;
       set_transient(Participants_Db::$prefix . 'admin_list_query' . $current_user->ID, self::$list_query, 3600 * 24);
     }
@@ -207,8 +207,9 @@ class PDb_List_Admin {
     // output the pagination controls
     echo '<div class="pdb-list">' . self::$pagination->links() . '</div>';
 
-    // print the CSV export form (admin users only)
-    if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability')))
+    // print the CSV export form (authorized users only)
+    $csv_role = Participants_Db::plugin_setting_is_true('editor_allowed_csv_export') ? 'editor' : 'admin';
+    if (Participants_Db::current_user_has_plugin_role($csv_role))
       self::_print_export_form();
 
     // print the plugin footer
@@ -313,10 +314,10 @@ class PDb_List_Admin {
           if ($selected_ids) {
             $count = count($selected_ids);
 
-          $pattern = $count > 1 ? 'IN ( ' . trim(str_repeat('%s,', $count), ',') . ' )' : '= %s';
-          $sql = "DELETE FROM " . Participants_Db::$participants_table . " WHERE id " . $pattern;
-					$wpdb->query($wpdb->prepare($sql, $selected_ids));
-          Participants_Db::set_admin_message(__('Record delete successful.', 'participants-database'), 'updated');
+            $pattern = $count > 1 ? 'IN ( ' . trim(str_repeat('%s,', $count), ',') . ' )' : '= %s';
+            $sql = "DELETE FROM " . Participants_Db::$participants_table . " WHERE id " . $pattern;
+            $wpdb->query($wpdb->prepare($sql, $selected_ids));
+            Participants_Db::set_admin_message(__('Record delete successful.', 'participants-database'), 'updated');
           }
           break;
 
@@ -347,7 +348,9 @@ class PDb_List_Admin {
     switch ($submit) {
 
       case self::$i18n['clear'] :
-        self::$filter['search'] = self::$default_filter['search'];
+        for ($i = 0; $i < self::$filter['list_filter_count']; $i++) {
+          self::$filter['search'][$i] = self::$default_filter['search'][0];
+        }
         self::save_filter(self::$filter);
       case self::$i18n['sort']:
       case self::$i18n['filter']:
@@ -412,15 +415,15 @@ class PDb_List_Admin {
     switch ($filter_set['operator']) {
 
 
-          case 'gt':
+      case 'gt':
 
-            $operator = '>';
-            break;
+        $operator = '>';
+        break;
 
-          case 'lt':
+      case 'lt':
 
-            $operator = '<';
-            break;
+        $operator = '<';
+        break;
 
       case '=':
 
@@ -435,18 +438,13 @@ class PDb_List_Admin {
 
       case 'NOT LIKE':
       case '!=':
+      case 'LIKE':
+      default:
 
         $operator = esc_sql($filter_set['operator']);
-        if ($filter_set['value'] === '') {
-          $filter_set['value'] = 'null';
-          $operator = '<>';
+        if (stripos($operator, 'LIKE') !== false) {
+          $delimiter = array('"%', '%"');
         }
-
-      default:
-      case 'LIKE':
-
-        $operator = 'LIKE';
-        $delimiter = array('"%', '%"');
         if ($filter_set['value'] === '') {
           $filter_set['value'] = 'null';
           $operator = '<>';
@@ -460,60 +458,60 @@ class PDb_List_Admin {
 
     $value = PDb_FormElement::get_title_value($filter_set['value'], $filter_set['search_field']);
 
-          if ($field_atts->form_element == 'timestamp') {
-            
+    if ($field_atts->form_element == 'timestamp') {
+
       $value = $filter_set['value'];
-            $value2 = false;
+      $value2 = false;
       if (strpos($filter_set['value'], ' to ')) {
         list($value, $value2) = explode('to', $filter_set['value']);
-            }
-            
-            $value = Participants_Db::parse_date($value, $field_atts, false);
-            if ($value2)
-              $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
-            
-            if ($value !== false) {
-            
+      }
+
+      $value = Participants_Db::parse_date($value, $field_atts, false);
+      if ($value2)
+        $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
+
+      if ($value !== false) {
+
         $stored_date = "DATE(p." . esc_sql($filter_set['search_field']) . ")";
-            
-              if ($value2 !== false and !empty($value2)) {
-                
+
+        if ($value2 !== false and !empty($value2)) {
+
           self::$list_query .= " " . $stored_date . " > DATE_ADD(FROM_UNIXTIME(0), interval " . esc_sql($value) . " second) AND " . $stored_date . " < DATE_ADD(FROM_UNIXTIME(0), interval " . esc_sql($value2) . " second)";
-              } else {
+        } else {
 
-                if ($operator == 'LIKE')
-                  $operator = '=';
-
-          self::$list_query .= " " . $stored_date . " " . $operator . " DATE_ADD(FROM_UNIXTIME(0), interval " . esc_sql($value) . " second) ";
-              }
-            }
-              } elseif ($field_atts->form_element == 'date') { 
-
-      $value = $filter_set['value'];
-            $value2 = false;
-      if (strpos($filter_set['value'], ' to ')) {
-        list($value, $value2) = explode('to', $filter_set['value']);
-                }
-
-            $value = Participants_Db::parse_date($value, $field_atts, true);
-            if ($value2)
-              $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
-
-            if ($value !== false) {
-              
-        $stored_date = "CAST(p." . esc_sql($filter_set['search_field']) . " AS SIGNED)";
-            
-              if ($value2 !== false and !empty($value2)) {
-                
-          self::$list_query .= " " . $stored_date . " > CAST(" . esc_sql($value) . " AS SIGNED) AND " . $stored_date . " < CAST(" . esc_sql($value2) . "  AS SIGNED)";
-          } else {
-            
           if ($operator == 'LIKE')
             $operator = '=';
-            
-          self::$list_query .= " " . $stored_date . " " . $operator . " CAST(" . esc_sql($value) . " AS SIGNED)";
-          }
+
+          self::$list_query .= " " . $stored_date . " " . $operator . " DATE_ADD(FROM_UNIXTIME(0), interval " . esc_sql($value) . " second) ";
         }
+      }
+    } elseif ($field_atts->form_element == 'date') {
+
+      $value = $filter_set['value'];
+      $value2 = false;
+      if (strpos($filter_set['value'], ' to ')) {
+        list($value, $value2) = explode('to', $filter_set['value']);
+      }
+
+      $value = Participants_Db::parse_date($value, $field_atts, true);
+      if ($value2)
+        $value2 = Participants_Db::parse_date($value2, $field_atts, $field_atts->form_element == 'date');
+
+      if ($value !== false) {
+
+        $stored_date = "CAST(p." . esc_sql($filter_set['search_field']) . " AS SIGNED)";
+
+        if ($value2 !== false and !empty($value2)) {
+
+          self::$list_query .= " " . $stored_date . " > CAST(" . esc_sql($value) . " AS SIGNED) AND " . $stored_date . " < CAST(" . esc_sql($value2) . "  AS SIGNED)";
+        } else {
+
+          if ($operator == 'LIKE')
+            $operator = '=';
+
+          self::$list_query .= " " . $stored_date . " " . $operator . " CAST(" . esc_sql($value) . " AS SIGNED)";
+        }
+      }
     } elseif ($filter_set['value'] === 'null') {
 
       switch ($filter_set['operator']) {
@@ -521,10 +519,10 @@ class PDb_List_Admin {
         case '!=':
         case 'NOT LIKE':
           self::$list_query .= ' (p.' . esc_sql($filter_set['search_field']) . ' IS NOT NULL AND p.' . esc_sql($filter_set['search_field']) . ' <> "")';
-        break;
+          break;
         case 'LIKE':
         case '=':
-      default:
+        default:
           self::$list_query .= ' (p.' . esc_sql($filter_set['search_field']) . ' IS NULL OR p.' . esc_sql($filter_set['search_field']) . ' = "")';
           break;
       }
@@ -546,78 +544,78 @@ class PDb_List_Admin {
   {
     ?>
     <div  class="wrap participants_db">
-    <a id="pdb-list-admin" name="pdb-list-admin"></a>
+      <a id="pdb-list-admin" name="pdb-list-admin"></a>
       <?php Participants_Db::admin_page_heading() ?>
-    <div id="poststuff">
-      <div class="post-body">
+      <div id="poststuff">
+        <div class="post-body">
           <h2><?php _e('List Participants', 'participants-database') ?></h2>
-    <?php
-  }
+          <?php
+        }
 
-  /**
-   * prints the sorting and filtering forms
-   *
-   * @param string $mode determines whether to print filter, sort, both or 
-   *                     none of the two functions
-   */
+        /**
+         * prints the sorting and filtering forms
+         *
+         * @param string $mode determines whether to print filter, sort, both or 
+         *                     none of the two functions
+         */
         private static function _sort_filter_forms()
         {
 
-    global $post;
+          global $post;
           $filter_count = intval(self::$filter['list_filter_count']);
-        //build the list of columns available for filtering
-        $filter_columns = array();
-        foreach (Participants_db::get_column_atts('backend') as $column) {
+          //build the list of columns available for filtering
+          $filter_columns = array();
+          foreach (Participants_db::get_column_atts('backend') as $column) {
 
-          if (in_array($column->name, array('id', 'private_id')))
-            continue;
+            if (in_array($column->name, array('id', 'private_id')))
+              continue;
 
-          // add the field name if a field with the same title is already in the list
-          $select_title = isset($filter_columns[$column->title]) ? $column->title . ' (' . $column->name . ')' : $column->title;
-          
-          $filter_columns[$select_title] = $column->name;
-        }
+            // add the field name if a field with the same title is already in the list
+            $select_title = isset($filter_columns[$column->title]) ? $column->title . ' (' . $column->name . ')' : $column->title;
+
+            $filter_columns[$select_title] = $column->name;
+          }
           ?>
           <div class="pdb-searchform">
             <form method="post" id="sort_filter_form" action="<?php echo self::prepare_page_link($_SERVER['REQUEST_URI']) ?>" >
               <input type="hidden" name="action" value="admin_list_filter">
               <table class="form-table">
                 <tbody><tr><td>
-                        <?php
-                        for ($i = 0; $i <= $filter_count - 1; $i++) :
-                          $filter_set = self::$filter['search'][$i];
-                          ?>
+                      <?php
+                      for ($i = 0; $i <= $filter_count - 1; $i++) :
+                        $filter_set = self::get_filter_set($i);
+                        ?>
                         <fieldset class="widefat inline-controls">
                           <?php if ($i === 0): ?>
                             <legend><?php _e('Show only records with', 'participants-database') ?>:</legend>
                             <?php
                           endif;
 
-        $element = array(
-            'type' => 'dropdown',
+                          $element = array(
+                              'type' => 'dropdown',
                               'name' => 'search_field[' . $i . ']',
                               'value' => $filter_set['search_field'],
                               'options' => array('' => 'none') + $filter_columns,
-        );
-        PDb_FormElement::print_element($element);
+                          );
+                          PDb_FormElement::print_element($element);
                           _e('that', 'participants-database');
-    $element = array(
-        'type' => 'dropdown',
+                          $element = array(
+                              'type' => 'dropdown',
                               'name' => 'operator[' . $i . ']',
                               'value' => $filter_set['operator'],
-        'options' => array(
-            'null_select' => false,
-            __('is', 'participants-database') => '=',
-            __('is not', 'participants-database') => '!=',
-            __('contains', 'participants-database') => 'LIKE',
-            __('doesn&#39;t contain', 'participants-database') => 'NOT LIKE',
-            __('is greater than', 'participants-database') => 'gt',
-            __('is less than', 'participants-database') => 'lt',
-        ),
-    );
-    PDb_FormElement::print_element($element);
-    ?>
-                          <input id="participant_search_term" type="text" name="value[<?php echo $i ?>]" value="<?php echo @$filter_set['value'] ?>">
+                              'options' => array(
+                                  'null_select' => false,
+                                  __('is', 'participants-database') => '=',
+                                  __('is not', 'participants-database') => '!=',
+                                  __('contains', 'participants-database') => 'LIKE',
+                                  __('doesn&#39;t contain', 'participants-database') => 'NOT LIKE',
+                                  __('is greater than', 'participants-database') => 'gt',
+                                  __('is less than', 'participants-database') => 'lt',
+                              ),
+                          );
+                          PDb_FormElement::print_element($element);
+                          ?>
+                          <input id="participant_search_term_<?php echo $i ?>" type="text" name="value[<?php echo $i ?>]" value="<?php echo htmlspecialchars($filter_set['value']) ?>">
                           <?php
                           if ($i < $filter_count - 1) {
                             echo '<br />';
@@ -641,332 +639,335 @@ class PDb_List_Admin {
                           ?>
 
                         </fieldset>
-                        <?php endfor ?>
+                      <?php endfor ?>
                       <fieldset class="widefat inline-controls">
-            <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['filter'] ?>">
-            <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['clear'] ?>">
-                      <div class="widefat inline-controls filter-count">
-                        <label for="list_filter_count"><?php _e('Number of filters to use: ', 'participants-database') ?><input id="list_filter_count" name="list_filter_count" class="number-entry single-digit" type="number" max="5" min="1" value="<?php echo $filter_count ?>"  /></label>
-                      </div>
-          </fieldset>
-                        </td></tr><tr><td>
-          <fieldset class="widefat inline-controls">
-            <legend><?php _e('Sort by', 'participants-database') ?>:</legend>
-            <?php
-            $element = array(
-                'type' => 'dropdown',
-                'name' => 'sortBy',
-                'value' => self::$filter['sortBy'],
-                'options' => self::$sortables,
-            );
-            PDb_FormElement::print_element($element);
+                        <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['filter'] ?>">
+                        <input class="button button-default" name="submit-button" type="submit" value="<?php echo self::$i18n['clear'] ?>">
+                        <div class="widefat inline-controls filter-count">
+                          <label for="list_filter_count"><?php _e('Number of filters to use: ', 'participants-database') ?><input id="list_filter_count" name="list_filter_count" class="number-entry single-digit" type="number" max="5" min="1" value="<?php echo $filter_count ?>"  /></label>
+                        </div>
+                      </fieldset>
+                    </td></tr><tr><td>
+                      <fieldset class="widefat inline-controls">
+                        <legend><?php _e('Sort by', 'participants-database') ?>:</legend>
+                        <?php
+                        $element = array(
+                            'type' => 'dropdown',
+                            'name' => 'sortBy',
+                            'value' => self::$filter['sortBy'],
+                            'options' => self::$sortables,
+                        );
+                        PDb_FormElement::print_element($element);
 
-            $element = array(
-                'type' => 'radio',
-                'name' => 'ascdesc',
+                        $element = array(
+                            'type' => 'radio',
+                            'name' => 'ascdesc',
                             'value' => strtolower(self::$filter['ascdesc']),
-                'options' => array(
-                    __('Ascending', 'participants-database') => 'asc',
-                    __('Descending', 'participants-database') => 'desc'
-                ),
-            );
-            PDb_FormElement::print_element($element);
-            ?>
-            <input class="button button-default"  name="submit-button" type="submit" value="<?php echo self::$i18n['sort'] ?>">
-          </fieldset>
-                        </td></tr></tbody></table>
-        </form>
+                            'options' => array(
+                                __('Ascending', 'participants-database') => 'asc',
+                                __('Descending', 'participants-database') => 'desc'
+                            ),
+                        );
+                        PDb_FormElement::print_element($element);
+                        ?>
+                        <input class="button button-default"  name="submit-button" type="submit" value="<?php echo self::$i18n['sort'] ?>">
+                      </fieldset>
+                    </td></tr></tbody></table>
+            </form>
           </div>
 
           <h3><?php printf(_n('%s record found, sorted by: %s.', '%s records found, sorted by: %s.', self::$num_records, 'participants-database'), self::$num_records, Participants_Db::column_title(self::$filter['sortBy'])) ?></h3>
-            <?php
-          }
+          <?php
+        }
 
-          /**
-           * prints the general list form controls for the admin lising: deleting and items-per-page selector
-           */
+        /**
+         * prints the general list form controls for the admin lising: deleting and items-per-page selector
+         */
         private static function _general_list_form_top()
-  {
-            ?>
+        {
+          ?>
 
-      <form id="list_form"  method="post">
+          <form id="list_form"  method="post">
             <?php PDb_FormElement::print_hidden_fields(array('action' => 'list_action')) ?>
-        <input type="hidden" id="select_count" value="0" />
-                <table class="form-table"><tbody><tr><td>
-        <fieldset class="widefat inline-controls">
+            <input type="hidden" id="select_count" value="0" />
+            <table class="form-table"><tbody><tr><td>
+                    <fieldset class="widefat inline-controls">
                       <?php if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability'))) : ?>
                         <span style="padding-right:20px" ><input type="submit" name="submit-button" class="button button-default" value="<?php echo self::$i18n['delete_checked'] ?>" id="delete_button"  ></span>
-          <?php endif ?>
-            <?php
-            $list_limit = PDb_FormElement::get_element(array(
-                        'type' => 'text-line',
-                        'name' => 'list_limit',
-                        'value' => self::$page_list_limit,
-                        'attributes' => array(
-                            'style' => 'width:2.8em',
-                            'maxLength' => '3'
-                        )
-                            )
-                    )
-            ?>
-          <?php printf(__('Show %s items per page.', 'participants-database'), $list_limit) ?>
-      <?php PDb_FormElement::print_element(array('type' => 'submit', 'name' => 'submit-button', 'class' => 'button button-default', 'value' => self::$i18n['change'])) ?>
-          
-        </fieldset>
-              </td></tr></tbody>
-        <?php
-      }
+                      <?php endif ?>
+                      <?php
+                      $list_limit = PDb_FormElement::get_element(array(
+                                  'type' => 'text-line',
+                                  'name' => 'list_limit',
+                                  'value' => self::$page_list_limit,
+                                  'attributes' => array(
+                                      'style' => 'width:2.8em',
+                                      'maxLength' => '3'
+                                  )
+                                      )
+                              )
+                      ?>
+                      <?php printf(__('Show %s items per page.', 'participants-database'), $list_limit) ?>
+                      <?php PDb_FormElement::print_element(array('type' => 'submit', 'name' => 'submit-button', 'class' => 'button button-default', 'value' => self::$i18n['change'])) ?>
 
-      /**
-       * prints the main body of the list, including headers
-       *
-       * @param string $mode dtermines the print mode: 'noheader' skips headers, (other choices to be determined)
-       */
-              private static function _main_table($mode = '')
-              {
-        ?>
+                    </fieldset>
+                  </td></tr></tbody>
+              <?php
+            }
 
-        <table class="wp-list-table widefat fixed pages pdb-list stuffbox" cellspacing="0" >
-          <?php
-          $PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
-          $head_pattern = '
+            /**
+             * prints the main body of the list, including headers
+             *
+             * @param string $mode dtermines the print mode: 'noheader' skips headers, (other choices to be determined)
+             */
+            private static function _main_table($mode = '')
+            {
+              ?>
+
+              <table class="wp-list-table widefat fixed pages pdb-list stuffbox" cellspacing="0" >
+                <?php
+                $PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
+                $head_pattern = '
 <th class="%2$s" scope="col">
   <span><a href="' . self::sort_link_base_URI() . '&column_sort=%2$s">%1$s%3$s</a></span>
 </th>
 ';
-          //template for outputting a column
-          $col_pattern = '<td>%s</td>';
+                //template for outputting a column
+                $col_pattern = '<td>%s</td>';
 
-          if (count(self::$participants) > 0) :
+                if (count(self::$participants) > 0) :
 
-            if ($mode != 'noheader') :
-              ?>
-              <thead>
-                <tr>
-            <?php self::_print_header_row($head_pattern) ?>
-                </tr>
-              </thead>
-              <?php
-            endif; // table header row
-            // print the table footer row if there is a long list
-            if ($mode != 'noheader' && count(self::$participants) > 10) :
-              ?>
-              <tfoot>
-                <tr>
-              <?php self::_print_header_row($head_pattern) ?>
-                </tr>
-              </tfoot>
-              <?php endif; // table footer row 
-            ?>
-            <tbody>
-            <?php
-            // output the main list
-            foreach (self::$participants as $value) {
-              ?>
-                <tr>
-        <?php // print delete check  ?>
-                  <td>
-                        <?php if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability'))) : ?>
+                  if ($mode != 'noheader') :
+                    ?>
+                    <thead>
+                      <tr>
+                        <?php self::_print_header_row($head_pattern) ?>
+                      </tr>
+                    </thead>
+                    <?php
+                  endif; // table header row
+                  // print the table footer row if there is a long list
+                  if ($mode != 'noheader' && count(self::$participants) > 10) :
+                    ?>
+                    <tfoot>
+                      <tr>
+                        <?php self::_print_header_row($head_pattern) ?>
+                      </tr>
+                    </tfoot>
+                  <?php endif; // table footer row 
+                  ?>
+                  <tbody>
+                    <?php
+                    // output the main list
+                    foreach (self::$participants as $value) {
+                      ?>
+                      <tr>
+                        <?php // print delete check  ?>
+                        <td>
+                          <?php if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability'))) : ?>
                             <input type="checkbox" class="delete-check" name="pid[]" value="<?php echo $value['id'] ?>" />
-                    <?php endif ?>
+                          <?php endif ?>
                           <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>" title="<?php _e('Edit', 'participants-database') ?>"><span class="glyphicon glyphicon-edit"></span></a>
-                  </td>
-              <?php
-              foreach (self::$display_columns as $column) {
+                        </td>
+                        <?php
+                        foreach (self::$display_columns as $column) {
 
-                // this is where we place form-element-specific text transformations for display
-                switch ($column->form_element) {
+                          // this is where we place form-element-specific text transformations for display
+                          switch ($column->form_element) {
 
-                  case 'image-upload':
+                            case 'image-upload':
 
-                    $image_params = array(
-                        'filename' => basename($value[$column->name]),
-                        'link' => '',
+                              $image_params = array(
+                                  'filename' => basename($value[$column->name]),
+                                  'link' => '',
                                   'mode' => (Participants_Db::plugin_setting_is_true('admin_thumbnails') ? 'image' : 'filename'),
-                      );
+                              );
 
-                    if (Participants_Db::is_single_record_link($column)) {
+                              if (Participants_Db::is_single_record_link($column)) {
                                 $page_link = get_permalink(Participants_Db::plugin_setting('single_record_page'));
-                      $image_params['link'] = Participants_Db::add_uri_conjunction($page_link) . 'pdb=' . $value['id'];
-                    }
-                    // this is to display the image as a linked thumbnail
-                    $image = new PDb_Image($image_params);
-                    $display_value = $image->get_image_html();
-                    
+                                $image_params['link'] = Participants_Db::add_uri_conjunction($page_link) . 'pdb=' . $value['id'];
+                              }
+                              // this is to display the image as a linked thumbnail
+                              $image = new PDb_Image($image_params);
+                              $display_value = $image->get_image_html();
 
-                    break;
 
-                  case 'date':
-                  case 'timestamp':
+                              break;
 
-                    if (!empty($value[$column->name])) {
+                            case 'date':
+                            case 'timestamp':
 
-                      $format = Participants_Db::$date_format;
+                              if (!empty($value[$column->name])) {
+
+                                $format = Participants_Db::$date_format;
                                 if (Participants_Db::plugin_setting_is_true('show_time') and $column->form_element == 'timestamp') {
-                        // replace spaces with &nbsp; so the time value stays together on a broken line
-                        $format .= ' ' . str_replace(' ', '&\\nb\\sp;', get_option('time_format'));
-                      }
+                                  // replace spaces with &nbsp; so the time value stays together on a broken line
+                                  $format .= ' ' . str_replace(' ', '&\\nb\\sp;', get_option('time_format'));
+                                }
                                 $time = Participants_Db::is_valid_timestamp($value[$column->name]) ? (int) $value[$column->name] : Participants_Db::parse_date($value[$column->name], $column->name, $column->form_element == 'date');
-                      $display_value = $value[$column->name] == '0000-00-00 00:00:00' ? '' : date_i18n($format, $time);
-                      //$display_value = date_i18n($format, $time);
+                                $display_value = $value[$column->name] == '0000-00-00 00:00:00' ? '' : date_i18n($format, $time);
+                                //$display_value = date_i18n($format, $time);
                               } else {
-                      $display_value = '';
+                                $display_value = '';
                               }
 
-                    break;
+                              break;
 
-                  case 'multi-select-other':
-                  case 'multi-checkbox':
-                    // multi selects are displayed as comma separated lists
+                            case 'multi-select-other':
+                            case 'multi-checkbox':
+                              // multi selects are displayed as comma separated lists
 
                               $column->value = $value[$column->name];
                               $display_value = PDb_FormElement::get_field_value_display($column, false);
 
                               //$display_value = is_serialized($value[$column->name]) ? implode(', ', unserialize($value[$column->name])) : $value[$column->name];
-                    break;
+                              break;
 
-                  case 'link':
+                            case 'link':
 
-                    $link_value = maybe_unserialize($value[$column->name]);
+                              $link_value = maybe_unserialize($value[$column->name]);
 
-                    if (count($link_value) === 1) {
+                              if (count($link_value) === 1) {
                                 $link_value = array_fill(0, 2, current((array) $link_value));
-                    }
+                              }
 
-                    $display_value = Participants_Db::make_link($link_value[0], $link_value[1]);
+                              $display_value = Participants_Db::make_link($link_value[0], $link_value[1]);
 
-                    break;
+                              break;
 
-                  case 'rich-text':
+                            case 'rich-text':
 
-                    if (!empty($value[$column->name]))
-                      $display_value = '<span class="textarea">' . $value[$column->name] . '</span>';
-                    else
-                      $display_value = '';
-                    break;
+                              if (!empty($value[$column->name]))
+                                $display_value = '<span class="textarea">' . $value[$column->name] . '</span>';
+                              else
+                                $display_value = '';
+                              break;
 
-                  case 'text-line':
+                            case 'text-line':
 
-                    if (Participants_Db::is_single_record_link($column)) {
+                              if (Participants_Db::is_single_record_link($column)) {
                                 $url = get_permalink(Participants_Db::plugin_setting('single_record_page'));
-                      $template = '<a href="%1$s" >%2$s</a>';
-                      $delimiter = false !== strpos($url, '?') ? '&' : '?';
-                      $url = $url . $delimiter . 'pdb=' . $value['id'];
+                                $template = '<a href="%1$s" >%2$s</a>';
+                                $delimiter = false !== strpos($url, '?') ? '&' : '?';
+                                $url = $url . $delimiter . 'pdb=' . $value['id'];
 
-                      $display_value = sprintf($template, $url, $value[$column->name]);
+                                $display_value = sprintf($template, $url, $value[$column->name]);
                               } elseif (Participants_Db::plugin_setting_is_true('make_links')) {
 
                                 $field = new stdClass();
                                 $field->value = $value[$column->name];
                                 $display_value = PDb_FormElement::make_link($field);
-                    } else {
+                              } else {
                                 $display_value = $value[$column->name] === '' ? $column->default : esc_html($value[$column->name]);
-                    }
+                              }
 
-                    break;
+                              break;
 
-                  case 'hidden':
+                            case 'hidden':
                               $display_value = $value[$column->name] === '' ? '' : esc_html($value[$column->name]);
-                    break;
+                              break;
 
-                  default:
+                            default:
                               $column->value = $value[$column->name];
                               $display_value = PDb_FormElement::get_field_value_display($column, false);
-                }
+                          }
 
                           if ($column->name === 'private_id' && Participants_Db::plugin_setting_is_set('registration_page')) {
-                  printf($PID_pattern, $display_value, Participants_Db::get_record_link($display_value));
-                } else {
-                  printf($col_pattern, $display_value);
-								}
-              }
-              ?>
-                </tr>
-                <?php } ?>
-            </tbody>
+                            printf($PID_pattern, $display_value, Participants_Db::get_record_link($display_value));
+                          } else {
+                            printf($col_pattern, $display_value);
+                          }
+                        }
+                        ?>
+                      </tr>
+                    <?php } ?>
+                  </tbody>
 
-              <?php else : // if there are no records to show; do this
+                <?php else : // if there are no records to show; do this
+                  ?>
+                  <tbody>
+                    <tr>
+                      <td><?php _e('No records found', 'participants-database') ?></td>
+                    </tr>
+                  </tbody>
+                <?php
+                endif; // participants array
                 ?>
-            <tbody>
-              <tr>
-                <td><?php _e('No records found', 'participants-database') ?></td>
-              </tr>
-            </tbody>
-              <?php
-              endif; // participants array
-              ?>
-        </table>
-      </form>
-              <?php
-            }
-
-            /**
-             * prints the CSV export form
-             */
-                private static function _print_export_form()
-                {
-              ?>
-
-      <div class="postbox">
-        <h3><?php _e('Export CSV', 'participants-database') ?></h3>
-        <div class="inside">
-        <form method="post" class="csv-export">
-          <input type="hidden" name="subsource" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
-          <input type="hidden" name="action" value="output CSV" />
-          <input type="hidden" name="CSV type" value="participant list" />
-          <input type="hidden" name="query" value="<?php echo rawurlencode(self::$list_query) ?>" />
+              </table>
+          </form>
           <?php
-          $date_string = str_replace(array('/', '#', '.', '\\', ', ', ',', ' '), '-', date_i18n(Participants_Db::$date_format));
-          $suggested_filename = Participants_Db::PLUGIN_NAME . '-' . $date_string . '.csv';
-          $namelength = round(strlen($suggested_filename) * 0.9);
+        }
+
+        /**
+         * prints the CSV export form
+         */
+        private static function _print_export_form()
+        {
+
+          $base_filename = self::get_admin_user_setting('csv_base_filename', Participants_Db::PLUGIN_NAME);
           ?>
-          <fieldset class="inline-controls">
-    <?php _e('File Name', 'participants-database') ?>:
-            <input type="text" name="filename" value="<?php echo $suggested_filename ?>" size="<?php echo $namelength ?>" />
+
+          <div class="postbox">
+            <h3><?php _e('Export CSV', 'participants-database') ?></h3>
+            <div class="inside">
+              <form method="post" class="csv-export">
+                <input type="hidden" name="subsource" value="<?php echo Participants_Db::PLUGIN_NAME ?>">
+                <input type="hidden" name="action" value="output CSV" />
+                <input type="hidden" name="CSV type" value="participant list" />
+                <input type="hidden" name="query" value="<?php echo rawurlencode(self::$list_query) ?>" />
+                <?php
+                $date_string = str_replace(array('/', '#', '.', '\\', ', ', ',', ' '), '-', date_i18n(Participants_Db::$date_format));
+                $suggested_filename = $base_filename . self::filename_datestamp() . '.csv';
+                $namelength = round(strlen($suggested_filename) * 0.9);
+                ?>
+                <fieldset class="inline-controls">
+                  <?php _e('File Name', 'participants-database') ?>:
+                  <input type="text" name="filename" value="<?php echo $suggested_filename ?>" size="<?php echo $namelength ?>" />
                   <input type="submit" name="submit-button" value="<?php _e('Download CSV for this list', 'participants-database') ?>" class="button button-primary" />
-            <label for="include_csv_titles"><input type="checkbox" name="include_csv_titles" value="1"><?php _e('Include field titles', 'participants-database') ?></label>
-          </fieldset>
-          <p>
-      <?php _e('This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages. The fields included in the export are defined in the "CSV" column on the Manage Database Fields page.', 'participants-database') ?>
-          </p>
-        </form>
+                  <label for="include_csv_titles"><input type="checkbox" name="include_csv_titles" value="1"><?php _e('Include field titles', 'participants-database') ?></label>
+                </fieldset>
+                <p>
+                  <?php _e('This will download the whole list of participants that match your search terms, and in the order specified by the sort. The export will include records on all list pages. The fields included in the export are defined in the "CSV" column on the Manage Database Fields page.', 'participants-database') ?>
+                </p>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
-      </div>
     </div>
-    </div>
-      <?php
-    }
+    <?php
+  }
 
-    /**
-     * prints a table header row
-     */
+  /**
+   * prints a table header row
+   */
   private static function _print_header_row($head_pattern)
   {
 
-      
+
     $sorticon_class = strtolower(self::$filter['ascdesc']) === 'asc' ? 'dashicons-arrow-up' : 'dashicons-arrow-down';
     // template for printing the registration page link in the admin
     $sorticon = '<span class="dashicons ' . $sorticon_class . '"></span>';
-      // print the "select all" header 
-      ?>
+    // print the "select all" header 
+    ?>
     <th scope="col" style="width:3em">
-    <?php if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability'))) : ?>
-      <?php /* translators: uses the check symbol in a phrase that means "check all"  printf('<span class="checkmark" >&#10004;</span>%s', __('all', 'participants-database'))s */ ?>
+      <?php if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability'))) : ?>
+        <?php /* translators: uses the check symbol in a phrase that means "check all"  printf('<span class="checkmark" >&#10004;</span>%s', __('all', 'participants-database'))s */ ?>
         <input type="checkbox" name="checkall" id="checkall" ><span class="glyphicon glyphicon-edit" style="opacity: 0"></span>
-        <?php endif ?>
-      </th>
-          <?php
-          // print the top header row
-          foreach (self::$display_columns as $column) {
-            $title = strip_tags(stripslashes($column->title));
-            printf(
+      <?php endif ?>
+    </th>
+    <?php
+    // print the top header row
+    foreach (self::$display_columns as $column) {
+      $title = strip_tags(stripslashes($column->title));
+      printf(
               $head_pattern, str_replace(
                       array('"', "'"), array('&quot;', '&#39;'), $title
               ), $column->name, ($column->name === self::$filter['sortBy'] ? $sorticon : '')
-            );
-          }
-        }
+      );
+    }
+  }
+
   /**
    * builds a column sort link
    * 
@@ -974,31 +975,33 @@ class PDb_List_Admin {
    * 
    * @return string the base URI for the sort link
    */
-  private static function sort_link_base_URI() {
+  private static function sort_link_base_URI()
+  {
     $uri = parse_url($_SERVER['REQUEST_URI']);
     parse_str($uri['query'], $query);
     unset($query['column_sort']);
     return $uri['path'] . '?' . http_build_query($query);
   }
-        /**
-         * sets up the main list columns
-         */
+
+  /**
+   * sets up the main list columns
+   */
   private static function setup_display_columns()
   {
-          
-          global $wpdb;
-          $sql = '
+
+    global $wpdb;
+    $sql = '
           SELECT f.name, f.form_element, f.default, f.group, f.title
           FROM ' . Participants_Db::$fields_table . ' f 
           WHERE f.name IN ("' . implode('","', PDb_Shortcode::get_list_display_columns('admin_column')) . '") 
           ORDER BY f.admin_column ASC';
-          
-          self::$display_columns = $wpdb->get_results($sql);
-        }
 
-        /**
-         * sets the admin list limit value
-         */
+    self::$display_columns = $wpdb->get_results($sql);
+  }
+
+  /**
+   * sets the admin list limit value
+   */
   private static function set_list_limit()
   {
 
@@ -1009,28 +1012,28 @@ class PDb_List_Admin {
     }
     if (!empty($input_limit)) {
       $limit_value = $input_limit;
-          }
-          self::$page_list_limit = $limit_value;
-          self::set_admin_user_setting('list_limit', $limit_value);
-        }
+    }
+    self::$page_list_limit = $limit_value;
+    self::set_admin_user_setting('list_limit', $limit_value);
+  }
 
-        /**
-         * sets the admin list limit value
-         */
+  /**
+   * sets the admin list limit value
+   */
   private static function set_list_sort()
   {
-          
+
     $sort_order = filter_input(INPUT_POST, 'ascdesc', FILTER_SANITIZE_STRING);
     $sort_by = filter_input(INPUT_POST, 'sortBy', FILTER_SANITIZE_STRING);
-          
+
     $sort_by = empty($sort_by) ? self::get_admin_user_setting('sort_by', Participants_Db::plugin_setting('admin_default_sort')) : $sort_by;
     $sort_order = empty($sort_order) ? self::get_admin_user_setting('sort_order', Participants_Db::plugin_setting('admin_default_sort_order')) : $sort_order;
-          
-          self::set_admin_user_setting('sort_by', $sort_by);
-          self::set_admin_user_setting('sort_order', $sort_order);
-        }
 
-        /**
+    self::set_admin_user_setting('sort_by', $sort_by);
+    self::set_admin_user_setting('sort_order', $sort_order);
+  }
+
+  /**
    * saves the filter array
    * 
    * @param array $filter_array
@@ -1059,6 +1062,24 @@ class PDb_List_Admin {
   }
 
   /**
+   * gets a search array from the filter
+   * 
+   * provides a blank array if there is no defined filter at the index given
+   * 
+   * @param int $index filter array index to get
+   * 
+   * @return array
+   */
+  public static function get_filter_set($index)
+  {
+    if (isset(self::$filter['search'][$index]) && is_array(self::$filter['search'][$index])) {
+      return self::$filter['search'][$index];
+    } else {
+      return self::$default_filter['search'][0];
+    }
+  }
+
+  /**
    * supplies an array of display fields
    * 
    * @return array array of field names
@@ -1074,24 +1095,24 @@ class PDb_List_Admin {
 
   /**
    * gets a user preference
-         * 
-         * @param string $name name of the setting to get
-         * @param string|bool $setting if there is no setting, supply this value instead
-         * @return string|bool the setting value or false if not found
-         */
+   * 
+   * @param string $name name of the setting to get
+   * @param string|bool $setting if there is no setting, supply this value instead
+   * @return string|bool the setting value or false if not found
+   */
   public static function get_admin_user_setting($name, $setting = false)
   {
-          
-    return self::get_user_setting($name, $setting, self::$user_settings);
-        }
 
-        /**
+    return self::get_user_setting($name, $setting, self::$user_settings);
+  }
+
+  /**
    * sets a user preference
-         * 
-         * @param string $name
-         * @param string|int $value the setting value
-         * @return null
-         */
+   * 
+   * @param string $name
+   * @param string|int $value the setting value
+   * @return null
+   */
   public static function set_admin_user_setting($name, $value)
   {
 
@@ -1107,13 +1128,13 @@ class PDb_List_Admin {
    */
   public static function set_user_setting($name, $value, $setting_name)
   {
-          
-          $settings = array();
+
+    $settings = array();
     $saved_settings = get_transient($setting_name);
-          if (is_array($saved_settings)) {
-            $settings = $saved_settings;
-          }
-          $settings[$name] = $value;
+    if (is_array($saved_settings)) {
+      $settings = $saved_settings;
+    }
+    $settings[$name] = $value;
     set_transient($setting_name, $settings);
   }
 
@@ -1132,25 +1153,35 @@ class PDb_List_Admin {
       $setting = isset($settings[$name]) ? $settings[$name] : $setting;
     }
     return $setting;
-        }
-
-        /**
-         * sets up the internationalization strings
-         */
+  }
+  
+  /**
+   * supplies the second part of a download filename
+   * 
+   * this is usually appended to the end of the base fielname for a plugin-generated file
+   * 
+   * @return string a filename-compatible datestamp
+   */
+  public static function filename_datestamp() {
+    return '-' . str_replace(array('/', '#', '.', '\\', ', ', ',', ' '), '-', date_i18n(Participants_Db::$date_format));
+  } 
+  /**
+   * sets up the internationalization strings
+   */
   private static function _setup_i18n()
   {
 
-          /* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
-          self::$i18n = array(
-              'delete_checked' => _x('Delete Checked', 'submit button label', 'participants-database'),
-              'change' => _x('Change', 'submit button label', 'participants-database'),
-              'sort' => _x('Sort', 'submit button label', 'participants-database'),
-              'filter' => _x('Filter', 'submit button label', 'participants-database'),
-              'clear' => _x('Clear', 'submit button label', 'participants-database'),
-              'search' => _x('Search', 'search button label', 'participants-database'),
-          );
-        }
+    /* translators: the following 5 strings are used in logic matching, please test after translating in case special characters cause problems */
+    self::$i18n = array(
+        'delete_checked' => _x('Delete Checked', 'submit button label', 'participants-database'),
+        'change' => _x('Change', 'submit button label', 'participants-database'),
+        'sort' => _x('Sort', 'submit button label', 'participants-database'),
+        'filter' => _x('Filter', 'submit button label', 'participants-database'),
+        'clear' => _x('Clear', 'submit button label', 'participants-database'),
+        'search' => _x('Search', 'search button label', 'participants-database'),
+    );
+  }
 
-      }
+}
 
-      // class ?>
+// class ?>

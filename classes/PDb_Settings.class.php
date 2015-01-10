@@ -24,7 +24,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'pdb-css'  => __('Custom CSS', 'participants-database'),
     );
 
-    self::$section_description = array(
+    $this->section_description = array(
         'pdb-record' => __('Settings for the [pdb_record] shortcode, which is used to show a user-editable form on the website.', 'participants-database'),
         'pdb-list' => __('Settings for the [pdb_list] shortcode, which is used to show a list of records from the database.', 'participants-database'),
         'pdb-signup' => __('Settings for the [pdb_signup] shortcode, which is used to show a signup or registration form on the website.', 'participants-database'),
@@ -918,6 +918,22 @@ class PDb_Settings extends xnau_Plugin_Settings {
         ),
     );
 
+/*
+ * @version 1.6
+ */
+    $this->plugin_settings[] = array(
+        'name' => 'strip_linebreaks',
+        'title' => __('Remove Line Breaks', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('Remove line breaks from all shortcode ouput.', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        ),
+    );
+
     $this->plugin_settings[] = array(
         'name' => 'primary_email_address_field',
         'title' => __('Primary Email Address Field', 'participants-database'),
@@ -951,7 +967,11 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'options' => array
             (
             'type' => 'checkbox',
-            'help_text' => sprintf(__('This forces date inputs to be interpreted strictly according to the "Input Date Format" setting. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database'), date(isset(Participants_Db::$plugin_options['input_date_format']) ? Participants_Db::$plugin_options['input_date_format'] : get_option('date_format')), (function_exists('date_create') ? '' : '<strong>(' . __('Your current PHP installation does not support this setting.', 'participants-database') . ' )</strong>')),
+            'help_text' => sprintf(
+                    __('This forces date inputs to be interpreted strictly according to the "Input Date Format" setting. You should tell your users what format you are expecting them to use. This also applies to date values used in [pdb_list] shortcode filters. The date with your current setting looks like this: <strong>%s</strong> %s', 'participants-database'), 
+                    strftime(Participants_Db::translate_date_format(Participants_Db::plugin_setting('input_date_format', get_option('date_format')), 'strftime')), 
+                    (function_exists('date_create') ? '' : '<strong>(' . __('Your current PHP installation does not support this setting.', 'participants-database') . ' )</strong>')
+                    ),
             'value' => 0,
             'options' => array(1, 0),
         ),
@@ -1003,6 +1023,18 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'help_text' => __('sets the user access level for fields management, plugin settings, deleting records and CSV operations.', 'participants-database'),
             'value' => 'manage_options',
             'options' => $this->get_role_select(),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'editor_allowed_csv_export',
+        'title' => __('Editor can Export CSV Files', 'participants-database'),
+        'group' => 'pdb-advanced',
+        'options' => array(
+            'type' => 'checkbox',
+            'help_text' => __('If checked, users with the plugin editor role can export a CSV.', 'participants-database'),
+            'value' => '0',
+            'options' => array(1, 0),
         )
     );
 
@@ -1326,8 +1358,8 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     printf('<a id="%1$s" name="%1$s" class="%2$s" ></a>', $name, Participants_Db::$prefix . 'anchor');
 
-    if (isset(self::$section_description[$name]))
-      printf('<div class="section-description" ><h4>%s</h4></div>', self::$section_description[$name]);
+    if (isset($this->section_description[$name]))
+      printf('<div class="section-description" ><h4>%s</h4></div>', $this->section_description[$name]);
   }
 
   /**
