@@ -1756,6 +1756,8 @@ class Participants_Db extends PDb_Base {
    *
    * this does not include hidden fields
    *
+   * @version 1.6 placeholder elements are also excluded
+   *
    * @global object $wpdb
    * @return array name=>value
    */
@@ -1763,7 +1765,7 @@ class Participants_Db extends PDb_Base {
 
     $sql = 'SELECT f.name,f.default,f.form_element 
             FROM ' . self::$fields_table . ' f
-            WHERE f.group != "internal"';
+            WHERE f.group != "internal" AND f.form_element != "placeholder"';
 
     global $wpdb;
 
@@ -1806,7 +1808,10 @@ class Participants_Db extends PDb_Base {
     $default_record['private_id'] = self::generate_pid();
     date_default_timezone_set(self::get_timezone());
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
-    $default_record['date_updated'] = date('Y-m-d H:i:s');
+    /*
+     * @version 1.6 stop setting date_updated on new record
+     */
+    // $default_record['date_updated'] = date('Y-m-d H:i:s');
 
     return $default_record;
   }

@@ -7,6 +7,16 @@
 ?>
 <div class="wrap <?php echo $this->wrap_class ?>">
 
+  <?php
+  /*
+   * as of version 1.6 this template can handle the display when no record is found
+   * 
+   * the "no_record_template" attribute must be set to true
+   */
+  if (!empty($this->participant_id)) : 
+    
+  ?>
+
   <?php // output any validation errors
  $this->print_errors(); ?>
   
@@ -66,5 +76,16 @@
     </table><!-- end group -->
   
   <?php $this->print_form_close() ?>
+  
+    <?php else : ?>
+    
+    <?php 
+    /*
+     * this part of the template is used if no record is found
+     */
+    echo empty(Participants_Db::$plugin_options['no_record_error_message']) ? '' : '<p class="alert alert-error">' . Participants_Db::plugin_setting('no_record_error_message') . '</p>'; 
+    ?>
+    
+    <?php endif ?>
   
 </div>
