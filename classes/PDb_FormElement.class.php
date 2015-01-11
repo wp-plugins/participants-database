@@ -194,7 +194,7 @@ class PDb_FormElement extends xnau_FormElement {
             $return = $field->value;
           } else {
             $field->link = xnau_Image_Handler::concatenate_directory_path(site_url(), Participants_Db::plugin_setting('image_upload_location')) . $field->value;
-            $return = self::make_link($field);
+             $return = self::make_link($field);
           }
           break;
         } else {
@@ -290,15 +290,15 @@ class PDb_FormElement extends xnau_FormElement {
         $field->value = self::get_value_title($field->value, $field->name);
         $return = sprintf('<span class="%s">%s</span>', $field->form_element,  self::make_link($field));
         break;
-        
+      
       case 'placeholder':
-      	
+        
       	$field->value = $field->default;
         $return = self::make_link($field);
         break;
       
       case 'hidden':
-      	
+        
         if ($field->value === $field->default) {
           $field->value = '';
         } elseif (!Participants_Db::is_dynamic_value($field->default)) {
@@ -394,7 +394,8 @@ class PDb_FormElement extends xnau_FormElement {
     $in_admin = is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX);
 
     // clean up the provided string
-    $URI = str_replace('mailto:', '', trim(strip_tags($field->value)));
+   $URI = str_replace('mailto:', '', trim(strip_tags($field->value)));
+
 
     if (isset($field->link) && !empty($field->link)) {
       /*

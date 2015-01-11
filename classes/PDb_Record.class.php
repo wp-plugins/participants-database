@@ -107,11 +107,14 @@ class PDb_Record extends PDb_Shortcode {
    */
   public function print_submit_button($class = 'button-primary', $button_value = false) {
     
-    $button_value = $button_value ? $button_value : $this->shortcode_atts['submit_button'];
+    if (!empty($this->participant_id)) {
+    
+			$button_value = $button_value ? $button_value : $this->shortcode_atts['submit_button'];
 
-    $pattern = '<input class="%s pdb-submit" type="submit" value="%s" name="save" >';
+			$pattern = '<input class="%s pdb-submit" type="submit" value="%s" name="save" >';
 
-    printf($pattern, $class, $button_value);
+			printf($pattern, $class, $button_value);
+		}
   }
 
   /**
@@ -122,6 +125,22 @@ class PDb_Record extends PDb_Shortcode {
     echo Participants_Db::plugin_setting('save_changes_label');
   }
 
+
+  /**
+   * outputs a "record not found" message
+   *
+   * the message is defined int he plugin settings
+   */
+  protected function _not_found() {
+    
+    if ($this->shortcode_atts['no_record_template'] !== '') {
+
+        $this->_print_from_template();
+      
+    } else {
+      $this->output = empty(Participants_Db::$plugin_options['no_record_error_message']) ? '' : '<p class="alert alert-error">' . Participants_Db::plugin_setting('no_record_error_message') . '</p>';
+    }
+  }
 }
 
 ?>

@@ -130,9 +130,6 @@ class PDb_List_Query {
      * if we're getting a paginated set of records, get the stored session, if not, 
      * and we are searching, save the session
      */
-    
-    error_log(__METHOD__.' post: '.print_r($_POST,1));
-    
     if (!empty($this->get_input[Participants_Db::$list_page])) {
       $this->_restore_query_session();
     } elseif (filter_input(INPUT_POST, 'action') === 'pdb_list_filter') {
@@ -280,12 +277,12 @@ class PDb_List_Query {
    */
   public function clear_background_clauses($field) {
     if (isset($this->where_clauses[$field]) && is_array($this->where_clauses[$field])) {
-      foreach ($this->where_clauses[$field] as $index => $clause) {
-        if ($clause->is_shortcode()) {
-          unset($this->where_clauses[$field][$index]);
-        }
+    foreach ($this->where_clauses[$field] as $index => $clause) {
+      if ($clause->is_shortcode()) {
+        unset($this->where_clauses[$field][$index]);
       }
     }
+  }
   }
   /**
    * adds where clauses and sort from the GET array
@@ -372,16 +369,16 @@ class PDb_List_Query {
        */
       if ($clause->is_or() && !$inparens) {
         $subquery .= '(';
-        $inparens = true;
-      }
-      $subquery .= $clause->statement();
+          $inparens = true;
+        }
+        $subquery .= $clause->statement();
       if ($clause->is_or() && !$last_clause) {
         $subquery .= ' OR ';
-      }
+        }
       if ($inparens && (!$clause->is_or() || $last_clause)) {
         $subquery .= ')';
-        $inparens = false;
-      }
+            $inparens = false;
+          }
       if (!$clause->is_or() && !$last_clause) {
         $subquery .= ' AND ';
       }
@@ -570,13 +567,13 @@ class PDb_List_Query {
 
       $statements = preg_split('/([&|])/', html_entity_decode($filter_string), -1, PREG_SPLIT_DELIM_CAPTURE);
       $logic = 'AND';
-      
-      for ($i = 0;$i < count($statements);$i = $i + 2) {
         
+      for ($i = 0;$i < count($statements);$i = $i + 2) {
+          
         if (isset($statements[$i+1])) {
           $logic = $statements[$i+1] === '|' ? 'OR' : 'AND';
-        }
-        
+          }
+          
         $this->_add_statement_from_filter_string($statements[$i], $logic);
         
       }// each $statement
@@ -647,7 +644,7 @@ class PDb_List_Query {
         'index' => $this->clause_index,
             )
     );
-    
+
     // increment the index value
     $this->clause_index++;
 
@@ -663,8 +660,6 @@ class PDb_List_Query {
        * conditioned to get a correct comparison
        */
       $search_term = Participants_Db::parse_date($filter->get_raw_term(), $field_atts);
-      
-      //error_log(__METHOD__.' raw term: '.$filter->get_raw_term().' parsed: '.$search_term);
 
       // if we don't get a valid date, skip this statement
       if ($search_term === false)
@@ -688,7 +683,7 @@ class PDb_List_Query {
       $statement = sprintf($pattern, $column);
       
     } else {
-    	
+    
     	if ($operator === NULL)
     		$operator = 'LIKE';
     
@@ -824,9 +819,6 @@ class PDb_List_Query {
    */
   private function _save_query_session()
   {
-    
-    error_log(__METHOD__.' search? '.($this->is_search_result?'yes':'no').' trace: '.print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,4),1));
-    
     $this->_clear_query_session();
     
     Participants_Db::$session->set($this->query_session, array(

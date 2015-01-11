@@ -166,7 +166,7 @@ this is a more detailed template showing how the parts of the display can be cus
           <?php $value = $this->field->value; // we do this just to make the variable name shorter ?>
           <td>
           	<?php echo PDb_FormElement::get_field_value_display($this->field); ?>
-          </td>
+            </td>
         
 			<?php endwhile; // fields ?>
       </tr>

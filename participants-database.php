@@ -318,7 +318,7 @@ class Participants_Db extends PDb_Base {
         $hook = "in_plugin_update_message-" . $plugin_path;
         //add_action( $hook, array(__CLASS__, 'plugin_update_message'), 20, 2 );
     }
-}
+        }
 
   /**
    * performs a fix for some older versions of the plugin; does nothing with current plugins
@@ -737,7 +737,7 @@ class Participants_Db extends PDb_Base {
 
     self::_record_access($id);
   }
-  
+
   /**
    * common function for printing all shortcodes
    * 
@@ -863,7 +863,7 @@ class Participants_Db extends PDb_Base {
    * @return string the output HTML
    */
   public static function print_signup_form($params) {
-    
+
     $params['module'] = 'signup';
 
     return self::print_signup_class_form($params);  
@@ -1301,7 +1301,7 @@ class Participants_Db extends PDb_Base {
    *                 submission does not validate
    */
   public static function process_form($post, $action, $participant_id = false, $column_names = false) {
-    
+
     if (!isset($action) || !in_array($action, array('insert','update')) || $post['subsource'] !== Participants_Db::PLUGIN_NAME) return false;
 
     global $wpdb;
@@ -1338,7 +1338,7 @@ class Participants_Db extends PDb_Base {
       $duplicate_record_preference = filter_input(INPUT_POST, 'match_preference', FILTER_SANITIZE_STRING);
       $match_field = filter_input(INPUT_POST, 'match_field', FILTER_SANITIZE_STRING);
     } else {
-      $duplicate_record_preference = self::plugin_setting('unique_email', '0');
+    $duplicate_record_preference = self::plugin_setting('unique_email', '0');
       $match_field = self::plugin_setting('unique_field','id');
     }
     if (self::current_user_has_plugin_role('admin') && !isset($_POST['csv_file_upload'])) {
@@ -1350,11 +1350,10 @@ class Participants_Db extends PDb_Base {
      */
       $duplicate_record_preference = '0';
     }
-    
     if ($action == 'insert' and $duplicate_record_preference !== '0') {
 
       $match_field_value = filter_var($post[$match_field], FILTER_SANITIZE_STRING);
-      
+
       $record_match = $match_field_value !== '' && self::field_value_exists($match_field_value, $match_field);
       // if true, the incoming record matches an existing record
       /**
@@ -1456,6 +1455,8 @@ class Participants_Db extends PDb_Base {
         return false;
     }
 
+    
+
     /*
      * determine the set of columns to process
      * 
@@ -1470,13 +1471,12 @@ class Participants_Db extends PDb_Base {
 
       if ($_POST['action'] === 'signup') {
       
-        $column_set = 'signup';
-      } else {
-
-        $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
-      }
+      $column_set = 'signup';
+    } else {
+      
+      $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
     }
-    
+    }
     $columns = self::get_column_atts($column_set);
 
     // gather the submit values and add them to the query
@@ -1662,23 +1662,23 @@ class Participants_Db extends PDb_Base {
     } elseif ( !empty( self::$admin_message ) and 'error' == self::$admin_message_type ) {
       return false;
     }
-    
+
     /*
      * @version 1.6
      * 
      * add in any missing default values
      */
     if ($action == 'insert') {
-      $all_columns = self::get_default_record();
-      unset($all_columns['private_id'],$all_columns['date_recorded'],$all_columns['date_updated']);
-      foreach ($all_columns as $name => $value) {
-        $find_result = preg_grep('/' . $name . '/', $column_data);
-        if (count($find_result) === 0 && $value != '') {
-          // if a field with a defined default value is missing from the submission, add it in
-          $column_data[] = "`$name` = %s";
-          $new_values[] = $value;
-        }
-      }
+			$all_columns = self::get_default_record();
+			unset($all_columns['private_id'],$all_columns['date_recorded'],$all_columns['date_updated']);
+			foreach ($all_columns as $name => $value) {
+				$find_result = preg_grep('/' . $name . '/', $column_data);
+				if (count($find_result) === 0 && $value != '') { 
+					// if a field with a defined default value is missing from the submission, add it in
+					$column_data[] = "`$name` = %s";
+					$new_values[] = $value;
+				}
+			}
     }
     
     
@@ -1699,21 +1699,21 @@ class Participants_Db extends PDb_Base {
     } elseif ($result === false) {
       $db_error_message = sprintf(self::$i18n['database_error'], $wpdb->last_query, $wpdb->last_error);
     } else {
-      // is it a new record?
-      if ($action == 'insert') {
+    // is it a new record?
+    if ($action == 'insert') {
 
-        // get the new record id for the return
-        $participant_id = $wpdb->insert_id;
+      // get the new record id for the return
+      $participant_id = $wpdb->insert_id;
 
-        /* 
-         * is this record a new one created in the admin? This also applies to CSV 
-         * imported new records
-         */
-        if (is_admin()) {
-        // if in the admin hang on to the id of the last record for an hour
-          set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 1));
-        }
+      /* 
+       * is this record a new one created in the admin? This also applies to CSV 
+       * imported new records
+       */
+      if (is_admin()) {
+      // if in the admin hang on to the id of the last record for an hour
+        set_transient(self::$last_record, $participant_id, (1 * 60 * 60 * 1));
       }
+    }
     }
     /*
      * set up user feedback
@@ -1753,8 +1753,10 @@ class Participants_Db extends PDb_Base {
 
   /**
    * gets the default set of values
-   * 
+   *
    * this does not include hidden fields
+   *
+   * @version 1.6 placeholder elements are also excluded
    *
    * @global object $wpdb
    * @return array name=>value
@@ -1763,7 +1765,7 @@ class Participants_Db extends PDb_Base {
 
     $sql = 'SELECT f.name,f.default,f.form_element 
             FROM ' . self::$fields_table . ' f
-            WHERE f.group != "internal"';
+            WHERE f.group != "internal" AND f.form_element != "placeholder"';
 
     global $wpdb;
 
@@ -1806,7 +1808,10 @@ class Participants_Db extends PDb_Base {
     $default_record['private_id'] = self::generate_pid();
     date_default_timezone_set(self::get_timezone());
     $default_record['date_recorded'] = date('Y-m-d H:i:s');
-    $default_record['date_updated'] = date('Y-m-d H:i:s');
+    /*
+     * @version 1.6 stop setting date_updated on new record
+     */
+    // $default_record['date_updated'] = date('Y-m-d H:i:s');
 
     return $default_record;
   }
@@ -2144,7 +2149,7 @@ class Participants_Db extends PDb_Base {
      */
     if (!is_object(self::$validation_errors)) {
       if (Participants_Db::is_form_validated()) {
-        self::$validation_errors = new PDb_FormValidation();
+      self::$validation_errors = new PDb_FormValidation();
       }
     }
 
@@ -2217,7 +2222,7 @@ class Participants_Db extends PDb_Base {
           if (isset($post_data['thanks_page']) && $post_data['thanks_page'] != $_SERVER['REQUEST_URI']) {
           
             self::$session->set('pdbid', $post_data['id']);
-            
+
             $redirect = $post_input['action'] == 'insert' ? $post_data['thanks_page'] : self::add_uri_conjunction($post_data['thanks_page']) . 'action=update';
 
             wp_redirect($redirect);
@@ -2304,7 +2309,7 @@ class Participants_Db extends PDb_Base {
 
             if ($query) {
               $query = str_replace('*', ' ' . trim($import_columns, ',') . ' ', $query);
-              $data += self::_prepare_CSV_rows($wpdb->get_results($query, ARRAY_A));
+            	$data += self::_prepare_CSV_rows($wpdb->get_results($query, ARRAY_A));
             }
 
             break;
@@ -2312,7 +2317,7 @@ class Participants_Db extends PDb_Base {
         endswitch; // CSV type
 
         if (!empty($filename)) {
-          
+
           $base_filename = substr($filename, 0, strpos($filename, PDb_List_Admin::filename_datestamp() . '.csv'));
           
           /*
@@ -2414,7 +2419,7 @@ class Participants_Db extends PDb_Base {
       self::$validation_errors->add_error($column, 'empty');
       return;
     }
-    // a value was submitted, try to find a record with it
+// a value was submitted, try to find a record with it
     //$match_id = self::_get_participant_id_by_term($column, $_POST[$column]);
     $match_id = self::find_record_match($column, $_POST);
     
@@ -2453,7 +2458,7 @@ class Participants_Db extends PDb_Base {
     if (self::plugin_setting_is_true('send_retrieve_link_notify_email')) {
       
       $body = self::proc_tags(self::plugin_setting('retrieve_link_notify_body'), $match_id);
-      $sent = wp_mail( 
+    $sent = wp_mail( 
             self::plugin_setting('email_signup_notify_addresses'), 
             self::proc_tags(self::plugin_setting('retrieve_link_notify_subject'), $match_id, 'all'), 
               (self::plugin_setting('html_email') ? self::process_rich_text($body) : $body),
@@ -2825,7 +2830,7 @@ class Participants_Db extends PDb_Base {
    * @return string                  text with the tags replaced by the data
    */
   public static function proc_tags($text, $participant_id, $mode = 'frontend') {
-    
+
     return self::replace_tags($text, self::get_participant($participant_id), self::get_column_atts($mode));
   }
   /**
@@ -2840,7 +2845,7 @@ class Participants_Db extends PDb_Base {
   public static function replace_tags($text, array$data, array$columns) {
 
     $values = $tags = array();
-
+      
     foreach ($columns as $column) {
       
       $column->value = $data[$column->name];
@@ -2857,14 +2862,14 @@ class Participants_Db extends PDb_Base {
     // add the date tag
     $tags[] = '[date]';
     $values[] = date_i18n(self::$date_format, self::parse_date());
-
+    
     // add the time tag
     $tags[] = '[time]';
     $values[] = date_i18n(get_option('time_format'), self::parse_date());
     
     if (isset($data['id']) && is_numeric($data['id'])) {
-      // add the admin record link tag
-      $tags[] = '[admin_record_link]';
+    // add the admin record link tag
+    $tags[] = '[admin_record_link]';
       $values[] = self::get_admin_record_link($data['id']);
     }
 
@@ -2880,7 +2885,6 @@ class Participants_Db extends PDb_Base {
 
     // replace the variables with strings
     return vsprintf($pattern, $values);
-    
   }
 
   /**
@@ -3010,14 +3014,14 @@ class Participants_Db extends PDb_Base {
         }
         
         if (!$errors) {
-	        $the_Date = new DateTime();
-	        $the_Date->setTimestamp($timestamp);
+        $the_Date = new DateTime();
+        $the_Date->setTimestamp($timestamp);
         } elseif (WP_DEBUG) {
         	error_log(__METHOD__.' IntlDateFormatter error: format string: '. Participants_Db::get_ICU_date_format(self::$plugin_options['input_date_format']).' timestamp: '.$timestamp.' formatter error: '. $DateFormat->getErrorMessage());
         }
-        
+
       }
-      
+        
       if (!$the_Date && class_exists('DateTime')) {
         
         self::$date_mode = 'DateTime';
@@ -3057,8 +3061,8 @@ class Participants_Db extends PDb_Base {
       }
     }
       
-      // ob_start();
-      // var_dump($date);
+//      ob_start();
+//      var_dump($date);
       // error_log(__METHOD__.' date value:'.ob_get_clean().' mode:'.self::$date_mode);
     
     /*
@@ -3091,12 +3095,12 @@ class Participants_Db extends PDb_Base {
             $string = $the_Date->format(self::$date_format);
           } else {
             /*
-             * remove the time portion of the timestamp
-             */
-           $string = preg_replace('# [0-9]{2}:[0-9]{2}:[0-9]{2}$#', '', $string);
-           $string .= ' 00:00 -0';
-         }
-       }
+           * remove the time portion of the timestamp
+           */
+          $string = preg_replace('# [0-9]{2}:[0-9]{2}:[0-9]{2}$#', '', $string);
+          $string .= ' 00:00 -0';
+        }
+      }
       }
       /*
        * @version 1.6
@@ -3118,9 +3122,9 @@ class Participants_Db extends PDb_Base {
         } else {
           $format_setting = Participants_Db::plugin_setting_is_set('input_date_format') ? Participants_Db::plugin_setting('input_date_format') : get_bloginfo('date_format');
           $format = Participants_Db::translate_date_format($format_setting, 'strftime');
-        }
+				}
         $date_array = strptime($string, $format);
-        
+    
         $date = mktime(
                 $date_array['tm_hour'], $date_array['tm_min'], $date_array['tm_sec'], $date_array['tm_mon'] + 1, $date_array['tm_mday'], $date_array['tm_year'] + 1900
                 );

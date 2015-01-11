@@ -21,7 +21,6 @@ class xnau_Plugin_Settings {
 
   // all registered sections
   protected $sections;
-  
   // descriptions for each section as needed;
   protected $section_description;
 

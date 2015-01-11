@@ -140,8 +140,8 @@ class PDb_Session {
 	 */
 	public function set( $key, $value ) {
 		$key = sanitize_key( $key );
-
-			$this->session[ $key ] = $value;
+		
+		$this->session[ $key ] = $value;
 
 		if( $this->use_php_sessions )
 			$_SESSION[$this->session_name] = $this->session;

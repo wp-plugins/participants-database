@@ -701,7 +701,7 @@ class PDb_Init
      * @return null
      */
     private static function set_database_real_version() {
-
+      
       global $wpdb;
 
       // set up the option starting with the first version

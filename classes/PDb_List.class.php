@@ -757,7 +757,7 @@ class PDb_List extends PDb_Shortcode {
 
   /**
    * get the column form element type
-   * 
+   *
    * @return string the form element type
    *
    */
@@ -826,7 +826,7 @@ class PDb_List extends PDb_Shortcode {
 
   /**
    * returns a concatenated string from an array of HTML lines
-   *
+   * 
    * @version 1.6 added option to assemble HTML without linebreaks
    * 
    * @param array $output
@@ -848,11 +848,11 @@ class PDb_List extends PDb_Shortcode {
    * @return string HTML
    */
   public function show_link($value, $template = false, $print = false) {
-    
+
     $params = maybe_unserialize($value);
 
     if ( is_array($params)) {
-      
+
       if (count($params) < 2)
         $params[1] = $params[0];
       

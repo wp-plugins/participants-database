@@ -1030,7 +1030,7 @@ abstract class PDb_Shortcode {
    *  and the presence of the ':' identifies it.
    *
    * if there is no indicator, the field is treated as a constant
-   * 
+   *
    * @version 1.6 moved to Base class
    *
    * @param string $value the current value of the field as read from the
@@ -1199,8 +1199,8 @@ abstract class PDb_Shortcode {
       if ($this->submission_page !== false) $form_status = 'multipage';
     }
     if (!$this->submission_page) {
-      $this->submission_page = $_SERVER['REQUEST_URI'];
-    }
+    $this->submission_page = $_SERVER['REQUEST_URI'];
+  }
     $this->set_form_status($form_status);
   }
   

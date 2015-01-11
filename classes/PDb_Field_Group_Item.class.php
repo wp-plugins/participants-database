@@ -96,7 +96,7 @@ class PDb_Field_Group_Item extends PDb_Template_Item {
   
   /**
    * indicates whether groups are to be printed in the form
-   * 
+   *
    * signup and record forms print group titles/descriptions only if the setting for that form is true
    * all other shortcodes always print groups, but they're really only seen in single record displays
    * 

@@ -35,8 +35,8 @@ this is the default template which formats the list of records as a table
         ?>
 			
       		<?php $this->search_form() ?>
-      		
         </div>
+        
       </div>
     <?php endif ?>
     <?php if ( $filter_mode == 'sort' || $filter_mode == 'both' ) : ?>
@@ -100,7 +100,7 @@ $this->print_list_count('<h5>');
           <?php if ( ! $this->field->is_empty( $this->field->value ) ) : ?>
           <td>
           	<?php echo PDb_FormElement::get_field_value_display($this->field); ?>
-          </td>
+            </td>
             
         <?php else : // if the field is empty ?>
         <td></td>

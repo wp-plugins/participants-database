@@ -12,9 +12,9 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2013 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.5
+ * @version    0.6
  * @link       http://xnau.com/wordpress-plugins/
  */
 class PDb_Template {
@@ -222,7 +222,7 @@ class PDb_Template {
    */
   public function set_edit_page($page) {
     $this->edit_page = Participants_Db::find_permalink($page);
-  }
+    }
   /**
    * sets the detail page property
    * 
@@ -277,6 +277,39 @@ class PDb_Template {
   	}
   }
   /**
+   * provides the field's form element
+   * 
+   * @var string $name the field name
+   * @return string HTML
+   */
+  public function get_form_element($name) {
+    if (property_exists($this->fields, $name)) {
+      $field = $this->fields->{$name};
+      if (!property_exists($this->fields, 'attributes') ) {
+        $field->attributes = array();
+      }
+      $element = array(
+          'type' => $field->form_element,
+          'name' => $field->name,
+          'value' => $field->value,
+          'options' => $field->values,
+          'class' => Participants_Db::$prefix . $field->form_element,
+          'attributes' => $field->attributes,
+      );
+      return PDb_FormElement::get_element($element);
+    }
+  }
+  
+  /**
+   * prints a field form element
+   * 
+   * @var string $name
+   * @return null
+   */
+  public function print_form_element($name) {
+    echo $this->get_form_element($name);
+  }
+  /**
    * returns the named value
    * 
    * @param string $name of the property
@@ -319,18 +352,18 @@ class PDb_Template {
         'radio',
         );
     if (in_array($this->fields->{$name}->form_element, $linkable_field_types)) {
-	    switch ($this->base_type) {
-	      case 'PDb_List':
-	        $this->fields->{$name}->link = $href;
-	        break;
-	      case 'PDb_Signup':
-	      case 'PDb_Single':
-	      case 'PDb_Record':
-	      default:
-	        $group = $this->fields->{$name}->group;
-	        $field = $this->record->{$group}->fields->{$name}->link = $href;
-	    }
+    switch ($this->base_type) {
+      case 'PDb_List':
+        $this->fields->{$name}->link = $href;
+        break;
+      case 'PDb_Signup':
+      case 'PDb_Single':
+      case 'PDb_Record':
+      default:
+        $group = $this->fields->{$name}->group;
+        $field = $this->record->{$group}->fields->{$name}->link = $href;
     }
+  }
   }
   
 

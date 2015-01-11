@@ -156,7 +156,7 @@ class xnau_FormValidation {
 
     $this->_add_error($name, $message, $overwrite);
   }
-  
+
   /**
    * clears errors associated with a field
    * 

@@ -140,7 +140,7 @@ class PDb_List_Query_Filter {
     }
     if (isset($params['index'])) {
       $this->index = $params['index'];
-    }
+  	}
   }
   /**
    * sets the search term property

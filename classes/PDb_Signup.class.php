@@ -99,8 +99,6 @@ class PDb_Signup extends PDb_Shortcode {
    *
    */
   public function __construct($shortcode_atts) {
-    
-    error_log(__METHOD__.' session: '.print_r(Participants_Db::$session,1));
 
     // define shortcode-specific attributes to use
     $shortcode_defaults = array(
@@ -126,11 +124,11 @@ class PDb_Signup extends PDb_Shortcode {
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
       if ($this->participant_values && ($form_status === 'normal' || ($shortcode_atts['module'] == 'thanks' && $form_status === 'multipage'))) {
         /*
-         * the submission is successful, clear the session
-         */
-        Participants_Db::$session->clear('pdbid');
-        Participants_Db::$session->clear('captcha_vars');
-        Participants_Db::$session->clear('captcha_result');
+       * the submission is successful, clear the session
+       */
+      Participants_Db::$session->clear('pdbid');
+      Participants_Db::$session->clear('captcha_vars');
+      Participants_Db::$session->clear('captcha_result');
         $this->submitted = true;
         $shortcode_atts['module'] = 'thanks';
       }
@@ -177,7 +175,7 @@ class PDb_Signup extends PDb_Shortcode {
         apply_filters(Participants_Db::$prefix . 'before_signup_thanks', $signup_feedback);
       }
 
-      $this->_send_email();
+        $this->_send_email();
 
       // form has been submitted, close it
       Participants_Db::$session->clear('form_status');

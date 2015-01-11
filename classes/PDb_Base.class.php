@@ -272,7 +272,7 @@ class PDb_Base {
 
     return $filename;
   }
-  
+
   /**
    * parses the value string and obtains the corresponding dynamic value
    *
@@ -453,7 +453,7 @@ class PDb_Base {
     return $locale;
   }
 
-
+  
   /**
    * provides a plugin setting
    * 
@@ -557,7 +557,7 @@ class PDb_Base {
 
     return str_replace(' ', '', preg_replace('#^[0-9]*#', '', strtolower($title)));
   }
-  
+
   /**
    * check the current users plugin role
    * 
@@ -578,7 +578,7 @@ class PDb_Base {
         return current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) || current_user_can(Participants_Db::$plugin_options['record_edit_capability']);
     }
   }
-  
+
   /**
    * checks if the current user's form submissions are to be validated
    * 
