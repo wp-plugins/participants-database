@@ -11,7 +11,7 @@
  * @version    0.5
  * @link       http://xnau.com/wordpress-plugins/
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 /*
  * defines the List Query Filter Object
  * 
@@ -153,7 +153,11 @@ class PDb_List_Query_Filter {
      $this->term = '';
    } else {
      global $wpdb;
-     $this->term = $wpdb->esc_like(PDb_FormElement::get_title_value($term, $this->field->name));
+     if (method_exists($wpdb, 'esc_like')) {
+			 $this->term = $wpdb->esc_like(PDb_FormElement::get_title_value($term, $this->field->name));
+     } else {
+			 $this->term = PDb_FormElement::get_title_value($term, $this->field->name);
+    }
    }
   }
   /**

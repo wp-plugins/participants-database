@@ -12,6 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Template_Item class
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Record_Item extends PDb_Template_Item {
   
   /**

@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.6 beta 9
+  Version: 1.6beta.10
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -27,6 +27,7 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+if (!defined( 'ABSPATH' ) ) exit;
 // register the class autoloading
 spl_autoload_register('PDb_class_loader');
 /**
@@ -225,6 +226,10 @@ class Participants_Db extends PDb_Base {
    * @var string the current list filter nonce
    */
   public static $list_filter_nonce;
+  /**
+   * @var int the number of characters to use in the private ID
+   */
+  public static $private_id_length = 5;
   
   /**
    * initializes the static class
@@ -456,8 +461,9 @@ class Participants_Db extends PDb_Base {
     add_menu_page(
             self::$plugin_title,
             self::$plugin_title, 
-            '', 
-            self::PLUGIN_NAME, array(__CLASS__, 'include_admin_file')
+            self::plugin_setting('record_edit_capability'), 
+            self::PLUGIN_NAME, 
+            null
     );
     
     add_submenu_page(
@@ -465,7 +471,7 @@ class Participants_Db extends PDb_Base {
             __('List Participants', 'participants-database'), 
             __('List Participants', 'participants-database'), 
             self::plugin_setting('record_edit_capability'), 
-            self::$plugin_page . '-list_participants', 
+            self::PLUGIN_NAME,
             array($list_admin_classname, 'initialize')
     );
 
@@ -1117,11 +1123,11 @@ class Participants_Db extends PDb_Base {
    * gets a single column object
    * 
    * @param string $name the column name
-   * @return object
+   * @return object|bool false if no field defined for the given name
    */
   public static function get_column($name) {
     
-    return self::$fields[$name];
+    return isset(self::$fields[$name]) ? self::$fields[$name] : false;
     
   }
 
@@ -1341,15 +1347,17 @@ class Participants_Db extends PDb_Base {
     $duplicate_record_preference = self::plugin_setting('unique_email', '0');
       $match_field = self::plugin_setting('unique_field','id');
     }
-    if (self::current_user_has_plugin_role('admin') && !isset($_POST['csv_file_upload'])) {
+    if (is_admin() && self::current_user_has_plugin_role('admin') && !isset($_POST['csv_file_upload'])) {
       /*
-       * set the preference to 0 if in the admin and not importing a CSV
+       * set the preference to 0 if current user is an admin in the admin and not 
+       * importing a CSV
        * 
        * this allows administrators to create new records without being affected 
        * by the duplicate record preference
      */
       $duplicate_record_preference = '0';
     }
+    
     if ($action == 'insert' and $duplicate_record_preference !== '0') {
 
       $match_field_value = filter_var($post[$match_field], FILTER_SANITIZE_STRING);
@@ -1455,8 +1463,6 @@ class Participants_Db extends PDb_Base {
         return false;
     }
 
-    
-
     /*
      * determine the set of columns to process
      * 
@@ -1512,7 +1518,7 @@ class Participants_Db extends PDb_Base {
           break;
 
         case 'private_id':
-          if (is_string($post['private_id']) && $post['private_id'] !== '') $new_value = $post['private_id'];
+          if (isset($post['private_id']) && strlen($post['private_id']) == self::$private_id_length) $new_value = $post['private_id'];
           else $new_value = $action == 'insert' ? self::generate_pid() : false;
           
           break;
@@ -1899,6 +1905,8 @@ class Participants_Db extends PDb_Base {
 
     global $wpdb;
 
+    if ( ! self::is_column($term)) return false;
+
     $sql = 'SELECT p.id FROM ' . self::$participants_table . ' p WHERE p.' . $term . ' = %s';
     $result = $wpdb->get_results($wpdb->prepare($sql, $value), ARRAY_N);
 
@@ -1931,7 +1939,7 @@ class Participants_Db extends PDb_Base {
         '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
         'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
-    for ($i = 0; $i < 5; $i++) {
+    for ($i = 0; $i < self::$private_id_length; $i++) {
 
       $pid .= $chr_source[array_rand($chr_source)];
     }
@@ -2158,6 +2166,8 @@ class Participants_Db extends PDb_Base {
       case 'update':
       case 'insert':
     
+        if (!Participants_Db::current_user_has_plugin_role()) return;
+    
         /*
          * we are here for one of these cases:
          *   a) we're adding a new record in the admin
@@ -2351,10 +2361,15 @@ class Participants_Db extends PDb_Base {
 
       case 'retrieve' :
 
-        self::_process_retrieval();
+        if (self::check_form_nonce( filter_input( INPUT_POST, 'session_hash' ))) {
+					self::_process_retrieval();
+        }
         return;
 
       case 'signup' :
+        
+        if ( ! self::check_form_nonce( filter_input( INPUT_POST, 'session_hash' )))
+                return;
         
         $_POST['private_id'] = '';
         $columns[] = 'private_id';
@@ -2384,6 +2399,18 @@ class Participants_Db extends PDb_Base {
         return;
 
     endswitch; // $_POST['action']
+  }
+  
+  
+  /**
+   * checks the nonce on a form submission
+   * 
+   * @param string $nonce the nonce value
+   * 
+   * @return bool true if nonce passes
+   */
+  public static function check_form_nonce ($nonce) {
+    return wp_verify_nonce($nonce, self::PLUGIN_NAME . '_nonce');
   }
   
    /**
@@ -2885,6 +2912,7 @@ class Participants_Db extends PDb_Base {
 
     // replace the variables with strings
     return vsprintf($pattern, $values);
+    
   }
 
   /**
@@ -2898,7 +2926,7 @@ class Participants_Db extends PDb_Base {
   public static function pdb_list_filter() {
 
     $multi = is_array($_POST['search_field']);
-    $postinput = filter_input_array(INPUT_POST, self::search_post_filter($multi), false);
+    $postinput = filter_input_array(INPUT_POST, self::search_post_filter($multi));
 
     if (!wp_verify_nonce($postinput['filterNonce'], self::$prefix . 'list-filter-nonce'))
       die('nonce check failed');
@@ -2908,12 +2936,30 @@ class Participants_Db extends PDb_Base {
     if (!is_object($post))
       $post = get_post($postinput['postID']);
     
+    $instance = empty($postinput['target_index']) ? $postinput['instance_index'] : $postinput['target_index'];
+    
+    self::print_list_search_result($post, $instance);
+    
+    do_action(Participants_Db::$prefix . 'list_ajax_complete', $post);
+    
+    exit;
+  }
+  
+  /**
+   * provides the list output from an AJAX search
+   * 
+   * @param object $post the current post object
+   * @param int $instance the instance index of the targeted list
+   * @return null
+   */
+  private static function print_list_search_result($post, $instance) {
     /* 
      * get the attributes array; these values were saved in the session array by 
      * the Shortcode class when it was instantiated
      */
     $session = self::$session->get('shortcode_atts');
-    $shortcode_atts = $session[$postinput['postID']]['list'][$postinput['instance_index']];
+    // translate the ArrayAccess object to a straight array
+    $shortcode_atts = $session[$post->ID]['list'][$instance]->toArray();
     
     // add the AJAX filtering flag
     $shortcode_atts['filtering'] = 1;
@@ -2922,7 +2968,16 @@ class Participants_Db extends PDb_Base {
     // output the filtered shortcode content
     header("Content-Type:	text/html");
     echo PDb_List::get_list( $shortcode_atts );
-    exit;
+    return;
+  } 
+  
+  /**
+   * clears the list search
+   * 
+   * @return null
+   */
+  private static function clear_list_search() {
+    self::$session->clear('shortcode_atts');
   }
   
   /**
@@ -3173,7 +3228,7 @@ class Participants_Db extends PDb_Base {
    * @param array $classes
    */
   public static function add_admin_body_class($class) {
-    if (version_compare(get_bloginfo('version'), '3.8', '>=')) {
+    if (self::has_dashicons()) {
       $class .= ' has-dashicons ';
     }
     return $class;
@@ -3185,7 +3240,7 @@ class Participants_Db extends PDb_Base {
    * @param array $classes
    */
   public static function add_body_class($classes) {
-    if (version_compare(get_bloginfo('version'), '3.8', '>=')) {
+    if (self::has_dashicons()) {
       $classes[] = 'has-dashicons';
     }
     global $post;
@@ -3198,6 +3253,14 @@ class Participants_Db extends PDb_Base {
       }
     }
     return $classes;
+  }
+  /**
+   * checks the WP version for the availability of dashicon fonts
+   * 
+   * @return bool true if the font is available
+   */
+  public static function has_dashicons() {
+    return version_compare(get_bloginfo('version'), '3.8', '>=');
   }
   
 /**

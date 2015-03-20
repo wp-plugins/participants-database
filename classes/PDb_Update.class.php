@@ -13,7 +13,7 @@
  * 
  * adapted from: http://wp.tutsplus.com/tutorials/plugins/a-guide-to-the-wordpress-http-api-automatic-plugin-updates/
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Update {
 
   /**

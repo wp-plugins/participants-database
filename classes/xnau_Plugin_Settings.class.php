@@ -11,6 +11,7 @@
  *
  * @depends xnau_FormElement class
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class xnau_Plugin_Settings {
 
   // class name of the plugin-specific subclass
@@ -21,6 +22,7 @@ class xnau_Plugin_Settings {
 
   // all registered sections
   protected $sections;
+  
   // descriptions for each section as needed;
   protected $section_description;
 

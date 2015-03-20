@@ -6,6 +6,7 @@
  * admin_init action
  *
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 if (!Participants_Db::current_user_has_plugin_role()) exit;
 
 $input_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('min_range' => 1));
@@ -191,7 +192,7 @@ if ($participant_values) :
 
                 wp_editor(
                         $column->value, 
-                        preg_replace('#[0-9_-]#', '', Participants_Db::$prefix . $column->name), 
+                        preg_replace(array('#-#', '#[^a-z_]#'), array('_', ''), Participants_Db::$prefix . $column->name), 
                         array(
                     'media_buttons' => false,
                     'textarea_name' => $column->name,

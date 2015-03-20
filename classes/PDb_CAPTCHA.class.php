@@ -14,7 +14,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_CAPTCHA {
   /**
    * @var string name of the element

@@ -1,19 +1,19 @@
 /*
  * Participants Database Plugin
  * 
- * version: 0.6
+ * version: 0.7
  * 
  * xnau webdesign xnau.com
  * 
- * handles AJAX list filtering and sorting
+ * handles AJAX list filtering, paging and sorting
  */
 PDbListFilter = (function($) {
   "use strict";
   var
           isError = false,
           errormsg = $('.pdb-searchform .pdb-error'),
-          filterform = $('.sort_filter_form[ref="update"]'),
-          remoteform = $('.sort_filter_form[ref="remote"]'),
+          filterform = $('.sort_filter_form[data-ref="update"]'),
+          remoteform = $('.sort_filter_form[data-ref="remote"]'),
           submission = {
             filterNonce: PDb_ajax.filterNonce,
             postID: PDb_ajax.postID
@@ -28,39 +28,65 @@ PDbListFilter = (function($) {
             clear_error_messages();
             // validate and process form here
             var
-                    this_button = $(event.target),
+                    this_button = get_button(event.target),
                     submitButton = event.target,
                     search_field_error = this_button.closest('.' + PDb_ajax.prefix + 'searchform').find('.search_field_error'),
                     value_error = this_button.closest('.' + PDb_ajax.prefix + 'searchform').find('.value_error');
-            //container.data('target', 'container').find('.list-container');
-            submission.submit = submitButton.value;
             
-            switch (submitButton.value) {
+            submission.submit = $(submitButton).data('submit');
 
-              case PDb_ajax.i18n.search:
-                if ($('select[name^="search_field"]').PDb_checkInputs('none')) {
+            switch (submission.submit) {
+
+              case 'search':
+                submission.listpage = '1';
+                if ($('[name^="search_field"]').PDb_checkInputs('none')) {
                   search_field_error.show();
                   isError = true;
                 }
-                if ($('input[name^="value"]').PDb_checkInputs('')) {
+                if ($('[name^="value"]').PDb_checkInputs('')) {
                   value_error.show();
                   isError = true;
                 }
                 if (isError) {
                   errormsg.show();
-                } else if (remote) {
+                  return;
+                }
+                if (remote) {
                   this_button.closest('form').submit();
-                } else {
-                  this_button.PDb_processSubmission();
+                  return
                 }
                 break;
                 
-              case PDb_ajax.i18n.clear:
-                clear_search();
+              case 'clear':
+                clear_search(this_button);
+                submission.listpage = '1';
+                break;
+              
+              case 'page':
+                submission.listpage = this_button.data('page');
+                break;
+                
+              case 'sort':
+                break;
+                
+              default:
+                return;
             }
+            this_button.PDb_processSubmission();
+            // trigger a general-purpose event
+            $('html').trigger('pdbListFilterComplete');
+          },
+          get_button = function (target) {
+            var $button = $(target);
+            if ($button.is('a')) return $button;
+            return $button.closest('a');
           },
           submit_remote_search = function(event) {
             submit_search(event, true);
+          },
+          get_page = function(event) {
+            $(event.target).data('submit', 'page');
+            submit_search(event);
           },
           clear_error_messages = function() {
             errormsg.hide();
@@ -78,7 +104,62 @@ PDbListFilter = (function($) {
               PDb_ajax.prefix = 'pdb-';
             }
             $('.wrap.pdb-list').PDb_idFix();
-          };
+          },
+          add_value_to_submission = function(el,submission) {
+    var
+            value = encodeURI(el.val()),
+            fieldname = el.attr('name'),
+            multiple = fieldname.match(/\[\]$/);
+    fieldname = fieldname.replace('[]', ''); // now we can remove the brackets
+    if (multiple && typeof submission[fieldname] === 'string') {
+      submission[fieldname] = [submission[fieldname]];
+    }
+    if (typeof submission[fieldname] === 'object') {
+      submission[fieldname][submission[fieldname].length] = value;
+    } else {
+      submission[fieldname] = value;
+    }
+          },
+          post_submission = function (button) {
+    var
+            target_instance = $('.pdb-list.pdb-instance-' + submission.instance_index),
+            container = target_instance.length ? target_instance : $('.pdb-list').first(),
+						pagination = container.find('.pagination'),
+						buttonParent = button.parent('fieldset, div'),
+            spinner = $(PDb_ajax.loading_indicator).clone();
+    $.ajax({
+      type: "POST",
+      url: PDb_ajax.ajaxurl,
+      data: submission,
+      beforeSend: function() {
+        buttonParent.append(spinner);
+      },
+      success: function(html, status) {
+        var
+                newContent = $(html),
+								replacePagination = newContent.find('.pagination'),
+                replaceContent = newContent.find('.list-container').length ? newContent.find('.list-container') : newContent;
+        newContent.PDb_idFix();
+        replaceContent.find('a.obfuscate[data-email-values]').each(function() {
+          $(this).PDb_email_obfuscate();
+        });
+        container.find('.list-container').replaceWith(replaceContent);
+				 if (replacePagination.length) {
+					 if (pagination.length) {
+						 pagination.each( function(i) { 
+							 $(this).replaceWith(replacePagination.get(i));
+						 } );
+					} else {
+						container.find('.list-container').after(replacePagination);
+					}
+        }
+        spinner.remove();
+      },
+      error: function(jqXHR, status, errorThrown) {
+        console.log('Participants Database JS error status:' + status + ' error:' + errorThrown);
+      }
+    });
+  };
   $.fn.PDb_idFix = function() {
     var el = this;
     el.find('#pdb-list').addClass('list-container').removeAttr('id');
@@ -100,63 +181,15 @@ PDbListFilter = (function($) {
       $(this).val(value);
     });
   };
-  $.fn.PDb_addValue = function(submission) {
-    var
-            el = this,
-            value = encodeURI(el.val()),
-            fieldname = el.attr('name'),
-            multiple = fieldname.match(/\[\]$/);
-    fieldname = fieldname.replace('[]', ''); // now we can remove the brackets
-    if (multiple && typeof submission[fieldname] === 'string') {
-      submission[fieldname] = [submission[fieldname]];
-    }
-    if (typeof submission[fieldname] === 'object') {
-      submission[fieldname][submission[fieldname].length] = value;
-    } else {
-      submission[fieldname] = value;
-    }
-  };
   $.fn.PDb_processSubmission = function() {
+    // collect the form values and add them to the submission
     filterform.find('input:not(input[type="submit"],input[type="radio"]), select').each(function() {
-      $(this).PDb_addValue(submission);
+      add_value_to_submission($(this),submission);
     });
     filterform.find('input[type="radio"]:checked').each(function() {
-      $(this).PDb_addValue(submission);
+      add_value_to_submission($(this),submission);
     });
-    // console.log(submission);
-    var
-            target_instance = $('.pdb-list.pdb-instance-' + submission.instance_index),
-            container = target_instance.length ? target_instance : $('.pdb-list').first(),
-            buttonParent = this.parent(),
-            spinner = $(PDb_ajax.loading_indicator).clone();
-    $.ajax({
-      type: "POST",
-      url: PDb_ajax.ajaxurl,
-      data: submission,
-      beforeSend: function() {
-        buttonParent.append(spinner);
-      },
-      success: function(html, status) {
-        var
-                newContent = $(html),
-                pagination = newContent.find('.pagination').first(),
-                replaceContent = newContent.find('.list-container').length ? newContent.find('.list-container') : newContent;
-        newContent.PDb_idFix();
-        replaceContent.find('a.obfuscate[data-email-values]').each(function() {
-          $(this).PDb_email_obfuscate();
-        });
-        container.find('.list-container').replaceWith(replaceContent);
-        if (container.find('.pagination').first().length) {
-          container.find('.pagination').first().replaceWith(pagination);
-        } else {
-          container.find('.list-container').after(pagination);
-        }
-        spinner.remove();
-      },
-      error: function(jqXHR, status, errorThrown) {
-        console.log('Participants Database JS error status:' + status + ' error:' + errorThrown);
-      }
-    });
+    post_submission(this);
   };
   return {
     run: function() {
@@ -167,6 +200,7 @@ PDbListFilter = (function($) {
 
       filterform.on('click', 'input[type="submit"]', submit_search);
       remoteform.on('click', 'input[type="submit"]', submit_remote_search);
+      $('.pdb-list').on('click', '.pdb-pagination a', get_page);
     }
   };
 }(jQuery));

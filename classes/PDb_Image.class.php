@@ -12,6 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Image_Handler class
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Image extends xnau_Image_Handler {
   
   /**

@@ -1,5 +1,6 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) die;
 /*
  * class for displaying an editable record on the frontend with the [pdb_record] shortcode
  *
@@ -129,11 +130,11 @@ class PDb_Record extends PDb_Shortcode {
   /**
    * outputs a "record not found" message
    *
-   * the message is defined int he plugin settings
+   * the message is defined in the plugin settings
    */
   protected function _not_found() {
     
-    if ($this->shortcode_atts['no_record_template'] !== '') {
+    if (Participants_Db::plugin_setting_is_true('no_record_use_template')) {
 
         $this->_print_from_template();
       

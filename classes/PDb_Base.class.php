@@ -11,7 +11,7 @@
  * @version    0.8
  * @link       http://xnau.com/wordpress-plugins/
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Base {
   /**
    * set if a shortcode is called on a page
@@ -237,8 +237,7 @@ class PDb_Base {
   public static function unserialize_array($string)
   {
 
-    // is_serialized is a WordPress utility function
-    return is_serialized($string) ? unserialize($string) : $string;
+    return maybe_unserialize($string);
   }
 
   /**
@@ -963,6 +962,8 @@ class PDb_Base {
   
   /**
    * clears the shortcode session for the current page
+   * 
+   * TODO: unused method
    * 
    * shortcode sessions are used to provide asynchronous functions with the current 
    * shortcode attributes

@@ -3,7 +3,7 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 3.6
-Tested up to: 4.0
+Tested up to: 4.1.1
 Stable tag: 1.5.4.9
 License: GPLv2
 
@@ -83,7 +83,7 @@ This plugin is fully compliant with WordPress Internationalization standards and
 
 * French: Dominique Chapelle
 
-* Italian: Mario Conte
+* Italian: Michele Balderi
 
 * Dutch: At Voogt [www.wederzijdsgenoegen.nl](http://www.wederzijdsgenoegen.nl)
 
@@ -104,6 +104,8 @@ This plugin is fully compliant with WordPress Internationalization standards and
 * Spanish: Cristhofer Chávez
 
 * German: Christian von Bock
+
+* Danish: Bo Hejberg Nielsen
 
 If you are multi-lingual and feel like contributing a translation, please contact me at: support@xnau.com.
 
@@ -148,7 +150,7 @@ Their record is added to the database with the information provided in the signu
 
 = What do you mean by a users record edit page? =
 
-This form appears on the page where you have placed the `[pdb_record]` shortcode. It is an expanded version of the signup form.
+This form appears on the page where you have placed the `[pdb_record]` shortcode. It is another form where the record can be edited on the frontend.
 
 An individual record can be edited on the frontend of your website by someone who has the private link to that record. The purpose here is to let people maintain their own records. It's also possible to put things like survey questions in the form so you can get feedback from people. You have complete control over what fields appear on this form. Fields can be designated as showing up on the signup form, on the frontend user's form, and on the backend admin form.
 

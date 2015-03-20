@@ -163,7 +163,6 @@ this is a more detailed template showing how the parts of the display can be cus
       <tr>
         <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
 
-          <?php $value = $this->field->value; // we do this just to make the variable name shorter ?>
           <td>
           	<?php echo PDb_FormElement::get_field_value_display($this->field); ?>
             </td>

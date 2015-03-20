@@ -19,6 +19,7 @@
  * @version    Release: 1.5.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_List_Admin {
 
   /**
@@ -134,7 +135,7 @@ class PDb_List_Admin {
 
     self::setup_display_columns();
 
-    self::$sortables = Participants_Db::get_sortables(self::get_display_columns());
+    self::$sortables = Participants_Db::get_sortables();
 
     // set up the basic values
     self::$default_filter = array(

@@ -17,6 +17,8 @@
  * @version    0.6
  * @link       http://xnau.com/wordpress-plugins/
  */
+
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Template {
   
   /**
@@ -247,12 +249,14 @@ class PDb_Template {
   /**
    * checks a field for a value to show
    * 
-   * @param string $name name of the field to check
+   * @param string $name names of the field to check
+
    * @return bool true if field value is non-empty
    */
   public function has_content($name) {
+    
   	$value = $this->fields->{$name}->value;
-    return !empty($value) or $value !== 0;
+    return strlen($value) !== 0;
   }
   /**
    * determines if a group has any fields with non-empty content
@@ -343,15 +347,7 @@ class PDb_Template {
    * @param string $href
    */
   private function _set_link($name, $href) {
-    $linkable_field_types = array(
-        'text-line',
-        'image-upload',
-        'file-upload',
-        'dropdown',
-        'checkbox',
-        'radio',
-        );
-    if (in_array($this->fields->{$name}->form_element, $linkable_field_types)) {
+    if (PDb_FormElement::field_is_linkable($this->fields->{$name})) {
     switch ($this->base_type) {
       case 'PDb_List':
         $this->fields->{$name}->link = $href;

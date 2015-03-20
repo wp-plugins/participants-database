@@ -37,6 +37,7 @@
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 /*
 
     This program is free software; you can redistribute it and/or modify
@@ -751,9 +752,9 @@ abstract class xnau_FormElement {
    */
   protected function _multi_checkbox() {
 
-		$this->value = (array) $this->value;
+		$this->value = (array) maybe_unserialize($this->value);
 
-    if (!isset($this->attributes['readonly'])) {
+//    if (!isset($this->attributes['readonly'])) {
 
     $this->_addline( '<div class="multicheckbox"' . ( $this->container_id ? ' id="' . $this->container_id . '"' : '' ) . '>' );
     $this->indent++;
@@ -761,9 +762,9 @@ abstract class xnau_FormElement {
     $this->_add_checkbox_series();
 
     $this->_addline('</div>', -1);
-    } else {
-      $this->_readonly_multi();
-    }
+//    } else {
+//      $this->_readonly_multi();
+//    }
   }
   
   /**
@@ -778,7 +779,7 @@ abstract class xnau_FormElement {
     if ( $type == 'radio' ) {
       $this->value = is_array($this->value) ? current($this->value) : $this->value;
     } else {
-      $this->value = (array) $this->value;
+      $this->value = (array) maybe_unserialize($this->value);
       if ( ! isset( $this->value['other'] ) ) $this->value['other'] = '';
     }
     
@@ -825,11 +826,11 @@ abstract class xnau_FormElement {
    */
   protected function _select_other_multi()
   {
-    if (!isset($this->attributes['readonly'])) {
+//    if (!isset($this->attributes['readonly'])) {
     $this->_select_other('checkbox');
-    } else {
-      $this->_readonly_multi();
-    }
+//    } else {
+//      $this->_readonly_multi();
+//    }
   }
 	
 	/**
@@ -845,7 +846,7 @@ abstract class xnau_FormElement {
     $link_placeholder = '(URL)';
     $linktext_placeholder = $this->i18n['linktext'];
 		
-    $parts = is_serialized( $this->value ) ? unserialize( $this->value ) : (array) $this->value;
+    $parts = (array) maybe_unserialize($this->value);
 
     // if the value contains only a URL, the linktext and URL are made the same
     // if the value is not a URL, only the linked text is used
@@ -1015,6 +1016,11 @@ abstract class xnau_FormElement {
       $this->attributes['type'] = $type;
     }
 
+    if (in_array($type, array('checkbox','radio','multi-checkbox','select-other')) && isset($this->attributes['readonly'])) {
+      $this->attributes['disabled'] = 'disabled';
+      unset($this->attributes['readonly']);
+    }
+
     $html = '<input name="' . $this->name . ( $this->group ? '[]' : '' ) . '"' . $size . ( false !== $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . '  value="' . $value . '" />';
     // unset the type attribute so it doesn't carry over to the next element
     unset($this->attributes['type']);
@@ -1030,6 +1036,8 @@ abstract class xnau_FormElement {
    */
   protected function _add_input_series($type = 'checkbox', $otherlabel = false)
   {
+    
+    if (empty($this->options)) return;
     
     // checkboxes are grouped, radios are not
     $this->group = $type === 'checkbox';
@@ -1129,6 +1137,7 @@ abstract class xnau_FormElement {
    */
   protected function _add_option_series($otherlabel = false)
   {
+    if (empty($this->options)) return;
     
     foreach ($this->_make_assoc($this->options) as $key => $value) {
       
@@ -1294,7 +1303,7 @@ abstract class xnau_FormElement {
   /**
    * returns a select state for a form field
    *
-   * @param mixed  $element_value  the set value of the element that we compare against
+   * @param mixed  $element_value  the set values of the element that we compare against
    * @param string $new_value      the selected value of the field
    * 
    * @param string $attribute      the keyword for the select state of the form element
@@ -1306,6 +1315,7 @@ abstract class xnau_FormElement {
    */
   protected function _set_selected($element_value, $new_value, $attribute = 'selected', $state = true)
   {
+
 
     if (is_array($new_value)) { 
       return $this->_set_multi_selected($element_value, $new_value, $attribute, $state);
@@ -1532,17 +1542,17 @@ abstract class xnau_FormElement {
     // collapse an array
     if (is_array($test)) $test = implode('', $test);
     switch (true) {
-      case $test === '0000-00-00 00:00:00':
-      case $test == '0':
-      case $test === 0:
-      case $test === '':
-      case $test === null:
-        return true;
-        break;
       case $test === false:
       case $test === true:
       default:
         return false;
+      case $test === '0000-00-00 00:00:00':
+      case strlen($test) === 0:
+//      case $test == '0': // zero shuld be a valid value generally
+//      case $test === 0:
+//      case $test === '':
+      case $test === null:
+        return true;
     }
   }
   

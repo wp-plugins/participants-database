@@ -6,6 +6,7 @@
  * this uses the generic plugin settings class to build the settings specific to
  * the plugin
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Settings extends xnau_Plugin_Settings {
 
   function __construct() {
@@ -692,6 +693,19 @@ class PDb_Settings extends xnau_Plugin_Settings {
     );
 
     $this->plugin_settings[] = array(
+        'name' => 'no_record_use_template',
+        'title' => __('Use Template for No Record Message', 'participants-database'),
+        'group' => 'pdb-record',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('If no record is found the record template is used for the display.', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        )
+    );
+
+    $this->plugin_settings[] = array(
         'name' => 'send_record_update_notify_email',
         'title' => __('Send Record Form Update Notification Email', 'participants-database'),
         'group' => 'pdb-record',
@@ -928,7 +942,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'options' => array
             (
             'type' => 'checkbox',
-            'help_text' => __('Remove line breaks from all shortcode ouput.', 'participants-database'),
+            'help_text' => __('Remove line breaks from all plugin shortcode ouput.', 'participants-database'),
             'value' => 0,
             'options' => array(1, 0),
         ),
@@ -1167,7 +1181,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     foreach ($columns as $column) {
 
-      if (in_array($column->form_element, array('text-line', 'image-upload', 'checkbox', 'placeholder'))) {
+      if (PDb_FormElement::field_is_linkable($column)) {
         $key = sprintf('%s (%s)', $column->title, $column->name);
         $columnlist[$key] = $column->name;
       }
@@ -1177,7 +1191,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
   }
 
   /**
-   * this provides a set of fields to select from
+   * this provides a set of fields that can be used to identify a record
    * 
    * @param bool $null if true include a null value
    * @global object $wpdb
@@ -1199,8 +1213,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
     $columns = $wpdb->get_results($sql, OBJECT_K);
 
     foreach ($columns as $column) {
-          $pattern = isset($columnlist[$column->title]) ? '%s (%s)' : '%s';
-          $key = sprintf($pattern, $column->title, $column->name);
+            $key = sprintf('%s (%s)', $column->title, $column->name);
         $columnlist[$key] = $column->name;
     }
 

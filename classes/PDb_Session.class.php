@@ -14,8 +14,9 @@
  * 
  * based on EDD_Session class by Pippin Williamson
  * https://github.com/easydigitaldownloads/Easy-Digital-Downloads/blob/master/includes/class-edd-session.php
+ * 
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Session {
 
 	/**
@@ -81,11 +82,7 @@ class PDb_Session {
 				
 		}
 
-		if ( empty( $this->session ) && ! $this->use_php_sessions ) {
 			add_action( 'plugins_loaded', array( $this, 'init' ), -1 );
-		} else {
-			add_action( 'plugins_loaded', array( $this, 'init' ), -1 ); /// formerly 'init'
-		}
 	}
 
 
