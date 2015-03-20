@@ -18,7 +18,7 @@
  * line of the CSV can be read from the object for storage or other use.
  *
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 abstract class xnau_CSV_Import {
 
   /**
@@ -288,10 +288,9 @@ csv line= '.print_r( $csv_line, true ) );
 
     $csv_text = file_get_contents($csv_file);
 
-    $single_quotes = substr_count($csv_text, "'");
-    $double_quotes = substr_count($csv_text, '"');
+    $assay = preg_match( "/([\"\'])([^\1]+)\1,/U", $csv_text, $matches);
 
-    return $single_quotes >= $double_quotes ? "'" : '"';
+    return isset($matches[1]) ? $matches[1] : '"';
   }
 
   /**
@@ -315,7 +314,8 @@ csv line= '.print_r( $csv_line, true ) );
     // sort the array by the number of hits
     arsort($result_array);
     // the most abundant character is chosen as most likely
-    return(key($result_array));
+    // falls back to comma if no clear winner emerges
+    return current($result_array) > 1 ? key($result_array) : ',';
   }
 
   /**

@@ -11,6 +11,7 @@
  * @version    Release: 1.5.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 if (!Participants_Db::current_user_has_plugin_role('admin'))
   exit;
 

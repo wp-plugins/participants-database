@@ -35,8 +35,8 @@ this is the default template which formats the list of records as a table
         ?>
 			
       		<?php $this->search_form() ?>
-        </div>
         
+      </div>
       </div>
     <?php endif ?>
     <?php if ( $filter_mode == 'sort' || $filter_mode == 'both' ) : ?>

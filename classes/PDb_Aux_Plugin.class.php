@@ -15,6 +15,7 @@
  * @version    Release: 3.2
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 if (!class_exists('PDb_Aux_Plugin')) :
 class PDb_Aux_Plugin {
 
@@ -90,7 +91,6 @@ class PDb_Aux_Plugin {
 
   function __construct($subclass, $plugin_file)
   {
-
     $this->plugin_path = plugin_basename($plugin_file);
       $this->plugin_data = get_plugin_data($plugin_file);
       $this->aux_plugin_settings = $this->aux_plugin_name;
@@ -170,7 +170,7 @@ class PDb_Aux_Plugin {
     if ($this->settings_API_status) {
 			// create the submenu page
 			add_submenu_page(
-							Participants_Db::PLUGIN_NAME, 
+							Participants_Db::$plugin_page, // Participants_Db::PLUGIN_NAME, 
 							$this->aux_plugin_title . ' Settings', 
 							$this->aux_plugin_title, 
 							'manage_options', 

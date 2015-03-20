@@ -12,7 +12,7 @@
  *
  * we're not using WP's dbDelta for updates because it's too fussy
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Init
 {
 

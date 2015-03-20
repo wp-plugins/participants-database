@@ -7,10 +7,11 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2013 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.5
+ * @version    Release: 1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_FormElement extends xnau_FormElement {
   
   /**
@@ -147,9 +148,18 @@ class PDb_FormElement extends xnau_FormElement {
     
     $return = '';
     
-    
+    /**
+     * filter: pdb-before_display_form_element
+     * 
+     * @since 1.6
+     * 
+     * @param string $return the value display
+     * @param object $field the field object
+     * 
+     * formerly, this was set as "pdb-before_display_field" and included a more limited set of arguments
+     */
     if (has_filter(Participants_Db::$prefix . 'before_display_form_element')) {
-            $return = Participants_Db::set_filter('before_display_field', $return, $field);
+            $return = Participants_Db::set_filter('before_display_form_element', $return, $field);
     } elseif (has_filter(Participants_Db::$prefix . 'before_display_field')) {
       // provided for backward-compatibility
       $return = Participants_Db::set_filter('before_display_field', $return, $field->value, $field->form_element);
@@ -373,6 +383,30 @@ class PDb_FormElement extends xnau_FormElement {
 	 */ 
   
   /**
+   * sets up the null select for dropdown elements
+   */
+  protected function _set_null_select() {
+    
+    $field = Participants_Db::get_column($this->name);
+    
+    $default = '';
+    if ($field) {
+      $default = $field->default;
+    }
+    
+    /*
+     * this is to add a blank mull select option if there is no default, no defined 
+     * null select and no set field value
+     */
+    if ( self::is_empty($default) && ! isset($this->options['null_select']) && self::is_empty($this->value) ) {
+      $this->options['null_select'] = '';
+    }
+    
+    parent::_set_null_select();
+    
+  }
+  
+  /**
    * outputs a link (HTML anchor tag) in specified format if enabled by "make_links"
    * option
    * 
@@ -395,7 +429,6 @@ class PDb_FormElement extends xnau_FormElement {
 
     // clean up the provided string
    $URI = str_replace('mailto:', '', trim(strip_tags($field->value)));
-
 
     if (isset($field->link) && !empty($field->link)) {
       /*
@@ -522,12 +555,12 @@ class PDb_FormElement extends xnau_FormElement {
     if (isset(Participants_Db::$fields[$fieldname])) {
       $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
     if (is_array($options_array)) {
-      foreach ($options_array as $index => $option_value) {
-        if (!is_string($index) or $index == 'other') {
+      foreach ($options_array as $option_title => $option_value) {
+        if (!is_string($option_title) or $option_title == 'other') {
           // we use the stored value
         } elseif ($option_value == $value) {
           // grab the option title
-          return $index;
+          return stripslashes($option_title);
         }
       }
     }
@@ -563,7 +596,7 @@ class PDb_FormElement extends xnau_FormElement {
    */
   public static function is_displayable($string) {
     
-    return is_string($string) && $string !== '';
+    return strlen($string) > 0;
   }
  
   /*
@@ -596,6 +629,27 @@ class PDb_FormElement extends xnau_FormElement {
      * it is set
      */
     return Participants_Db::set_filter('set_form_element_types', $types);
+  }
+  
+  /**
+   * determines if a field type is "linkable"
+   * 
+   * meaning it is displayed as a string that can be wrapped in an anchor tag
+   * 
+   * @param object $field the field object
+   * @return bool true if the type is linkable
+   */
+  public static function field_is_linkable($field) {
+    $linkable = in_array($field->form_element, array(
+              'text-line',
+              'image-upload',
+              'file-upload',
+              'dropdown',
+              'checkbox',
+              'radio',
+              )
+            );
+   return Participants_Db::set_filter('field_is_linkable', $linkable, $field->form_element);
   }
   
 } //class

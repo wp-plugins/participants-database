@@ -14,7 +14,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    PDb_FormElement class
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 class FormElement {
   /**
    * prints a form element

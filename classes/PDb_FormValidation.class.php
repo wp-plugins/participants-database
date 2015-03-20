@@ -14,7 +14,7 @@
  * @version    Release: 1.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_FormValidation extends xnau_FormValidation {
   
 

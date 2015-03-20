@@ -11,7 +11,7 @@
   /*
    * as of version 1.6 this template can handle the display when no record is found
    * 
-   * the "no_record_template" attribute must be set to true
+   * 
    */
   if (!empty($this->participant_id)) : 
     

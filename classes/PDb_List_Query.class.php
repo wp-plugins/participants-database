@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    1.0
+ * @version    1.2
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Participants_Db class
  * 
@@ -17,6 +17,7 @@
  * each overriding the next on a field-by-field basis.
  * 
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_List_Query {
   /**
    * @var array of where clause sets
@@ -25,7 +26,7 @@ class PDb_List_Query {
    * 
    * array( $field_name => array(  List_Query_Filter object, ... ), ... )
    */
-  private $where_clauses = array();
+  private $subclauses = array();
   /**
    * @var array of sort terms
    */
@@ -69,7 +70,7 @@ class PDb_List_Query {
    * 
    * @var string name of the query session value
    */
-  private $query_session;
+  static $query_session = 'list_query';
   /**
    * @var bool true if current query is a search result
    */
@@ -84,10 +85,16 @@ class PDb_List_Query {
    */
   private $clause_index = 0;
   /**
+   * holds the instance index value of the instantiating list instance
+   */
+  private $list_instance;
+  /**
    * @var object the instantiating List class instance
    */
   /**
    * construct the object
+   * 
+   * @param PDb_List object $List
    * 
    * @param array  $shortcode_atts array of shortcode attributes
    *                 filter      a shortcode filter string
@@ -98,15 +105,15 @@ class PDb_List_Query {
    * @param array  $columns      an array of column names to use in the SELECT statement
    * @param array  $i18n         translation strings from the List class
    */
-  function __construct($shortcode_atts, $columns = false, $i18n)
+  function __construct(PDb_List $List)
   {
-    $this->query_session = 'list_query';
+    $this->list_instance = $List->instance_index;
+    $this->i18n = $List->i18n;
     $this->_reset_filters();
-    $this->set_sort($shortcode_atts['orderby'], $shortcode_atts['order']);
-    $this->_set_columns($columns);
-    $this->suppress = filter_var($shortcode_atts['suppress'], FILTER_VALIDATE_BOOLEAN);
-    $this->_add_filter_from_shortcode_filter($shortcode_atts['filter']);
-    $this->i18n = $i18n;
+    $this->set_sort($List->shortcode_atts['orderby'], $List->shortcode_atts['order']);
+    $this->_set_columns($List->display_columns);
+    $this->suppress = filter_var($List->shortcode_atts['suppress'], FILTER_VALIDATE_BOOLEAN);
+    $this->_add_filter_from_shortcode_filter($List->shortcode_atts['filter']);
     /*
      * at this point, the object has been instantiated with the properties provided 
      * in the shortcode
@@ -132,7 +139,7 @@ class PDb_List_Query {
      */
     if (!empty($this->get_input[Participants_Db::$list_page])) {
       $this->_restore_query_session();
-    } elseif (filter_input(INPUT_POST, 'action') === 'pdb_list_filter') {
+    } elseif (filter_input(INPUT_POST, 'action') === 'pdb_list_filter' && $this->is_search_result) {
       $this->_save_query_session();
     }
   }
@@ -163,7 +170,7 @@ class PDb_List_Query {
    * @return string|bool key string for the type of error or false if no error
    */
   public function get_search_error() {
-    if ($this->is_search_result() && ($this->post_input['submit'] === $this->i18n['sort'] || $this->post_input['submit'] === $this->i18n['search'])) {
+    if ( $this->is_search_result() && $this->post_input['submit'] === 'search' ) {
       if (empty($this->post_input['search_field'])) {
         $this->is_search_result(false);
         return 'search';
@@ -187,7 +194,7 @@ class PDb_List_Query {
     $ascdesc = $this->_to_array($ascdesc);
     for ($i = 0;$i < count($fields);$i++) {
       if (!empty($fields[$i])) {
-        $this->sort[] = array(
+        $this->sort[$fields[$i]] = array(
             'field' => $fields[$i],
             'ascdesc' => (strtolower($ascdesc[$i]) === 'asc' ? 'ASC' : 'DESC')
             );
@@ -214,7 +221,8 @@ class PDb_List_Query {
         'search_field' => current($this->filter['fields']),
         'search_term' => current($this->filter['values']),
         'search_fields' => $this->filter['fields'],
-        'search_values' => $this->filter['values']
+        'search_values' => $this->filter['values'],
+        'sort_fields' => $this->sort,
     );
     if (!$key) return $filter;
     else return isset($filter[$key]) ? $filter[$key] : '';
@@ -248,8 +256,11 @@ class PDb_List_Query {
    * @param string $field_name
    * @return array|bool of List_Query_Filter objects, false if none are defined
    */
-  public function get_field_filters($field_name) {
-    return isset($this->where_clauses[$field_name]) ? $this->where_clauses[$field_name] : false;
+  public function get_field_filters($field_name = false) {
+    if ($field_name) {
+      return isset($this->subclauses[$field_name]) ? $this->subclauses[$field_name] : false;
+    }
+    return isset($this->subclauses) ? $this->subclauses : false;
   }
   /**
    * adds a filter to a field
@@ -276,10 +287,10 @@ class PDb_List_Query {
    * @return null
    */
   public function clear_background_clauses($field) {
-    if (isset($this->where_clauses[$field]) && is_array($this->where_clauses[$field])) {
-    foreach ($this->where_clauses[$field] as $index => $clause) {
+    if (isset($this->subclauses[$field]) && is_array($this->subclauses[$field])) {
+      foreach ($this->subclauses[$field] as $index => $clause) {
       if ($clause->is_shortcode()) {
-        unset($this->where_clauses[$field][$index]);
+          unset($this->subclauses[$field][$index]);
       }
     }
   }
@@ -292,7 +303,7 @@ class PDb_List_Query {
   private function _add_filter_from_get() {
     $this->get_input = filter_input_array(INPUT_GET, self::single_search_input_filter());
     if (isset($this->get_input)) {
-      $this->_add_filter_from_input($this->get_input);
+      $this->_add_filter_from_input($this->_prepare_submit_value($this->get_input));
     }
   }
   /**
@@ -303,7 +314,7 @@ class PDb_List_Query {
   private function _add_filter_from_post() {
     // look for the identifier of the list search submission
     if (filter_input(INPUT_POST, 'action') === 'pdb_list_filter') {
-      if (is_array($_POST['search_field'])) {
+      if (isset($_POST['search_field']) && is_array($_POST['search_field'])) {
         // process a multi search
         $this->post_input = filter_input_array(INPUT_POST, self::multi_search_input_filter());
       } else {
@@ -312,16 +323,17 @@ class PDb_List_Query {
           $this->post_input['search_field'] = '';
         }
       }
-      // accomodate several different submit button names
-      $this->_consolidate_submit_names();
+      // accomodate several different submit button names and un-translate to get key values
+      $this->post_input = $this->_prepare_submit_value($this->post_input);
       switch ($this->post_input['submit']) {
-        case $this->i18n['clear']:
+        case 'clear':
           $_GET[Participants_Db::$list_page] = 1;
           $this->is_search_result = false;
           $this->_clear_query_session();
           break;
-        case $this->i18n['search']:
-        case $this->i18n['sort']:
+        case 'search':
+        case 'sort':
+        case 'page':
           $this->_add_filter_from_input($this->post_input);
           break;
       }
@@ -398,7 +410,7 @@ class PDb_List_Query {
    */
   private function _build_clause_sequence() {
     $sequence = array();
-    foreach ($this->where_clauses as $field_clauses) {
+    foreach ($this->subclauses as $field_clauses) {
       foreach ($field_clauses as $clause) {
         $sequence[$clause->index()] = $clause;
       }
@@ -460,29 +472,32 @@ class PDb_List_Query {
    * @return null
    */
   private function  _add_filter_from_input($input) {
-    
     $this->_reset_filters();
-    if (empty($input['sortstring'])) {
-      $input['sortstring'] = $input['sortBy'];
-      $input['orderstring'] = $input['ascdesc'];
-    }
-    if (is_array($input['search_field'])) {
-      for ($i = 0;$i < count($input['search_field']);$i++) {
-        $search_field = $input['search_field'][$i];
-        $this->_remove_field_filters($search_field);
-        $this->_add_single_statement($search_field, $input['operator'][$i], $input['value'][$i]);
-      }
-      $this->is_search_result = true;
-    } elseif (!empty($input['search_field'])) {
-      $this->_remove_field_filters($input['search_field']);
-      $this->_add_single_statement($input['search_field'], $input['operator'], $input['value']);
-      $this->is_search_result = true;
-    } elseif ($input['submit'] !== $this->i18n['clear'] && empty($input['value'])) {
-      // we set this to true even for empty searches
-      $this->is_search_result = true;
-    }
-    if (!empty($input['sortstring'])) {
-      $this->set_sort($input['sortstring'], $input['orderstring']);
+    if ($input['target_instance'] === $this->list_instance) {
+    
+			if (empty($input['sortstring'])) {
+				$input['sortstring'] = $input['sortBy'];
+				$input['orderstring'] = $input['ascdesc'];
+			}
+			if (is_array($input['search_field'])) {
+				for ($i = 0;$i < count($input['search_field']);$i++) {
+					$search_field = $input['search_field'][$i];
+					$this->_remove_field_filters($search_field);
+					$this->_add_single_statement($search_field, $input['operator'][$i], $input['value'][$i]);
+				}
+				$this->is_search_result = true;
+			} elseif (!empty($input['search_field'])) {
+				$this->_remove_field_filters($input['search_field']);
+				$this->_add_single_statement($input['search_field'], $input['operator'], $input['value']);
+				$this->is_search_result = true;
+			} elseif ($input['submit'] !== 'clear' && empty($input['value'])) {
+				// we set this to true even for empty searches
+				$this->is_search_result = true;
+			}
+			if (!empty($input['sortstring'])) {
+				$this->set_sort($input['sortstring'], $input['orderstring']);
+			}
+      $this->_save_query_session();
     }
   }
   /**
@@ -491,7 +506,7 @@ class PDb_List_Query {
    * @param string $column
    */
   private function _remove_field_filters($column) {
-    unset($this->where_clauses[$column]);
+    unset($this->subclauses[$column]);
   }
   /**
    * sets the is search value
@@ -499,7 +514,7 @@ class PDb_List_Query {
    * @return null
    */
   private function _set_search_status() {
-    if ($this->post_input['submit'] == $this->i18n['search'] || !empty($this->get_input['search_field'])) {
+    if ($this->post_input['submit'] == 'search' || !empty($this->get_input['search_field'])) {
         $this->is_search_result = true;
     } else {
         $this->is_search_result = false;
@@ -541,7 +556,7 @@ class PDb_List_Query {
    */
   private function _setup_filter_array() {
     $this->_reset_filters();
-    foreach($this->where_clauses as $field_name => $filters) {
+    foreach($this->subclauses as $field_name => $filters) {
       foreach($filters as $filter) {
         /*
          * include the filter if it is a search filter
@@ -759,7 +774,7 @@ class PDb_List_Query {
     if ($statement) {
       $filter->update_parameters(array('statement' => $statement));
       
-      $this->where_clauses[$column][] = $filter;
+      $this->subclauses[$column][] = $filter;
     }
   }
   
@@ -770,7 +785,7 @@ class PDb_List_Query {
    */
   private function _set_up_clauses() {
     $count = 0;
-    foreach($this->where_clauses as $field) {
+    foreach($this->subclauses as $field) {
       if (is_array($field)) {
         foreach ($field as $clause) {
           $count++;
@@ -821,8 +836,8 @@ class PDb_List_Query {
   {
     $this->_clear_query_session();
     
-    Participants_Db::$session->set($this->query_session, array(
-        'where_clauses' => serialize($this->where_clauses),
+    Participants_Db::$session->set($this->query_session_name(), array(
+        'where_clauses' => serialize($this->subclauses),
         'sort' => serialize($this->sort),
         'clause_count' => $this->clause_count,
         'is_search' => $this->is_search_result
@@ -834,14 +849,25 @@ class PDb_List_Query {
   public function save_query_session() {
     $this->_save_query_session();
   }
-
+  /**
+   * sets the query session
+   * 
+   * this is used to restore an instance from another target list
+   * 
+   * @param int $index the list instance to restore the query session from
+   * 
+   * @return bool false if no query session is found matching the supplied index
+   */
+  public function set_query_session($index) {
+    return $this->_restore_query_session();
+  }
   /**
    * clears the query session
    * 
    * @return null
    */
   private function _clear_query_session() {
-   Participants_Db::$session->clear($this->query_session);
+   Participants_Db::$session->clear($this->query_session_name());
   }
   /**
    * restores the query session
@@ -850,14 +876,14 @@ class PDb_List_Query {
    */
   private function _restore_query_session() {
     
-    $data = Participants_Db::$session->get($this->query_session);
+    $data = Participants_Db::$session->get($this->query_session_name());
     
     $where_clauses = maybe_unserialize($data['where_clauses']);
     $sort = maybe_unserialize($data['sort']);
     $this->clause_count = $data['clause_count'];
     $this->is_search_result = $data['is_search'];
     if (is_array($where_clauses)) {
-      $this->where_clauses = $where_clauses;
+      $this->subclauses = $where_clauses;
     } else return false;
     if (is_array($sort)) {
       $this->sort = $sort;
@@ -865,18 +891,50 @@ class PDb_List_Query {
     return true;
   }
   /**
-   * allows for the use of several different submit button names
+   * adds the instance index value to the query session name
    * 
-   * @retun null
+   * this is so multiple query session scan be stored and retrieved according to 
+   * the instance index
+   * 
+   * @param int $index the index value if not using current instance
+   * 
+   * @return string
    */
-  private function _consolidate_submit_names() {
-    if (!empty($this->post_input['submit_button'])) {
-      $this->post_input['submit'] = $this->post_input['submit_button'];
-    } elseif (!empty($this->post_input['submit-buttton'])) {
-      $this->post_input['submit'] = $this->post_input['submit-button'];
+  private function query_session_name($index = '') {
+    return self::$query_session . empty($index) ? $this->list_instance : $index;
+  }
+  /**
+   * prepares a submission input array for use as a filter configuration
+   * 
+   * allows for the use of several different submit button names
+   * converts translated submit button value to key string
+   * 
+   * @param array $input the input array
+   * @retun array
+   */
+  private function _prepare_submit_value($input) {
+    $submit = $input['submit'];
+    if (!empty($input['submit_button'])) {
+      $submit = $input['submit_button'];
+    } elseif (!empty($input['submit-button'])) {
+      $submit = $input['submit-button'];
     }
-    unset($this->post_input['submit-button']);
-    unset($this->post_input['submit_button']);
+    unset($input['submit-button'], $input['submit_button']);
+    $input['submit'] = $this->untranslate_value($submit);
+    return $input;
+  }
+  /**
+   * untranslates the submit value
+   * 
+   * @param string $value the submit value
+   * 
+   * @return string the key or untranslated value
+   */
+  private function untranslate_value($value) {
+    if ($key = array_search($value, $this->i18n)) {
+      $value = $key;
+    }
+    return $value;
   }
   /**
    * sanitizes the operator value from a POST input
@@ -921,7 +979,7 @@ class PDb_List_Query {
    * @return array
    */
   public static function single_search_input_filter() {
-    return array(
+    return array_merge(array(
         'value' => array(
             'filter' => FILTER_SANITIZE_STRING,
             'flags' => FILTER_FLAG_NO_ENCODE_QUOTES
@@ -931,14 +989,9 @@ class PDb_List_Query {
             'options' => array( __CLASS__, 'sanitize_search_field')
         ),
         'operator' => FILTER_SANITIZE_STRING,
-        'submit' => FILTER_SANITIZE_STRING,
-        'submit_button' => FILTER_SANITIZE_STRING,
-        'submit-button' => FILTER_SANITIZE_STRING,
         'sortstring' => FILTER_SANITIZE_STRING,
         'orderstring' => FILTER_SANITIZE_STRING,
-        'ascdesc' => FILTER_SANITIZE_STRING,
-        'sortBy' => FILTER_SANITIZE_STRING,
-        Participants_Db::$list_page => FILTER_VALIDATE_INT,
+        ), self::_common_search_input_filter()
     );
   }
   /**
@@ -951,17 +1004,27 @@ class PDb_List_Query {
             'filter' => FILTER_SANITIZE_STRING,
             'flags' => FILTER_FLAG_NO_ENCODE_QUOTES
         );
-    return array(
+    return array_merge(array(
         'value' => $array_filter,
         'search_field' => $array_filter,
         'operator' => $array_filter,
         'logic' => $array_filter,
+        ), self::_common_search_input_filter()
+    );
+  }
+  /**
+   * supplies a common input filter array
+   * 
+   */
+  private static function _common_search_input_filter() {
+    return array(
         'submit' => FILTER_SANITIZE_STRING,
         'submit_button' => FILTER_SANITIZE_STRING,
         'submit-button' => FILTER_SANITIZE_STRING,
         'ascdesc' => FILTER_SANITIZE_STRING,
         'sortBy' => FILTER_SANITIZE_STRING,
         Participants_Db::$list_page => FILTER_VALIDATE_INT,  
+        'target_instance' => FILTER_VALIDATE_INT,
     );
   }
   /**

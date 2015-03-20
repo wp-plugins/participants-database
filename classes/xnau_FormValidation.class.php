@@ -15,6 +15,7 @@
  * @version    Release: 1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class xnau_FormValidation {
 
   // this array collects validation errors for each field

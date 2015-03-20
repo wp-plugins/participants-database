@@ -13,6 +13,7 @@
  * @depends    Participants_Db class, CSV_Import
  *
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_CSV_Import extends xnau_CSV_Import {
   
   function __construct( $file_field_name ) {

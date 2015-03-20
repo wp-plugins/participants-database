@@ -16,6 +16,7 @@
  *          with methods for setting the class of the current page indicator and an option
  *          to wrap the current page indicator numeral with a dummy anchor tag
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Pagination {
 
   /**
@@ -331,8 +332,8 @@ class PDb_Pagination {
       }
     }
 
-    $button_pattern = '<' . $button_wrap_tag . ' class="%2$s"><a href="%1$s">%3$s</a></' . $button_wrap_tag . '>';
-    $glyph_pattern = '<' . $button_wrap_tag . ' class="%2$s"><a title="%3$s" href="%1$s"><span class="glyphicon glyphicon-%4$s"></span></a></' . $button_wrap_tag . '>';
+    $button_pattern = '<' . $button_wrap_tag . ' class="%2$s"><a href="%1$s" data-page="%4$s" >%3$s</a></' . $button_wrap_tag . '>';
+    $glyph_pattern = '<' . $button_wrap_tag . ' class="%2$s"><a title="%3$s" href="%1$s" data-page="%5$s" ><span class="glyphicon glyphicon-%4$s"></span></a></' . $button_wrap_tag . '>';
     $disabled_pattern = $this->anchor_wrap ?
             '<' . $button_wrap_tag . ' class="%2$s"><a href="#">%3$s</a></' . $button_wrap_tag . '> ' :
             '<' . $button_wrap_tag . ' class="%2$s"><span>%3$s</span></' . $button_wrap_tag . '> ';
@@ -348,7 +349,8 @@ class PDb_Pagination {
           $this->_sprintf($link, 1),
           ($currentPage > 1 ? 'firstpage' : $this->disabled_class),
           __('First', 'participants-database'),
-          'first-page'
+          'first-page',
+          1
 );
     }
 
@@ -358,7 +360,8 @@ class PDb_Pagination {
             $this->_sprintf($link, $currentPage - 1), 
             ($currentPage > 1 ? 'nextpage' : $this->disabled_class), 
             __('Previous', 'participants-database'),
-            'previous-page'
+            'previous-page',
+            $currentPage - 1
     );
 
     for ($i = $loopStart; $i <= $loopEnd; $i++) {
@@ -367,6 +370,7 @@ class PDb_Pagination {
               ($i == $currentPage ? $disabled_pattern : $button_pattern), 
               $this->_sprintf($link, $i), 
               ($i == $currentPage ? $this->current_page_class : ''), 
+              $i,
               $i
       );
     }
@@ -375,7 +379,8 @@ class PDb_Pagination {
             $this->_sprintf($link, $currentPage + 1), 
             ($currentPage < $totalPages ? 'nextpage' : $this->disabled_class), 
             __('Next', 'participants-database'),
-            'next-page'
+            'next-page',
+            $currentPage + 1
     );
 
     if ($this->first_last) {
@@ -387,7 +392,8 @@ class PDb_Pagination {
           $this->_sprintf($link, $totalPages),
           ($currentPage < $totalPages ? 'lastpage' : $this->disabled_class),
           __('Last', 'participants-database'),
-          'last-page'
+          'last-page',
+          $totalPages
 );
     }
 

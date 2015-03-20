@@ -13,7 +13,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    xnau_FormElement class, Shortcode class
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Signup extends PDb_Shortcode {
   /**
    *
@@ -108,20 +108,30 @@ class PDb_Signup extends PDb_Shortcode {
     );
     
     $this->participant_id = Participants_Db::$session->get('pdbid');
+    $form_status = $this->get_form_status();
 
+    if ($this->participant_id === false) {
     if (filter_input(INPUT_GET, 'm') === 'r' || $shortcode_atts['module'] == 'retrieve') {
       /*
        * we're proceesing a link retrieve request
        */
       $shortcode_atts['module'] = 'retrieve';
-    } elseif ($this->participant_id !== false) {
+      }
+      if ($shortcode_atts['module'] == 'signup') {
+        /*
+         * we're showing the signup form
+         */
+        $this->participant_values = Participants_Db::get_default_record();
+      }
+    } else {
+      
       /*
        * if we arrive here, the form has been submitted and is complete or is a multipage 
        * form and we've come back to the signup shortcode before the form was completed: 
        * in which case we show the saved values from the record
        */
-      $form_status = $this->get_form_status();
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
+      
       if ($this->participant_values && ($form_status === 'normal' || ($shortcode_atts['module'] == 'thanks' && $form_status === 'multipage'))) {
         /*
        * the submission is successful, clear the session
@@ -133,18 +143,6 @@ class PDb_Signup extends PDb_Shortcode {
         $shortcode_atts['module'] = 'thanks';
       }
       $shortcode_atts['id'] = $this->participant_id;
-    } elseif ($shortcode_atts['module'] == 'signup') {
-      /*
-       * we're showing the signup form
-       */
-      $this->participant_values = Participants_Db::get_default_record();
-      
-    } else {
-      /*
-       * there was no type set.
-       */
-      error_log(__METHOD__.' doing nothing');
-      return;
     }
 
     // run the parent class initialization to set up the $shortcode_atts property
@@ -179,7 +177,7 @@ class PDb_Signup extends PDb_Shortcode {
 
       // form has been submitted, close it
       Participants_Db::$session->clear('form_status');
-//      $this->set_form_status('complete');
+      
     }
     // print the shortcode output
     $this->_print_from_template();

@@ -20,6 +20,7 @@
  * @version    Release: 1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_List extends PDb_Shortcode {
   /**
    *
@@ -110,6 +111,8 @@ class PDb_List extends PDb_Shortcode {
    */
   public function __construct($shortcode_atts) {
 
+    $this->set_instance_index();
+
     // define the default settings for the shortcode
     $shortcode_defaults = array(
         'sort' => 'false',
@@ -149,7 +152,7 @@ class PDb_List extends PDb_Shortcode {
     if (!empty($this->shortcode_atts['suppress'])) $this->suppress = filter_var($this->shortcode_atts['suppress'], FILTER_VALIDATE_BOOLEAN);
 
     // enqueue the filter/sort AJAX script
-    if ($this->_sort_filter_mode() !== 'none' and Participants_Db::plugin_setting_is_true('ajax_search')) {
+    if (Participants_Db::plugin_setting_is_true('ajax_search')) {
 
       global $wp_query;
 
@@ -158,8 +161,7 @@ class PDb_List extends PDb_Shortcode {
           'filterNonce' => Participants_Db::$list_filter_nonce,
           'postID' => ( isset($wp_query->post) ? $wp_query->post->ID : '' ),
           'prefix' => Participants_Db::$prefix,
-          'loading_indicator' => Participants_Db::get_loading_spinner(),
-          'i18n' => $this->i18n
+          'loading_indicator' => Participants_Db::get_loading_spinner()
       );
       
       wp_localize_script(Participants_Db::$prefix.'list-filter', 'PDb_ajax', $ajax_params);
@@ -169,12 +171,7 @@ class PDb_List extends PDb_Shortcode {
     /*
      * instantiate the List Query object
      */
-    $this->list_query = new PDb_List_Query(
-            $this->shortcode_atts, 
-            $this->display_columns,
-            $this->i18n,
-            $this->list_page
-            );
+    $this->set_list_query_object();
     if ($search_error = $this->list_query->get_search_error()) {
       $this->search_error($search_error);
     }
@@ -247,7 +244,7 @@ class PDb_List extends PDb_Shortcode {
   public function _setup_iteration() {
 
     // the list query object can be modified at this point to add a custom search
-    Participants_Db::set_filter('list_query_object', $this->list_query);
+    do_action(Participants_Db::$prefix . 'list_query_object', $this->list_query);
 
     // allow the query to be altered before the records are retrieved
     $list_query = Participants_Db::set_filter('list_query',$this->list_query->get_list_query());
@@ -269,7 +266,7 @@ class PDb_List extends PDb_Shortcode {
         'size' => $this->page_list_limit,
         'total_records' => $this->num_records,
         'filtering' => $this->shortcode_atts['filtering'],
-        'add_variables' => 'instance=' . Participants_Db::$instance_index . '#' . $this->list_anchor,
+        'add_variables' => 'instance=' . $this->instance_index . '#' . $this->list_anchor,
     );
     // instantiate the pagination object
     $this->pagination = new PDb_Pagination($pagination_defaults);
@@ -346,14 +343,23 @@ class PDb_List extends PDb_Shortcode {
   /**
    * sets the page number
    * 
-   * if the instance in the GET array matches the current instance, we set the 
-   * page number from the GET array
+   * if the instance in the input array matches the current instance, we set the 
+   * page number from the input array
    *
    * @return null
    */
-  private function _set_page_nummber() {
-    if (filter_input(INPUT_GET, 'instance', FILTER_VALIDATE_INT) === Participants_Db::$instance_index) {
-      $this->current_page = filter_input(INPUT_GET, $this->list_page, FILTER_VALIDATE_INT, array('options' => array('min_range' => 1, 'default' => 1)));
+  private function _set_page_nummber()
+  {
+    $input = false;
+    $this->current_page = 1;
+    if (filter_input(INPUT_GET, 'instance', FILTER_VALIDATE_INT) === $this->instance_index) {
+      $input = INPUT_GET;
+    }
+    if (isset($_POST[$this->list_page]) && filter_input(INPUT_POST, 'instance_index', FILTER_VALIDATE_INT) === $this->instance_index) {
+      $input = INPUT_POST;
+    }
+    if ($input) {
+      $this->current_page = filter_input($input, $this->list_page, FILTER_VALIDATE_INT, array('options' => array('min_range' => 1, 'default' => 1)));
       }
   }
   
@@ -486,10 +492,11 @@ class PDb_List extends PDb_Shortcode {
     
     $class_att = $class ? 'class="' . $class . '"' : '';
     
-    $output[] = '<form method="post" class="sort_filter_form" action="' . $action . '"' . $class_att . ' ref="' . $ref . '" >';
+    $output[] = '<form method="post" class="sort_filter_form" action="' . $action . '"' . $class_att . ' data-ref="' . $ref . '" >';
     $hidden_fields = array(
         'action' => 'pdb_list_filter',
-        'instance_index' => $this->shortcode_atts['target_instance'],
+        'target_instance' => $this->shortcode_atts['target_instance'],
+        'instance_index' => $this->instance_index,
         'pagelink' => $this->prepare_page_link($_SERVER['REQUEST_URI']),
         'sortstring' => $this->filter['sortstring'],
         'orderstring' => $this->filter['orderstring'],
@@ -524,13 +531,24 @@ class PDb_List extends PDb_Shortcode {
 
     $all_string = false === $all ? '(' . __('select', 'participants-database') . ')' : $all;
 
+    $search_columns = $this->searchable_columns($columns);
+
+    if (count($search_columns) > 1) {
     $element = array(
         'type' => 'dropdown',
         'name' => 'search_field' . ($multi ? '[]' : ''),
         'value' => $value,
         'class' => 'search-item',
-        'options' => array($all_string => 'none', 'null_select' => false) + $this->searchable_columns($columns),
-    );
+          'options' => array($all_string => 'none', 'null_select' => false) + $search_columns,
+      );
+    } else {
+      $element = array(
+          'type' => 'hidden',
+          'name' => 'search_field' . ($multi ? '[]' : ''),
+          'value' => current($search_columns),
+          'class' => 'search-item',
+			);
+    }
     $multifield_count++;
     if ($print)
       PDb_FormElement::print_element($element);
@@ -572,10 +590,14 @@ class PDb_List extends PDb_Shortcode {
    */
   public function search_form($print = true) {
 
+//    error_log(__METHOD__.' target: '.$this->shortcode_atts['target_instance'].' module: '.$this->module);
+    
+    $search_term = $this->list_query->current_filter('search_term');
+
     $output = array();
 
     $output[] = '<input name="operator" type="hidden" class="search-item" value="LIKE" />';
-    $output[] = '<input id="participant_search_term" type="text" name="value" class="search-item" value="' . $this->list_query->current_filter('search_term') . '">';
+    $output[] = '<input id="participant_search_term" type="text" name="value" class="search-item" value="' . $search_term . '">';
     $output[] = $this->search_submit_buttons();
 
     if ($print)
@@ -596,8 +618,8 @@ class PDb_List extends PDb_Shortcode {
     $submit_text = isset($values['submit']) ? $values['submit'] : $this->i18n['search'];
     $clear_text = isset($values['clear']) ? $values['clear'] : $this->i18n['clear'];
   	$output = array();
-  	$output[] = '<input name="submit_button" class="search-form-submit" type="submit" value="' . $submit_text . '">';
-    $output[] = '<input name="submit_button" class="search-form-clear" type="submit" value="' . $clear_text . '">';
+  	$output[] = '<input name="submit_button" class="search-form-submit" data-submit="search" type="submit" value="' . $submit_text . '">';
+    $output[] = '<input name="submit_button" class="search-form-clear" data-submit="clear" type="submit" value="' . $clear_text . '">';
     print $this->output_HTML($output);
   }
   /**
@@ -607,8 +629,8 @@ class PDb_List extends PDb_Shortcode {
    */
   public function search_submit_buttons() {
   	$output = array();
-  	$output[] = '<input name="submit_button" class="search-form-submit" type="submit" value="' . $this->i18n['search'] . '">';
-    $output[] = '<input name="submit_button" class="search-form-clear" type="submit" value="' . $this->i18n['clear'] . '">';
+  	$output[] = '<input name="submit_button" class="search-form-submit" data-submit="search" type="submit" value="' . $this->i18n['search'] . '">';
+    $output[] = '<input name="submit_button" class="search-form-clear" data-submit="clear" type="submit" value="' . $this->i18n['clear'] . '">';
     return $this->output_HTML($output);
   }
   /**
@@ -618,11 +640,16 @@ class PDb_List extends PDb_Shortcode {
    */
   public function sort_form($print = true) {
 
+    $value = $this->list_query->current_filter('sort_field');
+    $options = array();
+    if (!in_array($value, $this->sortables)) {
+      $options = array('null_select' => '');
+    }
     $element = array(
         'type' => 'dropdown',
         'name' => 'sortBy',
-        'value' => $this->list_query->current_filter('sort_field'),
-        'options' => array('null_select' => true,) + $this->sortables,
+        'value' => $value,
+        'options' => $options + $this->sortables,
         'class' => 'search-item',
     );
     $output[] = PDb_FormElement::get_element($element);
@@ -639,7 +666,7 @@ class PDb_List extends PDb_Shortcode {
     );
     $output[] = PDb_FormElement::get_element($element);
 
-    $output[] = '<input name="submit_button" type="submit" value="' . $this->i18n['sort'] . '" />';
+    $output[] = '<input name="submit_button" data-submit="sort" type="submit" value="' . $this->i18n['sort'] . '" />';
 
     if ($print)
       echo $this->output_HTML($output);
@@ -1109,6 +1136,27 @@ class PDb_List extends PDb_Shortcode {
       $this->page_list_limit = $limit;
     }
     
+  }
+
+  /**
+   * instantiates the list query object for the list instance
+   * 
+   * @return null
+   */
+  private function set_list_query_object() {
+    
+    $this->list_query = new PDb_List_Query($this);
+    $search_term = $this->list_query->current_filter('search_term');
+    
+//    error_log(__METHOD__.' list query: '.print_r($this->list_query->current_filter(),1));
+    
+    /*
+     * if the current list instance doesn't have a search term, see if there is an 
+     * incoming search that targets it
+     */
+    if (empty($search_term) && $this->list_query->is_search_result()) {
+      $this->list_query->set_query_session($this->shortcode_atts['target_instance']);
+    }
   }
 
   /**

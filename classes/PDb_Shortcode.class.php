@@ -25,7 +25,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  *
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 abstract class PDb_Shortcode {
 
   /**
@@ -60,7 +60,7 @@ abstract class PDb_Shortcode {
   /**
    * @var array holds the current shorcode attributes
    */
-  protected $shortcode_atts;
+  public $shortcode_atts;
   /**
    * @var array a selected array of fields to display
    */
@@ -153,6 +153,10 @@ abstract class PDb_Shortcode {
    * @var array all field objects used by the shortcode
    */
   var $fields = array();
+  /**
+   * @var int the instance index of the current object instance
+   */
+  var $instance_index;
 
   /**
    * instantiates the shortcode object
@@ -166,6 +170,8 @@ abstract class PDb_Shortcode {
     
     // increment the index each time this class is instantiated
     Participants_Db::$instance_index++;
+    
+    $this->set_instance_index();
     
     // set the global shortcode flag and trigger the action on the first instantiation of this class
     $this->plugin_shortcode_action();
@@ -184,7 +190,8 @@ abstract class PDb_Shortcode {
         'fields' => '',
         'groups' => '',
         'action' => '',
-        'target_instance' => Participants_Db::$instance_index,
+        'instance_index' => $this->instance_index,
+        'target_instance' => $this->instance_index,
         'target_page' => '',
         'record_id' => false,
         'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
@@ -209,6 +216,7 @@ abstract class PDb_Shortcode {
      * the actual values from the shortcode 
      */
     if ($this->shortcode_atts['filtering'] != 1) {
+      
       static $clear = true;
       if (is_null($clear) && filter_input(INPUT_GET,'shortcode_clear') === 'true') {
         $clear = true;
@@ -220,7 +228,7 @@ abstract class PDb_Shortcode {
       Participants_Db::$session->update('shortcode_atts', $this->shortcode_session());
     }
 
-    $this->wrap_class = $this->prefix . $this->module . ' ' . $this->prefix . 'instance-' . Participants_Db::$instance_index;
+    $this->wrap_class = $this->prefix . $this->module . ' ' . $this->prefix . 'instance-' . $this->instance_index;
 
     $this->_set_display_groups();
 
@@ -267,7 +275,14 @@ abstract class PDb_Shortcode {
     echo '<!-- end template: ' . $this->template_basename($this->template) . ' -->';
     }
 
-    $this->output = $this->strip_linebreaks(ob_get_clean());
+    /*
+     * @filter 'pdb-{module}_shortcode_output'
+     * 
+     * @param string content the shortcode output
+     * 
+     * all shortcode output is passed through the filter before printing
+     */
+    $this->output = apply_filters(Participants_Db::$prefix . $this->module . '_shortcode_output', $this->strip_linebreaks(ob_get_clean()));
   }
   
   /**
@@ -1060,10 +1075,10 @@ abstract class PDb_Shortcode {
         'subsource' => Participants_Db::PLUGIN_NAME,
         'shortcode_page' => $uri_components['path'],
         'thanks_page' => $this->submission_page,
-            'instance_index' => Participants_Db::$instance_index,
+        'instance_index'  => $this->instance_index,
         'pdb_data_keys' => $this->_form_data_keys(),
+        'session_hash'    => wp_create_nonce(Participants_Db::PLUGIN_NAME . '_nonce'),
     );
-    if (WP_DEBUG) echo '<!-- DEBUG: process fields: ' . implode(', ',PDb_Base::get_data_key_columns($this->_form_data_keys())) . ' -->';
     
     $hidden = is_array($hidden) ? $hidden : array();
     
@@ -1188,6 +1203,17 @@ abstract class PDb_Shortcode {
   }
 
   /**
+   * prints a "next" button for multi-page forms
+   * 
+   * this is simply an anchor to the thanks page
+   * 
+   * @return string
+   */
+  public function print_next_button() {
+    printf('<a type="button" class="button button-secondary" href="%s" >%s</a>', $this->submission_page, __('next', 'participants-database'));
+  }
+
+  /**
    * sets the form submission page
    */
   protected function _set_submission_page()
@@ -1234,7 +1260,7 @@ abstract class PDb_Shortcode {
     return array(
         $this->shortcode_atts['post_id'] => array( 
             $this->module => array( 
-                Participants_Db::$instance_index => $this->shortcode_atts
+                $this->instance_index => $this->shortcode_atts
                     )
                 )
             );
@@ -1313,6 +1339,18 @@ abstract class PDb_Shortcode {
       Participants_Db::$shortcode_present = true;
       do_action(Participants_Db::$prefix . 'shortcode_active');
     }
+  }
+
+  /**
+   * sets the current index value
+   * 
+   * @param int $index used to set the index value, omit to use assigned index
+   * 
+   * @return int the assigned index value
+   */
+  protected function set_instance_index($index = '') {
+    if (empty($this->instance_index))
+      $this->instance_index = empty($index) ? Participants_Db::$instance_index :  $index;
   }
 
 }

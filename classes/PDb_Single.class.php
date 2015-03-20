@@ -3,7 +3,7 @@
  * class for displaying an single record on the frontend with the [pdb_single] shortcode
  *
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
  class PDb_Single extends PDb_Shortcode {
   
   /**

@@ -2,19 +2,19 @@
 /**
  * WordPress session managment.
  *
- * Standardizes WordPress session data using database-backed options for storage.
+ * Standardizes WordPress session data using database-backed options for storage
  * for storing user session information.
+ *
+ * adapted from https://github.com/ericmann/wp-session-manager by Eric Mann
  *
  * @package WordPress
  * @subpackage Session
  * @since   3.7.0
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 /**
  * WordPress Session class for managing user session data.
  *
- * @package WordPress
- * @since   3.7.0
  */
 final class WP_Session extends Recursive_ArrayAccess implements Iterator, Countable {
 	/**

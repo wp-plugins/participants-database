@@ -49,8 +49,9 @@
 <?php endwhile; // group loop   ?>
 
     <fieldset class="field-group field-group-submit">
+      <legend><?php $this->print_save_changes_label() ?></legend>
       <div class="form-group">
-        <button type="submit" class="btn btn-default" ><?php $this->print_save_changes_label() ?></button>
+        <button type="submit" class="btn btn-default" ><?php echo $this->shortcode_atts['submit_button'] ?></button>
       </div>
     </fieldset>
 
