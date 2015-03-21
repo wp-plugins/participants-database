@@ -1,6 +1,6 @@
 <?php
 if (!defined( 'ABSPATH' ) ) exit;
-if (!Participants_Db::current_user_has_plugin_role('admin')) exit;
+if (!Participants_Db::current_user_has_plugin_role('admin', 'upload csv')) exit;
 
 $CSV_import = new PDb_CSV_Import('csv_file_upload');
 $csv_paramdefaults = array(

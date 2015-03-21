@@ -239,6 +239,7 @@ input.otherfield[type=text] {
 .pdb-list .pagination li,
 .pdb-pagination li {
     margin: 0;
+  list-style-type: none;
 }
 .pdb-list .pagination li>span,
 .pdb-pagination li>span,
@@ -297,8 +298,8 @@ input.otherfield[type=text] {
 }
 .pdb-list .pagination .glyphicon,
 .pdb-pagination .glyphicon  {
-  font-size: 80%;
-  line-height: 18px;
+  font-size: 100%;
+  line-height: 1;
   vertical-align: inherit;
 }
 .wp-admin .pdb-list .pagination .glyphicon {

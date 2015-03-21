@@ -416,6 +416,50 @@ class PDb_Base {
     
   }
 
+  
+  /**
+   * check the current users plugin role
+   * 
+   * the plugin has two roles: editor and admin; it is assumed an admin has the editor 
+   * capability
+   * 
+   * @param string $role optional string to test a specific role. If omitted, tests 
+   *                     for either role
+   * @param string $context the function or action being tested for
+   * 
+   * @return bool true if current user has the role tested
+   */
+  public static function current_user_has_plugin_role($role = 'editor', $context = '') {
+    
+    $role = $role === 'admin' ? 'plugin_admin_capability' : 'record_edit_capability';
+    
+    return current_user_can(self::plugin_capability(self::plugin_setting($role), $context));
+  }
+  
+  /**
+   * checks a plugin permission level and passes it through a filter
+   * 
+   * this allows for all plugin functions that are permission-controlled to be controlled 
+   * with a filter callback
+   * 
+   * the context value will contain the name of the function or script that is pretected
+   * 
+   * see: http://codex.wordpress.org/Roles_and_Capabilities
+   * 
+   * @param string $cap the plugin capability level (not WP cap) to check for
+   * @param string $context provides the context of the request
+   * 
+   * @return string the name of the WP capability to use
+   */
+  public static function plugin_capability ($cap, $context = '') {
+    
+    $capability = 'read'; // assume the lowest cap
+    if (in_array($cap, array('plugin_admin_capability','record_edit_capability'))) {
+      $capability = self::set_filter('access_capability', self::plugin_setting($cap), $context);
+    }
+    return $capability;
+  }
+
   /**
    * locate the translation file to use
    * 
@@ -558,27 +602,6 @@ class PDb_Base {
   }
 
   /**
-   * check the current users plugin role
-   * 
-   * the plugin has two roles: editor and admin
-   * 
-   * @param string $role optional string to test a specific role. If omitted, tests for either role
-   * @return bool true if current user has the role tested
-   */
-  public static function current_user_has_plugin_role($role = 'either') {
-    switch ($role) {
-      case 'admin':
-        return current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']);
-        break;
-      case 'editor':
-        return current_user_can(Participants_Db::$plugin_options['record_edit_capability']);
-        break;
-      default:
-        return current_user_can(Participants_Db::$plugin_options['plugin_admin_capability']) || current_user_can(Participants_Db::$plugin_options['record_edit_capability']);
-    }
-  }
-
-  /**
    * checks if the current user's form submissions are to be validated
    * 
    * @return bool true if the form should be validated 
@@ -586,7 +609,7 @@ class PDb_Base {
   public static function is_form_validated() {
     
     if (is_admin()) {
-      return self::current_user_has_plugin_role('admin') === false;
+      return self::current_user_has_plugin_role('admin', 'forms not validated') === false;
     } else {
       return true;
     }

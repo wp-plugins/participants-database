@@ -136,7 +136,7 @@ class PDb_List extends PDb_Shortcode {
 
     $this->list_page = Participants_Db::$list_page;
 
-    $this->_set_page_nummber();
+    $this->_set_page_number();
 
 //    error_log( __METHOD__.' $this->shortcode_atts:'.print_r( $this->shortcode_atts,1 ));
 
@@ -348,7 +348,7 @@ class PDb_List extends PDb_Shortcode {
    *
    * @return null
    */
-  private function _set_page_nummber()
+  private function _set_page_number()
   {
     $input = false;
     $this->current_page = 1;
@@ -358,7 +358,7 @@ class PDb_List extends PDb_Shortcode {
     if (isset($_POST[$this->list_page]) && filter_input(INPUT_POST, 'instance_index', FILTER_VALIDATE_INT) === $this->instance_index) {
       $input = INPUT_POST;
     }
-    if ($input) {
+    if ($input !== false) {
       $this->current_page = filter_input($input, $this->list_page, FILTER_VALIDATE_INT, array('options' => array('min_range' => 1, 'default' => 1)));
       }
   }
