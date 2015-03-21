@@ -461,7 +461,7 @@ class Participants_Db extends PDb_Base {
     add_menu_page(
             self::$plugin_title,
             self::$plugin_title, 
-            self::plugin_setting('record_edit_capability'), 
+            self::plugin_capability('record_edit_capability', 'main admin menu'),
             self::PLUGIN_NAME, 
             null
     );
@@ -470,17 +470,29 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('List Participants', 'participants-database'), 
             __('List Participants', 'participants-database'), 
-            self::plugin_setting('record_edit_capability'), 
+            self::plugin_capability('record_edit_capability', 'list participants'), 
             self::PLUGIN_NAME,
             array($list_admin_classname, 'initialize')
+    );
+
+    /**
+     * this registers the edit participant page without adding it as a menu item
+     */
+    add_submenu_page(
+            null, 
+            null, 
+            null, 
+            self::plugin_capability('record_edit_capability', 'edit participant'), 
+            self::$plugin_page . '-edit_participant', 
+            array(__CLASS__, 'include_admin_file')
     );
 
     add_submenu_page(
             self::PLUGIN_NAME, 
             __('Add Participant', 'participants-database'), 
             __('Add Participant', 'participants-database'), 
-            self::plugin_setting('record_edit_capability'), 
-            self::$plugin_page . '-edit_participant', 
+            self::plugin_capability('record_edit_capability', 'add participant'), 
+            self::$plugin_page . '-add_participant', 
             array(__CLASS__, 'include_admin_file')
     );
 
@@ -488,7 +500,7 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('Manage Database Fields', 'participants-database'), 
             __('Manage Database Fields', 'participants-database'), 
-            self::plugin_setting('plugin_admin_capability'), 
+            self::plugin_capability('plugin_admin_capability', 'manage fields'), 
             self::$plugin_page . '-manage_fields', 
             array(__CLASS__, 'include_admin_file')
     );
@@ -497,7 +509,7 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('Import CSV File', 'participants-database'), 
             __('Import CSV File', 'participants-database'), 
-            self::plugin_setting('plugin_admin_capability'), 
+            self::plugin_capability('plugin_admin_capability', 'upload csv'), 
             self::$plugin_page . '-upload_csv', 
             array(__CLASS__, 'include_admin_file')
     );
@@ -506,7 +518,7 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('Settings', 'participants-database'), 
             __('Settings', 'participants-database'), 
-            self::plugin_setting('plugin_admin_capability'), 
+            self::plugin_capability('plugin_admin_capability', 'plugin settings'), 
             self::$plugin_page . '_settings_page', 
             array(self::$Settings, 'show_settings_form')
     );
@@ -515,17 +527,9 @@ class Participants_Db extends PDb_Base {
             self::PLUGIN_NAME, 
             __('Setup Guide', 'participants-database'), 
             __('Setup Guide', 'participants-database'), 
-            self::plugin_setting('plugin_admin_capability'), 
+            self::plugin_capability('plugin_admin_capability', 'setup guide'), 
             self::$plugin_page . '-setup_guide', 
             array(__CLASS__, 'include_admin_file')
-    );
-
-    add_submenu_page(
-            '', 
-            __('Edit Record', 'participants-database'), 
-            __('Edit Record', 'participants-database'), 
-            self::plugin_setting('record_edit_capability'), 
-            self::$plugin_page . '_edit_participant'
     );
   }
 
@@ -618,7 +622,7 @@ class Participants_Db extends PDb_Base {
     
     $option_version = get_option(self::$Settings->option_version, '0.0');
 
-    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
+    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__), array('dashicons'));
     wp_register_style('custom_plugin_css', plugins_url('/css/PDb-custom.css', __FILE__), null, $option_version);
 
     wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
@@ -1216,7 +1220,7 @@ class Participants_Db extends PDb_Base {
       case 'backend':
 
           $where = 'WHERE v.name <> "id" AND v.form_element <> "captcha" AND v.form_element <> "placeholder"';
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can(self::plugin_capability('plugin_admin_capability', 'access admin field groups'))) {
           // don't show non-displaying groups to non-admin users
           $where .= 'AND g.admin = 0';
         }
@@ -1347,7 +1351,7 @@ class Participants_Db extends PDb_Base {
     $duplicate_record_preference = self::plugin_setting('unique_email', '0');
       $match_field = self::plugin_setting('unique_field','id');
     }
-    if (is_admin() && self::current_user_has_plugin_role('admin') && !isset($_POST['csv_file_upload'])) {
+    if (is_admin() && self::current_user_has_plugin_role('admin', 'csv upload') && !isset($_POST['csv_file_upload'])) {
       /*
        * set the preference to 0 if current user is an admin in the admin and not 
        * importing a CSV
@@ -1632,7 +1636,7 @@ class Participants_Db extends PDb_Base {
 
             default:
               
-              if (!self::current_user_has_plugin_role('admin') && $column->readonly != '0') {
+              if (!self::current_user_has_plugin_role('admin', 'readonly access') && $column->readonly != '0') {
                 // this prevents unauthorized users from saving readonly field data
                 $new_value = false;
               } elseif (is_array($post[$column->name])) {
@@ -2271,7 +2275,7 @@ class Participants_Db extends PDb_Base {
       case 'output CSV':
 
         $csv_role = Participants_Db::plugin_setting_is_true('editor_allowed_csv_export') ? 'editor' : 'admin';
-        if (!Participants_Db::current_user_has_plugin_role($csv_role)) {
+        if (!Participants_Db::current_user_has_plugin_role($csv_role, 'csv export')) {
           die();
         }
         $header_row = array();
@@ -2425,7 +2429,7 @@ class Participants_Db extends PDb_Base {
      * we check a transient based on the user's IP; if the user tries more than 3 
      * times per day to get a private ID, they are blocked for 24 hours
      */
-    $max_tries = Participants_Db::current_user_has_plugin_role('admin') ? 10000 : 3; // give the plugin admin unlimited tries
+    $max_tries = Participants_Db::current_user_has_plugin_role('admin', 'retrieve link') ? 10000 : 3; // give the plugin admin unlimited tries
     $transient = self::$prefix . 'retrieve-count-' . str_replace('.', '', $_SERVER['REMOTE_ADDR']);
     $count = get_transient($transient);
     if ($count === false) {

@@ -12,7 +12,7 @@
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if ( ! defined( 'ABSPATH' ) ) die;
-if (!Participants_Db::current_user_has_plugin_role('admin'))
+if (!Participants_Db::current_user_has_plugin_role('admin', 'manage fields'))
   exit;
 
 class PDb_Manage_Fields {

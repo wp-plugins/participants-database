@@ -1,7 +1,7 @@
 /*
  * Participants Database Plugin
  * 
- * version: 0.7
+ * version: 0.8
  * 
  * xnau webdesign xnau.com
  * 
@@ -28,12 +28,12 @@ PDbListFilter = (function($) {
             clear_error_messages();
             // validate and process form here
             var
-                    this_button = get_button(event.target),
-                    submitButton = event.target,
-                    search_field_error = this_button.closest('.' + PDb_ajax.prefix + 'searchform').find('.search_field_error'),
-                    value_error = this_button.closest('.' + PDb_ajax.prefix + 'searchform').find('.value_error');
+                    $pageButton = get_page_button(event.target),
+                    $submitButton = $(event.target),
+                    search_field_error = $submitButton.closest('.' + PDb_ajax.prefix + 'searchform').find('.search_field_error'),
+                    value_error = $submitButton.closest('.' + PDb_ajax.prefix + 'searchform').find('.value_error');
             
-            submission.submit = $(submitButton).data('submit');
+            submission.submit = $submitButton.data('submit');
 
             switch (submission.submit) {
 
@@ -52,18 +52,18 @@ PDbListFilter = (function($) {
                   return;
                 }
                 if (remote) {
-                  this_button.closest('form').submit();
+                  $submitButton.closest('form').submit();
                   return
                 }
                 break;
                 
               case 'clear':
-                clear_search(this_button);
+                clear_search($submitButton);
                 submission.listpage = '1';
                 break;
               
               case 'page':
-                submission.listpage = this_button.data('page');
+                submission.listpage = $pageButton.data('page');
                 break;
                 
               case 'sort':
@@ -72,11 +72,11 @@ PDbListFilter = (function($) {
               default:
                 return;
             }
-            this_button.PDb_processSubmission();
+            $submitButton.PDb_processSubmission();
             // trigger a general-purpose event
             $('html').trigger('pdbListFilterComplete');
           },
-          get_button = function (target) {
+          get_page_button = function (target) {
             var $button = $(target);
             if ($button.is('a')) return $button;
             return $button.closest('a');
@@ -198,8 +198,8 @@ PDbListFilter = (function($) {
 
       clear_error_messages();
 
-      filterform.on('click', 'input[type="submit"]', submit_search);
-      remoteform.on('click', 'input[type="submit"]', submit_remote_search);
+      filterform.on('click', '[type="submit"]', submit_search);
+      remoteform.on('click', '[type="submit"]', submit_remote_search);
       $('.pdb-list').on('click', '.pdb-pagination a', get_page);
     }
   };

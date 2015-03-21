@@ -166,7 +166,7 @@ class PDb_List_Admin {
     /*
      * save the query in a transient so it can be used by the export CSV functionality
      */
-    if (Participants_Db::current_user_has_plugin_role('admin')) {
+    if (Participants_Db::current_user_has_plugin_role('admin', 'csv export')) {
       global $current_user;
       set_transient(Participants_Db::$prefix . 'admin_list_query' . $current_user->ID, self::$list_query, 3600 * 24);
     }
@@ -210,7 +210,7 @@ class PDb_List_Admin {
 
     // print the CSV export form (authorized users only)
     $csv_role = Participants_Db::plugin_setting_is_true('editor_allowed_csv_export') ? 'editor' : 'admin';
-    if (Participants_Db::current_user_has_plugin_role($csv_role))
+    if (Participants_Db::current_user_has_plugin_role($csv_role, 'csv export'))
       self::_print_export_form();
 
     // print the plugin footer
@@ -693,7 +693,7 @@ class PDb_List_Admin {
         <input type="hidden" id="select_count" value="0" />
                 <table class="form-table"><tbody><tr><td>
         <fieldset class="widefat inline-controls">
-                      <?php if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability'))) : ?>
+                      <?php if (current_user_can(Participants_Db::plugin_capability('plugin_admin_capability', 'delete participants'))) : ?>
                         <span style="padding-right:20px" ><input type="submit" name="submit-button" class="button button-default" value="<?php echo self::$i18n['delete_checked'] ?>" id="delete_button"  ></span>
           <?php endif ?>
             <?php
@@ -765,7 +765,7 @@ class PDb_List_Admin {
                 <tr>
         <?php // print delete check  ?>
                   <td>
-                        <?php if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability'))) : ?>
+                          <?php if (current_user_can(Participants_Db::plugin_capability('plugin_admin_capability', 'delete participants'))) : ?>
                             <input type="checkbox" class="delete-check" name="pid[]" value="<?php echo $value['id'] ?>" />
                     <?php endif ?>
                           <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>" title="<?php _e('Edit', 'participants-database') ?>"><span class="glyphicon glyphicon-edit"></span></a>
@@ -952,7 +952,7 @@ class PDb_List_Admin {
       // print the "select all" header 
       ?>
     <th scope="col" style="width:3em">
-    <?php if (current_user_can(Participants_Db::plugin_setting('plugin_admin_capability'))) : ?>
+      <?php if (current_user_can(Participants_Db::plugin_capability('plugin_admin_capability', 'delete participants'))) : ?>
       <?php /* translators: uses the check symbol in a phrase that means "check all"  printf('<span class="checkmark" >&#10004;</span>%s', __('all', 'participants-database'))s */ ?>
         <input type="checkbox" name="checkall" id="checkall" ><span class="glyphicon glyphicon-edit" style="opacity: 0"></span>
         <?php endif ?>
