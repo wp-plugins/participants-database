@@ -98,10 +98,10 @@ class PDb_Aux_Plugin {
       $this->set_settings_containers();
       $this->plugin_options = get_option($this->aux_plugin_settings);
     
-      add_action('admin_menu', array($this, 'add_settings_page'));
-      add_action('admin_init', array($this, 'settings_api_init'));
-      add_action('init', array(&$this, 'initialize_updater'));
-    add_action('plugins_loaded', array(&$this, 'load_textdomain'));
+      add_action('admin_menu', 			array($this, 'add_settings_page'));
+			add_action('admin_init', 			array($this, 'settings_api_init'));
+			add_action('init',            array($this, 'initialize_updater'));
+			add_action('init',            array($this, 'load_textdomain'));
   }
   
   /**
@@ -144,14 +144,7 @@ class PDb_Aux_Plugin {
    * 
    */
   public function load_textdomain() {
-    $translation_file_path = dirname( $this->plugin_path ) . '/languages/';
-    if (is_file($translation_file_path . $this->aux_plugin_name . '.mo')) {
-      $plugin_name = $this->aux_plugin_name;
-    } else {
-      $plugin_name = Participants_Db::PLUGIN_NAME;
-      $translation_file_path = Participants_Db::translation_file_path();
-    }
-    load_plugin_textdomain($plugin_name, false, $translation_file_path);
+   Participants_Db::load_plugin_textdomain($this->plugin_path, $this->aux_plugin_name);
   }
 
   /*********************************
@@ -415,6 +408,7 @@ $html .= "\n" . '</div>';
         'options' => '',
         'style' => '',
         'class' => '',
+        'section' => $this->aux_plugin_shortname . '_setting_section'
     );
     $params = shortcode_atts($default, $atts);
 
@@ -423,7 +417,7 @@ $html .= "\n" . '</div>';
             $params['title'],
             array($this, 'setting_callback_function'),
             $this->aux_plugin_name,
-            $this->aux_plugin_shortname . '_setting_section',
+            $params['section'],
             array(
                 'type'  => $params['type'],
                 'name'  => $params['name'],

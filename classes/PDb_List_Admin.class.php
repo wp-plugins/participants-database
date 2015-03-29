@@ -567,12 +567,8 @@ class PDb_List_Admin {
         //build the list of columns available for filtering
         $filter_columns = array();
         foreach (Participants_db::get_column_atts('backend') as $column) {
-
-          if (in_array($column->name, array('id', 'private_id')))
-            continue;
-
           // add the field name if a field with the same title is already in the list
-          $select_title = isset($filter_columns[$column->title]) ? $column->title . ' (' . $column->name . ')' : $column->title;
+            $select_title = ( isset($filter_columns[$column->title]) || strlen($column->title) === 0 ) ? $column->title . ' (' . $column->name . ')' : $column->title;
           
           $filter_columns[$select_title] = $column->name;
         }

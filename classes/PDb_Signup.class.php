@@ -106,9 +106,11 @@ class PDb_Signup extends PDb_Shortcode {
         'submit_button' => Participants_Db::plugin_setting('signup_button_text'),
         'edit_record_page' => Participants_Db::plugin_setting('registration_page'),
     );
-    
-    $this->participant_id = Participants_Db::$session->get('pdbid');
     $form_status = $this->get_form_status();
+    
+    if ($form_status === 'multipage' ) {
+			$this->participant_id = Participants_Db::$session->get('pdbid');
+    }
 
     if ($this->participant_id === false) {
     if (filter_input(INPUT_GET, 'm') === 'r' || $shortcode_atts['module'] == 'retrieve') {

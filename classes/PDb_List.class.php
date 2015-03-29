@@ -293,9 +293,13 @@ class PDb_List extends PDb_Shortcode {
 
       foreach ($this->records as $id => $record) {
 
+        /*
+         * @version 1.6 
+         * 
+         * this array now contains all values for the record
+         */
         // set the values for the current record
-        $this->participant_values = (array) $record;
-        $this->participant_values['id'] = $id;
+        $this->participant_values = Participants_Db::get_participant($id);
 
         foreach ($record as $field => $value) {
           

@@ -325,6 +325,8 @@ class PDb_List_Query {
       }
       // accomodate several different submit button names and un-translate to get key values
       $this->post_input = $this->_prepare_submit_value($this->post_input);
+      
+      
       switch ($this->post_input['submit']) {
         case 'clear':
           $_GET[Participants_Db::$list_page] = 1;
@@ -556,6 +558,7 @@ class PDb_List_Query {
    */
   private function _setup_filter_array() {
     $this->_reset_filters();
+    
     foreach($this->subclauses as $field_name => $filters) {
       foreach($filters as $filter) {
         /*
@@ -649,7 +652,7 @@ class PDb_List_Query {
     if (!Participants_Db::is_column($column))
       return false;
 
-    $field_atts = Participants_Db::get_field_atts($column);
+    $field_atts = Participants_Db::get_column($column);
     
     $filter = new PDb_List_Query_Filter(array(
         'field' => $column,
