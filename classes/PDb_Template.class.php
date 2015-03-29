@@ -14,13 +14,16 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.6
+ * @version    1.0
  * @link       http://xnau.com/wordpress-plugins/
  */
 
 if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Template {
   
+  /**
+   * @var object holds the instantiating object
+   */
   /**
    * holds the record object
    * @var object $record
@@ -71,15 +74,27 @@ class PDb_Template {
    */
   var $detail_page;
   /**
+   * @var int the record ID
+   */
+  var $id;
+  /**
+   * @var string the link to the detail page
+   */
+  var $detail_link;
+  /**
+   * @var string link to the record edit page
+   */
+  var $edit_link;
+  /**
    * this class is instantiated with the module class
    * 
    * @var type $object
    */
-  function __construct(&$object)
+  function __construct($object)
   {
-    $this->_setup_fields($object);
-    $this->set_edit_page(Participants_Db::$plugin_options['registration_page']);
-    $this->set_detail_page(Participants_Db::$plugin_options['single_record_page']);
+    $this->list_object = $object;
+    $this->_setup_fields();
+		unset($this->list_object);
   }
   
   /**
@@ -104,6 +119,33 @@ class PDb_Template {
    */
   public function print_value($name) {
     $this->_print($name);
+  }
+  
+  
+  /**
+   * gets an individual value from the raw values array
+   * 
+   * @param string $name the name of the value to get
+   * @return mixed the value
+   */
+  public function get_value($name) {
+  	return $this->_value($name);
+  }
+  
+  
+  /**
+   * sets a field value
+   * 
+   * this does no field format checking, you must use a compatible value, for instance 
+   * if the field stores it's value as an array, you must store an array
+   *
+   * @param string $name of the field
+   * @param int|string $value the value to set the field to
+   */
+  public function set_value($name, $value) {
+    if (Participants_Db::is_column($name)) {
+      $this->_setvalue($name, $value);
+    }
   }
   
   /**
@@ -222,7 +264,10 @@ class PDb_Template {
    * 
    * @param string|int $page the page slug, path or ID
    */
-  public function set_edit_page($page) {
+  public function set_edit_page($page = '') {
+    if (empty($page)) {
+      $page = Participants_Db::$plugin_options['registration_page'];
+    }
     $this->edit_page = Participants_Db::find_permalink($page);
     }
   /**
@@ -231,19 +276,13 @@ class PDb_Template {
    * it is assumed the [pdb_single] shortcode is on that page
    * 
    * @param string|int $page the page slug, path or ID
-   */
-  public function set_detail_page($page) {
-    $this->detail_page = Participants_Db::find_permalink($page);
-  }
-  
-  /**
-   * gets an individual value from the raw values array
    * 
-   * @param string $name the name of the value to get
-   * @return mixed the value
    */
-  public function get_value($name) {
-  	return $this->_value($name);
+  public function set_detail_page($page = '') {
+    if (empty($page)) {
+      $page = !empty($this->list_object->shortcode_atts['single_record_link']) ? $this->list_object->shortcode_atts['single_record_link'] : Participants_Db::$plugin_options['single_record_page'];
+    }
+    $this->detail_page = Participants_Db::find_permalink($page);
   }
   
   /**
@@ -330,6 +369,23 @@ class PDb_Template {
     }
   }
   /**
+   * sets the field value
+   * 
+   * @param string $name of the property
+   * @param string|array $value the value to set
+   * @return mixed
+   */
+  protected function _setvalue($name, $value) {
+    switch($this->base_type) {
+      case 'Record_Item':
+        $this->record->values[$name] = $value;
+      case 'PDb_Single':
+      default:
+        $this->values[$name] = is_array($value) ? serialize($value) : $value;
+        $this->fields->{$name}->value = $value;
+    }
+  }
+  /**
    * 
    * prints a formatted field value
    * 
@@ -367,51 +423,44 @@ class PDb_Template {
    * sets up the fields object
    * 
    * this will use a different method for each type of object used to instantiate the class
-   *
-   * @param object $object the instantiating object
    */
-  private function _setup_fields(&$object) {
-    $this->base_type = get_class($object);
-    $this->module = $object->module;
+  private function _setup_fields() {
+    $this->base_type = get_class($this->list_object);
+    $this->values = $this->list_object->participant_values;
+    $this->set_edit_page();
+    $this->set_detail_page();
+    $this->module = $this->list_object->module;
+    $this->id = $this->values['id'];
+    $this->edit_link = $this->_cat_url_var($this->edit_page, 'pid', $this->values['private_id']);
+    $this->detail_link = $this->_cat_url_var($this->detail_page, 'pdb', $this->id);
     $this->fields = new stdClass();
     $this->groups = array();
     switch ($this->base_type) {
       case 'PDb_List':
-        $this->record = ''; // the list module does not have a record iterator
-        $this->values = $object->record->values;
-        foreach($object->record->fields as $field_object) {
+        foreach($this->list_object->record->fields as $field_object) {
           $name = $field_object->name;
           $value = isset($field_object->value) ? $field_object->value : '';
           $this->fields->{$name} = Participants_Db::get_column($name);
-          $this->fields->{$name}->module = $object->module;
+          $this->fields->{$name}->module = $this->list_object->module;
           $this->fields->{$name}->value = $value;
         }
-        reset($object->record->fields);
-        
-        //error_log(__METHOD__.' resetting:'.print_r(current($object->record->fields,1)));
-        
+        reset($this->list_object->record->fields);
+        $this->_setup_list_record_object();
         break;
       case 'PDb_Signup':
       case 'PDb_Single':
       case 'PDb_Record':
       default:
-        if (!isset($object->record)) {
+        if (!isset($this->list_object->record)) {
           error_log(__METHOD__.' cannot instantiate ' . __CLASS__ . ' object. Class must be instantiated with full module object.');
           break;
         }
-        $this->record = $object->record;
-        $this->values = $object->participant_values;
-        foreach($this->values as $name => $value) {
-          if (Participants_Db::is_column($name)) {
-            $this->fields->{$name} = Participants_Db::get_column($name);
-            $this->fields->{$name}->module = $object->module;
-            $this->fields->{$name}->value = $value;
-            //$this->fields->{$name}->value = PDb_FormElement::get_field_value_display($this->fields->{$name});
-          } else {
-            unset($this->values[$name]);
+        $this->record = clone $this->list_object->record;
+        foreach($this->list_object->fields as $name => $field) {
+          $this->fields->{$name} = $field;
+          $this->fields->{$name}->module = $this->list_object->module;
+          $this->fields->{$name}->value = $this->values[$name];
           }
-        }
-        reset($this->values);
         foreach($this->record as $name => $group) {
           $this->groups[$name] = $this_group = new stdClass();
           $this_group->name = $name;
@@ -427,6 +476,25 @@ class PDb_Template {
         break;
     }
     //unset($this->record->options);
+  }
+  /**
+   * builds a record object for the list module
+   * 
+   * @return null
+   */
+  private function _setup_list_record_object() {
+    $this->record = new stdClass();
+    $this->groups = new stdClass();
+    foreach ($this->list_object->display_groups as $group_name) {
+      $this->record->{$group_name} = Participants_Db::get_group($group_name);
+    }
+    foreach ($this->fields as &$field) {
+      $this->groups->{$field->group}->fields[$field->order] = $field->name;
+      if (!is_object($this->record->{$field->group}->fields)) {
+        $this->record->{$field->group}->fields = new stdClass();
+      }
+      $this->record->{$field->group}->fields->{$field->name} = $field;
+    }
   }
   /**
    * adds a value to an url

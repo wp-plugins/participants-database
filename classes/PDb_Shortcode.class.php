@@ -1080,6 +1080,10 @@ abstract class PDb_Shortcode {
         'session_hash'    => wp_create_nonce(Participants_Db::PLUGIN_NAME . '_nonce'),
     );
     
+    if ($this->get_form_status() === 'multipage') {
+      $default_hidden_fields['previous_multipage'] = $default_hidden_fields['shortcode_page'];
+    }
+    
     $hidden = is_array($hidden) ? $hidden : array();
     
     $hidden_fields = $hidden + $this->hidden_fields + $default_hidden_fields;
@@ -1210,7 +1214,9 @@ abstract class PDb_Shortcode {
    * @return string
    */
   public function print_next_button() {
-    printf('<a type="button" class="button button-secondary" href="%s" >%s</a>', $this->submission_page, __('next', 'participants-database'));
+    if (strlen($this->submission_page ) > 0) {
+			printf('<a type="button" class="button button-secondary" href="%s" >%s</a>', $this->submission_page, __('next', 'participants-database'));
+		}
   }
 
   /**
@@ -1222,7 +1228,9 @@ abstract class PDb_Shortcode {
     $form_status = 'normal';
     if (!empty($this->shortcode_atts['action'])) {
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
-      if ($this->submission_page !== false) $form_status = 'multipage';
+      if ($this->submission_page !== false) {
+        $form_status = 'multipage';
+      }
     }
     if (!$this->submission_page) {
     $this->submission_page = $_SERVER['REQUEST_URI'];

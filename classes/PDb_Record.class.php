@@ -8,8 +8,14 @@ if ( ! defined( 'ABSPATH' ) ) die;
 
 class PDb_Record extends PDb_Shortcode {
 
-  // class for the wrapper
+  /**
+   * @var string class for the wrapper
+   */
   var $wrap_class = 'participant-record';
+  /**
+   * @var string the originating page in a multipage form
+   */
+  var $previous_multipage;
 
   // methods
 
@@ -31,6 +37,8 @@ class PDb_Record extends PDb_Shortcode {
     );
     // run the parent class initialization to set up the parent methods 
     parent::__construct($shortcode_atts, $add_atts);
+
+    $this->_setup_multipage();
 
     // set the action URI for the form
     $this->_set_submission_page();
@@ -118,6 +126,20 @@ class PDb_Record extends PDb_Shortcode {
 		}
   }
 
+  
+  /**
+   * prints a "next" button for multi-page forms
+   * 
+   * this is simply an anchor to the thanks page
+   * 
+   * @return string
+   */
+  public function print_back_button() {
+    if (strlen($this->previous_multipage) > 0) {
+      printf('<a type="button" class="button button-secondary" href="%s" >%s</a>', $this->previous_multipage, __('back', 'participants-database'));
+    }
+  }
+
   /**
    * prints a 'save changes' label according to the plugin setting
    */
@@ -140,6 +162,19 @@ class PDb_Record extends PDb_Shortcode {
       
     } else {
       $this->output = empty(Participants_Db::$plugin_options['no_record_error_message']) ? '' : '<p class="alert alert-error">' . Participants_Db::plugin_setting('no_record_error_message') . '</p>';
+    }
+  }
+  
+  /**
+   * sets up the multipage referral
+   * 
+   * @retrun null
+   */
+  protected function _setup_multipage() {
+    $this->previous_multipage = Participants_Db::$session->get('previous_multipage', '');
+    if (strlen($this->previous_multipage) === 0) {
+      Participants_Db::$session->clear('pdbid');
+      $this->shortcode_atts['record_id'] = false;
     }
   }
 }

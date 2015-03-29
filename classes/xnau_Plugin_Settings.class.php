@@ -52,7 +52,7 @@ class xnau_Plugin_Settings {
    * 
    * @var string
    */
-  var $option_version;
+  var $option_version_location;
 
   /**
    * @var string type to use for text area settings; rich or plain text
@@ -79,7 +79,7 @@ class xnau_Plugin_Settings {
 
     $this->settings_page = $this->WP_setting.'_settings_page';
 
-    $this->option_version = Participants_Db::$prefix.'option_version';
+    $this->option_version_location = Participants_Db::$prefix.'option_version';
 
     // set up the HTML for the built-in display functions
     // these are generic settings to be modified by the subclass
@@ -161,13 +161,20 @@ class xnau_Plugin_Settings {
 
   }
 
+  /**
+   * provides the current options version number
+   */
+  public function option_version() {
+    return get_option($this->option_version_location, '0.0');
+  }
+
   protected function increment_option_version() {
     
 //    error_log(__METHOD__.' incrementing version');
     
-    $version = get_option($this->option_version, '0.0');
+    $version = get_option($this->option_version_location, '0.0');
     
-    update_option($this->option_version, floatval($version) + 0.1);
+    update_option($this->option_version_location, floatval($version) + 0.1);
   }
 
   /*******************

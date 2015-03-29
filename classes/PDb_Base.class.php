@@ -416,6 +416,18 @@ class PDb_Base {
     
   }
 
+  /**
+   * supplies a group object for the named group
+   * 
+   * @param string $name group name
+   * @return object the group parameters as a stdClass object
+   */
+  public static function get_group($name) {
+    global $wpdb;
+    $sql = 'SELECT * FROM ' . Participants_Db::$groups_table  . ' WHERE `name` = "%s"';
+    return current($wpdb->get_results($wpdb->prepare($sql, $name)));
+  }
+  
   
   /**
    * check the current users plugin role
@@ -461,39 +473,26 @@ class PDb_Base {
   }
 
   /**
-   * locate the translation file to use
+   * loads the plugin translation fiels and sets the textdomain
    * 
-   * @return string relative path to translation file
+   * the parameter is for the use of aux plugins
+   * 
+   * originally from: http://geertdedeckere.be/article/loading-wordpress-language-files-the-right-way
+   * 
+   * @param string $path of the calling file
+   * @param string $textdomain omit to use default plugin textdomain
+   * 
+   * @return null
    */
-  public static function translation_file_path($basepath = false) {
+  public static function load_plugin_textdomain($path, $textdomain = '') {
     
-    $filename = Participants_Db::PLUGIN_NAME . '-' . self::get_locale() . '.mo';
-    $basepath = !$basepath ? dirname( plugin_basename( __FILE__ ) ) : $basepath;
-    // first check for a custom translation file in the WP plugin root
-    if (is_file(WP_PLUGIN_DIR . '/languages/' . $filename)) {
-      return 'languages/';
-    } else {
-      return $basepath . '/languages/';
-    }
-  }
-  /**
-   * determines the language setting
-   * 
-   * this is to remain compatible with pre-4.0 WP installs
-   * 
-   * @global string $locale
-   * @return string language designator
-   */
-  public static function get_locale() {
-    global $locale;
-    if (empty($locale)) {
-      if (defined('WPLANG')) {
-        $locale = WPLANG;
-      } else {
-        $locale = get_option('WPLANG', 'en_EN');
-      }
-    }
-    return $locale;
+    $textdomain = empty($textdomain) ? Participants_Db::PLUGIN_NAME : $textdomain;
+    // The "plugin_locale" filter is also used in load_plugin_textdomain()
+    $locale = apply_filters('plugin_locale', get_locale(), $textdomain);
+
+    load_textdomain( $textdomain, WP_LANG_DIR.'/' . Participants_Db::PLUGIN_NAME . '/' . $textdomain . '-' . $locale . '.mo' );
+    load_plugin_textdomain( $textdomain, false, dirname(plugin_basename($path)).'/languages/');
+
   }
 
   
@@ -518,7 +517,7 @@ class PDb_Base {
    * @return bool false true if the setting has been saved by the user
    */
   public static function plugin_setting_is_set($name) {
-    return isset(Participants_Db::$plugin_options[$name]) && Participants_Db::plugin_setting($name) !== '';
+    return isset(Participants_Db::$plugin_options[$name]) && strlen(Participants_Db::plugin_setting($name)) > 0;
   }
   /**
    * provides a boolean plugin setting value

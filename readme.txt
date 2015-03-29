@@ -2,7 +2,7 @@
 Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
-Requires at least: 3.6
+Requires at least: 4.0
 Tested up to: 4.1.1
 Stable tag: 1.5.4.9
 License: GPLv2
@@ -262,14 +262,13 @@ You can define a "captcha" form element which will show a simple math question f
 * improvements to multi-page form handling
 * improvements to internationalized date handling
 * bug when using a single-field form fixed
-* plugin now supports custom translation files
+* plugin now supports custom translation files and most translation plugins
 * CSV import now allows delimiters and enclosures to be set by the user
 * better support for values titles in search results
 * better support for custom search forms
 * new shortcode attributes for forms: "autocomplete", "edit_record_page" and "submit_button"
-* improved security on user input
+* improved security on user input and form submissions
 * improved security on admin functions
-* users with cookies disabled are shown a warning
 
 = 1.5.4.9 =
 
@@ -517,7 +516,7 @@ Taking defensive precautions against other plugins in the admin:
 
 = 1.6 =
 
-major update; several new features, code optimizations
+Version 1.6 is a major update; several new features, code optimizations, many bug fixes.
 
 == Using the Plugin ==
 

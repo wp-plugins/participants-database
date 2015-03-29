@@ -365,7 +365,7 @@ class Participants_Db extends PDb_Base {
      */
     self::_setup_columns();
     
-    load_plugin_textdomain(self::PLUGIN_NAME, false, self::translation_file_path(dirname(plugin_basename(__FILE__))));
+    self::load_plugin_textdomain(__FILE__);
 
     self::$plugin_title = __('Participants Database', 'participants-database');
     
@@ -381,19 +381,19 @@ class Participants_Db extends PDb_Base {
     if ( false === get_option( self::$db_version_option ) || get_option( self::$db_version_option ) != self::$db_version )
       PDb_Init::on_update();
 
-    // get the plugin options array
-    if (!is_array(self::$plugin_options)) {
-      
-      $default_options = get_option(self::$default_options);
-      
-      if (!is_array($default_options)) {
-
     /*
      * instantiate the settings class; this only sets up the settings definitions, 
      * the WP Settings API may not be available at this point, so we register the 
      * settings on the 'admin_menu' hook
      */
     self::$Settings = new PDb_Settings();
+
+    // get the plugin options array
+    if (!is_array(self::$plugin_options)) {
+      
+      $default_options = get_option(self::$default_options);
+      
+      if (!is_array($default_options)) {
 
         $default_options = self::$Settings->get_default_options();
 
@@ -417,19 +417,52 @@ class Participants_Db extends PDb_Base {
      */
     self::$date_format = get_option('date_format');
     
-    if (0 != self::$plugin_options['html_email']) {
+    if (self::plugin_setting_is_true('html_email')) {
       $type = 'text/html; charset="' . get_option('blog_charset') . '"';
-      //add_filter('wp_mail_content_type', array( __CLASS__, 'set_content_type'));
     } else {
       $type = 'text/plain; charset=us-ascii';
     }
-    self::$email_headers = "MIME-Version: 1.0\n" .
+    $email_headers = 
             "From: " . self::$plugin_options['receipt_from_name'] . " <" . self::$plugin_options['receipt_from_address'] . ">\n" .
             "Content-Type: " . $type . "\n";
+
+    self::$email_headers = self::set_filter('email_headers', $email_headers);
 
     // this processes form submits before any output so that redirects can be used
     self::process_page_request();
     
+    $option_version = self::$Settings->option_version();
+
+    /*
+     * register frontend scripts and stylesheets
+     */
+    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__), array('dashicons'));
+    wp_register_style('custom_plugin_css', plugins_url('/css/PDb-custom.css', __FILE__), null, $option_version);
+
+    wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'otherselect', plugins_url('js/otherselect.js', __FILE__), array('jquery'));
+    
+    
+    /*
+     * register admin scripts and stylesheets
+     */
+    wp_register_script(self::$prefix.'cookie', plugins_url('js/jquery_cookie.js', __FILE__));
+    wp_register_script(self::$prefix.'manage_fields',   plugins_url('js/manage_fields.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs','jquery-ui-sortable','jquery-ui-dialog',self::$prefix.'cookie'), false, true);
+    wp_register_script(self::$prefix.'settings_script', plugins_url('js/settings.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs',self::$prefix.'cookie'), false, true);
+    wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'otherselect', plugins_url('js/otherselect.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'list-admin', plugins_url('js/list_admin.js', __FILE__), array('jquery'));
+    wp_register_script(self::$prefix.'debounce',        plugins_url('js/jq_debounce.js', __FILE__), array('jquery'));
+    //wp_register_script( 'datepicker', plugins_url( 'js/jquery.datepicker.js', __FILE__ ) );
+    //wp_register_script( 'edit_record', plugins_url( 'js/edit.js', __FILE__ ) );
+    
+    wp_register_style('pdb-utility', plugins_url('/css/xnau-utility.css', __FILE__));
+    wp_register_style('pdb-global-admin', plugins_url('/css/PDb-admin-global.css', __FILE__), false, false);
+    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
+    wp_register_style('pdb-admin', plugins_url('/css/PDb-admin.css', __FILE__));
     
   }
   
@@ -442,14 +475,11 @@ class Participants_Db extends PDb_Base {
 
     
     global $pagenow;
-    if (($pagenow == 'admin.php' && $_GET['page'] == 'participants-database_settings_page') || $pagenow == 'options.php') {
-    /*
-     * intialize the plugin settings for the plugin settings pages
-     */
-    if (!is_object(self::$Settings)) {
-    self::$Settings = new PDb_Settings();
-    }
-    self::$Settings->initialize();
+    if (($pagenow == 'admin.php' && filter_input(INPUT_GET, 'page') == 'participants-database_settings_page') || $pagenow == 'options.php') {
+			/*
+			 * intialize the plugin settings for the plugin settings pages
+			 */
+			self::$Settings->initialize();
     }
 
     /*
@@ -543,17 +573,6 @@ class Participants_Db extends PDb_Base {
    */
   public static function admin_includes($hook) {
 
-    wp_register_script(self::$prefix.'cookie', plugins_url('js/jquery_cookie.js', __FILE__));
-    wp_register_script(self::$prefix.'manage_fields',   plugins_url('js/manage_fields.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs','jquery-ui-sortable','jquery-ui-dialog',self::$prefix.'cookie'), false, true);
-    wp_register_script(self::$prefix.'settings_script', plugins_url('js/settings.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs',self::$prefix.'cookie'), false, true);
-    wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
-    wp_register_script(self::$prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
-    wp_register_script(self::$prefix.'otherselect', plugins_url('js/otherselect.js', __FILE__), array('jquery'));
-    wp_register_script(self::$prefix.'list-admin', plugins_url('js/list_admin.js', __FILE__), array('jquery'));
-    wp_register_script(self::$prefix.'debounce',        plugins_url('js/jq_debounce.js', __FILE__), array('jquery'));
-    //wp_register_script( 'datepicker', plugins_url( 'js/jquery.datepicker.js', __FILE__ ) );
-    //wp_register_script( 'edit_record', plugins_url( 'js/edit.js', __FILE__ ) );
-
     if (false !== stripos($hook, 'participants-database')) {
       wp_enqueue_script('jquery');
       wp_enqueue_script('jquery-ui-core');
@@ -591,11 +610,6 @@ class Participants_Db extends PDb_Base {
       wp_enqueue_script(self::$prefix . 'manage_fields');
     }
 
-    wp_register_style('pdb-utility', plugins_url('/css/xnau-utility.css', __FILE__));
-    wp_register_style('pdb-global-admin', plugins_url('/css/PDb-admin-global.css', __FILE__), false, false);
-    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__));
-    wp_register_style('pdb-admin', plugins_url('/css/PDb-admin.css', __FILE__));
-
     wp_enqueue_style('pdb-global-admin');
     wp_enqueue_style('pdb-utility');
 
@@ -615,21 +629,6 @@ class Participants_Db extends PDb_Base {
    */
   public static function include_scripts() {
 
-    if (!is_object(self::$Settings)) {
-      self::$Settings = new PDb_Settings();
-    }
-    self::$Settings->initialize();
-    
-    $option_version = get_option(self::$Settings->option_version, '0.0');
-
-    wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__), array('dashicons'));
-    wp_register_style('custom_plugin_css', plugins_url('/css/PDb-custom.css', __FILE__), null, $option_version);
-
-    wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
-    wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));
-    wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
-    wp_register_script(self::$prefix.'otherselect', plugins_url('js/otherselect.js', __FILE__), array('jquery'));
-
   }
 
   /**
@@ -639,7 +638,7 @@ class Participants_Db extends PDb_Base {
    */
   public static function include_stylesheets() {
     
-    if (self::$plugin_options['use_plugin_css']) {
+    if (self::plugin_setting_is_true('use_plugin_css')) {
       wp_enqueue_style('pdb-frontend');
     }
     wp_enqueue_style('custom_plugin_css');
@@ -669,16 +668,14 @@ class Participants_Db extends PDb_Base {
   public static function include_admin_file()
   {
 
-    $parts = explode('-', filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING));
+    $file = str_replace(self::$plugin_page . '-', '', filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING)) . '.php';
 
-    $file = array_pop($parts);
-
-    if (is_file(plugin_dir_path(__FILE__) . $file . '.php')) {
+    if (is_file(plugin_dir_path(__FILE__) . $file)) {
 
       // we'll need this in the included file
       global $wpdb;
 
-      include $file . '.php';
+      include $file;
     }
   }
 
@@ -933,7 +930,7 @@ class Participants_Db extends PDb_Base {
    * 
    * @global object $wpdb
    * @param string $field the name of the field to get
-   * @param string $atts
+   * @param string $atts depricated
    * @return stdClass 
    */
   public static function get_field_atts($field = false, $atts = '*') {
@@ -2130,6 +2127,7 @@ class Participants_Db extends PDb_Base {
         'CSV_type' => FILTER_SANITIZE_STRING,
         'include_csv_titles' => FILTER_VALIDATE_BOOLEAN,
         'nocookie' => FILTER_VALIDATE_BOOLEAN,
+        'previous_multipage' => FILTER_SANITIZE_STRING,
     );
     $post_input = filter_input_array(INPUT_POST, $post_sanitize);
     // only process POST arrays from this plugin's pages
@@ -2142,6 +2140,13 @@ class Participants_Db extends PDb_Base {
     if ($check === false) return;
 
     // error_log( __METHOD__.' post:'.print_r( $_POST, true ) );
+
+    /*
+     * the originating page for a multipage form is saved in a session value
+     * 
+     * if this is an empty string, it is assumed the submission was not part of a multipage form series
+     */
+    self::$session->set('previous_multipage', $post_input['previous_multipage']);
 
     /*
      * get the defined columns for the submitting shortcode (if any)
@@ -3064,7 +3069,7 @@ class Participants_Db extends PDb_Base {
         
         self::$date_mode = 'Intl';
 
-        $DateFormat = new IntlDateFormatter( self::get_locale(), IntlDateFormatter::LONG, IntlDateFormatter::NONE, NULL, NULL, Participants_Db::get_ICU_date_format(self::$plugin_options['input_date_format']) );
+        $DateFormat = new IntlDateFormatter( get_locale(), IntlDateFormatter::LONG, IntlDateFormatter::NONE, NULL, NULL, Participants_Db::get_ICU_date_format(self::$plugin_options['input_date_format']) );
         $DateFormat->setLenient(false); // we want it strict
         $timestamp = $DateFormat->parse($string);
 
@@ -3427,11 +3432,11 @@ class Participants_Db extends PDb_Base {
     
     $response = (object) array(
                 'slug' => self::PLUGIN_NAME,
-                'new_version' => '1.5', 
-                'requires' => '3.4',  
-                'tested' => '3.7',
+                'new_version' => '1.6', 
+                'requires' => '4.0',  
+                'tested' => '4.1.1',
                 'upgrade_notice' => $upgrade_notice,
-                'package' => 'https://downloads.wordpress.org/plugin/participants-database.1.4.9.4.zip',
+                'package' => 'https://downloads.wordpress.org/plugin/participants-database.1.6.zip',
                 'url' => 'http://wordpress.org/plugins/participants-database/',
     );
     
