@@ -183,10 +183,11 @@ PDbListFilter = (function($) {
   };
   $.fn.PDb_processSubmission = function() {
     // collect the form values and add them to the submission
-    filterform.find('input:not(input[type="submit"],input[type="radio"]), select').each(function() {
+    var $thisform = this.closest('form');
+    $thisform.find('input:not(input[type="submit"],input[type="radio"]), select').each(function() {
       add_value_to_submission($(this),submission);
     });
-    filterform.find('input[type="radio"]:checked').each(function() {
+    $thisform.find('input[type="radio"]:checked').each(function() {
       add_value_to_submission($(this),submission);
     });
     post_submission(this);

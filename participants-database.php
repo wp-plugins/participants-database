@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.6beta.10
+  Version: 1.6beta.11
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -200,7 +200,7 @@ class Participants_Db extends PDb_Base {
    * index for tracking multiple instances of a shortcode
    * @var int
    */
-  public static $instance_index = 0;
+  public static $instance_index = 1;
   /**
    * @var string name of the list pagination variable
    */
@@ -701,7 +701,7 @@ class Participants_Db extends PDb_Base {
       $record_id = self::get_participant_id($get_pid);
     }
     // get the id from the SESSION array; this overrides the GET string
-    if (self::$session->get('pdbid')) {
+    if ($record_id === false && self::$session->get('pdbid')) {
       $record_id = self::get_record_id_by_term('id', self::$session->get('pdbid'));
     }
 
@@ -1361,7 +1361,7 @@ class Participants_Db extends PDb_Base {
     
     if ($action == 'insert' and $duplicate_record_preference !== '0') {
 
-      $match_field_value = filter_var($post[$match_field], FILTER_SANITIZE_STRING);
+      $match_field_value = isset($post[$match_field]) ? filter_var($post[$match_field], FILTER_SANITIZE_STRING) : '';
 
       $record_match = $match_field_value !== '' && self::field_value_exists($match_field_value, $match_field);
       // if true, the incoming record matches an existing record
@@ -2175,8 +2175,6 @@ class Participants_Db extends PDb_Base {
       case 'update':
       case 'insert':
     
-        if (!Participants_Db::current_user_has_plugin_role()) return;
-    
         /*
          * we are here for one of these cases:
          *   a) we're adding a new record in the admin
@@ -2386,8 +2384,18 @@ class Participants_Db extends PDb_Base {
         // route the $_POST data through a callback if defined
         $post_data = self::set_filter('before_submit_signup', $_POST);
 
+        
+    
+        /*
+         * the signup form should update the current record if it is revisited during a multipage form session
+         */
+        $submit_action = 'insert';
+        if (self::$session->get('pdbid') !== false) {
+          $submit_action = 'update';
+        }
+
         // submit the data
-        $post_data['id'] = self::process_form($post_data, 'insert', false, $columns);
+        $post_data['id'] = self::process_form($post_data, $submit_action, self::$session->get('pdbid'), $columns);
 
         if (false !== $post_data['id']) {
           
@@ -2884,7 +2892,7 @@ class Participants_Db extends PDb_Base {
       
     foreach ($columns as $column) {
       
-      $column->value = $data[$column->name];
+      $column->value = isset($data[$column->name]) ? $data[$column->name] : '';
 
       $tags[] = '[' . $column->name . ']';
 
@@ -2892,8 +2900,10 @@ class Participants_Db extends PDb_Base {
     }
 
     // add the "record_link" tag
-    $tags[] = '[record_link]';
-    $values[] = Participants_Db::get_record_link($data['private_id']);
+    if (isset($data['private_id'])) {
+			$tags[] = '[record_link]';
+			$values[] = Participants_Db::get_record_link($data['private_id']);
+    }
 
     // add the date tag
     $tags[] = '[date]';
@@ -2935,6 +2945,7 @@ class Participants_Db extends PDb_Base {
   public static function pdb_list_filter() {
 
     $multi = is_array($_POST['search_field']);
+    self::$instance_index = filter_input( INPUT_POST, 'instance_index', FILTER_SANITIZE_NUMBER_INT );
     $postinput = filter_input_array(INPUT_POST, self::search_post_filter($multi));
 
     if (!wp_verify_nonce($postinput['filterNonce'], self::$prefix . 'list-filter-nonce'))
@@ -2967,6 +2978,10 @@ class Participants_Db extends PDb_Base {
      * the Shortcode class when it was instantiated
      */
     $session = self::$session->get('shortcode_atts');
+    if (!is_object($session[$post->ID]['list'][$instance])) {
+      printf( 'session for list instance %s not found', $instance );
+      return;
+    }
     // translate the ArrayAccess object to a straight array
     $shortcode_atts = $session[$post->ID]['list'][$instance]->toArray();
     

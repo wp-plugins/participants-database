@@ -46,6 +46,8 @@ class PDb_Session {
   /**
    * true if the current user does not allow cookies
    * 
+   * @version 1.6 removed; not reliable
+   * 
    * @var bool
    */
   public $no_user_cookie = false;
@@ -100,8 +102,6 @@ class PDb_Session {
 			$this->session = WP_Session::get_instance();
     }
 
-    $this->test_cookie();
-
 		return $this->session;
 	}
 
@@ -126,6 +126,20 @@ class PDb_Session {
 	public function get( $key, $default = false ) {
 		$key = sanitize_key( $key );
 		return isset( $this->session[ $key ] ) ? maybe_unserialize( $this->session[ $key ] ) : $default;
+	}
+
+  
+	/**
+	 * get a session variable array
+   * 
+	 * @param string $key Session key
+   * @param string|array|bool $default the value to return if none is found in the session
+	 * @return string Session variable or $default value
+	 */
+	public function getArray( $key, $default = false ) {
+		$key = sanitize_key( $key );
+    $array_object = isset( $this->session[ $key ] ) ? maybe_unserialize( $this->session[ $key ] ) : false;
+		return is_object( $array_object ) ? $array_object->toArray() : $default;
 	}
 
 	/**
@@ -159,7 +173,7 @@ class PDb_Session {
 	public function update( $key, $value ) {
     
 		$key = sanitize_key( $key );
-    $stored = $this->get($key);
+    $stored = $this->getArray($key);
 
 		if (is_array($value) && is_array($stored) )
 			$this->session[ $key ] = self::deep_merge($value, $stored);
@@ -207,20 +221,6 @@ class PDb_Session {
         }
       }
     return $c;
-  }
-  /**
-   * tests for cookie access in the user's browser and sets the no_user_cookie property
-   * 
-   * we test for either the wordpress test cookie or the plugin session cookie
-   * 
-   * @return null
-   */
-  private function test_cookie()
-  {
-    $this->no_user_cookie = ((bool) filter_input(INPUT_COOKIE, 'wordpress_test_cookie')) === false;
-    if ($this->no_user_cookie) {
-      $this->no_user_cookie = ((bool) filter_input(INPUT_COOKIE, WP_SESSION_COOKIE)) === false;
-    }
   }
 }
 

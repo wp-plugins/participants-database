@@ -92,10 +92,7 @@ class PDb_Signup extends PDb_Shortcode {
 	/**
    * instantiates the signup form object
    *
-   * this class is called by a WP shortcode
-   *
    * @param array $shortcode_atts   this array supplies the display parameters for the instance
-   *                 'title'   string displays a title for the form (default none)
    *
    */
   public function __construct($shortcode_atts) {
@@ -106,10 +103,23 @@ class PDb_Signup extends PDb_Shortcode {
         'submit_button' => Participants_Db::plugin_setting('signup_button_text'),
         'edit_record_page' => Participants_Db::plugin_setting('registration_page'),
     );
+    /*
+     * status values: normal (signup form submission) or multipage
+     */
     $form_status = $this->get_form_status();
     
-    if ($form_status === 'multipage' ) {
+    /*
+     * get the record ID from the last submission or current multiform
+     */
 			$this->participant_id = Participants_Db::$session->get('pdbid');
+    
+    if ($shortcode_atts['module'] === 'signup' && $this->participant_id !== false && !isset($shortcode_atts['action']) && $form_status === 'multipage') {
+      /*
+       * if we've opened a regular signup form while in a multipage session, treat it 
+       * as a normal signup form and terminate the multipage session
+       */
+      $this->participant_id = false;
+      $this->_clear_multipage_session();
     }
 
     if ($this->participant_id === false) {
@@ -136,11 +146,9 @@ class PDb_Signup extends PDb_Shortcode {
       
       if ($this->participant_values && ($form_status === 'normal' || ($shortcode_atts['module'] == 'thanks' && $form_status === 'multipage'))) {
         /*
-       * the submission is successful, clear the session
+         * the submission is successful, clear the session and set the submitted flag
        */
-      Participants_Db::$session->clear('pdbid');
-      Participants_Db::$session->clear('captcha_vars');
-      Participants_Db::$session->clear('captcha_result');
+        $this->_clear_multipage_session();
         $this->submitted = true;
         $shortcode_atts['module'] = 'thanks';
       }
@@ -181,6 +189,7 @@ class PDb_Signup extends PDb_Shortcode {
       Participants_Db::$session->clear('form_status');
       
     }
+    
     // print the shortcode output
     $this->_print_from_template();
   }
@@ -234,8 +243,12 @@ class PDb_Signup extends PDb_Shortcode {
   protected function _set_submission_page()
   {
 
+    $form_status = 'normal';
     if (!empty($this->shortcode_atts['action'])) {
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
+      if ($this->submission_page !== false) {
+        $form_status = 'multipage';
+      }
     }
     if (!$this->submission_page) {
       if (Participants_Db::plugin_setting('signup_thanks_page', 'none') != 'none') { 
@@ -243,10 +256,10 @@ class PDb_Signup extends PDb_Shortcode {
       }
     }
     if (!$this->submission_page) {
-
       // the signup thanks page is not set up, so we submit to the page the form is on
       $this->submission_page = $_SERVER['REQUEST_URI'];
     }
+    $this->set_form_status($form_status);
   }
 
   /**
@@ -299,7 +312,7 @@ class PDb_Signup extends PDb_Shortcode {
    */
   private function get_thanks_message() {
 
-    $this->output = $this->_proc_tags($this->thanks_message);
+    $this->output = empty($this->participant_values) ? '' : $this->_proc_tags($this->thanks_message);
     unset($_POST);
     return $this->output;
   }
@@ -481,6 +494,15 @@ message:
     } else {
       return true;
     }
+  }
+
+  /**
+   * clears the multipage form session values
+   */
+  function _clear_multipage_session() {
+    Participants_Db::$session->clear('pdbid');
+    Participants_Db::$session->clear('captcha_vars');
+    Participants_Db::$session->clear('captcha_result');
   }
 
 }

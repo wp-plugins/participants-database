@@ -474,9 +474,9 @@ class PDb_List_Query {
    * @return null
    */
   private function  _add_filter_from_input($input) {
-    $this->_reset_filters();
-    if ($input['target_instance'] === $this->list_instance) {
     
+    $this->_reset_filters();
+    if ($input['target_instance'] == $this->list_instance) { 
 			if (empty($input['sortstring'])) {
 				$input['sortstring'] = $input['sortBy'];
 				$input['orderstring'] = $input['ascdesc'];

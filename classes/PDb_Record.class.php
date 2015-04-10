@@ -52,7 +52,7 @@ class PDb_Record extends PDb_Shortcode {
 
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
 
-      if (false === $this->participant_values) {
+      if ($this->participant_values === false) {
 
         $this->_not_found();
       } else {
@@ -165,6 +165,27 @@ class PDb_Record extends PDb_Shortcode {
     }
   }
   
+  
+
+  /**
+   * sets the form submission page
+   */
+  protected function _set_submission_page()
+  {
+
+    $form_status = 'normal';
+    if (!empty($this->shortcode_atts['action'])) {
+      $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
+      if ($this->submission_page !== false) {
+        $form_status = 'multipage';
+      }
+    }
+    if (!$this->submission_page) {
+      $this->submission_page = $_SERVER['REQUEST_URI'];
+    }
+    $this->set_form_status($form_status);
+  }
+  
   /**
    * sets up the multipage referral
    * 
@@ -174,7 +195,6 @@ class PDb_Record extends PDb_Shortcode {
     $this->previous_multipage = Participants_Db::$session->get('previous_multipage', '');
     if (strlen($this->previous_multipage) === 0) {
       Participants_Db::$session->clear('pdbid');
-      $this->shortcode_atts['record_id'] = false;
     }
   }
 }

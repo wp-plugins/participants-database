@@ -251,16 +251,6 @@ abstract class PDb_Shortcode {
 
       return false;
     }
-    /*
-     * don't show the signup form if cookies are disabled.
-     */
-    if ($this->module === 'signup' && Participants_Db::$session->no_user_cookie) {
-      $message = Participants_Db::plugin_setting('no_cookie_message');
-      if (!empty($message)) {
-        $this->output = '<p class="alert alert-error">' . $message . '</p>';
-        return false;
-      }
-    }
 
     ob_start();
     
@@ -1225,17 +1215,9 @@ abstract class PDb_Shortcode {
   protected function _set_submission_page()
   {
 
-    $form_status = 'normal';
-    if (!empty($this->shortcode_atts['action'])) {
-      $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
-      if ($this->submission_page !== false) {
-        $form_status = 'multipage';
-      }
-    }
-    if (!$this->submission_page) {
-    $this->submission_page = $_SERVER['REQUEST_URI'];
-  }
-    $this->set_form_status($form_status);
+    if (empty($this->submission_page)) {
+			$this->submission_page = $_SERVER['REQUEST_URI'];
+		}
   }
   
   /**
