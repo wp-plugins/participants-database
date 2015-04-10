@@ -94,7 +94,7 @@ class PDb_Template {
   {
     $this->list_object = $object;
     $this->_setup_fields();
-		unset($this->list_object);
+    unset($this->list_object);
   }
   
   /**
