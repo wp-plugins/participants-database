@@ -16,6 +16,10 @@ while ( $this->have_groups() ) : $this->the_group();
  		
  		<span class="pdb-value <?php echo $this->field->name . ' ' . $this->get_empty_class( $this->field ) ?>"><?php $this->field->print_value() ?></span>
  		
- 	<?php endwhile;
+    <?php break; // only do the first iteration 
+    
+    endwhile;
+    
+  break;
  	
 endwhile; ?>

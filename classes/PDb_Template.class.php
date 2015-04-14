@@ -382,6 +382,9 @@ class PDb_Template {
       case 'PDb_Single':
       default:
         $this->values[$name] = is_array($value) ? serialize($value) : $value;
+        if (!isset($this->fields->{$name})) {
+          $this->fields->{$name} = new stdClass();
+        }
         $this->fields->{$name}->value = $value;
     }
   }
@@ -484,16 +487,15 @@ class PDb_Template {
    */
   private function _setup_list_record_object() {
     $this->record = new stdClass();
-    $this->groups = new stdClass();
-    foreach ($this->list_object->display_groups as $group_name) {
-      $this->record->{$group_name} = Participants_Db::get_group($group_name);
+    $this->_setup_record_groups();
+    foreach ($this->fields as $name => $field) {
+      $this->groups[$field->group]->fields[$field->order] = $name;
+      $this->record->{$field->group}->fields->{$name} = clone $field;
     }
-    foreach ($this->fields as &$field) {
-      $this->groups->{$field->group}->fields[$field->order] = $field->name;
-      if (!is_object($this->record->{$field->group}->fields)) {
-        $this->record->{$field->group}->fields = new stdClass();
       }
-      $this->record->{$field->group}->fields->{$field->name} = $field;
+  private function _setup_record_groups() {
+    foreach ($this->list_object->display_groups as $group_name) {
+      $this->record->{$group_name} = new PDb_Template_Field_Group(Participants_Db::get_group($group_name));
     }
   }
   /**
@@ -509,5 +511,40 @@ class PDb_Template {
   	$op = strpos($url, '?') === false ? '?' : '&';
   	return $url . $op . $name . '=' . urlencode($value);
   }
+}
+/**
+ * class that forms a container for field groups
+ */
+class PDb_Template_Field_Group {
+  
+  var $id;
+  var $title;
+  var $order;
+  var $display;
+  var $name;
+  var $admin;
+  var $description;
+  /**
+   *
+   * @var object
+   */
+  var $fields;
+  /**
+   * instantates the object
+   */
+  public function __construct($group)
+  {
+    $this->fields = new stdClass;
+    $this->_import($group);
+  }
+  /**
+   * imports the incoming object's properties
+   */
+  private function _import($object)
+  {   
+      foreach (get_object_vars($object) as $key => $value) {
+          $this->$key = $value;
+      }
+  } 
 }
 ?>

@@ -10,7 +10,7 @@
  * @license    GPL2
  * @version    0.2
  * @link       http://xnau.com/wordpress-plugins/
- * @depends    zydev_parseCSV class
+ * @depends    parseCSV class
  *
  * this class is given a $_POST field name for an uploaded file and an optional
  * list of target columns. it parses the file contents as a CSV-format text file
@@ -67,7 +67,7 @@ abstract class xnau_CSV_Import {
    */
   var $i10n_context;
   /**
-   * @var object the zydev_parseCSV instance
+   * @var object the parseCSV instance
    */
   var $CSV;
 
@@ -178,7 +178,7 @@ abstract class xnau_CSV_Import {
       return false;
     }
 
-    $this->CSV = new zydev_parseCSV();
+    $this->CSV = new parseCSV();
 
     /* this method determines the delimiter automatically then parses the file; 
      * we don't use it because it seems easily confused

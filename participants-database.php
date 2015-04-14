@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.6beta.11
+  Version: 1.6beta.12
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -1298,14 +1298,14 @@ class Participants_Db extends PDb_Base {
    * 
    * @param array  $post           the array of new values (typically the $_POST array)
    * @param string $action         the db action to be performed: insert or update
-   * @param int|bool   $participant_id the id of the record to update. If it is false, it 
-   *                                   creates a new record, if true, it creates or updates 
-   *                                   the default record.
+   * @param int|bool    $participant_id the id of the record to update. If it is false 
+   *                                    or omitted, it creates a new record, if true, it 
+   *                                    creates or updates the default record.
    * @param array|bool $column_names   array of column names to process from the $post 
    *                                   array, if false, processes a preset set of columns
    *
-   * @return unknown int ID of the record created or updated, bool false if 
-   *                 submission does not validate
+   * @return int|bool   int ID of the record created or updated, bool false if submission 
+   *                    does not validate
    */
   public static function process_form($post, $action, $participant_id = false, $column_names = false) {
 
@@ -1449,7 +1449,7 @@ class Participants_Db extends PDb_Base {
     switch ($action) {
 
       case 'update':
-        $sql = 'UPDATE ' . self::$participants_table . ' SET date_updated = NOW(), ';
+        $sql = 'UPDATE ' . self::$participants_table . ' SET `date_updated` = NOW(), ';
         $where = " WHERE id = " . $participant_id;
         break;
 
@@ -1506,9 +1506,9 @@ class Participants_Db extends PDb_Base {
         case 'date_updated':
         case 'last_accessed':
           
-          // clear the value if it's a record update
-          if ($action == 'update' && $column->name == 'date_updated') {
-            $post['date_updated'] = '';
+          // remove the value from the post array if it is already set in the sql
+          if (isset($post[$column->name]) && strpos($sql, $column->name) !== false) {
+            unset($post[$column->name]);
           }
           /*
            * this func returns bool false if the timestamp is not present or is invalid, 
@@ -2269,7 +2269,7 @@ class Participants_Db extends PDb_Base {
 
           case self::$i18n['submit'] :
           default :
-            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id;
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME;
 
         }
         wp_redirect($redirect);
