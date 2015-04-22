@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.6beta.12
+  Version: 1.6beta.13
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -217,7 +217,9 @@ class Participants_Db extends PDb_Base {
    */
   public static $session;
   /**
-   * this is set once per plugin instantiation, then all instances arew expected to use this instead of running their own queries
+   * this is set once per plugin instantiation, then all instances are expected to use this instead of running their own queries
+   * 
+   * 
    * 
    * @var array of all field objects, indexed by field name
    */
@@ -403,9 +405,14 @@ class Participants_Db extends PDb_Base {
       self::$plugin_options = array_merge($default_options, (array) get_option(self::$participants_db_options));
     }
     /*
-     * writes the custom CSS setting to the custom css file
+     * normally, the custom CSS is written to a static css file, but on some systems, 
+     * that doesn't work, so the fallback is to load the dynamic CSS file
      */
-    self::_set_custom_css();
+    if (self::_set_custom_css()) {
+      $custom_css_file = 'PDb-custom.css';
+    } else {
+      $custom_css_file = 'custom_css.php';
+    }
     
     /*
      * set the plugin date display format; uses the blog setting, which is localized
@@ -437,7 +444,7 @@ class Participants_Db extends PDb_Base {
      * register frontend scripts and stylesheets
      */
     wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__), array('dashicons'));
-    wp_register_style('custom_plugin_css', plugins_url('/css/PDb-custom.css', __FILE__), null, $option_version);
+    wp_register_style('custom_plugin_css', plugins_url('/css/' . $custom_css_file, __FILE__), null, $option_version);
 
     wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));
@@ -684,7 +691,7 @@ class Participants_Db extends PDb_Base {
    *
    *
    * the ID of the record to show for editing can be provided one of three ways: 
-   *    $_GET['pid'] (private link), 
+   *    $_GET['pid'] (private link) or in the POST array (actively editing a record)
    *    $atts['id'](deprecated) or $atts['record_id'] (in the sortcode), or 
    *    self::$session->get('pdbid') (directly from the signup form)
    * 
@@ -697,10 +704,14 @@ class Participants_Db extends PDb_Base {
     $record_id = false;
     // get the pid from the get string if given (for backwards compatibility)
     $get_pid = filter_input(INPUT_GET, 'pid', FILTER_SANITIZE_STRING);
+    if (empty($get_pid)) {
+      $get_pid = filter_input(INPUT_POST, 'pid', FILTER_SANITIZE_STRING);
+    }
     if (!empty($get_pid)) {
       $record_id = self::get_participant_id($get_pid);
     }
-    // get the id from the SESSION array; this overrides the GET string
+    
+    // get the id from the SESSION array
     if ($record_id === false && self::$session->get('pdbid')) {
       $record_id = self::get_record_id_by_term('id', self::$session->get('pdbid'));
     }
@@ -1484,6 +1495,7 @@ class Participants_Db extends PDb_Base {
       $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
     }
     }
+    
     $columns = self::get_column_atts($column_set);
 
     // gather the submit values and add them to the query

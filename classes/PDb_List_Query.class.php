@@ -624,7 +624,7 @@ class PDb_List_Query {
   /**
    * adds a List_Query_Filter object to the where clauses
    * 
-   * @param string $column      the name fo the field to target
+   * @param string $column      the name of the field to target
    * @param string $operator     the operator
    * @param string $search_term the term to filter by
    * @param string $logic       the logic term to add to the array

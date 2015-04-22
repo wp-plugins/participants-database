@@ -326,7 +326,7 @@ csv line= '.print_r( $csv_line, true ) );
   protected function import_columns() {
 
     // build the column names from the CSV if it's there
-    if (!$this->CSV->error and is_array($this->CSV->titles) and $this->column_names != $this->CSV->titles) {
+    if (is_array($this->CSV->titles) and $this->column_names != $this->CSV->titles) {
 
       $this->column_names = $this->CSV->titles;
 

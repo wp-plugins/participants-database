@@ -1,7 +1,7 @@
 /*
  * Participants Database Plugin
  * 
- * version: 0.8
+ * version: 0.85
  * 
  * xnau webdesign xnau.com
  * 
@@ -184,6 +184,9 @@ PDbListFilter = (function($) {
   $.fn.PDb_processSubmission = function() {
     // collect the form values and add them to the submission
     var $thisform = this.closest('form');
+    if (!$thisform.length) {
+      $thisform = this.closest('.pdb-list').find('.sort_filter_form');
+    }
     $thisform.find('input:not(input[type="submit"],input[type="radio"]), select').each(function() {
       add_value_to_submission($(this),submission);
     });

@@ -562,9 +562,14 @@ class PDb_Base {
   /**
    * writes the custom CSS setting to the custom css file
    * 
+   * @return bool true if the css file can be written to
+   * 
    */
   protected static function _set_custom_css() {
     $css_file = Participants_Db::$plugin_path . '/css/PDb-custom.css';
+    if (!is_writable($css_file)) {
+      return false;
+    }
     $file_contents = file_get_contents($css_file);
     $custom_css = Participants_Db::$plugin_options['custom_css'];
     if ($file_contents === $custom_css) {
@@ -572,6 +577,7 @@ class PDb_Base {
     } else {
       file_put_contents($css_file, $custom_css);
     }
+    return true;
   }
 
   /**
@@ -964,6 +970,7 @@ class PDb_Base {
         'logic' => $multi_validation,
         'sortBy' => FILTER_SANITIZE_STRING,
         'ascdesc' => FILTER_SANITIZE_STRING,
+        'listpage' => FILTER_VALIDATE_INT,
      );
   }
   
