@@ -14,7 +14,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    1.0
+ * @version    1.1
  * @link       http://xnau.com/wordpress-plugins/
  */
 
@@ -24,6 +24,7 @@ class PDb_Template {
   /**
    * @var object holds the instantiating object
    */
+  private $shortcode_object;
   /**
    * holds the record object
    * @var object $record
@@ -92,9 +93,9 @@ class PDb_Template {
    */
   function __construct($object)
   {
-    $this->list_object = $object;
+    $this->shortcode_object = $object;
     $this->_setup_fields();
-    unset($this->list_object);
+    unset($this->shortcode_object);
   }
   
   /**
@@ -244,7 +245,7 @@ class PDb_Template {
    */
   public function get_edit_link($page = '') {
     $edit_page = empty($page) ? $this->edit_page : Participants_Db::find_permalink($page);
-    return $this->_cat_url_var($edit_page, 'pid', $this->_value('private_id'));
+    return $this->cat_url_var($edit_page, 'pid', $this->_value('private_id'));
   }
   
   /**
@@ -254,7 +255,7 @@ class PDb_Template {
    */
   public function get_detail_link($page = '') {
     $detail_page = empty($page) ? $this->detail_page : Participants_Db::find_permalink($page);
-    return $this->_cat_url_var($detail_page, 'pdb', $this->_value('id'));
+    return $this->cat_url_var($detail_page, 'pdb', $this->_value('id'));
   }
   
   /**
@@ -280,7 +281,7 @@ class PDb_Template {
    */
   public function set_detail_page($page = '') {
     if (empty($page)) {
-      $page = !empty($this->list_object->shortcode_atts['single_record_link']) ? $this->list_object->shortcode_atts['single_record_link'] : Participants_Db::$plugin_options['single_record_page'];
+      $page = !empty($this->shortcode_object->shortcode_atts['single_record_link']) ? $this->shortcode_object->shortcode_atts['single_record_link'] : Participants_Db::$plugin_options['single_record_page'];
     }
     $this->detail_page = Participants_Db::find_permalink($page);
   }
@@ -352,6 +353,20 @@ class PDb_Template {
   public function print_form_element($name) {
     echo $this->get_form_element($name);
   }
+  
+  /**
+   * adds a value to an url
+   * 
+   * @param string $url
+   * @param string $name of the variable
+   * @param string $value
+   * 
+   * @return string the concatenated url
+   */
+  public function cat_url_var($url, $name, $value) {
+  	$op = strpos($url, '?') === false ? '?' : '&';
+  	return $url . $op . $name . '=' . urlencode($value);
+  }
   /**
    * returns the named value
    * 
@@ -382,6 +397,9 @@ class PDb_Template {
       case 'PDb_Single':
       default:
         $this->values[$name] = is_array($value) ? serialize($value) : $value;
+        if (!isset($this->fields->{$name})) {
+          $this->fields->{$name} = new stdClass();
+        }
         $this->fields->{$name}->value = $value;
     }
   }
@@ -425,40 +443,40 @@ class PDb_Template {
    * this will use a different method for each type of object used to instantiate the class
    */
   private function _setup_fields() {
-    $this->base_type = get_class($this->list_object);
-    $this->values = $this->list_object->participant_values;
+    $this->base_type = get_class($this->shortcode_object);
+    $this->values = $this->base_type !== 'PDb_List' ? $this->shortcode_object->participant_values : Participants_Db::get_participant($this->shortcode_object->record->record_id);
     $this->set_edit_page();
     $this->set_detail_page();
-    $this->module = $this->list_object->module;
+    $this->module = $this->shortcode_object->module;
     $this->id = $this->values['id'];
-    $this->edit_link = $this->_cat_url_var($this->edit_page, 'pid', $this->values['private_id']);
-    $this->detail_link = $this->_cat_url_var($this->detail_page, 'pdb', $this->id);
+    $this->edit_link = $this->cat_url_var($this->edit_page, 'pid', $this->values['private_id']);
+    $this->detail_link = $this->cat_url_var($this->detail_page, 'pdb', $this->id);
     $this->fields = new stdClass();
     $this->groups = array();
     switch ($this->base_type) {
       case 'PDb_List':
-        foreach($this->list_object->record->fields as $field_object) {
+        foreach($this->shortcode_object->record->fields as $field_object) {
           $name = $field_object->name;
           $value = isset($field_object->value) ? $field_object->value : '';
           $this->fields->{$name} = Participants_Db::get_column($name);
-          $this->fields->{$name}->module = $this->list_object->module;
+          $this->fields->{$name}->module = $this->shortcode_object->module;
           $this->fields->{$name}->value = $value;
         }
-        reset($this->list_object->record->fields);
+        reset($this->shortcode_object->record->fields);
         $this->_setup_list_record_object();
         break;
       case 'PDb_Signup':
       case 'PDb_Single':
       case 'PDb_Record':
       default:
-        if (!isset($this->list_object->record)) {
+        if (!isset($this->shortcode_object->record)) {
           error_log(__METHOD__.' cannot instantiate ' . __CLASS__ . ' object. Class must be instantiated with full module object.');
           break;
         }
-        $this->record = clone $this->list_object->record;
-        foreach($this->list_object->fields as $name => $field) {
+        $this->record = clone $this->shortcode_object->record;
+        foreach($this->shortcode_object->fields as $name => $field) {
           $this->fields->{$name} = $field;
-          $this->fields->{$name}->module = $this->list_object->module;
+          $this->fields->{$name}->module = $this->shortcode_object->module;
           $this->fields->{$name}->value = $this->values[$name];
           }
         foreach($this->record as $name => $group) {
@@ -484,30 +502,51 @@ class PDb_Template {
    */
   private function _setup_list_record_object() {
     $this->record = new stdClass();
-    $this->groups = new stdClass();
-    foreach ($this->list_object->display_groups as $group_name) {
-      $this->record->{$group_name} = Participants_Db::get_group($group_name);
+    $this->_setup_record_groups();
+    foreach ($this->fields as $name => $field) {
+      $this->groups[$field->group]->fields[$field->order] = $name;
+      $this->record->{$field->group}->fields->{$name} = clone $field;
     }
-    foreach ($this->fields as &$field) {
-      $this->groups->{$field->group}->fields[$field->order] = $field->name;
-      if (!is_object($this->record->{$field->group}->fields)) {
-        $this->record->{$field->group}->fields = new stdClass();
       }
-      $this->record->{$field->group}->fields->{$field->name} = $field;
+  private function _setup_record_groups() {
+    foreach ($this->shortcode_object->display_groups as $group_name) {
+      $this->record->{$group_name} = new PDb_Template_Field_Group(Participants_Db::get_group($group_name));
     }
+  }
+}
+/**
+ * class that forms a container for field groups
+ */
+class PDb_Template_Field_Group {
+  
+  var $id;
+  var $title;
+  var $order;
+  var $display;
+  var $name;
+  var $admin;
+  var $description;
+  /**
+   *
+   * @var object
+   */
+  var $fields;
+  /**
+   * instantates the object
+   */
+  public function __construct($group)
+  {
+    $this->fields = new stdClass;
+    $this->_import($group);
   }
   /**
-   * adds a value to an url
-   * 
-   * @param string $url
-   * @param string $name of the variable
-   * @param string $value
-   * 
-   * @return string the concatenated url
+   * imports the incoming object's properties
    */
-  private function _cat_url_var($url, $name, $value) {
-  	$op = strpos($url, '?') === false ? '?' : '&';
-  	return $url . $op . $name . '=' . urlencode($value);
-  }
+  private function _import($object)
+  {   
+      foreach (get_object_vars($object) as $key => $value) {
+          $this->$key = $value;
+      }
+  } 
 }
 ?>

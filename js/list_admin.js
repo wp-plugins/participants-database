@@ -54,7 +54,7 @@ var PDbListAdmin = (function ($) {
             resizable : false,
             buttons : [{
                 icons : {
-                  primary : "dashicons dashicons-yes"
+                  primary : "dashicons dashicons-yes ui-icon-check"
                 },
                 click : function () {
                   listform.prepend(submitElement.clone().val(list_adminL10n.delete));
@@ -65,7 +65,7 @@ var PDbListAdmin = (function ($) {
                 }
               }, {
                 icons : {
-                  primary : "dashicons dashicons-no-alt"
+                  primary : "dashicons dashicons-no-alt ui-icon-close"
                 },
                 click : function () {
                   checkState = true;

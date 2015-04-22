@@ -291,7 +291,7 @@ class PDb_List extends PDb_Shortcode {
 
     if (!empty($this->records)) {
 
-      foreach ($this->records as $id => $record) {
+      foreach ($this->records as $record_id => $record_fields) {
 
         /*
          * @version 1.6 
@@ -299,9 +299,9 @@ class PDb_List extends PDb_Shortcode {
          * this array now contains all values for the record
          */
         // set the values for the current record
-        $this->participant_values = Participants_Db::get_participant($id);
+        $this->participant_values = Participants_Db::get_participant($record_id);
 
-        foreach ($record as $field => $value) {
+        foreach ($record_fields as $field => $value) {
           
           /*
            * as of 1.5.5, we don't fill up the records property with all the field properties, 
@@ -317,7 +317,7 @@ class PDb_List extends PDb_Shortcode {
           $this->_set_field_link($field_object);
 
           // add the field to the record object
-          $this->records[$id]->{$field_object->name} = $field_object;
+          $this->records[$record_id]->{$field_object->name} = $field_object;
       }
     }
 
@@ -359,7 +359,7 @@ class PDb_List extends PDb_Shortcode {
     if (filter_input(INPUT_GET, 'instance', FILTER_VALIDATE_INT) === $this->instance_index) {
       $input = INPUT_GET;
     }
-    if (isset($_POST[$this->list_page]) && filter_input(INPUT_POST, 'instance_index', FILTER_VALIDATE_INT) === $this->instance_index) {
+    if (isset($_POST[$this->list_page]) && filter_input(INPUT_POST, 'instance_index', FILTER_VALIDATE_INT) == $this->instance_index) {
       $input = INPUT_POST;
     }
     if ($input !== false) {

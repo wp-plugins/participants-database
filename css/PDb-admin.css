@@ -296,6 +296,7 @@ body[class*='participants-database'] .text-block li {
 }
 #delete_button.armed {
   border: 1px solid rgba(204, 0, 0, 0.5);
+  color: #000;
 /*  box-shadow: 0 0 13px rgba(204, 0, 0, 0.3) inset;*/
 }
 #delete_button.armed:hover {

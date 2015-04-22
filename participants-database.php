@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.6beta.11
+  Version: 1.6beta.13
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -217,7 +217,9 @@ class Participants_Db extends PDb_Base {
    */
   public static $session;
   /**
-   * this is set once per plugin instantiation, then all instances arew expected to use this instead of running their own queries
+   * this is set once per plugin instantiation, then all instances are expected to use this instead of running their own queries
+   * 
+   * 
    * 
    * @var array of all field objects, indexed by field name
    */
@@ -403,9 +405,14 @@ class Participants_Db extends PDb_Base {
       self::$plugin_options = array_merge($default_options, (array) get_option(self::$participants_db_options));
     }
     /*
-     * writes the custom CSS setting to the custom css file
+     * normally, the custom CSS is written to a static css file, but on some systems, 
+     * that doesn't work, so the fallback is to load the dynamic CSS file
      */
-    self::_set_custom_css();
+    if (self::_set_custom_css()) {
+      $custom_css_file = 'PDb-custom.css';
+    } else {
+      $custom_css_file = 'custom_css.php';
+    }
     
     /*
      * set the plugin date display format; uses the blog setting, which is localized
@@ -437,7 +444,7 @@ class Participants_Db extends PDb_Base {
      * register frontend scripts and stylesheets
      */
     wp_register_style('pdb-frontend', plugins_url('/css/participants-database.css', __FILE__), array('dashicons'));
-    wp_register_style('custom_plugin_css', plugins_url('/css/PDb-custom.css', __FILE__), null, $option_version);
+    wp_register_style('custom_plugin_css', plugins_url('/css/' . $custom_css_file, __FILE__), null, $option_version);
 
     wp_register_script(self::$prefix.'shortcode', plugins_url('js/shortcodes.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'list-filter', plugins_url('js/list-filter.js', __FILE__), array('jquery'));
@@ -684,7 +691,7 @@ class Participants_Db extends PDb_Base {
    *
    *
    * the ID of the record to show for editing can be provided one of three ways: 
-   *    $_GET['pid'] (private link), 
+   *    $_GET['pid'] (private link) or in the POST array (actively editing a record)
    *    $atts['id'](deprecated) or $atts['record_id'] (in the sortcode), or 
    *    self::$session->get('pdbid') (directly from the signup form)
    * 
@@ -697,10 +704,14 @@ class Participants_Db extends PDb_Base {
     $record_id = false;
     // get the pid from the get string if given (for backwards compatibility)
     $get_pid = filter_input(INPUT_GET, 'pid', FILTER_SANITIZE_STRING);
+    if (empty($get_pid)) {
+      $get_pid = filter_input(INPUT_POST, 'pid', FILTER_SANITIZE_STRING);
+    }
     if (!empty($get_pid)) {
       $record_id = self::get_participant_id($get_pid);
     }
-    // get the id from the SESSION array; this overrides the GET string
+    
+    // get the id from the SESSION array
     if ($record_id === false && self::$session->get('pdbid')) {
       $record_id = self::get_record_id_by_term('id', self::$session->get('pdbid'));
     }
@@ -1298,14 +1309,14 @@ class Participants_Db extends PDb_Base {
    * 
    * @param array  $post           the array of new values (typically the $_POST array)
    * @param string $action         the db action to be performed: insert or update
-   * @param int|bool   $participant_id the id of the record to update. If it is false, it 
-   *                                   creates a new record, if true, it creates or updates 
-   *                                   the default record.
+   * @param int|bool    $participant_id the id of the record to update. If it is false 
+   *                                    or omitted, it creates a new record, if true, it 
+   *                                    creates or updates the default record.
    * @param array|bool $column_names   array of column names to process from the $post 
    *                                   array, if false, processes a preset set of columns
    *
-   * @return unknown int ID of the record created or updated, bool false if 
-   *                 submission does not validate
+   * @return int|bool   int ID of the record created or updated, bool false if submission 
+   *                    does not validate
    */
   public static function process_form($post, $action, $participant_id = false, $column_names = false) {
 
@@ -1449,7 +1460,7 @@ class Participants_Db extends PDb_Base {
     switch ($action) {
 
       case 'update':
-        $sql = 'UPDATE ' . self::$participants_table . ' SET date_updated = NOW(), ';
+        $sql = 'UPDATE ' . self::$participants_table . ' SET `date_updated` = NOW(), ';
         $where = " WHERE id = " . $participant_id;
         break;
 
@@ -1484,6 +1495,7 @@ class Participants_Db extends PDb_Base {
       $column_set = $action == 'update' ? ( is_admin() ? 'backend' : 'frontend' ) : ( $participant_id ? 'all' : 'new' );
     }
     }
+    
     $columns = self::get_column_atts($column_set);
 
     // gather the submit values and add them to the query
@@ -1506,9 +1518,9 @@ class Participants_Db extends PDb_Base {
         case 'date_updated':
         case 'last_accessed':
           
-          // clear the value if it's a record update
-          if ($action == 'update' && $column->name == 'date_updated') {
-            $post['date_updated'] = '';
+          // remove the value from the post array if it is already set in the sql
+          if (isset($post[$column->name]) && strpos($sql, $column->name) !== false) {
+            unset($post[$column->name]);
           }
           /*
            * this func returns bool false if the timestamp is not present or is invalid, 
@@ -2269,7 +2281,7 @@ class Participants_Db extends PDb_Base {
 
           case self::$i18n['submit'] :
           default :
-            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME . '-list_participants&id=' . $participant_id;
+            $redirect = get_admin_url() . 'admin.php?page=' . self::PLUGIN_NAME;
 
         }
         wp_redirect($redirect);

@@ -102,6 +102,17 @@ class PDb_Aux_Plugin {
 			add_action('admin_init', 			array($this, 'settings_api_init'));
 			add_action('init',            array($this, 'initialize_updater'));
 			add_action('init',            array($this, 'load_textdomain'));
+    /*
+     * this sets up the setting verfication callback mechanism
+     * 
+     * to set up a setting verification callback, create your function with a name 
+     * like this: setting_callback_for_{setting name} It passes in the new value 
+     * and the previous value. The callback must return the value to save.
+     */
+    if (!has_filter('pre_update_option_' . $this->aux_plugin_settings, array($this, 'settings_callbacks'))) {
+      add_filter('pre_update_option_' . $this->aux_plugin_settings, array($this, 'settings_callbacks'), 10, 2);
+    }
+    
   }
   
   /**
@@ -186,6 +197,47 @@ class PDb_Aux_Plugin {
               );
     }
   }  
+  
+  /**
+   * adds a setting to the Settings API
+   * 
+   * @param array $atts an array of settings parameters
+   * @return null
+   * 
+   */
+  protected function add_setting($atts) {
+    
+    $default = array(
+        'type' => 'text',
+        'name' => '',
+        'title' => '',
+        'default' => '',
+        'help' => '',
+        'options' => '',
+        'style' => '',
+        'class' => '',
+        'section' => $this->aux_plugin_shortname . '_setting_section'
+    );
+    $params = shortcode_atts($default, $atts);
+
+    add_settings_field(
+            $params['name'], 
+            $params['title'],
+            array($this, 'setting_callback_function'),
+            $this->aux_plugin_name,
+            $params['section'],
+            array(
+                'type'  => $params['type'],
+                'name'  => $params['name'],
+                'value' => isset($this->plugin_options[$params['name']]) ? $this->plugin_options[$params['name']] : $params['default'],
+                'title' => $params['title'],
+                'help'  => $params['help'],
+                'options' => $params['options'],
+                'style' => $params['style'],
+                'class' => $params['class'],
+                )
+            );
+  }
   /**
    * renders the plugin settings page
    * 
@@ -391,44 +443,23 @@ $html .= "\n" . '</div>';
   }
   
   /**
-   * adds a setting to the Settings API
+   * executes save settings callbacks
    * 
-   * @param array $atts an array of settings parameters
-   * @return null
+   * when the plugin settings are saved, each one is checked for a callback to execute
    * 
+   * @uses WP filter 'pre_update_option_{option_name}'
    */
-  protected function add_setting($atts) {
-    
-    $default = array(
-        'type' => 'text',
-        'name' => '',
-        'title' => '',
-        'default' => '',
-        'help' => '',
-        'options' => '',
-        'style' => '',
-        'class' => '',
-        'section' => $this->aux_plugin_shortname . '_setting_section'
-    );
-    $params = shortcode_atts($default, $atts);
-
-    add_settings_field(
-            $params['name'], 
-            $params['title'],
-            array($this, 'setting_callback_function'),
-            $this->aux_plugin_name,
-            $params['section'],
-            array(
-                'type'  => $params['type'],
-                'name'  => $params['name'],
-                'value' => isset($this->plugin_options[$params['name']]) ? $this->plugin_options[$params['name']] : $params['default'],
-                'title' => $params['title'],
-                'help'  => $params['help'],
-                'options' => $params['options'],
-                'style' => $params['style'],
-                'class' => $params['class'],
-                )
-            );
+  public function settings_callbacks( $new_value, $old_value) 
+  {
+    $settings_values = $new_value;
+    foreach ($settings_values as $name => $value) {
+      $callback = array($this, 'setting_callback_for_' . $name);
+      if (is_callable($callback)) {
+        $prev_value = isset($old_value[$name]) ? $old_value[$name] : '';
+        $new_value[$name] = call_user_func($callback, $value, $prev_value);
+      }
+    }
+    return $new_value;
   }
 
   /**
