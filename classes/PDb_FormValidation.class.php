@@ -165,7 +165,7 @@ class PDb_FormValidation extends xnau_FormValidation {
 
           break;
 
-        case ( $this->_is_regex($field->validation) ) :
+        case ( self::is_regex($field->validation) ) :
 
           $regex = $field->validation;
           break;

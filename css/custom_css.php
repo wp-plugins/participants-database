@@ -1,6 +1,8 @@
 <?php
 /*
- * we basically need to know where wordpress is installed, and at this point we don't have any of the usual constants or functions, so we're just going to take a few guesses here.
+ * we basically need to know where wordpress is installed, and at this point we 
+ * don't have any of the usual constants or functions, so we're just going to take 
+ * a few guesses here.
  * 
  */
 $wp_path = $_SERVER['DOCUMENT_ROOT'] . '/wp-load.php';
