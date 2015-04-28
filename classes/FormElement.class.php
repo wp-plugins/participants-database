@@ -15,34 +15,36 @@
  * @depends    PDb_FormElement class
  */
 if ( ! defined( 'ABSPATH' ) ) die;
-class FormElement {
-  /**
-   * prints a form element
-   * 
-   * @param array $params
-   */
-  public static function print_element($params) {
-   PDb_FormElement::print_element($params);
-  }
-  /**
-   * gets a form element html
-   * 
-   * @param array $params
-   * @return string
-   */
-  public static function get_element($params) {
-   return PDb_FormElement::get_element($params);
-  }
-  /**
-   * prints a series of hidden fields
-   * 
-   * @param array $fields name => value pairs
-   * @param bool $print true to print, false to return
-   */
-  public static function print_hidden_fields($fields, $print = true) {
-    $hidden_fields = PDb_FormElement::print_hidden_fields($fields, false);
-    if ($print) echo $hidden_fields;
-    else return $hidden_fields;
+if (!class_exists('FormElement')) {
+  class FormElement {
+    /**
+     * prints a form element
+     * 
+     * @param array $params
+     */
+    public static function print_element($params) {
+     PDb_FormElement::print_element($params);
+    }
+    /**
+     * gets a form element html
+     * 
+     * @param array $params
+     * @return string
+     */
+    public static function get_element($params) {
+     return PDb_FormElement::get_element($params);
+    }
+    /**
+     * prints a series of hidden fields
+     * 
+     * @param array $fields name => value pairs
+     * @param bool $print true to print, false to return
+     */
+    public static function print_hidden_fields($fields, $print = true) {
+      $hidden_fields = PDb_FormElement::print_hidden_fields($fields, false);
+      if ($print) echo $hidden_fields;
+      else return $hidden_fields;
+    }
   }
 }
 

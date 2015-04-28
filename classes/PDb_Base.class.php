@@ -384,6 +384,12 @@ class PDb_Base {
 	    }
     }
 
+    /*
+     * note: we need to sanitize the value, but we don't know what kind of value 
+     * it will be so we're just going to treat them all as strings. It won't be an 
+     * object or array anyway, so if a number is represented as a string, it's not 
+     * a big deal.
+     */
     return filter_var($dynamic_value, FILTER_SANITIZE_STRING);
   }
   

@@ -292,7 +292,7 @@ class xnau_FormValidation {
           $regex = '#^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$#i';
           break;
 
-        case ( $this->_is_regex($field->validation) ) :
+        case ( self::is_regex($field->validation) ) :
 
           $regex = $field->validation;
           break;
@@ -390,10 +390,10 @@ class xnau_FormValidation {
    * @param string $string the string to test
    * @return bool
    */
-  protected function _is_regex($string)
+  public static function is_regex($string)
   {
 
-    if (!is_string($string))
+    if (!is_string($string || strlen($string) === 0))
       return false;
 
     return @preg_match($string,'test string') !== false;
