@@ -12,7 +12,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2014 xnau webdesign
  * @license    GPL2
- * @version    Release: 3.4
+ * @version    Release: 3.5
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if (!defined('ABSPATH'))
@@ -109,26 +109,17 @@ if (!class_exists('PDb_Aux_Plugin')) :
      */
     function __construct($subclass, $plugin_file)
     {
-      $this->plugin_path = plugin_basename($plugin_file);
-      $this->plugin_data = get_plugin_data($plugin_file);
+      $this->plugin_path = $plugin_file;
       $this->subclass = $subclass;
-      $this->set_attribution($plugin_file);
+      
+      $this->aux_plugin_settings = $this->aux_plugin_shortname . '_settings';
+      $this->settings_page = Participants_Db::$plugin_page . '-' . $this->aux_plugin_name . '_settings';
 
       add_action('admin_menu', array($this, 'add_settings_page'));
       add_action('admin_init', array($this, 'settings_api_init'));
-      add_action('init', array($this, 'initialize_updater'));
-      add_action('init', array($this, 'set_plugin_options'));
+      add_action('init', array($this, 'set_plugin_options'), 1);
       add_action('init', array($this, 'load_textdomain'));
-      /*
-       * this sets up the setting verfication callback mechanism
-       * 
-       * to set up a setting verification callback, create your function with a name 
-       * like this: setting_callback_for_{setting name} It passes in the new value 
-       * and the previous value. The callback must return the value to save.
-       */
-      if (!has_filter('pre_update_option_' . $this->aux_plugin_settings, array($this, 'settings_callbacks'))) {
-        add_filter('pre_update_option_' . $this->aux_plugin_settings, array($this, 'settings_callbacks'), 10, 2);
-      }
+      add_action('init', array($this, 'initialize_updater'), 50);
     }
 
     /**
@@ -156,8 +147,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      * 
      * @return mixed
      */
-    public function plugin_option($option_name, $default = false)
-    {
+    public function plugin_option($option_name, $default = false) {
       return isset($this->plugin_options[$option_name]) ? $this->plugin_options[$option_name] : $default;
     }
 
@@ -168,15 +158,6 @@ if (!class_exists('PDb_Aux_Plugin')) :
     public function initialize_updater()
     {
       $this->Updater = new PDb_Update($this->plugin_path, $this->plugin_data['Version']);
-    }
-
-    /**
-     * sets the slug for the aux plugin settings page
-     */
-    public function set_settings_containers()
-    {
-      $this->settings_page = Participants_Db::$plugin_page . '-' . $this->aux_plugin_name . '_settings';
-      $this->aux_plugin_settings = Participants_Db::set_filter('aux_plugin_admin_settings_name', $this->aux_plugin_shortname . '_settings');
     }
 
     /**
@@ -193,22 +174,38 @@ if (!class_exists('PDb_Aux_Plugin')) :
     /**
      * sets the plugin options array
      */
-    public function set_plugin_options()
-    {
-      $this->set_settings_containers();
+    public function set_plugin_options() {
+      $this->plugin_data = get_plugin_data($this->plugin_path);
+      $this->plugin_path = plugin_basename($this->plugin_path);
+      $this->set_attribution();
       $this->register_option_for_translations();
-      $settings_name = $this->get_filtered_settings_name();
-      $this->plugin_options = get_option($settings_name);
+      /*
+       * this sets up the setting verfication callback mechanism
+       * 
+       * to set up a setting verification callback, create your function with a name 
+       * like this: setting_callback_for_{setting name} It passes in the new value 
+       * and the previous value. The callback must return the value to save.
+       */
+      if (!has_filter('pre_update_option_' . $this->aux_plugin_settings, array($this, 'settings_callbacks'))) {
+        add_filter('pre_update_option_' . $this->aux_plugin_settings, array($this, 'settings_callbacks'), 10, 2);
+      }
+      $this->plugin_options = get_option($this->settings_name());
     }
 
     /**
-     * gets the filtered settings name
+     * provides the name of the plugin options
      * 
+     * this is to allow a filter to modify the name
+     * 
+     * @param string $settings_name the base setting name for the plugin
      * @return string
      */
-    public function get_filtered_settings_name()
-    {
-      return Participants_Db::set_filter('aux_plugin_options', $this->aux_plugin_settings);
+    public function settings_name($settings_name = '') {
+      $settings_name = empty($settings_name) ? $this->aux_plugin_settings : $settings_name;
+      if (is_admin()) {
+        return Participants_Db::set_filter('aux_plugin_admin_settings_name', $settings_name);
+      }
+      return Participants_Db::set_filter('aux_plugin_settings_name', $settings_name);
     }
 
     /**
@@ -228,10 +225,8 @@ if (!class_exists('PDb_Aux_Plugin')) :
 
     /**
      * sets up the attribution string
-     * 
-     * @param string $plugin_file path to the plugin definition script
      */
-    protected function set_attribution($plugin_file)
+    protected function set_attribution()
     {
       $data = $this->plugin_data;
       $name_pattern = _x('%s version %s', 'displays the name and version of the plugin', 'participants-database');
@@ -239,16 +234,17 @@ if (!class_exists('PDb_Aux_Plugin')) :
       $this->attribution = sprintf($name_pattern . '<br />' . $author_pattern, $data['Name'], $data['Version'], $data['Author']);
     }
 
-    /*     * *******************************
+    /*********************************
      * plugin options section
      */
 
     /**
      * initializes the settings API
+     * 
+     * this is expected to be overridden by the child class
      */
-    function settings_api_init()
-    {
-      
+    public function settings_api_init() {
+      register_setting($this->aux_plugin_name . '_settings', $this->settings_name());
     }
 
     /**
@@ -330,7 +326,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      * 
      * this generic rendering is expected to be overridden in the subclass
      */
-    function render_settings_page()
+    public function render_settings_page()
     {
       ?>
       <div class="wrap" >
@@ -361,7 +357,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      * 
      * @param array $section information about the section
      */
-    function setting_section_callback_function($section) {}
+    public function setting_section_callback_function($section) {}
 
     /**
      * shows a setting input field
@@ -378,7 +374,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      */
     public function setting_callback_function($atts)
     {
-      $options = $this->plugin_options;
+      $options = get_option($this->settings_name());
       $defaults = array(
           'name' => '', // 0
           'type' => 'text', // 1
@@ -423,7 +419,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      */
     protected function _build_text($values)
     {
-      $pattern = "\n" . '<input name="' . $this->aux_plugin_settings . '[%1$s]" type="%2$s" value="%3$s" title="%4$s" class="%5$s" style="%6$s"  />';
+      $pattern = "\n" . '<input name="' . $this->settings_name() . '[%1$s]" type="%2$s" value="%3$s" title="%4$s" class="%5$s" style="%6$s"  />';
       if (!empty($values[6]))
         $pattern .= "\n" . '<p class="description">%7$s</p>';
       return vsprintf($pattern, $values);
@@ -437,7 +433,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      */
     protected function _build_textarea($values)
     {
-      $pattern = '<textarea name="' . $this->aux_plugin_settings . '[%1$s]" title="%4$s" class="%5$s" style="%6$s"  />%3$s</textarea>';
+      $pattern = '<textarea name="' . $this->settings_name() . '[%1$s]" title="%4$s" class="%5$s" style="%6$s"  />%3$s</textarea>';
       if (!empty($values[6]))
         $pattern .= '<p class="description">%7$s</p>';
       return vsprintf($pattern, $values);
@@ -454,8 +450,8 @@ if (!class_exists('PDb_Aux_Plugin')) :
       $selectstring = $this->set_selectstring($values[1]);
       $values[8] = $values[2] == 1 ? $selectstring : '';
       $pattern = '
-<input name="' . $this->aux_plugin_settings . '[%1$s]" type="hidden" value="0" />
-<input name="' . $this->aux_plugin_settings . '[%1$s]" type="%2$s" value="1" title="%4$s" class="%5$s" style="%6$s" %9$s />
+<input name="' . $this->settings_name() . '[%1$s]" type="hidden" value="0" />
+<input name="' . $this->settings_name() . '[%1$s]" type="%2$s" value="1" title="%4$s" class="%5$s" style="%6$s" %9$s />
 ';
       if (!empty($values[6]))
         $pattern .= '<p class="description">%7$s</p>';
@@ -472,7 +468,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
     {
       $selectstring = $this->set_selectstring($values[1]);
       $html = '';
-      $pattern = "\n" . '<label title="%4$s"><input type="%2$s" %9$s value="%3$s" name="' . $this->aux_plugin_settings . '[%1$s]"> <span>%4$s</span></label><br />';
+      $pattern = "\n" . '<label title="%4$s"><input type="%2$s" %9$s value="%3$s" name="' . $this->settings_name() . '[%1$s]"> <span>%4$s</span></label><br />';
       $html .= "\n" . '<div class="' . $values[1] . ' ' . $values[4] . '" >';
       foreach ($values[7] as $name => $title) {
         $values[8] = $values[2] == $name ? $selectstring : '';
@@ -496,7 +492,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
     {
       $selectstring = $this->set_selectstring($values[1]);
       $html = '';
-      $pattern = "\n" . '<label title="%4$s"><input type="checkbox" %9$s value="%4$s" name="' . $this->aux_plugin_settings . '[%1$s][]"> <span>%4$s</span></label><br />';
+      $pattern = "\n" . '<label title="%4$s"><input type="checkbox" %9$s value="%4$s" name="' . $this->settings_name() . '[%1$s][]"> <span>%4$s</span></label><br />';
       $html .= "\n" . '<div class="checkbox-group ' . $values[1] . ' ' . $values[4] . '" >';
       for ($i = 0; $i < count($values[7]); $i++) {
         $value = $values[7][$i];
@@ -522,7 +518,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
       $selectstring = $this->set_selectstring($values[1]);
       $html = '';
       $pattern = "\n" . '<option %9$s value="%4$s" ><span>%5$s</span></option>';
-      $html .= "\n" . '<div class="dropdown-group ' . $values[1] . ' ' . $values[4] . '" ><select name="' . $this->aux_plugin_settings . '[' . $values[0] . ']" >';
+      $html .= "\n" . '<div class="dropdown-group ' . $values[1] . ' ' . $values[4] . '" ><select name="' . $this->settings_name() . '[' . $values[0] . ']" >';
 
       if (PDb_FormElement::is_assoc($values[7])) {
         foreach ($values[7] as $name => $title) {
@@ -575,7 +571,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      */
     protected function _text_setting($setting, $values)
     {
-      $pattern = '<input name="' . $this->aux_plugin_settings . '[%1$s]" type="%2$s" value="%3$s" title="%4$s" class="%5$s" style="%6$s"  />';
+      $pattern = '<input name="' . $this->settings_name() . '[%1$s]" type="%2$s" value="%3$s" title="%4$s" class="%5$s" style="%6$s"  />';
       if (!empty($setting['help']))
         $pattern .= '<p class="description">%7$s</p>';
       return vsprintf($pattern, $values);

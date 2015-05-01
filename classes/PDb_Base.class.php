@@ -1047,16 +1047,14 @@ class PDb_Base {
     if ($key === false) {
       $key = self::get_key();
     }
-    $alphanum = self::get_alpha_set();
-    for ($i = 0; $i < strlen($string); $i++) {
-      $pos = $i % strlen($key);
-      if (array_search($string[$i], $alphanum) !== false) { // characters not included in the alpha set are skipped
-        $replace = array_search($string[$i], $alphanum) ^ array_search($key[$pos], $alphanum);
-        $string[$i] = $alphanum[$replace];
+    $text = $string;
+    $output = '';
+    for ($i = 0; $i < strlen($text);) {
+      for ($j = 0; ($j < strlen($key) && $i < strlen($text)); $j++, $i++) {
+        $output .= $text{$i} ^ $key{$j};
       }
     }
-
-    return $string;
+    return $output;
   }
   /**
    * supplies a random alphanumeric key
