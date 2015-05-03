@@ -85,7 +85,7 @@ if ($participant_values) :
           }
           $section = $column->group
           ?>
-          <h3 class="field-group-title"><?php echo $groups[$section]['title'] ?></h3>
+          <h3 class="field-group-title"><?php _e($groups[$section]['title']) ?></h3>
           <?php if ($options['show_group_descriptions']) echo '<p class="' . Participants_Db::$prefix . 'group-description">' . $groups[$section]['description'] . '</p>' ?>
           <table class="form-table">
             <?php
@@ -113,7 +113,7 @@ if ($participant_values) :
               $add_title = sprintf($fieldnote_pattern, __('read only', 'participants-database'));
             }
             ?>
-            <th><?php echo $column_title . $add_title ?></th>
+            <th><?php echo __($column_title) . $add_title ?></th>
             <td id="<?php echo Participants_Db::$prefix . $column->name ?>" >
               <?php
               
@@ -215,7 +215,7 @@ if ($participant_values) :
 
               if (!empty($column->help_text)) :
                 ?>
-                <span class="helptext"><?php echo stripslashes(trim($column->help_text)) ?></span>
+                <span class="helptext"><?php _e(stripslashes(trim($column->help_text))) ?></span>
     <?php endif; ?>
             </td>
           </tr>
@@ -243,9 +243,9 @@ if ($participant_values) :
           </tr>
   <?php else : ?>
           <tr>
-            <th><h3><?php echo $options['save_changes_label'] ?></h3></th>
+            <th><h3><?php echo __($options['save_changes_label']) ?></h3></th>
           <td class="submit-buttons">
-            <input class="button button-primary pdb-submit" type="submit" value="<?php echo $options['save_changes_button'] ?>" name="save">
+            <input class="button button-primary pdb-submit" type="submit" value="<?php _e($options['save_changes_button']) ?>" name="save">
             <input name="submit_button" type="hidden" value="<?php echo self::$i18n['apply'] ?>">
           </td>
           </tr>

@@ -560,7 +560,7 @@ class PDb_FormElement extends xnau_FormElement {
           // we use the stored value
         } elseif ($option_value == $value) {
           // grab the option title
-          return stripslashes($option_title);
+          return __(stripslashes($option_title));
         }
       }
     }

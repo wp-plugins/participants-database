@@ -669,7 +669,7 @@ abstract class xnau_FormElement {
       $this->_addline( $this->_input_tag( 'checkbox', $checked_value, 'checked' ), 1 );
       
       if ( false !== $title ) {
-        $this->_addline( $title, 1 );
+        $this->_addline( __($title), 1 );
         $this->_addline( '</label>', -1 );
       }
       
@@ -1062,7 +1062,7 @@ abstract class xnau_FormElement {
        
     foreach ($this->_make_assoc($this->options) as $option_key => $option_value) {
       
-      $option_key = stripslashes($option_key);
+      $option_key = __(stripslashes($option_key));
       
       if (($option_value === false or $option_value === 'false' or $option_value === 'optgroup') and !empty($option_key)) {
         if ($optgroup) {
@@ -1139,14 +1139,14 @@ abstract class xnau_FormElement {
   {
     if (empty($this->options)) return;
     
-    foreach ($this->_make_assoc($this->options) as $key => $value) {
+    foreach ($this->_make_assoc($this->options) as $title => $value) {
       
-      if (($value === false or $value === 'false' or $value === 'optgroup') and !empty($key)) {
-        $this->_add_options_divider($key);
+      if (($value === false or $value === 'false' or $value === 'optgroup') and !empty($title)) {
+        $this->_add_options_divider($title);
       } elseif($value === 'other') {
-        $otherlabel = $key;
+        $otherlabel = $title;
       } elseif (!empty($value) or $value === 0) {
-        $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . stripslashes($key) . '</option>', -1);
+        $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . __(stripslashes($title)) . '</option>', -1);
       }
     }
     // add the "other" option

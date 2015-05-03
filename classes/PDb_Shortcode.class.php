@@ -1063,7 +1063,7 @@ abstract class PDb_Shortcode {
     $default_hidden_fields = array(
         'action' => $this->module,
         'subsource' => Participants_Db::PLUGIN_NAME,
-        'shortcode_page' => $uri_components['path'],
+        'shortcode_page'  => $uri_components['path'] . '?' . $uri_components['query'],
         'thanks_page' => $this->submission_page,
         'instance_index'  => $this->instance_index,
         'pdb_data_keys' => $this->_form_data_keys(),

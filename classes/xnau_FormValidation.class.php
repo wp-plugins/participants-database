@@ -393,7 +393,7 @@ class xnau_FormValidation {
   public static function is_regex($string)
   {
 
-    if (!is_string($string || strlen($string) === 0))
+    if (!is_string($string) || strlen($string) === 0)
       return false;
 
     return @preg_match($string,'test string') !== false;
