@@ -95,9 +95,9 @@ if ($participant_values) :
 
           <tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) . ' ' . $column->name . '-field' ?>">
             <?php
-            $column_title = str_replace(array('"',"'"), array('&quot;','&#39;'), stripslashes($column->title));
+            $column_title = str_replace(array('"',"'"), array('&quot;','&#39;'), __(stripslashes($column->title)));
             if ($options['mark_required_fields'] && $column->validation != 'no') {
-              $column_title = sprintf($options['required_field_marker'], $column_title);
+              $column_title = sprintf(__($options['required_field_marker']), $column_title);
             }
             ?>
             <?php
@@ -113,7 +113,7 @@ if ($participant_values) :
               $add_title = sprintf($fieldnote_pattern, __('read only', 'participants-database'));
             }
             ?>
-            <th><?php echo __($column_title) . $add_title ?></th>
+            <th><?php echo $column_title . $add_title ?></th>
             <td id="<?php echo Participants_Db::$prefix . $column->name ?>" >
               <?php
               

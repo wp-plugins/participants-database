@@ -289,9 +289,16 @@ class PDb_Base {
    */
   public static function get_dynamic_value($value) {
 
-    $dynamic_value = '';
+    // this value serves as a key for the dynamic value to get
+    $dynamic_key = html_entity_decode($value);
+    /**
+     * @version 1.6 added 'pdb-dynamic_value' filter
+     */
+    $dynamic_value = Participants_Db::set_filter('dynamic_value', '', $dynamic_key);
+    // return the value if it was set in the filter
+    if (!empty($dynamic_value)) return $dynamic_value;
 
-    if (strpos(html_entity_decode($value), '->') > 0) {
+    if (strpos($dynamic_key, '->') > 0) {
       
       /*
        * here, we can get values from one of several WP objects
@@ -300,7 +307,7 @@ class PDb_Base {
        */
       global $post, $current_user;
 
-      list( $object, $property ) = explode('->', html_entity_decode($value));
+      list( $object, $property ) = explode('->', $dynamic_key);
 
       $object = ltrim($object, '$');
 
@@ -308,13 +315,13 @@ class PDb_Base {
 
         $dynamic_value = $$object->$property;
       }
-    } elseif (strpos(html_entity_decode($value), ':') > 0) {
+    } elseif (strpos($dynamic_key, ':') > 0) {
       
       /*
        * here, we are attempting to access a value from a PHP superglobal
        */
 
-      list( $global, $name ) = explode(':', html_entity_decode($value));
+      list( $global, $name ) = explode(':', $dynamic_key);
       
       /*
        * if the value refers to an array element by including [index_name] or 
@@ -386,9 +393,9 @@ class PDb_Base {
 
     /*
      * note: we need to sanitize the value, but we don't know what kind of value 
-     * it will be so we're just going to treat them all as strings. It won't be an 
-     * object or array anyway, so if a number is represented as a string, it's not 
-     * a big deal.
+     * it will be so we're just going to treat them all as strings. It shouldn't 
+     * be object or array anyway, so if a number is represented as a string, it's 
+     * not a big deal.
      */
     return filter_var($dynamic_value, FILTER_SANITIZE_STRING);
   }
@@ -400,7 +407,8 @@ class PDb_Base {
    * @return bool true if the value is to be parsed as dynamic
    */
   public static function is_dynamic_value($value) {
-  	return strpos(html_entity_decode($value), '->') > 0 || strpos(html_entity_decode($value), ':') > 0;
+    $test_value = html_entity_decode($value);
+  	return strpos($test_value, '->') > 0 || strpos($test_value, ':') > 0;
   }
 
   /**

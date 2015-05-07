@@ -808,12 +808,11 @@ abstract class PDb_Shortcode {
     }
     if ($field->form_element === 'hidden') {
 
-      $value = $this->_empty($record_value) ? '' : $record_value;
       /*
        * use the dynamic value if no value has been set
-         */
+       */
       if (in_array($this->module, array('signup', 'record', 'retrieve'))) {
-        if ($value === '') {
+        if (Participants_Db::is_dynamic_value($value)) {
           $value = $this->get_dynamic_value($field->default);
         }
         /*
@@ -826,7 +825,6 @@ abstract class PDb_Shortcode {
           $this->display_as_readonly($field);
         }
     }
-
     $field->value = $value;
   }
 
@@ -1063,7 +1061,7 @@ abstract class PDb_Shortcode {
     $default_hidden_fields = array(
         'action' => $this->module,
         'subsource' => Participants_Db::PLUGIN_NAME,
-        'shortcode_page'  => $uri_components['path'] . '?' . $uri_components['query'],
+        'shortcode_page'  => $uri_components['path'] . (isset($uri_components['query']) ? '?' . $uri_components['query'] : ''),
         'thanks_page' => $this->submission_page,
         'instance_index'  => $this->instance_index,
         'pdb_data_keys' => $this->_form_data_keys(),

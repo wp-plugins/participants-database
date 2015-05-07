@@ -349,7 +349,8 @@ body[class*='participants-database'] .text-block li {
 :focus:-moz-placeholder {
   color: transparent !important;
 }
-.pdb-admin-edit-participant .fieldnote {
+.pdb-admin-edit-participant .fieldnote,
+.pdb-admin-edit-participant .reqd {
   color: #AAAAAA;
   display: inline-block;
   margin-left: 10px;
@@ -519,7 +520,15 @@ a.dragger {
   float:left;
   margin-right:10px;
   height:140px;
-  width:300px;
+  width:400px;
+}
+.pdb-admin-settings {
+  max-width: 670px;
+}
+.pdb-admin-settings h3 {
+  margin-top: 3em;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #aaa;
 }
 
 /*   UI TABS   */

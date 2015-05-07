@@ -329,7 +329,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
     public function render_settings_page()
     {
       ?>
-      <div class="wrap" >
+      <div class="wrap pdb-admin-settings" >
 
       <?php Participants_Db::admin_page_heading() ?>  
         <h2><?php echo $this->aux_plugin_title ?></h2>
