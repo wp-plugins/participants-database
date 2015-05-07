@@ -542,7 +542,7 @@ class PDb_FormElement extends xnau_FormElement {
    * this func grabs the value and matches it to a title from a list of values set 
    * for a particular field
    * 
-   * if there is no title defined, or if the values is stored as a simple string, 
+   * if there is no title defined, or if the values are stored as a simple string, 
    * the value is returned unchanged
    * 
    * @global object $wpdb
@@ -560,7 +560,7 @@ class PDb_FormElement extends xnau_FormElement {
           // we use the stored value
         } elseif ($option_value == $value) {
           // grab the option title
-          return stripslashes($option_title);
+          return __(stripslashes($option_title));
         }
       }
     }

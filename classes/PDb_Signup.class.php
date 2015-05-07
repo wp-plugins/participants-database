@@ -303,7 +303,7 @@ class PDb_Signup extends PDb_Shortcode {
     
     if (Participants_Db::plugin_setting_is_true('show_retrieve_link')) {
       $retrieve_link = Participants_Db::plugin_setting('link_retrieval_page') !== 'none' ? get_permalink(Participants_Db::plugin_setting('link_retrieval_page')) : $_SERVER['REQUEST_URI'];
-      echo $open_tag . '<a href="' . Participants_Db::add_uri_conjunction($retrieve_link) . 'm=r">' . $linktext . '</a>' . $close_tag;
+      echo $open_tag . '<a href="' . Participants_Db::add_uri_conjunction($retrieve_link) . 'm=r">' . __($linktext) . '</a>' . $close_tag;
     }
   }
 

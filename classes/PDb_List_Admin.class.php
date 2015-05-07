@@ -595,7 +595,7 @@ class PDb_List_Admin {
                               'options' => array('' => 'none') + $filter_columns,
         );
         PDb_FormElement::print_element($element);
-                          _e('that', 'participants-database');
+                          _ex('that', 'joins two search terms, such as in "Show only records with last name that is Smith"', 'participants-database');
     $element = array(
         'type' => 'dropdown',
                               'name' => 'operator[' . $i . ']',
@@ -612,7 +612,7 @@ class PDb_List_Admin {
     );
     PDb_FormElement::print_element($element);
     ?>
-                          <input id="participant_search_term_<?php echo $i ?>" type="text" name="value[<?php echo $i ?>]" value="<?php echo htmlspecialchars($filter_set['value']) ?>">
+                            <input id="participant_search_term_<?php echo $i ?>" type="text" name="value[<?php echo $i ?>]" value="<?php echo htmlspecialchars(esc_attr($filter_set['value'])) ?>">
                           <?php
                           if ($i < $filter_count - 1) {
                             echo '<br />';
@@ -959,7 +959,7 @@ class PDb_List_Admin {
             $title = strip_tags(stripslashes($column->title));
             printf(
               $head_pattern, str_replace(
-                      array('"', "'"), array('&quot;', '&#39;'), $title
+                      array('"', "'"), array('&quot;', '&#39;'), __($title)
               ), $column->name, ($column->name === self::$filter['sortBy'] ? $sorticon : '')
             );
           }
