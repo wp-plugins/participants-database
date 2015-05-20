@@ -422,10 +422,10 @@ class PDb_FormElement extends xnau_FormElement {
    */
   public static function make_link($field, $template = false, $get = false) {
   
-    /*
-     * determine if the current user is in the admin and not doing an AJAX call
+    /**
+     * links may only be placed on string values
      */
-    $in_admin = is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX);
+    if ( is_array($field->value)) return $field->value;
 
     // clean up the provided string
    $URI = str_replace('mailto:', '', trim(strip_tags($field->value)));
@@ -560,7 +560,7 @@ class PDb_FormElement extends xnau_FormElement {
           // we use the stored value
         } elseif ($option_value == $value) {
           // grab the option title
-          return __(stripslashes($option_title));
+            return apply_filters( 'pdb-translate_string', stripslashes($option_title));
         }
       }
     }

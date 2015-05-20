@@ -102,6 +102,10 @@ class PDb_List extends PDb_Shortcode {
    * @var int the current page number
    */
   private $current_page = 1;
+  /**
+   * @var string nonce key string
+   */
+  public static $list_filter_nonce_key = 'list-filter';
 
   /**
    * initializes and outputs the list on the frontend as called by the shortcode
@@ -158,7 +162,7 @@ class PDb_List extends PDb_Shortcode {
 
       $ajax_params = array(
           'ajaxurl' => admin_url('admin-ajax.php'),
-          'filterNonce' => Participants_Db::$list_filter_nonce,
+          //'filterNonce' => Participants_Db::nonce(self::$list_filter_nonce_key),
           'postID' => ( isset($wp_query->post) ? $wp_query->post->ID : '' ),
           'prefix' => Participants_Db::$prefix,
           'loading_indicator' => Participants_Db::get_loading_spinner()
@@ -504,7 +508,11 @@ class PDb_List extends PDb_Shortcode {
         'pagelink' => $this->prepare_page_link($_SERVER['REQUEST_URI']),
         'sortstring' => $this->filter['sortstring'],
         'orderstring' => $this->filter['orderstring'],
+        'filterNonce' => Participants_Db::nonce(self::$list_filter_nonce_key),
     );
+    if ($ref === 'remote') {
+      $hidden_fields['submit_button'] = 'search';
+    } 
     $output[] = PDb_FormElement::print_hidden_fields($hidden_fields, false);
 
     if ($print)

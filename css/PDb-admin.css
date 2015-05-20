@@ -211,9 +211,10 @@ body[class*='participants-database'] .form-table {
 .participants_db .wp-editor-wrap {
   float:left;
 }
-.participants_db .wp-editor-wrap+.helptext {
-  display:inline-block;
-  margin: 30px 0 0 10px;
+.participants_db .wp-editor-wrap + .helptext, 
+.participants_db textarea + .helptext {
+    display: inline-block;
+    margin: 30px 0px 0px 0px;
 }
 textarea,
 select,

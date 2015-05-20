@@ -312,6 +312,11 @@ class PDb_List_Query {
    * @return null
    */
   private function _add_filter_from_post() {
+    
+    if (! Participants_Db::nonce_check(filter_input(INPUT_POST, 'filterNonce'), PDb_List::$list_filter_nonce_key)) {
+      return null;
+    }
+    
     // look for the identifier of the list search submission
     if (filter_input(INPUT_POST, 'action') === 'pdb_list_filter') {
       if (isset($_POST['search_field']) && is_array($_POST['search_field'])) {

@@ -189,8 +189,8 @@ abstract class xnau_CSV_Import {
      * we use our own detection algorithms and parse the file based on what we 
      * found
      */
-    $this->CSV->enclosure = $this->_detect_enclosure($src_file);
     $this->CSV->delimiter = $this->_detect_delimiter($src_file);
+    $this->CSV->enclosure = $this->_detect_enclosure($src_file);
     $this->CSV->parse($src_file);
 
     if (WP_DEBUG and $this->CSV->error)
@@ -274,12 +274,7 @@ csv line= '.print_r( $csv_line, true ) );
   /**
    * detect an enclosure character
    *
-   * there's no way to do this 100%, so we will look and fall back to a
-   * reasonable assumption if we don't see a clear choice: simply whichever
-   * of the two most common enclosure characters is more numerous is returned
-   *
-   * @todo experiment with doing this with a regex using a backreference 
-   *       counting repetitions of first and last character matches
+   * this uses a regex backreference to find pairs of enclosure characters
    *
    * @param string $csv_file path to a csv file to read and analyze
    * @return string the best guess enclosure character
@@ -288,7 +283,7 @@ csv line= '.print_r( $csv_line, true ) );
 
     $csv_text = file_get_contents($csv_file);
 
-    $assay = preg_match( "/([\"\'])([^\1]+)\1,/U", $csv_text, $matches);
+    $assay = preg_match( "/([\"\'])([^\1]+)\1" . $this->CSV->delimiter . "/U", $csv_text, $matches);
 
     return isset($matches[1]) ? $matches[1] : '"';
   }
@@ -296,7 +291,7 @@ csv line= '.print_r( $csv_line, true ) );
   /**
    * determines the delimiter character in the CSV file
    * 
-   * again, crude method used here, but should be right most of the time
+   * crude method used here, but should be right most of the time
    * 
    * @param string $csv_file the CSV file to scan for a delimiter
    * @return string the delimiter

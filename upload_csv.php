@@ -57,7 +57,7 @@ update_option(Participants_Db::$prefix . 'csv_import_params', $csv_params);
         <div class="postbox">
           <h3><?php _e('Prepare a spreadsheet file with the correct format:', 'participants-database') ?></h3>
           <div class="inside">
-            <p><?php _e('To properly import your membership data, the columns in your spreadsheet must match exactly the columns in the database. Currently, the CSV import columns are as follows:', 'participants-database') ?></p>
+            <p><?php _e('To properly import your membership data, the columns in your spreadsheet must match exactly the columns in the database. Currently, the CSV export columns are as follows:', 'participants-database') ?></p>
             <table class="spreadsheet">
               <tr>
                 <?php

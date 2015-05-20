@@ -669,7 +669,7 @@ abstract class xnau_FormElement {
       $this->_addline( $this->_input_tag( 'checkbox', $checked_value, 'checked' ), 1 );
       
       if ( false !== $title ) {
-        $this->_addline( __($title), 1 );
+        $this->_addline( apply_filters( 'pdb-translate_string', $title), 1 );
         $this->_addline( '</label>', -1 );
       }
       
@@ -699,13 +699,13 @@ abstract class xnau_FormElement {
     // make a unique prefix for the js function
     $js_prefix = $this->_prep_js_string($this->name);
 
+    $id = (isset($this->attributes['id']) ? $this->attributes['id'] : $js_prefix)  . '_select';
     if ($other) {
       $this->_addline('<div class="dropdown-other-control-group" name="' . $this->name . '" rel="' . $otherlabel . '">');
       $this->add_class('otherselect');
-      $this->_addline('<select name="' . $this->name . '" ' . $this->_attributes() . ' >');
+      $this->_addline('<select id="' . $id . '" name="' . $this->name . '" ' . $this->_attributes() . ' >');
       //$this->_addline('<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >');
     } else {
-      $id = isset($this->attributes['id']) ? $this->attributes['id'] : $js_prefix . '_select';
       $this->_addline('<select id="' . $id . '" name="' . $this->name . '" ' . $this->_attributes() . ' >');
     }
 
@@ -1062,7 +1062,7 @@ abstract class xnau_FormElement {
        
     foreach ($this->_make_assoc($this->options) as $option_key => $option_value) {
       
-      $option_key = __(stripslashes($option_key));
+      $option_key = apply_filters( 'pdb-translate_string', stripslashes($option_key));
       
       if (($option_value === false or $option_value === 'false' or $option_value === 'optgroup') and !empty($option_key)) {
         if ($optgroup) {
@@ -1146,7 +1146,7 @@ abstract class xnau_FormElement {
       } elseif($value === 'other') {
         $otherlabel = $title;
       } elseif (!empty($value) or $value === 0) {
-        $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . __(stripslashes($title)) . '</option>', -1);
+        $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . apply_filters( 'pdb-translate_string', stripslashes($title)) . '</option>', -1);
       }
     }
     // add the "other" option
@@ -1168,7 +1168,7 @@ abstract class xnau_FormElement {
    */
   protected function _output() {
 
-    return implode( self::BR, $this->output ).self::BR;
+    return implode( self::BR, (array)$this->output ).self::BR;
 
   }
 
