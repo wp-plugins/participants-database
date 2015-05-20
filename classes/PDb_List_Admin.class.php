@@ -135,7 +135,7 @@ class PDb_List_Admin {
 
     self::setup_display_columns();
 
-    self::$sortables = Participants_Db::get_sortables();
+    self::$sortables = Participants_Db::get_sortables(false, 'alpha');
 
     // set up the basic values
     self::$default_filter = array(
@@ -178,10 +178,11 @@ class PDb_List_Admin {
     self::$num_records = $wpdb->get_var(str_replace('*', 'COUNT(*)', self::$list_query));
 
     // set the pagination object
-    $get_page = filter_input(INPUT_GET, self::$list_page, FILTER_VALIDATE_INT, array('default' => 1, 'min_range' => 1));
+    $current_page = filter_input(INPUT_GET, self::$list_page, FILTER_VALIDATE_INT, array( 'options' => array('default' => 1, 'min_range' => 1)));
+    
     self::$pagination = new PDb_Pagination(array(
         'link' => self::prepare_page_link($_SERVER['REQUEST_URI']) . '&' . self::$list_page . '=%1$s',
-        'page' => $get_page,
+        'page' => $current_page,
         'size' => self::$page_list_limit,
         'total_records' => self::$num_records,
 //        'wrap_tag' => '<div class="pdb-list"><div class="pagination"><label>' . _x('Page', 'noun; page number indicator', 'participants-database') . ':</label> ',
@@ -568,10 +569,13 @@ class PDb_List_Admin {
         $filter_columns = array();
         foreach (Participants_db::get_column_atts('backend') as $column) {
           // add the field name if a field with the same title is already in the list
-            $select_title = ( isset($filter_columns[$column->title]) || strlen($column->title) === 0 ) ? $column->title . ' (' . $column->name . ')' : $column->title;
+            $title = apply_filters( 'pdb-translate_string', $column->title);
+            $select_title = ( isset($filter_columns[$column->title]) || strlen($column->title) === 0 ) ? $title . ' (' . $column->name . ')' : $title;
           
           $filter_columns[$select_title] = $column->name;
         }
+          $record_id_field = Participants_Db::$fields['id'];
+          $filter_columns += array(apply_filters( 'pdb-translate_string', $record_id_field->title) => 'id');
           ?>
           <div class="pdb-searchform">
             <form method="post" id="sort_filter_form" action="<?php echo self::prepare_page_link($_SERVER['REQUEST_URI']) ?>" >
@@ -956,10 +960,10 @@ class PDb_List_Admin {
           <?php
           // print the top header row
           foreach (self::$display_columns as $column) {
-            $title = strip_tags(stripslashes($column->title));
+      $title = apply_filters( 'pdb-translate_string', strip_tags(stripslashes($column->title)));
             printf(
               $head_pattern, str_replace(
-                      array('"', "'"), array('&quot;', '&#39;'), __($title)
+                      array('"', "'"), array('&quot;', '&#39;'), $title
               ), $column->name, ($column->name === self::$filter['sortBy'] ? $sorticon : '')
             );
           }

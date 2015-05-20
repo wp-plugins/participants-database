@@ -191,7 +191,7 @@ abstract class PDb_Shortcode {
         'groups' => '',
         'action' => '',
         'instance_index' => $this->instance_index,
-        'target_instance' => $this->instance_index,
+        'target_instance' => '1', // if no target instance is specified, assume it's the first instance
         'target_page' => '',
         'record_id' => false,
         'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call
@@ -230,9 +230,10 @@ abstract class PDb_Shortcode {
 
     $this->wrap_class = $this->prefix . $this->module . ' ' . $this->prefix . 'instance-' . $this->instance_index;
 
-    $this->_set_display_groups();
-
     $this->_set_display_columns();
+
+    $public_groups_only = $this->module === 'retrieve' ? false : true;
+    $this->_set_display_groups($public_groups_only);
 
     $this->wrap_class = trim($this->wrap_class) . ' ' . trim($this->shortcode_atts['class']);
     // set the template to use
@@ -550,6 +551,8 @@ abstract class PDb_Shortcode {
    */
   protected function _setup_iteration() {
 
+    $this->_setup_hidden_fields();
+
     $this->record = new stdClass;
 
     $groups = Participants_Db::get_groups();
@@ -573,9 +576,7 @@ abstract class PDb_Shortcode {
            * hidden fields are stored separately for modules that use them as
            * hidden input fields
            */
-        if ($field->form_element == 'hidden' && in_array($field->name, $this->display_columns)) { // and in_array($this->module, array('signup', 'record'))
-            $this->hidden_fields[$field->name] = $field->value;
-        } else {
+        if ($field->form_element !== 'hidden' ) {
 
           $this->_set_field_link($field);
 
@@ -585,7 +586,12 @@ abstract class PDb_Shortcode {
           if (in_array($field->name, $this->display_columns)) {
             $field_count++;
             if (!$this->_empty($field->value)) $all_empty_fields = false;
-            $this->record->$group_name->fields->{$field->name} = $field;
+            /**
+             * @version 1.6 'pdb-before_field_added_to_iterator' filter
+             * @param $field object
+             */
+            $this->record->$group_name->fields->{$field->name} = Participants_Db::set_filter('before_field_added_to_iterator', $field);
+          }
           }
           }
         }
@@ -595,10 +601,25 @@ abstract class PDb_Shortcode {
       } elseif ($all_empty_fields) {
         $this->record->$group_name->class[] = 'empty-field-group';
       }
-    }
 
     // save the number of groups
     $this->group_count = count((array) $this->record);
+  }
+
+  /**
+   * sets up the hidden fields array
+   * 
+   * in this class, this simply adds all defined hidden fields
+   * 
+   * @return null
+   */
+  protected function _setup_hidden_fields() {
+    foreach (Participants_Db::$fields as $field) {
+      if ($field->form_element === 'hidden') {
+        $this->_set_field_value($field);
+        $this->hidden_fields[$field->name] = $field->value;
+      }
+    }
   }
 
   /*   * **************
@@ -610,7 +631,6 @@ abstract class PDb_Shortcode {
    * 
    * if given an array, returns an array of field objects
    * 
-   * TODO: remove, looks unused
    * 
    * @param string|array $fields
    * @global object $wpdb
@@ -653,7 +673,7 @@ abstract class PDb_Shortcode {
       case 'thanks':
           case 'retrieve':
 
-            if ($field->form_element !== 'placeholder') {
+                if (!in_array($field->form_element, array('placeholder'))) {
               $return[$field->name] = clone $field;
             }
         break;
@@ -704,25 +724,24 @@ abstract class PDb_Shortcode {
   }
 
   /**
-   * gets only display-enabled groups
+   * sets up the display groups
    * 
    * first, attempts to get the list from the shortcode, then uses the defined as 
    * visible list from the database
    *
-   * if the "groups" attribute is used, it overrides the "display" group setting
+   * if the shortcode "groups" attribute is used, it overrides the gobal group 
+   * visibility settings
    *
    * @global object $wpdb
-   * @param  bool $logic true to get display-enabled groups, false to get non-enabled groups
+   * @param  bool $public_only if true, include only public groups, if false, include all groups
    * @return null
    */
-  protected function _set_display_groups($logic = true)
+  protected function _set_display_groups($public_only = true)
   {
 
     global $wpdb;
     $groups = array();
-    if (!empty($this->shortcode_atts['fields']) && $this->display_columns === false) {
-      
-      $this->_set_display_columns();
+    if (!empty($this->shortcode_atts['fields'])) {
       
       foreach ($this->display_columns as $column) {
         $column = $this->fields[$column];
@@ -736,22 +755,22 @@ abstract class PDb_Shortcode {
       /*
        * process the shortcode groups attribute and get the list of groups defined
        */
-      $list = array();
+      $group_list = array();
       $groups_attribute = explode(',', str_replace(array(' '), '', $this->shortcode_atts['groups']));
       foreach ($groups_attribute as $item) {
         if (Participants_Db::is_group($item))
-          $list[] = trim($item);
+          $group_list[] = trim($item);
       }
-      if (count($list) !== 0) {
+      if (count($group_list) !== 0) {
       /*
        * get a list of all defined groups
        */
       $sql = 'SELECT g.name 
-              FROM ' . Participants_Db::$groups_table . ' g';
+                FROM ' . Participants_Db::$groups_table . ' g ORDER BY FIELD( g.name, "' . implode('","', $group_list) . '")';
 
       $result = $wpdb->get_results($sql, ARRAY_N);
       foreach ($result as $group) {
-        if (in_array(current($group), $list) === $logic) {
+          if (in_array(current($group), $group_list) || $public_only === false) {
             $groups[] = current($group);
         }
       }
@@ -759,9 +778,19 @@ abstract class PDb_Shortcode {
     }
     if (count($groups) === 0) {
 
+      $orderby = empty($this->shortcode_atts['fields']) ? 'g.order ASC' : 'FIELD( g.name, "' . implode('","', $groups) . '")';
+      
+      if ($this->module === 'signup') {
+        $sql = 'SELECT DISTINCT g.name 
+                FROM ' . Participants_Db::$groups_table . ' g 
+                JOIN ' . Participants_Db::$fields_table . ' f ON f.group = g.name 
+                WHERE g.display = "' . ( $public_only ? '1' : '0' ) . '" AND f.signup = "1" AND f.form_element <> "hidden" ORDER BY ' . $orderby;
+        
+      } else {
       $sql = 'SELECT g.name 
               FROM ' . Participants_Db::$groups_table . ' g
-              WHERE g.display = "' . ( $logic ? '1' : '0' ) . '" ORDER BY g.order ASC';
+                WHERE g.display = "' . ( $public_only ? '1' : '0' ) . ' " ORDER BY ' . $orderby;
+      }
 
       $result = $wpdb->get_results($sql, ARRAY_N);
 
@@ -835,7 +864,8 @@ abstract class PDb_Shortcode {
    * 
    * @param object $field field data object
    */
-  protected function _set_field_link($field) {
+  protected function _set_field_link($field)
+  {
 
     $link = '';
 
@@ -912,7 +942,7 @@ abstract class PDb_Shortcode {
     switch($this->module) {
       
         case 'signup':
-        $where .= 'WHERE field.signup = 1 AND ' . $groups . ' AND field.form_element NOT IN ("placeholder")';
+        $where .= 'WHERE field.signup = 1 AND ' . $groups . ' AND field.form_element NOT IN ("placeholder", "hidden")';
         break;
       
       case 'retrieve':
@@ -932,7 +962,7 @@ abstract class PDb_Shortcode {
       SELECT field.name
       FROM ' . Participants_Db::$fields_table . ' field
       JOIN ' . Participants_Db::$groups_table . ' fieldgroup ON field.group = fieldgroup.name 
-      ' . $where . ' ORDER BY  fieldgroup.order, field.order';
+      ' . $where . ' ORDER BY fieldgroup.order, field.order ASC';
 
     $this->display_columns = $wpdb->get_col($sql);
   }
@@ -957,7 +987,8 @@ abstract class PDb_Shortcode {
     $sql = '
       SELECT f.name, f.' . $set . '
       FROM ' . Participants_Db::$fields_table . ' f 
-      WHERE f.' . $set . ' > 0';
+      WHERE f.' . $set . ' > 0 
+      ORDER BY  f.order';
 
     $columns = $wpdb->get_results($sql, ARRAY_A);
 
@@ -1065,7 +1096,7 @@ abstract class PDb_Shortcode {
         'thanks_page' => $this->submission_page,
         'instance_index'  => $this->instance_index,
         'pdb_data_keys' => $this->_form_data_keys(),
-        'session_hash'    => wp_create_nonce(Participants_Db::PLUGIN_NAME . '_nonce'),
+        'session_hash'    => Participants_Db::nonce(Participants_Db::$main_submission_nonce_key),
     );
     
     if ($this->get_form_status() === 'multipage') {

@@ -4,7 +4,7 @@
   Plugin URI: http://xnau.com/wordpress-plugins/participants-database
   Description: Plugin for managing a database of participants, members or volunteers
   Author: Roland Barker
-  Version: 1.6beta.17
+  Version: 1.6beta.18
   Author URI: http://xnau.com
   License: GPL2
   Text Domain: participants-database
@@ -225,9 +225,9 @@ class Participants_Db extends PDb_Base {
    */
   public static $fields;
   /**
-   * @var string the current list filter nonce
+   * @var string context string for the main submission nonce
    */
-  public static $list_filter_nonce;
+  public static $main_submission_nonce_key = 'main_submission';
   /**
    * @var int the number of characters to use in the private ID
    */
@@ -288,6 +288,7 @@ class Participants_Db extends PDb_Base {
     add_action('wp_enqueue_scripts',    array(__CLASS__, 'include_scripts'));
     add_action('admin_enqueue_scripts', array(__CLASS__, 'admin_includes'));
     add_filter('wp_headers',            array(__CLASS__, 'control_caching'));
+    add_filter('pdb-translate_string',  array(__CLASS__, 'string_static_translation'), 1); // call it early so it won't try to process an already translated string
 
     // handles ajax request from list filter
     add_action('wp_ajax_pdb_list_filter',        array(__CLASS__, 'pdb_list_filter'));
@@ -372,8 +373,6 @@ class Participants_Db extends PDb_Base {
     self::$plugin_title = __('Participants Database', 'participants-database');
     
     self::_set_i18n();
-    
-    self::$list_filter_nonce = wp_create_nonce(self::$prefix . 'list-filter-nonce');
     
     /*
      * checks for the need to update the DB
@@ -1492,7 +1491,7 @@ class Participants_Db extends PDb_Base {
       $column_set = $column_names;
     } else {
 
-      if ($_POST['action'] === 'signup') {
+      if (filter_input(INPUT_POST, 'action') === 'signup') {
       
       $column_set = 'signup';
     } else {
@@ -2385,14 +2384,14 @@ class Participants_Db extends PDb_Base {
 
       case 'retrieve' :
 
-        if (self::check_form_nonce( filter_input( INPUT_POST, 'session_hash' ))) {
+        if (self::nonce_check( filter_input( INPUT_POST, 'session_hash' ), self::$main_submission_nonce_key)) {
 					self::_process_retrieval();
         }
         return;
 
       case 'signup' :
         
-        if ( ! self::check_form_nonce( filter_input( INPUT_POST, 'session_hash' )))
+        if ( ! self::nonce_check( filter_input( INPUT_POST, 'session_hash' ), self::$main_submission_nonce_key))
                 return;
         
         $_POST['private_id'] = '';
@@ -2439,12 +2438,39 @@ class Participants_Db extends PDb_Base {
   /**
    * checks the nonce on a form submission
    * 
+   * @uses filter pdb-nonce_verify
+   * 
    * @param string $nonce the nonce value
+   * @param string $context the context string
    * 
    * @return bool true if nonce passes
    */
-  public static function check_form_nonce ($nonce) {
-    return wp_verify_nonce($nonce, self::PLUGIN_NAME . '_nonce');
+  public static function nonce_check ($nonce, $context) {
+    return self::set_filter('nonce_verify', wp_verify_nonce($nonce, self::nonce_key($context)), $context);
+  }
+  /**
+   * provides a key string for a nonce
+   * 
+   * @uses filter pdb-nonce_key
+   * 
+   * @param string $context a context string for the key string
+   * 
+   * @return string
+   */
+  public static function nonce_key($context) {
+    return self::set_filter('nonce_key', self::$prefix . $context);
+  }
+  /**
+   * provides a nonce string
+   * 
+   * @uses filter pdb-nonce
+   * 
+   * @param string $context an optional context string for the filter
+   * 
+   * @return string
+   */
+  public static function nonce($context) {
+    return self::set_filter('nonce', wp_create_nonce(self::nonce_key($context)));
   }
   
    /**
@@ -2487,12 +2513,6 @@ class Participants_Db extends PDb_Base {
     if (!is_object(self::$validation_errors)) {
       self::$validation_errors = new PDb_FormValidation();
     }
-    /**
-     * @version 1.6
-     * $match_id is made available to a filter so a custom match criterion can be used
-     * $validation_errors object is provided for form validation feedback
-     */
-    $match_id = self::set_filter('retrieve_find_record', $match_id, self::$validation_errors);
     
     if ($match_id === false) {
       self::$validation_errors->add_error($column, 'identifier');
@@ -2500,12 +2520,19 @@ class Participants_Db extends PDb_Base {
     } else {
       $participant_values = self::get_participant($match_id);
     }
-    $email_field = self::plugin_setting('primary_email_address_field', 'email');
-    if (!empty($email_field)) {
-      $body = self::proc_tags(self::$plugin_options['retrieve_link_email_body'], $match_id);
+    $body_template = self::plugin_setting('retrieve_link_email_body');
+    $subject = self::plugin_setting('retrieve_link_email_subject');
+    /**
+     * @version 1.6
+     * 
+     * filter pdb-before_send_retrieve_link_email
+     */
+    $recipient = self::set_filter('before_send_retrieve_link_email', $participant_values[self::plugin_setting('primary_email_address_field', 'email')], $subject, $body_template);
+    if (!empty($recipient)) {
+      $body = self::proc_tags($body_template, $match_id);
       $sent = wp_mail( 
-              $participant_values[$email_field], 
-              self::proc_tags(self::plugin_setting('retrieve_link_email_subject'), $match_id), 
+              $recipient, 
+              self::proc_tags($subject, $match_id), 
               (self::plugin_setting('html_email') ? self::process_rich_text($body) : $body), 
               self::$email_headers
               );
@@ -2965,7 +2992,7 @@ class Participants_Db extends PDb_Base {
     self::$instance_index = filter_input( INPUT_POST, 'instance_index', FILTER_SANITIZE_NUMBER_INT );
     $postinput = filter_input_array(INPUT_POST, self::search_post_filter($multi));
 
-    if (!wp_verify_nonce($postinput['filterNonce'], self::$prefix . 'list-filter-nonce'))
+    if (!self::nonce_check($postinput['filterNonce'], PDb_List::$list_filter_nonce_key))
       die('nonce check failed');
 
     global $post;

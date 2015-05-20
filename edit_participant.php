@@ -95,9 +95,9 @@ if ($participant_values) :
 
           <tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) . ' ' . $column->name . '-field' ?>">
             <?php
-            $column_title = str_replace(array('"',"'"), array('&quot;','&#39;'), __(stripslashes($column->title)));
+            $column_title = str_replace(array('"',"'"), array('&quot;','&#39;'), apply_filters( 'pdb-translate_string', stripslashes($column->title)));
             if ($options['mark_required_fields'] && $column->validation != 'no') {
-              $column_title = sprintf(__($options['required_field_marker']), $column_title);
+              $column_title = sprintf(apply_filters( 'pdb-translate_string', $options['required_field_marker']), $column_title);
             }
             ?>
             <?php
@@ -243,7 +243,7 @@ if ($participant_values) :
           </tr>
   <?php else : ?>
           <tr>
-            <th><h3><?php echo __($options['save_changes_label']) ?></h3></th>
+            <th><h3><?php echo apply_filters( 'pdb-translate_string', $options['save_changes_label']) ?></h3></th>
           <td class="submit-buttons">
             <input class="button button-primary pdb-submit" type="submit" value="<?php _e($options['save_changes_button']) ?>" name="save">
             <input name="submit_button" type="hidden" value="<?php echo self::$i18n['apply'] ?>">

@@ -89,8 +89,7 @@ PDbListFilter = (function($) {
             submit_search(event);
           },
           clear_error_messages = function() {
-            errormsg.hide();
-            errormsg.children().hide();
+            errormsg.hide().children().hide();
             isError = false;
           },
           clear_search = function() {

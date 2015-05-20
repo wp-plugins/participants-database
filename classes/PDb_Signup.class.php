@@ -22,7 +22,7 @@ class PDb_Signup extends PDb_Shortcode {
   var $submitted = false;
   /**
    *
-   * @var array holds the recipient values after a form submission
+   * @var string the user's email address
    */
   var $recipient;
   /**
@@ -113,21 +113,24 @@ class PDb_Signup extends PDb_Shortcode {
      */
 			$this->participant_id = Participants_Db::$session->get('pdbid');
     
-    if ($shortcode_atts['module'] === 'signup' && $this->participant_id !== false && !isset($shortcode_atts['action']) && $form_status === 'multipage') {
       /*
        * if we've opened a regular signup form while in a multipage session, treat it 
        * as a normal signup form and terminate the multipage session
        */
+    if ($shortcode_atts['module'] === 'signup' && $this->participant_id !== false && !isset($shortcode_atts['action']) && $form_status === 'multipage') {
       $this->participant_id = false;
       $this->_clear_multipage_session();
     }
-
+    /*
+     * if no ID is set, no submission has been received
+     */
     if ($this->participant_id === false) {
     if (filter_input(INPUT_GET, 'm') === 'r' || $shortcode_atts['module'] == 'retrieve') {
       /*
        * we're proceesing a link retrieve request
        */
       $shortcode_atts['module'] = 'retrieve';
+        add_filter('pdb-before_field_added_to_iterator', array($this, 'allow_readonly_fields_in_form'));
       }
       if ($shortcode_atts['module'] == 'signup') {
         /*
@@ -217,6 +220,21 @@ class PDb_Signup extends PDb_Shortcode {
 
     include $this->template;
   }
+  /**
+   * sets up the hidden fields array
+   * 
+   * in this class, this simply adds all defined hidden fields
+   * 
+   * @return null
+   */
+  protected function _setup_hidden_fields() {
+    foreach (Participants_Db::$fields as $field) {
+      if ($field->form_element === 'hidden' && $field->signup) {
+        $this->_set_field_value($field);
+        $this->hidden_fields[$field->name] = $field->value;
+      }
+    }
+  }
 
   /**
    * sets up the signup form email preferences
@@ -232,6 +250,8 @@ class PDb_Signup extends PDb_Shortcode {
     $this->receipt_body = Participants_Db::plugin_setting('signup_receipt_email_body');
     $this->thanks_message = Participants_Db::plugin_setting('signup_thanks');
     $this->email_header = Participants_Db::$email_headers;
+    $this->recipient = @$this->participant_values[Participants_Db::plugin_setting('primary_email_address_field')];
+
   }
 
   /**
@@ -303,7 +323,7 @@ class PDb_Signup extends PDb_Shortcode {
     
     if (Participants_Db::plugin_setting_is_true('show_retrieve_link')) {
       $retrieve_link = Participants_Db::plugin_setting('link_retrieval_page') !== 'none' ? get_permalink(Participants_Db::plugin_setting('link_retrieval_page')) : $_SERVER['REQUEST_URI'];
-      echo $open_tag . '<a href="' . Participants_Db::add_uri_conjunction($retrieve_link) . 'm=r">' . __($linktext) . '</a>' . $close_tag;
+      echo $open_tag . '<a href="' . Participants_Db::add_uri_conjunction($retrieve_link) . 'm=r">' . apply_filters( 'pdb-translate_string', $linktext) . '</a>' . $close_tag;
     }
   }
 
@@ -345,17 +365,26 @@ class PDb_Signup extends PDb_Shortcode {
    */
   private function _do_receipt() {
     
-    $recipient = @$this->participant_values[Participants_Db::$plugin_options['primary_email_address_field']];
-
-    if (filter_var($recipient, FILTER_VALIDATE_EMAIL) === false) {
+    if (filter_var($this->recipient, FILTER_VALIDATE_EMAIL) === false) {
       error_log(Participants_Db::$plugin_title.': no valid email address was found for the user receipt email, mail could not be sent.');
       return NULL;
     }
 
+    /**
+     * filter
+     * 
+     * pdb-receipt_email_template 
+     * pdb-receipt_email_subject
+     * 
+     * @param string email template
+     * @param array of current record values
+     * 
+     * @return string template
+     */
     $this->_mail(
-            $recipient, 
-            $this->_proc_tags($this->receipt_subject), 
-            Participants_Db::process_rich_text($this->_proc_tags($this->receipt_body))
+            $this->recipient, 
+            $this->_proc_tags(Participants_Db::set_filter('receipt_email_subject', $this->receipt_subject, $this->participant_values)), 
+            Participants_Db::process_rich_text($this->_proc_tags(Participants_Db::set_filter('receipt_email_template', $this->receipt_body, $this->participant_values)))
     );
   }
 
@@ -398,7 +427,8 @@ class PDb_Signup extends PDb_Shortcode {
             WHERE v.name = "' . Participants_Db::plugin_setting('retrieve_link_identifier') . '" 
             ';
 
-    return $wpdb->get_results($sql, OBJECT_K);
+    $result = $wpdb->get_results($sql, OBJECT_K);
+    return $result;
   }
 
   /**
@@ -496,6 +526,17 @@ message:
     }
   }
 
+  /**
+   * changes the readonly status of internal fields used in the retrieve form
+   * 
+   * @param $field a PDb_Field_Item object
+   */
+  public function allow_readonly_fields_in_form($field) {
+    if ($field->group !== 'internal') return $field;
+    $field->readonly = 0;
+    return $field;
+  }
+  
   /**
    * clears the multipage form session values
    */

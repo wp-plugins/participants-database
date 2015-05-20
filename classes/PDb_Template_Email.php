@@ -15,7 +15,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    
  */
-
+if (!defined('ABSPATH')) exit;
 class PDb_Template_Email {
   /**
    * @var string holds the "to" email field
@@ -45,7 +45,7 @@ class PDb_Template_Email {
    *                'from' => $email_from
    *                'subject' => $email_subject
    *                'template' -> $email_template
-   * @param int|array $data if an integer, gets the PDB record with that ID, if 
+   * @param int|array $data if an integer, gets the PDB record with that ID, is 
    *                        array, uses it as the data source; must be associative 
    *                        array with fields labeled
    */
@@ -60,7 +60,7 @@ class PDb_Template_Email {
    * @return bool true if successful
    */
   public function send_email() {
-    return $this->_mail($this->email_to, $this->email_subject, $this->process_template());
+    return $this->_mail($this->email_to, $this->replace_tags($this->email_subject, $this->data), $this->process_template());
   }
   /**
    * sends a templated email

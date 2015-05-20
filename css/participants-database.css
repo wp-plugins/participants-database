@@ -115,6 +115,12 @@ div.mce-panel {
 .wrap[class|="pdb"] th {
   vertical-align: middle;
 }
+.field-group {
+  margin: 1.3em 0;
+}
+.field-group legend {
+  font-weight: bold;
+}
 
 /* Select Other */
 .selectother label,

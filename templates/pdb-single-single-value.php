@@ -10,16 +10,16 @@
  * [pdb_single template="single-value" record_id="123" fields="first_name"]
  *
  */
-while ( $this->have_groups() ) : $this->the_group();
+while ($this->have_groups()) : $this->the_group();
  
- 	while ( $this->have_fields() ) : $this->the_field(); ?>
+  while ($this->have_fields()) : $this->the_field();
+  ?>
  		
- 		<span class="pdb-value <?php echo $this->field->name . ' ' . $this->get_empty_class( $this->field ) ?>"><?php $this->field->print_value() ?></span>
- 		
-    <?php break; // only do the first iteration 
+    <span class="pdb-value <?php echo $this->field->name . ' ' . $this->get_empty_class($this->field) ?>"><?php $this->field->print_value() ?></span>
     
+  <?php
     endwhile;
     
   break;
  	
-endwhile; ?>
+endwhile;
