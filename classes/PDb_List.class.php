@@ -396,7 +396,7 @@ class PDb_List extends PDb_Shortcode {
     // replace it with the new value if provided, escaping the input
     if (in_array($this->module, array('record','signup','retrieve')) && isset($_POST[$field->name])) {
 
-      $value = $this->_esc_submitted_value(filter_input(INPUT_POST,$field->name));
+      $value = $this->_esc_submitted_value(filter_input(INPUT_POST,$field->name, FILTER_SANITIZE_STRING));
           }
     $value = $this->_empty($record_value) ? ($this->_empty($field_obj->default) ? '' : $field_obj->default) : $record_value;
 

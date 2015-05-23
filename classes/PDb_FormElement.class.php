@@ -237,15 +237,7 @@ class PDb_FormElement extends xnau_FormElement {
          * these elements are stored as serialized arrays of values, the data is displayed 
          * a comma-separated string of the values, using the value titles if defined
          */
-        $multivalues = Participants_Db::unserialize_array($field->value);
-        // remove empty elements and convert to string for display
-        $multivalues = array_filter((array)$multivalues, array( __CLASS__, 'is_displayable'));
-        
-        $titles = array();
-        foreach($multivalues as $value) {
-          $titles[] = self::get_value_title($value, $field->name);
-        }
-        $return = implode(', ', $titles);
+        $return = self::array_display($field);
         break;
 
       case 'link' :
@@ -283,12 +275,17 @@ class PDb_FormElement extends xnau_FormElement {
       case 'text-area':
       case 'textarea':
         
-        $return = sprintf('<span class="textarea">%s</span>',$field->value );
+        $pattern = $html ? '<span class="textarea">%s</span>' : '%s';
+        $return = sprintf( $pattern,$field->value );
         break;
       
       case 'rich-text':
         
+        if ($html) {
         $return = sprintf('<span class="textarea richtext">%s</span>', Participants_Db::process_rich_text($field->value));
+        } else {
+          $return = strip_tags($field->value);
+        }
         break;
       
       case 'dropdown':
@@ -297,14 +294,19 @@ class PDb_FormElement extends xnau_FormElement {
       case 'dropdown-other':
       case 'select-other':
         
-        $field->value = self::get_value_title($field->value, $field->name);
+        $field->value = self::array_display($field);
+        
+        if ($html) {
         $return = sprintf('<span class="%s">%s</span>', $field->form_element,  self::make_link($field));
+        } else {
+          $return = $field->value;
+        }
         break;
       
       case 'placeholder':
         
       	$field->value = $field->default;
-        $return = self::make_link($field);
+        $return = $html ? self::make_link($field) : $field->value;
         break;
       
       case 'hidden':
@@ -317,7 +319,7 @@ class PDb_FormElement extends xnau_FormElement {
       
       default :
 
-        $return = self::make_link($field);
+        $return = $html ? self::make_link($field) : $field->value;
 
       endswitch;
     }
@@ -325,6 +327,29 @@ class PDb_FormElement extends xnau_FormElement {
     return $return;
   
     
+  }
+
+  /**
+   * provides a display string for an array field value
+   * 
+   * for multi-select form elements
+   * 
+   * @param object $field the field object
+   * 
+   * @return string the array presented as a string
+   */
+  static function array_display($field) 
+  {
+    $multivalues = maybe_unserialize($field->value);
+    if (!is_array($multivalues)) return $field->value;
+    // remove empty elements and convert to string for display
+    $multivalues = array_filter((array)$multivalues, array( __CLASS__, 'is_displayable'));
+
+    $titles = array();
+    foreach($multivalues as $value) {
+      $titles[] = self::get_value_title($value, $field->name);
+    }
+    return implode(', ', $titles);
   }
 
   /************************* 

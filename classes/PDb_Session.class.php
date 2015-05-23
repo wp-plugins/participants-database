@@ -69,8 +69,6 @@ class PDb_Session {
 
 		if( $this->use_php_sessions ) {
 
-			// Use PHP SESSION (must be enabled via the PDB_USE_PHP_SESSIONS constant)
-
 			if( ! session_id() )
 				add_action( 'init', 'session_start', -2 );
 

@@ -231,7 +231,7 @@ class PDb_List_Admin {
     self::$filter = self::get_filter();
     if (filter_input(INPUT_POST, 'action') === 'admin_list_filter') {
       unset(self::$filter['search']);
-      for ($i = filter_input(INPUT_POST, 'list_filter_count'); $i > 0; $i--) {
+      for ($i = filter_input(INPUT_POST, 'list_filter_count', FILTER_SANITIZE_NUMBER_INT); $i > 0; $i--) {
         self::$filter['search'][] = current(self::$default_filter['search']);
       }
       foreach (array_keys($_POST) as $key) {
@@ -244,10 +244,10 @@ class PDb_List_Admin {
             }
           }
         } elseif (isset(self::$filter[$key])) {
-          self::$filter[$key] = filter_input(INPUT_POST, $key);
+          self::$filter[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING);
         }
       }
-    } elseif ($column_sort = filter_input(INPUT_GET, 'column_sort')) {
+    } elseif ($column_sort = filter_input(INPUT_GET, 'column_sort', FILTER_SANITIZE_STRING)) {
       if (self::$filter['sortBy'] !== $column_sort) {
         // if we're changing the sort column, set the sort to ASC
         self::$filter['ascdesc'] = 'ASC';
@@ -325,7 +325,7 @@ class PDb_List_Admin {
 
         case self::$i18n['change']:
 
-          $list_limit = intval(filter_input(INPUT_POST, 'list_limit'));
+          $list_limit = filter_input(INPUT_POST, 'list_limit', FILTER_VALIDATE_INT);
           if ($list_limit > 0) {
             self::set_admin_user_setting('list_limit', $list_limit);
           }
@@ -345,7 +345,7 @@ class PDb_List_Admin {
   private static function _process_search()
   {
 
-    $submit = filter_input(INPUT_POST, 'submit-button');
+    $submit = filter_input(INPUT_POST, 'submit-button', FILTER_SANITIZE_STRING);
 
     switch ($submit) {
 

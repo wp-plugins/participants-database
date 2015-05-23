@@ -14,8 +14,7 @@
  *
 */
 ?>
-<div class="wrap <?php echo $this->wrap_class ?>">
-<a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
+<div class="wrap <?php echo $this->wrap_class ?>" id="<?php echo $this->list_anchor ?>">
 <?php
   /*
    * SEARCH/SORT FORM
@@ -32,7 +31,7 @@
    * function
    */
 ?>
-  <table class="wp-list-table widefat fixed pages list-container" cellspacing="0" >
+  <table class="wp-list-table widefat fixed pages list-container" >
 
     <?php 
     // print the count if enabled in the shortcode

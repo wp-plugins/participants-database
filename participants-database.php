@@ -288,7 +288,7 @@ class Participants_Db extends PDb_Base {
     add_action('wp_enqueue_scripts',    array(__CLASS__, 'include_scripts'));
     add_action('admin_enqueue_scripts', array(__CLASS__, 'admin_includes'));
     add_filter('wp_headers',            array(__CLASS__, 'control_caching'));
-    add_filter('pdb-translate_string',  array(__CLASS__, 'string_static_translation'), 1); // call it early so it won't try to process an already translated string
+    add_filter('pdb-translate_string',  array(__CLASS__, 'string_static_translation'), 20);
 
     // handles ajax request from list filter
     add_action('wp_ajax_pdb_list_filter',        array(__CLASS__, 'pdb_list_filter'));
@@ -373,6 +373,10 @@ class Participants_Db extends PDb_Base {
     self::$plugin_title = __('Participants Database', 'participants-database');
     
     self::_set_i18n();
+    /**
+     * @version 1.6 filter pdb-private_id_length
+     */
+    self::$private_id_length = self::set_filter('private_id_length', self::$private_id_length);
     
     /*
      * checks for the need to update the DB
@@ -457,6 +461,7 @@ class Participants_Db extends PDb_Base {
     wp_register_script(self::$prefix.'cookie', plugins_url('js/jquery_cookie.js', __FILE__));
     wp_register_script(self::$prefix.'manage_fields',   plugins_url('js/manage_fields.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs','jquery-ui-sortable','jquery-ui-dialog',self::$prefix.'cookie'), false, true);
     wp_register_script(self::$prefix.'settings_script', plugins_url('js/settings.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs',self::$prefix.'cookie'), false, true);
+    wp_register_script(self::$prefix.'record_edit_script', plugins_url('js/record_edit.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs',self::$prefix.'cookie'), false, true);
     wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'otherselect', plugins_url('js/otherselect.js', __FILE__), array('jquery'));
@@ -481,7 +486,7 @@ class Participants_Db extends PDb_Base {
 
     
     global $pagenow;
-    if (($pagenow == 'admin.php' && filter_input(INPUT_GET, 'page') == 'participants-database_settings_page') || $pagenow == 'options.php') {
+    if (($pagenow == 'admin.php' && filter_input(INPUT_GET, 'page') === 'participants-database_settings_page') || $pagenow == 'options.php') {
 			/*
 			 * intialize the plugin settings for the plugin settings pages
 			 */
@@ -605,6 +610,10 @@ class Participants_Db extends PDb_Base {
       wp_enqueue_script(self::$prefix.'settings_script');
     }
 
+    if (false !== stripos($hook, 'participants-database-edit_participant')) {
+      //wp_enqueue_script(self::$prefix.'record_edit_script');
+    }
+    
     if (false !== stripos($hook, 'participants-database-manage_fields')) {
       wp_localize_script(self::$prefix . 'manage_fields', 'manageFields', array('uri' => $_SERVER['REQUEST_URI']));
       wp_localize_script(self::$prefix . 'manage_fields', 'PDb_L10n', array(
@@ -2384,14 +2393,14 @@ class Participants_Db extends PDb_Base {
 
       case 'retrieve' :
 
-        if (self::nonce_check( filter_input( INPUT_POST, 'session_hash' ), self::$main_submission_nonce_key)) {
+        if (self::nonce_check( filter_input( INPUT_POST, 'session_hash', FILTER_SANITIZE_STRING ), self::$main_submission_nonce_key)) {
 					self::_process_retrieval();
         }
         return;
 
       case 'signup' :
         
-        if ( ! self::nonce_check( filter_input( INPUT_POST, 'session_hash' ), self::$main_submission_nonce_key))
+        if ( ! self::nonce_check( filter_input( INPUT_POST, 'session_hash', FILTER_SANITIZE_STRING ), self::$main_submission_nonce_key))
                 return;
         
         $_POST['private_id'] = '';
