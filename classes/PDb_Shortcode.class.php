@@ -308,37 +308,32 @@ abstract class PDb_Shortcode {
   /**
    * selects the template to use
    *
+   * @return null
    */
-  private function _find_template() {
+  private function _find_template()
+  {
 
-    $template = false;
-
-    $template = get_stylesheet_directory() . '/templates/pdb-' . $this->module . '-' . $this->template_name . '.php';
+    $custom_template_file = 'pdb-' . $this->module . '-' . $this->template_name . '.php';
+    /**
+     * @version 1.6 'pdb-template_select' filter added
+     */
+    $template = Participants_Db::set_filter('template_select', $custom_template_file);
 
     if (!file_exists($template)) {
-      /*
-       * we do this here so that the callback can choose to provide a default template 
-       * or override the custom template.
-       */
-      $template = Participants_Db::set_filter('template_select', $template);
+      $template = get_stylesheet_directory() . '/templates/' . $custom_template_file;
     }
 
     if (!file_exists($template)) {
-      
-      $template = Participants_Db::$plugin_path . 'templates/pdb-' . $this->module . '-' . $this->template_name . '.php';
+      $template = Participants_Db::$plugin_path . 'templates/' . $custom_template_file;
     }
 
     if (!file_exists($template)) {
-
       $template = Participants_Db::$plugin_path . 'templates/pdb-' . $this->module . '-default.php';
     }
 
     if (!file_exists($template)) {
-
       error_log(__METHOD__ . ' template not found: ' . $template);
     }
-
-    // pass the found template value through a filter so it can be changed by a plugin
 		$this->template = $template;
   }
 
@@ -924,8 +919,6 @@ abstract class PDb_Shortcode {
   /**
    * sets up the array of display columns
    * 
-   *
-   *
    * @global object $wpdb
    */
   protected function _set_shortcode_display_columns() {

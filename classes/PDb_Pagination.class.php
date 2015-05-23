@@ -209,7 +209,7 @@ class PDb_Pagination {
   function setLink($url, $add_variables) {
     
     if ( ! empty($add_variables) )
-      $conj = false !== strpos($url,'?') ? '&' : '?';
+      $conj = false !== strpos($url,'?') ? '&amp;' : '?';
     $this->link = $url . $conj . $add_variables;
   }
 

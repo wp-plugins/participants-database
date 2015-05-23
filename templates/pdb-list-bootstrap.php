@@ -7,8 +7,7 @@ this is the default template which formats the list of records as a table
 
 */
 ?>
-<div class="wrap <?php echo $this->wrap_class ?>">
-<a name="<?php echo $this->list_anchor ?>" id="<?php echo $this->list_anchor ?>"></a>
+<div class="wrap <?php echo $this->wrap_class ?>" id="<?php echo $this->list_anchor ?>">
 <?php /* SEARCH/SORT FORM */ ?>
   <?php if ( $filter_mode != 'none' ) : ?>
   <div class="pdb-searchform">

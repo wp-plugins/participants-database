@@ -55,7 +55,7 @@ $mode = isset($_POST['action']) && $_POST['action'] == 'success' ? 'success' : '
 
       <?php endwhile; // groups ?>
         <tr>
-          <td colspan="2" class="submit-buttons">
+          <td class="submit-buttons">
             
            <?php $this->print_submit_button('button-primary',__('Submit','participants-database')); // you can specify a class for the button ?>
            

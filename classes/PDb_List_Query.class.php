@@ -313,7 +313,7 @@ class PDb_List_Query {
    */
   private function _add_filter_from_post() {
     
-    if (! Participants_Db::nonce_check(filter_input(INPUT_POST, 'filterNonce'), PDb_List::$list_filter_nonce_key)) {
+    if (! Participants_Db::nonce_check(filter_input(INPUT_POST, 'filterNonce', FILTER_SANITIZE_STRING), PDb_List::$list_filter_nonce_key)) {
       return null;
     }
     

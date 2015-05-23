@@ -473,7 +473,7 @@ class PDb_Manage_Fields {
       global $wpdb;
       
       // process form submission
-      $action = filter_input(INPUT_POST, 'action');
+      $action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
 
       switch ($action) {
 

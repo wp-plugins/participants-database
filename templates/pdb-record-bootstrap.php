@@ -31,7 +31,7 @@
           ?>
 
           <div class="form-group <?php $this->field->print_element_class() ?>">
-            <label for="<?php $this->field->print_element_id() ?>">
+            <label>
               <?php $this->field->print_label() ?>
             </label>
             <div class="input-group" >

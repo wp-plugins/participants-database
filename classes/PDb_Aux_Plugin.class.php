@@ -168,7 +168,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      */
     public function load_textdomain()
     {
-      Participants_Db::load_plugin_textdomain($this->plugin_path, $this->aux_plugin_name);
+      Participants_Db::load_plugin_textdomain($this->plugin_path, null, $this->aux_plugin_name);
     }
 
     /**
