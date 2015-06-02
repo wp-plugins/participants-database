@@ -152,12 +152,8 @@ class PDb_List_Query_Filter {
    if ($term === 'null' || $term === ''  || is_null($term)) {
      $this->term = '';
    } else {
-     global $wpdb;
-     if (method_exists($wpdb, 'esc_like')) {
-			 $this->term = $wpdb->esc_like(PDb_FormElement::get_title_value($term, $this->field->name));
-     } else {
-			 $this->term = PDb_FormElement::get_title_value($term, $this->field->name);
-    }
+     $term = PDb_FormElement::get_title_value($term, $this->field->name);
+     $this->term = self::_esc_like($term);
    }
   }
   /**
@@ -171,9 +167,8 @@ class PDb_List_Query_Filter {
   public function empty_search_allowed() {
     if ($this->is_shortcode() || Participants_Db::plugin_setting_is_true('empty_search', false)) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
   /**
    * is it a search on an empty value?
@@ -193,8 +188,7 @@ class PDb_List_Query_Filter {
    */
   public function get_term() {
     if ($this->wildcard_present() || $this->like_term === true) {
-    	global $wpdb;
-      return str_replace(array('*', '?'), array('%', '_'), $wpdb->esc_like($this->term));
+      return str_replace(array('*', '?'), array('%', '_'), self::_esc_like($this->term));
     } else {
       return esc_sql($this->term);
     }
@@ -234,5 +228,22 @@ class PDb_List_Query_Filter {
    */
   public static function sanitize_sql($sql) {
     return stripslashes(esc_sql($sql));
+  }
+  /**
+   * escapes a term used in a LIKE statement
+   * 
+   * uses alternative to $wpdb->esc_like if not available
+   * 
+   * @global object $wpdb
+   * @param string $term
+   * 
+   * @return string escaped term
+   */
+  private static function _esc_like($term) {
+    global $wpdb;
+    if (method_exists($wpdb, 'esc_like')) {
+      return $wpdb->esc_like($term);
+     }
+     return mysql_real_escape_string(addcslashes($term, "%_"));
   }
 }

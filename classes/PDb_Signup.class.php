@@ -1,15 +1,15 @@
 <?php
 /*
  * prints a signup form
- * adds a record to the database
+ * provides user feedback
  * emails a receipt and a notification
  *
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdeign@xnau.com>
- * @copyright  2011,2013 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.7
+ * @version    0.8
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    xnau_FormElement class, Shortcode class
  */
@@ -173,7 +173,10 @@ class PDb_Signup extends PDb_Shortcode {
     if ($this->submitted) {
 
       /*
-       * filter provides access to the freshly-stored record and the email and thanks message properties so user feedback can be altered.
+       * filter provides access to the freshly-stored record and the email and 
+       * thanks message properties so user feedback can be altered.
+       * 
+       * filter: pdb-before_signup_thanks
        */
       if (has_filter(Participants_Db::$prefix . 'before_signup_thanks')) {
 
@@ -408,27 +411,6 @@ class PDb_Signup extends PDb_Shortcode {
             $this->_proc_tags(Participants_Db::$plugin_options['record_update_email_subject']), 
             Participants_Db::process_rich_text($this->_proc_tags(Participants_Db::$plugin_options['record_update_email_body']))
     );
-  }
-
-  /**
-   * grab the defined identifier field for display in the retrieve private link form
-   * 
-   * @global type $wpdb
-   * @return string
-   */
-  function get_retrieve_field() {
-
-    global $wpdb;
-
-    $columns = array('name', 'title', 'form_element');
-
-    $sql = 'SELECT v.' . implode(',v.', $columns) . ' 
-            FROM ' . Participants_Db::$fields_table . ' v 
-            WHERE v.name = "' . Participants_Db::plugin_setting('retrieve_link_identifier') . '" 
-            ';
-
-    $result = $wpdb->get_results($sql, OBJECT_K);
-    return $result;
   }
 
   /**

@@ -31,9 +31,9 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2011, 2012, 2013, 2014 xnau webdesign
+ * @copyright  2011, 2012, 2013, 2014, 2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.6
+ * @version    1.3
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -92,11 +92,9 @@ abstract class xnau_FormElement {
   var $attributes;
   
   /**
-   * space-separated string of class names for the form element
-   *
-   * @var string
+   * @var array of class names
    */
-  var $classes;
+  var $classes = array();
 
   /**
    * array holding the text lines of an element to be output
@@ -224,11 +222,11 @@ abstract class xnau_FormElement {
     $this->form_element = $params['type'];
     $this->value        = $params['value'];
     $this->name         = $params['name'];
-    $this->classes      = $params['class'];
     $this->size         = $params['size'];
     $this->container_id = $params['container_id'];
     $this->group        = $params['group'];
     $this->module       = isset($params['module']) ? $params['module'] : '';
+    $this->attributes   = $params['attributes'];
     
     if ( NULL !== $params['options'] || ! empty( $params['options'] ) ) {
       
@@ -241,15 +239,14 @@ abstract class xnau_FormElement {
     					'other' => _x('other', 'indicates a write-in choice', 'participants-database' ),
 							'linktext' => _x( 'Link Text','indicates the text to be clicked to go to another web page', 'participants-database' )
     					);
-    
-    $this->attributes = $params['attributes'];
-    
-    // transfers the class attribute if it's set in the attributes array
-    // it's possible for class names to be in either/both places, this collects them onto one place
+    /*
+     * classes can come in in the classes parameter or as part of the attributes array. 
+     * We consolidate them into the classes property here.
+     */
+    $this->classes = empty($params['class']) ? array() : explode(' ', $params['class']);
     if (isset($this->attributes['class'])) {
-      
-      $this->classes .= ' ' . $this->attributes['class'];
-      $this->attributes['class'] = '';
+      $this->classes = array_merge($this->classes, explode(' ', $this->attributes['class']));
+      unset($this->attributes['class']);
     }
     
     $this->indent = $params['indent'];
@@ -463,7 +460,7 @@ abstract class xnau_FormElement {
           $return = $field->value;
         } else {
           $upload_dir = wp_upload_dir();
-          $field->link =  get_bloginfo('url') . '/' . Participants_Db::$plugin_options['image_upload_location'] . $field->value;
+          $field->link =  $upload_dir['url'] . $field->value;
           $return = self::make_link($field);
         }
         break;
@@ -531,11 +528,11 @@ abstract class xnau_FormElement {
     case 'text-area':
     case 'textarea':
 
-      $return = sprintf('<span class="textarea">%s</span>',$field->value );
+      $return = $html ? sprintf('<span class="' . self::class_attribute('textarea') . '">%s</span>',$field->value ) : $field->value;
       break;
     case 'rich-text':
 
-      $return = '<span class="textarea richtext">' . $field->value . '</span>';
+      $return = $html ? '<span class="' . self::class_attribute('textarea richtext') . '">' . $field->value . '</span>' : $field->value;
       break;
     default :
 
@@ -556,6 +553,10 @@ abstract class xnau_FormElement {
    * builds a input text element
    */
   protected function _text_line() {
+    
+    if (is_array($this->value)) {
+      $this->value = current($this->value);
+    }
     
     $this->value = htmlspecialchars($this->value, ENT_QUOTES, 'UTF-8', false);
     
@@ -603,7 +604,7 @@ abstract class xnau_FormElement {
     
     $value = ! empty( $this->value ) ? $this->value : '';
     
-    $this->_addline( '<textarea name="' . $this->name . '" rows="' . $this->textarea_dims['rows'] . '" cols="' . $this->textarea_dims['cols'] . '" ' . $this->_attributes() . ' >'.$value.'</textarea>', empty( $this->value ) ? 0 : -1 );
+    $this->_addline( '<textarea name="' . $this->name . '" rows="' . $this->textarea_dims['rows'] . '" cols="' . $this->textarea_dims['cols'] . '" ' . $this->_attributes() . $this->_class() . ' >'.$value.'</textarea>', empty( $this->value ) ? 0 : -1 );
     
   }
   
@@ -660,14 +661,13 @@ abstract class xnau_FormElement {
         if ($unchecked_value === false) $unchecked_value = '';
       }
 
-      if ( false !== $title ) {
-        $this->_addline( '<label for="' . $this->name . '">' );
-      }
-      $id = $this->element_id();
+      $this->attributes['id'] = $id = $this->element_id();
       $this->attributes['id'] = $id . '-default';
       $this->_addline( $this->_input_tag( 'hidden', $unchecked_value ) );
-      
       $this->attributes['id'] = $id;
+      if ( false !== $title ) {
+        $this->_addline( '<label for="' . $this->attributes['id'] . '">' );
+      }
       $this->_addline( $this->_input_tag( 'checkbox', $checked_value, 'checked' ), 1 );
       
       if ( false !== $title ) {
@@ -707,10 +707,10 @@ abstract class xnau_FormElement {
     if ($other) {
       $this->_addline('<div class="dropdown-other-control-group" >');
       $this->add_class('otherselect');
-      $this->_addline('<select name="' . $this->name . '" ' . $this->_attributes() . ' >');
+      $this->_addline('<select name="' . $this->name . '" ' . $this->_attributes() . $this->_class() . ' >');
       //$this->_addline('<select id="' . $js_prefix . '_otherselect" onChange="' . $js_prefix . 'SelectOther()" name="' . $this->name . '" ' . $this->_attributes() . ' >');
     } else {
-      $this->_addline('<select name="' . $this->name . '" ' . $this->_attributes() . ' >');
+      $this->_addline('<select name="' . $this->name . '" ' . $this->_attributes() . $this->_class() . ' >');
     }
 
     // restore the ID attribute
@@ -730,16 +730,16 @@ abstract class xnau_FormElement {
     if ( $other ) {
     
     // build the text input element
+      $this->attributes['id'] .= '_other';
       $is_other = $this->_set_selected( $this->options, $this->value, 'selected', false ) !== '';
-      $this->attributes['class'] .= ' otherfield';
-      $this->_addline('<input type="text" name="' . $this->name . '" value="' . ( $is_other ? $this->value : '' ) . '" ' . $this->_attributes() . ' >');
+      $this->_addline('<input type="text" name="' . $this->name . '" value="' . ( $is_other ? $this->value : '' ) . '" ' . $this->_attributes() . $this->_class('otherfield') . ' >');
       $this->_addline('</div>');
     }
       
     } else {
       // readonly display
-      $this->attributes['class'] .= ' pdb-readonly';
-      $this->_addline('<input type="text" name="' . $this->name . '" value="' . $this->value . '" ' . $this->_attributes() . ' >');
+      $this->attributes['id'] .= '_readonly';
+      $this->_addline('<input type="text" name="' . $this->name . '" value="' . $this->value . '" ' . $this->_attributes() . $this->_class('pdb-readonly') . ' >');
     }
   }
 
@@ -820,12 +820,11 @@ abstract class xnau_FormElement {
     $closetag = array_pop($this->output); // save the <span.checkbox-group> close tag
     
     // add the text input element
-    $this->attributes['class'] =  'otherfield';
     $value = $type == 'checkbox' ? $this->value['other'] : (!in_array($this->value, $this->options) ? $this->value : '' );
-    $name = $value === '' ? 'temp' : $this->name . ($type == 'checkbox' ? '[other]' : '');
+    $name = $this->name . ($type == 'checkbox' ? '[other]' : '');
     $id = $this->element_id();
     $this->attributes['id'] = $id . '_other';
-    $this->_addline('<input type="text" name="' . $name . '" value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false) . '" ' . $this->_attributes() . ' >');
+    $this->_addline('<input type="text" name="' . $name . '" value="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false) . '" ' . $this->_attributes() . $this->_class('otherfield') . ' >');
     $this->attributes['id'] = $id;
     array_push($this->output, $controltag, $closetag); // replace the span close tags, enclosing the input element in it
     
@@ -1037,7 +1036,7 @@ abstract class xnau_FormElement {
     }
 
     $value_att = in_array($type, array('file','image')) ? '' : 'value="' . $value . '"';
-    $html = '<input name="' . $this->name . ( $this->group ? '[]' : '' ) . '"' . $size . ( false !== $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . '  ' . $value_att . ' />';
+    $html = '<input name="' . $this->name . ( $this->group ? '[]' : '' ) . '"' . $size . ( false !== $select ? $this->_set_selected( $value, $this->value, $select ) : '' ) . ' ' . $this->_attributes() . $this->_class() . '  ' . $value_att . ' />';
     // unset the type attribute so it doesn't carry over to the next element
     unset($this->attributes['type']);
     return $html;
@@ -1058,12 +1057,6 @@ abstract class xnau_FormElement {
     // checkboxes are grouped, radios are not
     $this->group = $type === 'checkbox';
 		
-		$class = '';
-    if (!empty($this->classes)) {
-      $class = 'class="' . $this->classes . '"';
-			$this->classes = '';
-			}
-    
     // checkboxes are given a null select so an "unchecked" state is possible
     $null_select = (isset($this->options['null_select'])) ? $this->options['null_select'] : ($type == 'checkbox' ? true : false);
     
@@ -1093,7 +1086,7 @@ abstract class xnau_FormElement {
       } else {
         $id = $this->element_id();
         $this->attributes['id'] = $this->legal_name($this->prefix . $this->name . '-' . ($option_value === '' ? '_' : trim(strtolower($option_value))));
-      $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
+        $this->_addline('<label ' . $this->_class() . ' for="' . $this->attributes['id'] . '">');
       $this->_addline($this->_input_tag($type, $option_value, 'checked'), 1);
       $this->_addline($option_key . '</label>');
         $this->attributes['id'] = $id;
@@ -1106,17 +1099,16 @@ abstract class xnau_FormElement {
     if ($otherlabel) {
       
       $value = $type == 'checkbox' ? (isset($this->value['other']) ? $this->value['other'] : '') : $this->value;
-      $this->attributes['class'] =  'otherselect';
       $this->_addline('<div class="othercontrol">');
       $id = $this->element_id();
       $this->attributes['id'] = $id . '_otherselect';
-      $this->_addline('<label ' . $class . ' for="' . $this->attributes['id'] . '">');
+      $this->_addline('<label ' . $this->_class() . ' for="' . $this->attributes['id'] . '">');
       $this->_addline(sprintf('<input type="%s" name="%s"  value="%s" %s %s />', 
               $type, 
-              $type == 'checkbox' ? 'temp' : $this->name, 
+              $this->name, 
               $otherlabel, 
               $this->_set_selected($this->options, $value, 'checked', $value === ''), 
-              $this->_attributes()
+              $this->_attributes() . $this->_class('otherselect')
               ), 1);
       $this->attributes['id'] = $id;
       //$this->_addline('<input type="' . $type . '" id="' . $this->name . '_otherselect" name="' . ($type == 'checkbox' ? 'temp' : $this->name) . '"  value="' . $otherlabel . '" ' . $this->_set_selected($this->options, ( $type == 'checkbox' ? $this->value['other'] : $this->value), 'checked', false) . ' ' . $this->_attributes() . ' />', 1);
@@ -1283,7 +1275,7 @@ abstract class xnau_FormElement {
    */
   public function add_class( $classname ) {
     
-    $this->classes .= ' ' . $classname;
+    $this->classes[] = $classname;
     
   }
   
@@ -1294,21 +1286,9 @@ abstract class xnau_FormElement {
    */
   protected function _attributes() {
     
-    $attributes_array = array();
+    $attributes_array = $this->attributes;
     $output = '';
     
-    if ( ! empty( $this->classes ) ) {
-      
-      $attributes_array['class'] = $this->classes;
-      
-    }
-    
-    if (! empty( $this->attributes ) ) {
-      
-      $attributes_array = array_merge( $attributes_array, $this->attributes );
-      
-    }
-
     if ( empty( $attributes_array ) ) return '';
         
     $pattern = '%1$s="%2$s" ';
@@ -1321,6 +1301,32 @@ abstract class xnau_FormElement {
     
     return $output;
     
+  }
+  
+  /**
+   * builds a class attribute string
+   * 
+   * @param string $add_class any additional classes to add
+   * 
+   * @return string an html class attribute string
+   */
+  protected function _class($add_class = false) {
+    return self::class_attribute($add_class, $this->classes);
+  }
+  
+  /**
+   * supplies a class attribute string
+   * 
+   * @param string $add_class any additional classes to add
+   * 
+   * @return string an html class attribute string
+   */
+  public static function class_attribute($add_class, $classes = array()) {
+    if ($add_class) {
+      $classes[] = $add_class;
+    }
+    $class_string = implode(' ', $classes);
+    return empty($class_string) ? '' : ' class="' . $class_string . '"';
   }
   
   /**
@@ -1667,5 +1673,4 @@ abstract class xnau_FormElement {
     return $types;
   }
   
-} //class
-?>
+}

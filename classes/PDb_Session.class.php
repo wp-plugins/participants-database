@@ -30,8 +30,6 @@ class PDb_Session {
 	/**
 	 * Whether to use PHP $_SESSION or WP_Session
 	 *
-	 * PHP $_SESSION is opt-in only by defining the PDB_USE_PHP_SESSIONS constant
-	 *
 	 * @var bool
 	 */
 	private $use_php_sessions = false;
@@ -148,6 +146,7 @@ class PDb_Session {
 	 * @return mixed Session variable
 	 */
 	public function set( $key, $value ) {
+    
 		$key = sanitize_key( $key );
 		
 		$this->session[ $key ] = $value;
@@ -221,5 +220,3 @@ class PDb_Session {
     return $c;
   }
 }
-
-?>

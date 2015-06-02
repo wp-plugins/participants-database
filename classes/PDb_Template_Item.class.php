@@ -12,6 +12,7 @@
  * @link       http://xnau.com/wordpress-plugins/
  *
  */
+if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Template_Item {
   
   /**

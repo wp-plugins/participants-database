@@ -14,7 +14,7 @@
   font: 400 20px/1 dashicons, sans-serif;
 }
 .has-dashicons .glyphicon {
-  font: 400 20px/1 dashicons;
+  font: 400 100%/1 dashicons;
 }
 
 /* SIGNUP FORM */
@@ -42,7 +42,12 @@
 
 
 /* RECORD FORM */
-
+.form-group {
+  margin: 0 0 1.5em 0;
+}
+.form-group p {
+  margin: 0;
+}
 .edit-participant textarea,
 .participants_db textarea,
 .edit-participant select,
@@ -115,8 +120,8 @@ div.mce-panel {
 .wrap[class|="pdb"] th {
   vertical-align: middle;
 }
-.field-group {
-  margin: 1.3em 0;
+.field-group.group-with-title {
+  margin: 1.5em 0;
 }
 .field-group legend {
   font-weight: bold;
@@ -305,9 +310,7 @@ input.otherfield[type=text] {
 }
 .pdb-list .pagination .glyphicon,
 .pdb-pagination .glyphicon  {
-  font-size: 100%;
-  line-height: 1;
-  vertical-align: inherit;
+  vertical-align: -0.15em;
 }
 .wp-admin .pdb-list .pagination .glyphicon {
   vertical-align: top;

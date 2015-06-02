@@ -136,4 +136,3 @@ class Recursive_ArrayAccess implements ArrayAccess {
 		$this->dirty = true;
 	}
 }
-?>

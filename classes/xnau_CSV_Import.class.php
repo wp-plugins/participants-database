@@ -152,7 +152,7 @@ abstract class xnau_CSV_Import {
    */
   function _set_root_path() {
 
-    $this->root_path = ABSPATH;
+    $this->root_path = Participants_Db::app_base_path();
   }
 
   /**
@@ -200,7 +200,7 @@ abstract class xnau_CSV_Import {
      * build the column names from the CSV if we have one and it's different from 
      * the CSV columns defined by the database
      */
-    $this->import_columns();
+    $this->setup_import_columns();
 
     $line_num = 1;
 
@@ -318,14 +318,12 @@ csv line= '.print_r( $csv_line, true ) );
    * if the imported row is different from the plugin's defined CSV columns
    *
    */
-  protected function import_columns() {
+  protected function setup_import_columns() {
 
     // build the column names from the CSV if it's there
     if (is_array($this->CSV->titles) and $this->column_names != $this->CSV->titles) {
 
       $this->column_names = $this->CSV->titles;
-
-      $this->errors[] = __('New columns imported from the CSV file.', 'participants-database');
 
       // remove enclosure characters
       array_walk($this->column_names, array($this, '_enclosure_trim'), $this->CSV->enclosure);

@@ -6,9 +6,9 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2012 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.1
+ * @version    0.2
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Participants_Db class, CSV_Import
  *
@@ -46,10 +46,10 @@ class PDb_CSV_Import extends xnau_CSV_Import {
    * if the imported row is different from the plugin's defined CSV columns
    *
    */
-  protected function import_columns() {
+  protected function setup_import_columns() {
 
     // build the column names from the CSV if it's there
-    if (!$this->CSV->error and is_array($this->CSV->titles) and $this->column_names != $this->CSV->titles) {
+    if (is_array($this->CSV->titles) and $this->column_names != $this->CSV->titles) {
 
       $this->column_names = $this->CSV->titles;
 
@@ -64,7 +64,7 @@ class PDb_CSV_Import extends xnau_CSV_Import {
   
   function _set_upload_dir() {
 
-    $this->upload_directory = Participants_Db::$plugin_options['image_upload_location'];
+    $this->upload_directory = Participants_Db::files_location();
   
     // check for the target directory; attept to create if it doesn't exist
     return is_dir( $this->root_path.$this->upload_directory ) ? true : Participants_Db::_make_uploads_dir( $this->upload_directory ) ;

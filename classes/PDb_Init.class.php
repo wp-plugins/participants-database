@@ -47,7 +47,7 @@ class PDb_Init
     }
 
     /**
-     * Set up tables, add options, etc. - All preparation that only needs to be done once
+     * set up database, defaults
      */
     public function on_activate()
     {
@@ -55,9 +55,7 @@ class PDb_Init
     }
 
     /**
-     * Do nothing like removing settings, etc.
-     * The user could reactivate the plugin and wants everything in the state before activation.
-     * Take a constant to remove everything, so you can develop & test easier.
+     * 
      */
     public function on_deactivate()
     {
@@ -65,7 +63,7 @@ class PDb_Init
     }
 
     /**
-     * Remove/Delete everything - If the user wants to uninstall, then he wants the state of origin.
+     * remove all plugin settings and database tables
      */
     public function on_uninstall()
     {

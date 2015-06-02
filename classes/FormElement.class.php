@@ -47,5 +47,3 @@ if (!class_exists('FormElement')) {
     }
   }
 }
-
-?>

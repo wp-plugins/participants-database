@@ -204,5 +204,3 @@ message:
     return array();
   }
 }
-
-?>

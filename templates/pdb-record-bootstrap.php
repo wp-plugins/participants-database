@@ -1,13 +1,16 @@
 <?php
-/*
+/**
  * single table-based template for the [pdb_record] shortcode for editing a record on the frontend
  *
  * this template is design to match the formatting and layout of the pdb-signup-default template
+ * 
+ * @version Participants Database 1.6
  */
 ?>
 <div class="wrap <?php echo $this->wrap_class ?>">
 
   <?php
+  if (!empty($this->participant_id)) : 
   // output any validation errors
   $this->print_errors();
   ?>
@@ -19,7 +22,7 @@
 
 <?php while ($this->have_groups()) : $this->the_group(); ?>
 
-      <fieldset class="field-group field-group-<?php echo $this->group->name ?>">
+      <fieldset class="field-group field-group-<?php echo $this->group->name ?> <?php echo $this->group->printing_title() ? 'group-with-title' : 'group-no-title' ?>">
 
         <?php $this->group->print_title('<legend>','</legend>') ?>
         <?php $this->group->print_description() ?>
@@ -56,5 +59,16 @@
     </fieldset>
 
 <?php $this->print_form_close() ?>
+
+  <?php else : ?>
+    
+    <?php 
+    /*
+     * this part of the template is used if no record is found
+     */
+    echo empty(Participants_Db::$plugin_options['no_record_error_message']) ? '' : '<p class="alert alert-error">' . Participants_Db::plugin_setting('no_record_error_message') . '</p>'; 
+    ?>
+    
+    <?php endif ?>
 
 </div>

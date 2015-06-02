@@ -10,9 +10,9 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2012 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.6
+ * @version    1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if ( ! defined( 'ABSPATH' ) ) die;

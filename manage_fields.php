@@ -8,4 +8,3 @@ if ( ! defined( 'ABSPATH' ) ) die;
 if (!Participants_Db::current_user_has_plugin_role('admin', 'manage fields')) exit;
 
 new PDb_Manage_Fields();
-  ?>
