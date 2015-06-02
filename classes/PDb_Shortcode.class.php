@@ -19,9 +19,9 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2013 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    1.5.5
+ * @version    1.6
  * @link       http://xnau.com/wordpress-plugins/
  *
  */
@@ -779,12 +779,12 @@ abstract class PDb_Shortcode {
         $sql = 'SELECT DISTINCT g.name 
                 FROM ' . Participants_Db::$groups_table . ' g 
                 JOIN ' . Participants_Db::$fields_table . ' f ON f.group = g.name 
-                WHERE g.display = "' . ( $public_only ? '1' : '0' ) . '" AND f.signup = "1" AND f.form_element <> "hidden" ORDER BY ' . $orderby;
+                WHERE f.signup = "1" ' . ( $public_only ? 'AND g.display = "1"' : '' ) . ' AND f.form_element <> "hidden" ORDER BY ' . $orderby;
         
       } else {
       $sql = 'SELECT g.name 
               FROM ' . Participants_Db::$groups_table . ' g
-                WHERE g.display = "' . ( $public_only ? '1' : '0' ) . ' " ORDER BY ' . $orderby;
+                WHERE 1=1 ' . ( $public_only ? 'AND g.display = "1"' : '' ) . ' ORDER BY ' . $orderby;
       }
 
       $result = $wpdb->get_results($sql, ARRAY_N);
@@ -836,7 +836,7 @@ abstract class PDb_Shortcode {
        * use the dynamic value if no value has been set
        */
       if (in_array($this->module, array('signup', 'record', 'retrieve'))) {
-        if (Participants_Db::is_dynamic_value($value)) {
+        if (Participants_Db::is_dynamic_value($field->default)) {
           $value = $this->get_dynamic_value($field->default);
         }
         /*
@@ -1098,7 +1098,7 @@ abstract class PDb_Shortcode {
     
     $hidden = is_array($hidden) ? $hidden : array();
     
-    $hidden_fields = $hidden + $this->hidden_fields + $default_hidden_fields;
+    $hidden_fields = $this->hidden_fields + $hidden + $default_hidden_fields;
     
     PDb_FormElement::print_hidden_fields($hidden_fields);
   }

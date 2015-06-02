@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) die;
       $id = $this->shortcode_atts['record_id'];
     } else $id = 0;
 		// override the shortcode att if the value is in the URI
-    $get_pdb = filter_input(INPUT_GET, 'pdb', FILTER_VALIDATE_INT, array('min_range' => 1));
+    $get_pdb = filter_input(INPUT_GET, 'pdb', FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
     if (!empty($get_pdb)) {
       $id = $get_pdb;
     }
@@ -85,4 +85,3 @@ if ( ! defined( 'ABSPATH' ) ) die;
   }
   
  }
- ?>

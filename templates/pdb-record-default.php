@@ -3,6 +3,8 @@
  * default template for the [pdb_record] shortcode for editing a record on the frontend
  *
  * this template uses a table to format the form
+ * 
+ * @version Participants Database 1.6
  */
 ?>
 <div class="wrap <?php echo $this->wrap_class ?>">

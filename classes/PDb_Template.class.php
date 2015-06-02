@@ -1,7 +1,7 @@
 <?php
 
 /*
- * utility class for accessing a record from a template
+ * utility class for arbitrarily accessing record fields in a template
  * 
  * this class facilitates building a template that is not based on a loop, but needs 
  * to access and print any of the fields of a record by name
@@ -14,7 +14,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    1.1
+ * @version    1.2
  * @link       http://xnau.com/wordpress-plugins/
  */
 
@@ -549,4 +549,3 @@ class PDb_Template_Field_Group {
       }
   } 
 }
-?>

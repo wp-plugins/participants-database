@@ -85,7 +85,7 @@ $this->print_list_count('<h5>');
       <section id="record-<?php echo $this->record->record_id ?>">
         <?php while( $this->have_fields() ) : $this->the_field(); // each field is one cell ?>
 
-        <?php if ( ! $this->field->is_empty($this->field->value) ) : ?>
+        <?php if ( $this->field->has_content() ) : ?>
         <div class="pdb-field">
           <span class="pdb-field-title"><?php echo $this->field->title ?></span>
           <span class="pdb-field-data"><?php echo PDb_FormElement::get_field_value_display($this->field); ?></span>
@@ -121,7 +121,7 @@ $this->print_list_count('<h5>');
 																		 'current_page_class'=>'active currentpage',
 																		 'wrappers' => array(
 																												'wrap_class' => 'pagination-large pagination-centered',
-                                                        'list_class' => 'pagination',
+                                                        'list_class' => '',
 																												),
 																		 ));
 	$this->pagination->show();

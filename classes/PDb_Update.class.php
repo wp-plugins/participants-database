@@ -170,5 +170,3 @@ class PDb_Update {
   }
 
 }
-
-?>

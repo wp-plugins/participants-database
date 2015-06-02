@@ -10,13 +10,12 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2014 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 3.5
+ * @version    3.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
-if (!defined('ABSPATH'))
-  die;
+if (!defined('ABSPATH')) die;
 if (!class_exists('PDb_Aux_Plugin')) :
 
   class PDb_Aux_Plugin {
@@ -56,6 +55,11 @@ if (!class_exists('PDb_Aux_Plugin')) :
      * @var string
      */
     public $aux_plugin_title;
+
+    /**
+     * @var string abbreviated plugin name, should be unique in most contexts
+     */
+    public $aux_plugin_shortname;
 
     /**
      * slug of the aux plugin settings page

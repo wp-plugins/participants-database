@@ -137,6 +137,9 @@ class PDb_List_Query {
      * if we're getting a paginated set of records, get the stored session, if not, 
      * and we are searching, save the session
      */
+    
+//    error_log(__METHOD__.' post: '.print_r($_POST,1));
+    
     if (!empty($this->get_input[Participants_Db::$list_page])) {
       $this->_restore_query_session();
     } elseif (filter_input(INPUT_POST, 'action') === 'pdb_list_filter' && $this->is_search_result) {
@@ -303,6 +306,15 @@ class PDb_List_Query {
   private function _add_filter_from_get() {
     $this->get_input = filter_input_array(INPUT_GET, self::single_search_input_filter());
     if (isset($this->get_input)) {
+      /*
+       * fill in some assumed defaults in case an abbreviated get string is used
+       */
+      if (empty($this->get_input['operator'])) {
+        $this->get_input['operator'] = 'LIKE';
+      }
+      if (empty($this->get_input['target_instance'])) {
+        $this->get_input['target_instance'] = '1';
+      }
       $this->_add_filter_from_input($this->_prepare_submit_value($this->get_input));
     }
   }
@@ -344,6 +356,45 @@ class PDb_List_Query {
           $this->_add_filter_from_input($this->post_input);
           break;
       }
+    }
+  }
+  /**
+   * adds a filter statement from an input array
+   * 
+   * @param array $input from GET or POST array
+   * @return null
+   */
+  private function  _add_filter_from_input($input) {
+    
+    $this->_reset_filters();
+    if ($input['target_instance'] == $this->list_instance) { 
+      if (empty($input['sortstring'])) {
+        $input['sortstring'] = $input['sortBy'];
+        $input['orderstring'] = $input['ascdesc'];
+      }
+      if (is_array($input['search_field'])) {
+        for ($i = 0;$i < count($input['search_field']);$i++) {
+          $search_field = $input['search_field'][$i];
+          $this->_remove_field_filters($search_field);
+          $this->_add_single_statement($search_field, $input['operator'][$i], $input['value'][$i]);
+        }
+        $this->is_search_result = true;
+      } elseif (!empty($input['search_field'])) {
+        $this->_remove_field_filters($input['search_field']);
+        $this->_add_single_statement($input['search_field'], $input['operator'], $input['value']);
+        $this->is_search_result = true;
+        
+        error_log(__METHOD__.' '.print_r($this,1));
+        
+        
+      } elseif ($input['submit'] !== 'clear' && empty($input['value'])) {
+        // we set this to true even for empty searches
+        $this->is_search_result = true;
+      }
+      if (!empty($input['sortstring'])) {
+        $this->set_sort($input['sortstring'], $input['orderstring']);
+      }
+      $this->_save_query_session();
     }
   }
   /**
@@ -471,41 +522,6 @@ class PDb_List_Query {
       return '*';
     }
     return 'p.' . implode( ', p.', $this->columns);
-  }
-  /**
-   * adds a filter statement from an input array
-   * 
-   * @param array $input from GET or POST array
-   * @return null
-   */
-  private function  _add_filter_from_input($input) {
-    
-    $this->_reset_filters();
-    if ($input['target_instance'] == $this->list_instance) { 
-			if (empty($input['sortstring'])) {
-				$input['sortstring'] = $input['sortBy'];
-				$input['orderstring'] = $input['ascdesc'];
-			}
-			if (is_array($input['search_field'])) {
-				for ($i = 0;$i < count($input['search_field']);$i++) {
-					$search_field = $input['search_field'][$i];
-					$this->_remove_field_filters($search_field);
-					$this->_add_single_statement($search_field, $input['operator'][$i], $input['value'][$i]);
-				}
-				$this->is_search_result = true;
-			} elseif (!empty($input['search_field'])) {
-				$this->_remove_field_filters($input['search_field']);
-				$this->_add_single_statement($input['search_field'], $input['operator'], $input['value']);
-				$this->is_search_result = true;
-			} elseif ($input['submit'] !== 'clear' && empty($input['value'])) {
-				// we set this to true even for empty searches
-				$this->is_search_result = true;
-			}
-			if (!empty($input['sortstring'])) {
-				$this->set_sort($input['sortstring'], $input['orderstring']);
-			}
-      $this->_save_query_session();
-    }
   }
   /**
    * clears the filter statements for a single column
@@ -1049,4 +1065,3 @@ class PDb_List_Query {
   }
 
 }
-

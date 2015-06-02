@@ -6,9 +6,9 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2014 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.8
+ * @version    0.9
  * @link       http://xnau.com/wordpress-plugins/
  */
 if ( ! defined( 'ABSPATH' ) ) die;
@@ -18,6 +18,30 @@ class PDb_Base {
    * @var bool
    */
   public static $shortcode_present = false;
+  /**
+   * finds the WP installation root
+   * 
+   * this uses constants, so it's not filterable, but the constants (if customized) 
+   * are defined in the config file, so should be accurate for a particular installation
+   * 
+   * this works by finding the common path to both ABSPATH and WP_CONTENT_DIR which 
+   * we can assume is the base install path of WP, even if the WP application is in 
+   * another directory and/or the content directory is in a different place
+   * 
+   * @return string
+   */
+  public static function app_base_path() {
+    $content_path = explode('/', WP_CONTENT_DIR);
+    $wp_app_path = explode('/', ABSPATH);
+    $end = min(count($content_path), count($wp_app_path));
+    $i = 0;
+    $common = array();
+    while ($content_path[$i] === $wp_app_path[$i] and $i < $end) {
+      $common[] = $content_path[$i];
+      $i++;
+    }
+    return trailingslashit(implode('/', $common));
+  }
   /**
    * parses a list shortcode filter string into an array
    * 
@@ -278,7 +302,7 @@ class PDb_Base {
 
     if (!file_exists($filename)) {
 
-      $filename = get_bloginfo('wpurl') . '/' . Participants_Db::plugin_setting('image_upload_location') . basename($filename);
+      $filename = self::files_uri() . basename($filename);
     }
 
     return $filename;
@@ -535,6 +559,20 @@ class PDb_Base {
   }
   
   /**
+   * creates a translated key string of the format title (name) where "name" is untranslated
+   * 
+   * @param string $title the title string
+   * @param string $name the name string
+   * 
+   * @return string the translated title with the untranslated name added (if supplied)
+   */
+  public static function title_key($title, $name = '') {
+    if (empty($name)) {
+      return Participants_Db::set_filter('pdb-translate_string', $title);
+    }
+    return sprintf('%s (%s)', Participants_Db::set_filter('pdb-translate_string', $title), $name);
+  }
+  /**
    * provides a plugin setting
    * 
    * @param string $name setting name
@@ -589,12 +627,12 @@ class PDb_Base {
   public static function set_filter($slug, $term, $var1 = NULL, $var2 = NULL)
   {
     if (strpos($slug, Participants_Db::$prefix) === false) {
-			$tag = Participants_Db::$prefix . $slug;
+			$slug = Participants_Db::$prefix . $slug;
     }
-    if (!has_filter($tag)) {
+    if (!has_filter($slug)) {
       return $term;
     }
-    return apply_filters($tag, $term, $var1, $var2);
+    return apply_filters($slug, $term, $var1, $var2);
   }
 
   /**
@@ -609,7 +647,7 @@ class PDb_Base {
       return false;
     }
     $file_contents = file_get_contents($css_file);
-    $custom_css = Participants_Db::$plugin_options['custom_css'];
+    $custom_css = Participants_Db::plugin_setting('custom_css');
     if ($file_contents === $custom_css) {
       // error_log(__METHOD__.' CSS settings are unchanged; do nothing');
     } else {
@@ -618,6 +656,32 @@ class PDb_Base {
     return true;
   }
 
+  /**
+   * supplies an image/file upload location
+   * 
+   * relative to WP root
+   * 
+   * @return string realtive path to the plugin files location
+   */
+  public static function files_location() {
+    return Participants_Db::set_filter('files_location', Participants_Db::plugin_setting('image_upload_location'));
+  }
+  /**
+   * supplies the absolute path to the files location
+   * 
+   * @return string
+   */
+  public static function files_path() {
+    return trailingslashit(PDb_Image::concatenate_directory_path( self::app_base_path(), Participants_Db::files_location()));
+  }
+  /**
+   * supplies the absolute path to the files location
+   * 
+   * @return string
+   */
+  public static function files_uri() {
+    return trailingslashit(home_url(Participants_Db::files_location()));
+  }
   /**
    * deletes a file
    * 
@@ -629,7 +693,7 @@ class PDb_Base {
   public static function delete_file($filename)
   {
     $current_dir = getcwd(); // save the cirrent dir
-    chdir(ABSPATH . Participants_Db::plugin_setting('image_upload_location')); // set the plugin uploads dir
+    chdir(self::files_path()); // set the plugin uploads dir
     $result = unlink(basename($filename)); // delete the file
     chdir($current_dir); // change back to the previous directory
     return $result;
@@ -870,7 +934,6 @@ class PDb_Base {
 /**
  * collect a list of all the plugin shortcodes present in the content
  *
- * @global array $shortcode_tags
  * @param string $content the content to test
  * @param string $tag
  * @return array of plugin shortcode tags
@@ -880,13 +943,13 @@ class PDb_Base {
     $shortcodes = array();
     // get all shortcodes
     preg_match_all('/' . get_shortcode_regex() . '/s', $content, $matches, PREG_SET_ORDER);
-    
-    // none found
-    if (!empty($matches[0][0]) && false === strpos($matches[0][0], $tag))
-      return false;
+    // if no shortcodes, return empty array
+    if (empty($matches)) return array();
     // check each one for a plugin shortcode
     foreach ($matches as $shortcode) {
+      if (false !== strpos($shortcode[0], $tag)) {
       $shortcodes[] = $shortcode[2] . '-shortcode';
+    }
     }
     return $shortcodes;
   }
@@ -899,7 +962,6 @@ class PDb_Base {
  * be used to detect any of the plugin's shortcode. Generally, we just check for 
  * the common prefix
  *
- * @global array $shortcode_tags
  * @param string $content the content to test
  * @param string $tag
  * @return boolean
@@ -1088,6 +1150,7 @@ class PDb_Base {
     }
     return $output;
   }
+
   /**
    * supplies a random alphanumeric key
    * 
@@ -1145,5 +1208,3 @@ class PDb_Base {
   }
   
 }
-
-?>

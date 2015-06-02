@@ -1,6 +1,9 @@
 @charset "UTF-8";
 
 /* Participants DB Admin CSS */
+.has-dashicons .glyphicon {
+    font-size: 18px;
+}
 
 /*** PARTICIPANT LIST ***/
 body[class*='participants-database'] .widefat td {
@@ -106,6 +109,25 @@ fieldset.widefat.inline-controls label {
   display: inline-block;
   margin-left: 30px;
   width: 50%;
+}
+.dashicons.sort-icon {
+  font-size: 30px;
+  line-height: 0.7;
+  opacity: 0.7;
+}
+
+
+/* HORIZ SCROLL */
+.pdb-horiz-scroll-scroller {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.pdb-horiz-scroll-width {
+  min-width: 100em;
+}
+.manage-fields-wrap .pdb-horiz-scroll-width {
+  width: 130em;
 }
 
 /*** FOOTER ***/
@@ -382,6 +404,9 @@ div.manage-fields-wrap {
 .id, .order, .persistent, .sortable, .admin_column, .display_column, .CSV {
   text-align:center;
 }
+body[class*="participants-database"] .manage-fields tr.highlighted {
+  background-color:#E0EDF9;
+}
 th.vertical-title  {
   width:25px;
 }
@@ -653,6 +678,9 @@ a.dragger {
   position: relative;
   left:0;
 }
+.settings-class.participants_db .ui-tabs-panel {
+  max-width: 60em;
+}
 .participants_db .ui-tabs-panel h3 {
   font: italic normal normal 24px/29px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
   margin: 0;
@@ -691,16 +719,10 @@ a.dragger {
 .ui-dialog.ui-widget {
   font-family: inherit;
   font-size:1.1em;
-  /* css3 drop shadow */
-/*  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);*/
-  /* css3 border radius */
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
   background:#FFFFFF;
   border: 1px solid #D54E21;
+  box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
   /* styling of the dialog box, i have a fixed dimension for this demo */
   width:328px;
   /* make sure it has the highest z-index */

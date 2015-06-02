@@ -188,4 +188,3 @@ function wp_session_register_garbage_collection() {
 }
 }
 add_action( 'wp', 'wp_session_register_garbage_collection' );
-?>

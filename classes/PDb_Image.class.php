@@ -6,9 +6,9 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdeign@xnau.com>
- * @copyright  2011 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.1
+ * @version    0.2
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Image_Handler class
  */
@@ -45,8 +45,8 @@ class PDb_Image extends xnau_Image_Handler {
    */
   public function set_image_directory() {
 
-    $this->image_directory = $this->concatenate_directory_path( ABSPATH, Participants_Db::$plugin_options['image_upload_location'] );
-    $this->image_directory_uri = $this->concatenate_directory_path( site_url(), Participants_Db::$plugin_options['image_upload_location'] );
+    $this->image_directory = Participants_Db::files_path();
+    $this->image_directory_uri = Participants_Db::files_uri();
   }
   
   /**
@@ -67,9 +67,10 @@ class PDb_Image extends xnau_Image_Handler {
     }
     
     // check that the file exists, then set the absolute path
-    if ( !empty($this->default_image) and is_file( $this->concatenate_directory_path( ABSPATH, $this->default_image, false ) ) ) {
+    $default_image = self::concatenate_directory_path( Participants_Db::app_base_path(), $this->default_image, false );
+    if ( !empty($this->default_image) and is_file( $default_image ) ) {
       
-      $this->default_image = $this->concatenate_directory_path( site_url(), $this->default_image, false );
+      $this->default_image = $default_image;
       
     } else $this->default_image = false; 
     

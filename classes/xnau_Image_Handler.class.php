@@ -7,7 +7,7 @@
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdeign@xnau.com>
- * @copyright  2011, 2013 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
  * @version    0.3
  * @link       http://xnau.com/wordpress-plugins/
@@ -26,7 +26,7 @@
  *   watermarking
  *   
  */
-
+if ( ! defined( 'ABSPATH' ) ) die;
 abstract class xnau_Image_Handler {
 
   /**

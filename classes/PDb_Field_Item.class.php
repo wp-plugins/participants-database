@@ -137,6 +137,37 @@ class PDb_Field_Item extends PDb_Template_Item {
   }
 	
 	/**
+   * tests a value for emptiness, includinf arrays with empty elements
+   * 
+   * @param mixed $value the value to test
+   * @return bool
+   */
+  public function is_empty($value = false) {
+    
+    if ($value === false) {
+      $value = $this->value;
+    }
+    
+    if (is_object($value)) {
+      // backward compatibility: we used to call this with an object
+      $value = $value->value;
+    }
+    
+    if (is_array($value)) $value = implode('', $value);
+    
+    return strlen($value) === 0;
+  }
+  
+  /**
+   * tests a field for printable content
+   * 
+   * @return bool
+   */
+  public function has_content() {
+    return ! $this->is_empty();
+  }
+	
+	/**
 	 * is this the single record link?
 	 * returns boolean
 	 */

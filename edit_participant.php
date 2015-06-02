@@ -8,8 +8,7 @@
  */
 if ( ! defined( 'ABSPATH' ) ) die;
 if (!Participants_Db::current_user_has_plugin_role()) exit;
-
-$input_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('min_range' => 1));
+$input_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
 if (!isset($participant_id)) {
   // if there is no id in the request, use the default record
   $participant_id = empty($input_id) ? false : $input_id;
@@ -114,7 +113,7 @@ if ($participant_values) :
             }
             ?>
             <th><?php echo $column_title . $add_title ?></th>
-            <td id="<?php echo Participants_Db::$prefix . $column->name ?>" >
+            <td id="<?php echo Participants_Db::$prefix . $column->name ?>-field" >
               <?php
               
 
@@ -227,7 +226,7 @@ if ($participant_values) :
       <table class="form-table">
   <?php if (is_admin()) : ?>
           <tr>
-          <td colspan="2" class="submit-buttons">
+          <td class="submit-buttons">
             <?php if (!empty($input_id)) : ?><input class="button button-default button-leftarrow" type="submit" value="<?php echo self::$i18n['previous'] ?>" name="submit_button"><?php endif ?>
             <input class="button button-primary" type="submit" value="<?php echo self::$i18n['submit'] ?>" name="submit_button">
             <input class="button button-primary" type="submit" value="<?php echo self::$i18n['apply'] ?>" name="submit_button">
@@ -235,7 +234,7 @@ if ($participant_values) :
           </td>
           </tr>
           <tr>
-            <td colspan="2">
+            <td >
               <?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', 'participants-database') ?>
               <br />
               <?php if (!empty($input_id)) {_e('<strong>Previous:</strong> save and move to previous record', 'participants-database'); } ?>

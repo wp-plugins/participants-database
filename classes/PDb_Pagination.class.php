@@ -16,7 +16,9 @@
  *          with methods for setting the class of the current page indicator and an option
  *          to wrap the current page indicator numeral with a dummy anchor tag
  */
-if ( ! defined( 'ABSPATH' ) ) die;
+if (!defined('ABSPATH'))
+  die;
+
 class PDb_Pagination {
 
   /**
@@ -95,7 +97,8 @@ class PDb_Pagination {
    *                'add_variables' additional GET string to add
    *                'instance'      the list instance the control is attached to
    */
-  function __construct($args) {
+  function __construct($args)
+  {
     extract(wp_parse_args($args, array(
                 'page' => 1,
                 'size' => 10,
@@ -111,25 +114,26 @@ class PDb_Pagination {
     $this->setPage($page);
     $this->setTotalRecords($total_records);
     $this->setSize($size);
-    $this->setLink($link,$add_variables);
+    $this->setLink($link, $add_variables);
     $this->filtering = $filtering;
     $this->set_wrappers();
     $this->set_anchor_wrap($anchor_wrap);
     $this->current_page_class = $current_page_class;
     $this->disabled_class = $disabled_class;
-    $this->first_last = empty($first_last) ? ($total_records/($size == 0 ? 1 : $size) > 5 ? true : false) : ($first_last == 'true' ? true : false); 
+    $this->first_last = empty($first_last) ? ($total_records / ($size == 0 ? 1 : $size) > 5 ? true : false) : ($first_last == 'true' ? true : false);
   }
 
   /**
    * returns the pagination links
    *
    */
-  public function links() {
+  public function links()
+  {
     return $this->create_links();
   }
 
-  public function show() {
-
+  public function show()
+  {
     echo $this->create_links();
   }
 
@@ -145,8 +149,8 @@ class PDb_Pagination {
    *                first_last         bool   whether to show the first and last page links
    *                wrappers           array  the HTML to wrap the links in (see set_wrappers())
    */
-  public function set_props($array) {
-
+  public function set_props($array)
+  {
     foreach ($array as $prop => $value) {
 
       switch ($prop) {
@@ -176,7 +180,8 @@ class PDb_Pagination {
    *
    * @param unknown_type $page
    */
-  function setPage($page) {
+  function setPage($page)
+  {
     $this->page = 0 + $page;
   }
 
@@ -185,7 +190,8 @@ class PDb_Pagination {
    *
    * @param integer $size
    */
-  function setSize($size) {
+  function setSize($size)
+  {
     $this->size = intval($size);
     if ($this->size < 1) {
       $this->size = $this->total_records;
@@ -197,7 +203,8 @@ class PDb_Pagination {
    *
    * @param integer $total
    */
-  function setTotalRecords($total) {
+  function setTotalRecords($total)
+  {
     $this->total_records = false === $total ? false : 0 + $total;
   }
 
@@ -206,17 +213,18 @@ class PDb_Pagination {
    *
    * @param string $url
    */
-  function setLink($url, $add_variables) {
-    
-    if ( ! empty($add_variables) )
-      $conj = false !== strpos($url,'?') ? '&amp;' : '?';
+  function setLink($url, $add_variables)
+  {
+    if (!empty($add_variables))
+      $conj = false !== strpos($url, '?') ? '&amp;' : '?';
     $this->link = $url . $conj . $add_variables;
   }
 
   /**
    * sets all the wrap HTML values
    */
-  public function set_wrappers($wrappers = array()) {
+  public function set_wrappers($wrappers = array())
+  {
 
     $defaults = array(
         'wrap_class' => '',
@@ -236,7 +244,8 @@ class PDb_Pagination {
    *
    * @params string $class
    */
-  public function set_current_page_class($class) {
+  public function set_current_page_class($class)
+  {
 
     $this->current_page_class = $class;
   }
@@ -246,7 +255,8 @@ class PDb_Pagination {
    *
    * @param bool $flag
    */
-  public function set_anchor_wrap($flag) {
+  public function set_anchor_wrap($flag)
+  {
 
     $this->anchor_wrap = $flag;
   }
@@ -256,7 +266,8 @@ class PDb_Pagination {
    *
    * @return string
    */
-  function getLimitSql() {
+  function getLimitSql()
+  {
     $sql = "LIMIT " . $this->getLimit();
     return $sql;
   }
@@ -266,7 +277,8 @@ class PDb_Pagination {
    *
    * @return string
    */
-  function getLimit() {
+  function getLimit()
+  {
     if ($this->total_records == 0) {
       $lastpage = 0;
     } else {
@@ -293,7 +305,8 @@ class PDb_Pagination {
    *
    * @return 	string
    */
-  function create_links() {
+  function create_links()
+  {
     // object is not set up properly
     if (false === $this->total_records)
       return '';
@@ -418,12 +431,9 @@ class PDb_Pagination {
    * @param int $pagenum
    * @return string
    */
-  private function _sprintf($link,$pagenum) {
-    
+  private function _sprintf($link, $pagenum)
+  {
     return str_replace('%1$s', $pagenum, $link);
-    
-  }
-
 }
 
-?>
+}

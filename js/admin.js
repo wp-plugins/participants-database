@@ -1,8 +1,8 @@
 // participants-database admin support scripts
 PDbAdmin = (function($) {
   $.fn.PDb_email_obfuscate = function () {
-    var address, link,
-            el = this;
+    var address, link;
+    var el = this;
     try {
       address = jQuery.parseJSON(el.attr('data-email-values'));
     } catch (e) {
@@ -15,7 +15,7 @@ PDbAdmin = (function($) {
     init: function() {
       $('input[placeholder], textarea[placeholder]').placeholder();
       $('.participants_db .ui-tabs-nav li').append($('<span class="mask"/>'));
-      $('.manage-fields-wrap').on('focus', '.manage-fields input[type="text"]:not([id*=other], .digit, [readonly])', function() {
+      $('.manage-fields-wrap').on('focus', '[name*=title], [name*=default] ', function() {
         $(this).addClass('focused').closest('td').addClass('focused');
       }).on('blur', '.manage-fields input[type="text"]', function() {
         $(this).removeClass('focused').closest('td').removeClass('focused');

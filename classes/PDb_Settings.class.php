@@ -3,8 +3,17 @@
 /**
  * plugin settings class for participants-database plugin
  *
+ *
  * this uses the generic plugin settings class to build the settings specific to
  * the plugin
+ * 
+ * @package    WordPress
+ * @subpackage Participants Database Plugin
+ * @author     Roland Barker <webdesign@xnau.com>
+ * @copyright  2015 xnau webdesign
+ * @license    GPL2
+ * @version    1.0
+ * @link       http://xnau.com/wordpress-plugins/
  */
 if ( ! defined( 'ABSPATH' ) ) die;
 class PDb_Settings extends xnau_Plugin_Settings {
@@ -13,8 +22,9 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $this->WP_setting = Participants_Db::$participants_db_options;
 
-    // define the settings sections
-    // no need to worry about the namespace, it will be prefixed
+    /*
+     * define the settings sections
+     */
     $this->sections = array(
         'pdb-main' => __('General Settings', 'participants-database'),
         'pdb-signup' => __('Signup Form Settings', 'participants-database'),
@@ -22,6 +32,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'pdb-list' => __('List Display Settings', 'participants-database'),
         'pdb-resend' => __('Resend Link Settings', 'participants-database'),
         'pdb-advanced' => __('Advanced Settings', 'participants-database'),
+        'pdb-admin' => __('Admin Settings', 'participants-database'),
         'pdb-css'  => __('Custom CSS', 'participants-database'),
     );
 
@@ -31,6 +42,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'pdb-signup' => __('Settings for the [pdb_signup] shortcode, which is used to show a signup or registration form on the website.', 'participants-database'),
         'pdb-resend' => __('Settings for the lost private link resend function.', 'participants-database'),
         'pdb-advanced' => __('Settings for special configurations.', 'participants-database'),
+        'pdb-admin' => __('Settings for the plugin backend.', 'participants-database'),
         'pdb-css' => __('User CSS rules for styling plugin displays.</h4><p>If you\'re new to CSS, try this tutorial to help you get started: <a href="http://www.ostraining.com/blog/wordpress/firebug-wordpress-css/">Use Firebug for Editing WordPress Themes.</a></p>' , 'participants-database'),
     );
     // determine the type of text-area elements to use for email body settings
@@ -76,7 +88,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
      *
      *   general settings
      *
-     * **************************************************** */
+     ******************************************************/
 
     $this->plugin_settings[] = array(
         'name' => 'image_upload_location',
@@ -466,7 +478,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         )
     );
     
-
+/*
     $this->plugin_settings[] = array(
         'name' => 'no_cookie_message',
         'title' => __('No User Cookie Message', 'participants-database'),
@@ -477,148 +489,13 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'value' => __('Please enable cookies in your browser to use this feature.', 'participants-database'),
         )
     );
+*/  
     
-    /*******************************************************
-     * 
-     * link retrieval settings
-     * 
-     *******************************************************/
-
-    $this->plugin_settings[] = array(
-        'name' => 'show_retrieve_link',
-        'title' => __('Enable Lost Private Link', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __('Show a link on the signup form allowing users to have their private link emailed to them.', 'participants-database'),
-            'value' => 0,
-            'options' => array(1, 0),
-        )
-    );
-   
-    $this->plugin_settings[] = array(
-        'name' => 'retrieve_link_text',
-        'title' => __('Lost Private Link Text', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => 'text',
-            'help_text' => __('clickable text shown in the signup form', 'participants-database'),
-            'value' => __('Forget your private link? Click here to have it emailed to you.','participants-database'),
-        )
-    );
-    $this->plugin_settings[] = array(
-        'name' => 'link_retrieval_page',
-        'title' => __('Lost Private Link Page', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array
-            (
-            'type' => 'dropdown-other',
-            'help_text' => __('send people to this page to request their private link.', 'participants-database'),
-            'options' => $this->_get_pagelist(true),
-            'attributes' => array('other' => 'Post ID'),
-            'value' => 'none',
-        )
-    );
-   
-    $this->plugin_settings[] = array(
-        'name' => 'retrieve_link_identifier',
-        'title' => __('Lost Private Link ID Field', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => 'dropdown',
-            'help_text' => __('The field used to identify the user&#39;s account. This must be a unique identifier for the record', 'participants-database'),
-            'options' => self::_get_identifier_columns(false),
-            'value' => 'email',
-        )
-    );
-   
-    $this->plugin_settings[] = array(
-        'name' => 'id_field_prompt',
-        'title' => __('ID Field Help Text', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => 'text',
-            'help_text' => __('help text for the record identification field', 'participants-database'),
-            'value' => __("Type in your %s, your private link will be emailed to you.", 'participants-database'),
-        )
-    );
-   
-    $this->plugin_settings[] = array(
-        'name' => 'retrieve_link_email_subject',
-        'title' => __('Lost Private Link Email Subject', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => 'text',
-            'help_text' => __('subject line for the lost private link email', 'participants-database'),
-            'value' => sprintf(__("Here is your private link on %s", 'participants-database'), get_bloginfo('name')),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'retrieve_link_email_body',
-        'title' => __('Lost Private Link Email', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => $this->textarea_type,
-            'help_text' => __('Body of the email sent when a lost private link is requested.', 'participants-database'),
-            /* translators: the %s will be the name of the website */
-            'value' => '<p>' . sprintf(__('Here is the private link you requested from %s:', 'participants-database'), get_bloginfo('name')) . '</p><p><a href="[record_link]">[record_link]</a>.</p>',
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'send_retrieve_link_notify_email',
-        'title' => __('Send Lost Private Link Notification Email', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __('Send an email notification that a lost private link has been requested. This email will go to the "Signup Notification Recipients."', 'participants-database'),
-            'value' => 0,
-            'options' => array(1, 0),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'retrieve_link_notify_subject',
-        'title' => __('Lost Private Link Notification Email Subject', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => 'text',
-            'help_text' => __('subject of the notification email; placeholder tags can be used (see above)', 'participants-database'),
-            /* translators: the %s will be the name of the website */
-            'value' => sprintf(__('A Lost Private Link has been requested on %s', 'participants-database'), get_bloginfo('name')),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'retrieve_link_notify_body',
-        'title' => __('Lost Private Link Notification Email', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => $this->textarea_type,
-            'help_text' => __('notification email body', 'participants-database'),
-            'value' => __('<p>A lost private link has been requested by:</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>', 'participants-database'),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'identifier_field_message',
-        'title' => __('Retrieve Private Link Error Message', 'participants-database'),
-        'group' => 'pdb-resend',
-        'options' => array(
-            'type' => 'text-area',
-            'help_text' => __('Message shown when a record matching the retrieve link idenifier cannot be found', 'participants-database'),
-            'value' => __('A record matching that %s cannot be found.', 'participants-database'),
-        )
-    );
-
-    /*     * ****************************************************
+    /******************************************************
      *
      *   record form settings
      *
-     * **************************************************** */
+     * *****************************************************/
 
     $this->plugin_settings[] = array(
         'name' => 'registration_page',
@@ -699,7 +576,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
         'options' => array
             (
             'type' => 'checkbox',
-            'help_text' => __('If no record is found the record template is used for the display.', 'participants-database'),
+            'help_text' => __('If checked, use the record template to show the "Record Not Found" message. If unchecked, the message is shown without using the template.', 'participants-database'),
             'value' => 0,
             'options' => array(1, 0),
         )
@@ -850,42 +727,155 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
 
     $this->plugin_settings[] = array(
-        'name' => 'admin_default_sort',
-        'title' => __('Admin List Default Sort', 'participants-database'),
-        'group' => 'pdb-list',
-        'options' => array
-            (
-            'type' => 'dropdown',
-            'value' => 'date_updated',
-            'help_text' => __('The record list shown in the admin section will be sorted by this field by default. (Field must be checked "sortable.")', 'participants-database'),
-            'options' => $this->_get_sort_columns(),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'admin_default_sort_order',
-        'title' => __('Admin List Default Sort Order', 'participants-database'),
-        'group' => 'pdb-list',
-        'options' => array(
-            'type' => 'dropdown',
-            'help_text' => __('Sets the default order of the record list in the admin.', 'participants-database'),
-            'value' => 'desc',
-            'options' => array(__('Ascending', 'participants-database') => 'asc', __('Descending', 'participants-database') => 'desc', 'null_select' => false),
-        )
-    );
-    
-    $this->plugin_settings[] = array(
-        'name' => 'admin_thumbnails',
-        'title' => __('Show Image Thumbnails in Admin List', 'participants-database'),
+        'name' => 'empty_search',
+        'title' => __('Allow Empty Search', 'participants-database'),
         'group' => 'pdb-list',
         'options' => array
             (
             'type' => 'checkbox',
-            'help_text' => '',
+            'help_text' => __("This allows frontend searches to find records with missing or blank data.", 'participants-database'),
             'value' => 0,
             'options' => array(1, 0),
         ),
     );
+    
+    /*******************************************************
+     * 
+     * link retrieval settings
+     * 
+     *******************************************************/
+
+    $this->plugin_settings[] = array(
+        'name' => 'show_retrieve_link',
+        'title' => __('Enable Lost Private Link', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('Show a link on the signup form allowing users to have their private link emailed to them.', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_text',
+        'title' => __('Lost Private Link Text', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('clickable text shown in the signup form', 'participants-database'),
+            'value' => __('Forget your private link? Click here to have it emailed to you.','participants-database'),
+        )
+    );
+    $this->plugin_settings[] = array(
+        'name' => 'link_retrieval_page',
+        'title' => __('Lost Private Link Page', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array
+            (
+            'type' => 'dropdown-other',
+            'help_text' => __('send people to this page to request their private link.', 'participants-database'),
+            'options' => $this->_get_pagelist(true),
+            'attributes' => array('other' => 'Post ID'),
+            'value' => 'none',
+        )
+    );
+   
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_identifier',
+        'title' => __('Lost Private Link ID Field', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'dropdown',
+            'help_text' => __('The field used to identify the user&#39;s account. This must be a unique identifier for the record', 'participants-database'),
+            'options' => self::_get_identifier_columns(false),
+            'value' => 'email',
+        )
+    );
+    
+    $this->plugin_settings[] = array(
+        'name' => 'id_field_prompt',
+        'title' => __('ID Field Help Text', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('help text for the record identification field', 'participants-database'),
+            'value' => __("Type in your %s, your private link will be emailed to you.", 'participants-database'),
+        )
+    );
+   
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_email_subject',
+        'title' => __('Lost Private Link Email Subject', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('subject line for the lost private link email', 'participants-database'),
+            'value' => sprintf(__("Here is your private link on %s", 'participants-database'), get_bloginfo('name')),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_email_body',
+        'title' => __('Lost Private Link Email', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => $this->textarea_type,
+            'help_text' => __('Body of the email sent when a lost private link is requested.', 'participants-database'),
+            /* translators: the %s will be the name of the website */
+            'value' => '<p>' . sprintf(__('Here is the private link you requested from %s:', 'participants-database'), get_bloginfo('name')) . '</p><p><a href="[record_link]">[record_link]</a>.</p>',
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'send_retrieve_link_notify_email',
+        'title' => __('Send Lost Private Link Notification Email', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('Send an email notification that a lost private link has been requested. This email will go to the "Signup Notification Recipients."', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        )
+    );
+    
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_notify_subject',
+        'title' => __('Lost Private Link Notification Email Subject', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text',
+            'help_text' => __('subject of the notification email; placeholder tags can be used (see above)', 'participants-database'),
+            /* translators: the %s will be the name of the website */
+            'value' => sprintf(__('A Lost Private Link has been requested on %s', 'participants-database'), get_bloginfo('name')),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'retrieve_link_notify_body',
+        'title' => __('Lost Private Link Notification Email', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => $this->textarea_type,
+            'help_text' => __('notification email body', 'participants-database'),
+            'value' => __('<p>A lost private link has been requested by:</p><ul><li>Name: [first_name] [last_name]</li><li>Email: [email]</li></ul>', 'participants-database'),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'identifier_field_message',
+        'title' => __('Retrieve Private Link Error Message', 'participants-database'),
+        'group' => 'pdb-resend',
+        'options' => array(
+            'type' => 'text-area',
+            'help_text' => __('Message shown when a record matching the retrieve link idenifier cannot be found', 'participants-database'),
+            'value' => __('A record matching that %s cannot be found.', 'participants-database'),
+        )
+    );
+
+  
     
     /******************************************************
      *
@@ -1017,42 +1007,6 @@ class PDb_Settings extends xnau_Plugin_Settings {
     );
 
     $this->plugin_settings[] = array(
-        'name' => 'record_edit_capability',
-        'title' => __('Record Edit Access Level', 'participants-database'),
-        'group' => 'pdb-advanced',
-        'options' => array(
-            'type' => 'dropdown',
-            'help_text' => __('sets the user access level for adding, editing and listing records.', 'participants-database'),
-            'value' => 'edit_others_posts',
-            'options' => $this->get_role_select(),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'plugin_admin_capability',
-        'title' => __('Plugin Admin Access Level', 'participants-database'),
-        'group' => 'pdb-advanced',
-        'options' => array(
-            'type' => 'dropdown',
-            'help_text' => __('sets the user access level for fields management, plugin settings, deleting records and CSV operations.', 'participants-database'),
-            'value' => 'manage_options',
-            'options' => $this->get_role_select(),
-        )
-    );
-
-    $this->plugin_settings[] = array(
-        'name' => 'editor_allowed_csv_export',
-        'title' => __('Editor can Export CSV Files', 'participants-database'),
-        'group' => 'pdb-advanced',
-        'options' => array(
-            'type' => 'checkbox',
-            'help_text' => __('If checked, users with the plugin editor role can export a CSV.', 'participants-database'),
-            'value' => '0',
-            'options' => array(1, 0),
-        )
-    );
-
-    $this->plugin_settings[] = array(
         'name' => 'strict_search',
         'title' => __('Strict User Searching', 'participants-database'),
         'group' => 'pdb-advanced',
@@ -1076,18 +1030,6 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'options' => array(1, 0),
         ),
     );
-    $this->plugin_settings[] = array(
-        'name' => 'empty_search',
-        'title' => __('Allow Empty Search', 'participants-database'),
-        'group' => 'pdb-advanced',
-        'options' => array
-            (
-            'type' => 'checkbox',
-            'help_text' => __("This allows frontend searches to find records with missing or blank data.", 'participants-database'),
-            'value' => 0,
-            'options' => array(1, 0),
-        ),
-    );
 
     $this->plugin_settings[] = array(
         'name' => 'use_php_sessions',
@@ -1101,7 +1043,103 @@ class PDb_Settings extends xnau_Plugin_Settings {
             'options' => array(1, 0),
         ),
     );
+    
+    /******************************************************
+     *
+     *   admin section settings
+     *
+     * *****************************************************/
 
+    
+    $this->plugin_settings[] = array(
+        'name' => 'admin_default_sort',
+        'title' => __('Admin List Default Sort', 'participants-database'),
+        'group' => 'pdb-admin',
+        'options' => array
+            (
+            'type' => 'dropdown',
+            'value' => 'date_updated',
+            'help_text' => __('The record list shown in the admin section will be sorted by this field by default. (Field must be checked "sortable.")', 'participants-database'),
+            'options' => $this->_get_sort_columns(),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'admin_default_sort_order',
+        'title' => __('Admin List Default Sort Order', 'participants-database'),
+        'group' => 'pdb-admin',
+        'options' => array(
+            'type' => 'dropdown',
+            'help_text' => __('Sets the default order of the record list in the admin.', 'participants-database'),
+            'value' => 'desc',
+            'options' => array(__('Ascending', 'participants-database') => 'asc', __('Descending', 'participants-database') => 'desc', 'null_select' => false),
+        )
+    );
+    
+    $this->plugin_settings[] = array(
+        'name' => 'admin_thumbnails',
+        'title' => __('Show Image Thumbnails in Admin List', 'participants-database'),
+        'group' => 'pdb-admin',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => '',
+            'value' => 0,
+            'options' => array(1, 0),
+        ),
+    );
+
+    
+
+    $this->plugin_settings[] = array(
+        'name' => 'admin_horiz_scroll',
+        'title' => __('Plugin Admin Horizontal Scrolling', 'participants-database'),
+        'group' => 'pdb-admin',
+        'options' => array
+            (
+            'type' => 'checkbox',
+            'help_text' => __('use horizontal scrolling on list and fields management screens', 'participants-database'),
+            'value' => 0,
+            'options' => array(1, 0),
+        ),
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'record_edit_capability',
+        'title' => __('Record Edit Access Level', 'participants-database'),
+        'group' => 'pdb-admin',
+        'options' => array(
+            'type' => 'dropdown',
+            'help_text' => __('sets the user access level for adding, editing and listing records.', 'participants-database'),
+            'value' => 'edit_others_posts',
+            'options' => $this->get_role_select(),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'plugin_admin_capability',
+        'title' => __('Plugin Admin Access Level', 'participants-database'),
+        'group' => 'pdb-admin',
+        'options' => array(
+            'type' => 'dropdown',
+            'help_text' => __('sets the user access level for fields management, plugin settings, deleting records and CSV operations.', 'participants-database'),
+            'value' => 'manage_options',
+            'options' => $this->get_role_select(),
+        )
+    );
+
+    $this->plugin_settings[] = array(
+        'name' => 'editor_allowed_csv_export',
+        'title' => __('Editor can Export CSV Files', 'participants-database'),
+        'group' => 'pdb-admin',
+        'options' => array(
+            'type' => 'checkbox',
+            'help_text' => __('If checked, users with the plugin editor role can export a CSV.', 'participants-database'),
+            'value' => '0',
+            'options' => array(1, 0),
+        )
+    );
+    
 
     /******************************************************
      *
@@ -1149,11 +1187,10 @@ class PDb_Settings extends xnau_Plugin_Settings {
     if ($with_none)
       $pagelist[__('Same Page', 'participants-database')] = 'none';
 
-    $pages = get_posts(array('post_type' => 'page', 'post_status' => array('publish','private'), 'posts_per_page' => -1));
+    $pages = get_posts(array('post_type' => 'page', 'posts_per_page' => -1));
 
     foreach ($pages as $page) {
-
-      $pagelist[$page->post_title] = $page->ID;
+      $pagelist[Participants_Db::set_filter('pdb-translate_string', $page->post_title)] = $page->ID;
     }
 
     /*
@@ -1179,15 +1216,15 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $columns = Participants_Db::get_column_atts('all');
 
-    foreach ($columns as $column) {
+    $linkable = array();
 
+    foreach ($columns as $column) {
       if (PDb_FormElement::field_is_linkable($column)) {
-        $key = sprintf('%s (%s)', $column->title, $column->name);
-        $columnlist[$key] = $column->name;
+        $linkable[] = $column;
       }
     }
 
-    return $columnlist;
+    return self::column_dropdown_options($linkable, $columnlist);
   }
 
   /**
@@ -1212,10 +1249,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $columns = $wpdb->get_results($sql, OBJECT_K);
 
-    foreach ($columns as $column) {
-            $key = sprintf('%s (%s)', $column->title, $column->name);
-        $columnlist[$key] = $column->name;
-    }
+      $columnlist = self::column_dropdown_options($columns, $columnlist);
 
       wp_cache_set('id_columns', $columnlist);
       
@@ -1230,11 +1264,22 @@ class PDb_Settings extends xnau_Plugin_Settings {
 
     $columns = Participants_Db::get_column_atts('sortable');
 
-    foreach ($columns as $column) {
-
-      $columnlist[$column->title] = $column->name;
+    return self::column_dropdown_options($columns, $columnlist);
     }
 
+  /**
+   * builds a column list dropdown from an array of column objects
+   * 
+   * @param array $columns array of column objects
+   * @param array $columnlist the array to build on: this is primarily so a default 
+   *                          or null select value can be added to the resulting array
+   * @return array [title (name)] => name
+   */
+  private static function column_dropdown_options($columns, $columnlist = array()) 
+  {
+    foreach ($columns as $column) {
+      $columnlist[Participants_Db::title_key($column->title, $column->name)] = $column->name;
+    }
     return $columnlist;
   }
   
@@ -1421,4 +1466,3 @@ class PDb_Settings extends xnau_Plugin_Settings {
   }
 
 }
-?>

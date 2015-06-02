@@ -5,9 +5,9 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2013 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.6
+ * @version    1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  *
  */
@@ -203,7 +203,7 @@ class PDb_FormElement extends xnau_FormElement {
             $field->link = false;
             $return = $field->value;
           } else {
-            $field->link = xnau_Image_Handler::concatenate_directory_path(site_url(), Participants_Db::plugin_setting('image_upload_location')) . $field->value;
+            $field->link = Participants_Db::files_uri() . $field->value;
              $return = self::make_link($field);
           }
           break;
@@ -275,14 +275,14 @@ class PDb_FormElement extends xnau_FormElement {
       case 'text-area':
       case 'textarea':
         
-        $pattern = $html ? '<span class="textarea">%s</span>' : '%s';
+        $pattern = $html ? '<span ' . self::class_attribute('textarea') . '>%s</span>' : '%s';
         $return = sprintf( $pattern,$field->value );
         break;
       
       case 'rich-text':
         
         if ($html) {
-        $return = sprintf('<span class="textarea richtext">%s</span>', Participants_Db::process_rich_text($field->value));
+        $return = sprintf('<span ' . self::class_attribute('textarea richtext') . '>%s</span>', Participants_Db::process_rich_text($field->value));
         } else {
           $return = strip_tags($field->value);
         }
@@ -297,7 +297,7 @@ class PDb_FormElement extends xnau_FormElement {
         $field->value = self::array_display($field);
         
         if ($html) {
-        $return = sprintf('<span class="%s">%s</span>', $field->form_element,  self::make_link($field));
+          $return = sprintf('<span %s>%s</span>', self::class_attribute($field->form_element),  self::make_link($field));
         } else {
           $return = $field->value;
         }
@@ -604,8 +604,29 @@ class PDb_FormElement extends xnau_FormElement {
     $value = $title;
     if (isset(Participants_Db::$fields[$fieldname])) {
       $options_array = maybe_unserialize(Participants_Db::$fields[$fieldname]->values);
-      if (is_array($options_array) && isset($options_array[$title])) {
+      if (is_array($options_array)) {
+        if (isset($options_array[$title])) {
         $value = $options_array[$title];
+        } else {
+          /*
+           * we still haven't located the corresponding value, maybe we're looking for a 
+           * partial match to the title
+           * 
+           * this is also necessary when titles are tagged with translations: the search 
+           * can take place in multiple languages, and a match will still happen
+           * 
+           * TODO: this only gets the first partial match to the title, ideally, this would 
+           * open up the query to all partial matches, but that is going to require a fundamental 
+           * change to how we are processing search terms that refer to value titles and 
+           * not stored values
+           */
+          foreach ($options_array as $key => $option) {
+            if (stripos($key, $title) !== false) {
+              $value = $option;
+              break;
+            }
+          }
+        }
       }
     }
     return $value;
@@ -626,6 +647,7 @@ class PDb_FormElement extends xnau_FormElement {
  
   /*
    * static function for assembling the types array
+   * 
    */
   public static function get_types() {
      $types = array ( 
@@ -677,5 +699,4 @@ class PDb_FormElement extends xnau_FormElement {
    return Participants_Db::set_filter('field_is_linkable', $linkable, $field->form_element);
   }
   
-} //class
-?>
+}

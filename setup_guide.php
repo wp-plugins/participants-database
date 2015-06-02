@@ -1,6 +1,6 @@
 <div class="text-block">
 <?php
-$langfile = ABSPATH . 'wp-content/plugins/' . Participants_Db::PLUGIN_NAME . '/languages/setup_guide-' . get_locale() . '.html';
+$langfile = Participants_Db::$plugin_path . 'languages/setup_guide-' . get_locale() . '.html';
 if (file_exists($langfile)) {
   $text = file_get_contents($langfile);
   echo wpautop($text);

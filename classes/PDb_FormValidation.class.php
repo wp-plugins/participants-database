@@ -11,7 +11,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2012 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5
+ * @version    1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if ( ! defined( 'ABSPATH' ) ) die;
@@ -33,7 +33,7 @@ class PDb_FormValidation extends xnau_FormValidation {
      * 
      */
     foreach (array('invalid', 'empty', 'nonmatching', 'duplicate', 'captcha', 'identifier') as $error_type) {
-      $this->error_messages[$error_type] = Participants_Db::$plugin_options[$error_type . '_field_message'];
+      $this->error_messages[$error_type] = Participants_Db::plugin_setting($error_type . '_field_message');
     }
     /*
      * this filter provides an opportunity to add or modify validation error messages
@@ -43,7 +43,7 @@ class PDb_FormValidation extends xnau_FormValidation {
      */
     $this->error_messages = Participants_Db::set_filter('validation_error_messages', $this->error_messages);
 
-    $this->error_style = Participants_Db::$plugin_options['field_error_style'];
+    $this->error_style = Participants_Db::plugin_setting('field_error_style');
   }
   
 
@@ -282,5 +282,3 @@ class PDb_FormValidation extends xnau_FormValidation {
     return $string;
   }
 }
-
-?>

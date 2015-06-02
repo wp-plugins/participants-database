@@ -15,9 +15,9 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2012 - 2015 xnau webdesign
+ * @copyright  2015 - 2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.6
+ * @version    1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if ( ! defined( 'ABSPATH' ) ) die;
@@ -46,7 +46,7 @@ class PDb_List extends PDb_Shortcode {
    *
    * @var string name of the list anchor element
    */
-  public $list_anchor = 'participants-list';
+  public $list_anchor;
   /**
    *
    * @var string holds the url of the registrations page
@@ -138,6 +138,8 @@ class PDb_List extends PDb_Shortcode {
     // run the parent class initialization to set up the parent methods 
     parent::__construct($shortcode_atts, $shortcode_defaults);
 
+    $this->list_anchor = 'participants-list-' . $this->instance_index;
+
     $this->list_page = Participants_Db::$list_page;
 
     $this->_set_page_number();
@@ -153,7 +155,9 @@ class PDb_List extends PDb_Shortcode {
     /*
      * if the 'suppress' shortcode attribute is set
      */
-    if (!empty($this->shortcode_atts['suppress'])) $this->suppress = filter_var($this->shortcode_atts['suppress'], FILTER_VALIDATE_BOOLEAN);
+    if (!empty($this->shortcode_atts['suppress'])) {
+      $this->suppress = filter_var($this->shortcode_atts['suppress'], FILTER_VALIDATE_BOOLEAN);
+    }
 
     // enqueue the filter/sort AJAX script
     if (Participants_Db::plugin_setting_is_true('ajax_search')) {
@@ -162,7 +166,7 @@ class PDb_List extends PDb_Shortcode {
 
       $ajax_params = array(
           'ajaxurl' => admin_url('admin-ajax.php'),
-          //'filterNonce' => Participants_Db::nonce(self::$list_filter_nonce_key),
+          'filterNonce' => Participants_Db::nonce(self::$list_filter_nonce_key),
           'postID' => ( isset($wp_query->post) ? $wp_query->post->ID : '' ),
           'prefix' => Participants_Db::$prefix,
           'loading_indicator' => Participants_Db::get_loading_spinner()
@@ -604,12 +608,12 @@ class PDb_List extends PDb_Shortcode {
 
 //    error_log(__METHOD__.' target: '.$this->shortcode_atts['target_instance'].' module: '.$this->module);
     
-    $search_term = $this->list_query->current_filter('search_term');
+    $search_term = PDb_FormElement::get_value_title($this->list_query->current_filter('search_term'), $this->list_query->current_filter('search_field'));
 
     $output = array();
 
     $output[] = '<input name="operator" type="hidden" class="search-item" value="LIKE" />';
-    $output[] = '<input id="participant_search_term" type="text" name="value" class="search-item" value="' . $search_term . '">';
+    $output[] = '<input id="participant_search_term" type="text" name="value" class="search-item" value="' . esc_attr($search_term) . '">';
     $output[] = $this->search_submit_buttons();
 
     if ($print)
@@ -630,8 +634,8 @@ class PDb_List extends PDb_Shortcode {
     $submit_text = isset($values['submit']) ? $values['submit'] : $this->i18n['search'];
     $clear_text = isset($values['clear']) ? $values['clear'] : $this->i18n['clear'];
   	$output = array();
-  	$output[] = '<input name="submit_button" class="search-form-submit" data-submit="search" type="submit" value="' . $submit_text . '">';
-    $output[] = '<input name="submit_button" class="search-form-clear" data-submit="clear" type="submit" value="' . $clear_text . '">';
+  	$output[] = '<input name="submit_button" class="search-form-submit" data-submit="search" type="submit" value="' . esc_attr($submit_text) . '">';
+    $output[] = '<input name="submit_button" class="search-form-clear" data-submit="clear" type="submit" value="' . esc_attr($clear_text) . '">';
     print $this->output_HTML($output);
   }
   /**
@@ -641,8 +645,8 @@ class PDb_List extends PDb_Shortcode {
    */
   public function search_submit_buttons() {
   	$output = array();
-  	$output[] = '<input name="submit_button" class="search-form-submit" data-submit="search" type="submit" value="' . $this->i18n['search'] . '">';
-    $output[] = '<input name="submit_button" class="search-form-clear" data-submit="clear" type="submit" value="' . $this->i18n['clear'] . '">';
+  	$output[] = '<input name="submit_button" class="search-form-submit" data-submit="search" type="submit" value="' . esc_attr($this->i18n['search']) . '">';
+    $output[] = '<input name="submit_button" class="search-form-clear" data-submit="clear" type="submit" value="' . esc_attr($this->i18n['clear']) . '">';
     return $this->output_HTML($output);
   }
   /**
@@ -678,7 +682,7 @@ class PDb_List extends PDb_Shortcode {
     );
     $output[] = PDb_FormElement::get_element($element);
 
-    $output[] = '<input name="submit_button" data-submit="sort" type="submit" value="' . $this->i18n['sort'] . '" />';
+    $output[] = '<input name="submit_button" data-submit="sort" type="submit" value="' . esc_attr($this->i18n['sort']) . '" />';
 
     if ($print)
       echo $this->output_HTML($output);
@@ -1188,5 +1192,3 @@ class PDb_List extends PDb_Shortcode {
   }
 
 }
-
-// class ?>

@@ -1,11 +1,22 @@
 <?php
-
+/**
+ * handles the presentation of the editable frontend record
+ * 
+ *  * 
+ * @package    WordPress
+ * @subpackage Participants Database Plugin
+ * @author     Roland Barker <webdesign@xnau.com>
+ * @copyright  2015 xnau webdesign
+ * @license    GPL2
+ * @version    1.6
+ * @link       http://xnau.com/wordpress-plugins/
+ * 
+ */
 if ( ! defined( 'ABSPATH' ) ) die;
 /*
  * class for displaying an editable record on the frontend with the [pdb_record] shortcode
  *
  */
-
 class PDb_Record extends PDb_Shortcode {
 
   /**
@@ -198,5 +209,3 @@ class PDb_Record extends PDb_Shortcode {
     }
   }
 }
-
-?>

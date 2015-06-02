@@ -14,12 +14,14 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2012 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.5
+ * @version    Release: 1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
-if ( ! defined( 'ABSPATH' ) ) die;
+if (!defined('ABSPATH'))
+  die;
+
 class PDb_List_Admin {
 
   /**
@@ -135,7 +137,7 @@ class PDb_List_Admin {
 
     self::setup_display_columns();
 
-    self::$sortables = Participants_Db::get_sortables(false, 'alpha');
+    self::$sortables = Participants_Db::get_sortables(false, false, 'alpha');
 
     // set up the basic values
     self::$default_filter = array(
@@ -178,7 +180,7 @@ class PDb_List_Admin {
     self::$num_records = $wpdb->get_var(str_replace('*', 'COUNT(*)', self::$list_query));
 
     // set the pagination object
-    $current_page = filter_input(INPUT_GET, self::$list_page, FILTER_VALIDATE_INT, array( 'options' => array('default' => 1, 'min_range' => 1)));
+    $current_page = filter_input(INPUT_GET, self::$list_page, FILTER_VALIDATE_INT, array('options' => array('default' => 1, 'min_range' => 1)));
     
     self::$pagination = new PDb_Pagination(array(
         'link' => self::prepare_page_link($_SERVER['REQUEST_URI']) . '&' . self::$list_page . '=%1$s',
@@ -712,7 +714,7 @@ class PDb_List_Admin {
       <?php PDb_FormElement::print_element(array('type' => 'submit', 'name' => 'submit-button', 'class' => 'button button-default', 'value' => self::$i18n['change'])) ?>
           
         </fieldset>
-              </td></tr></tbody>
+                  </td></tr></tbody></table>
         <?php
       }
 
@@ -724,15 +726,11 @@ class PDb_List_Admin {
               private static function _main_table($mode = '')
               {
         ?>
-
+            <div class="pdb-horiz-scroll-scroller">
+              <div class="pdb-horiz-scroll-width" style="width: <?php echo count(self::$display_columns) * 10 ?>em">
         <table class="wp-list-table widefat fixed pages pdb-list stuffbox" cellspacing="0" >
           <?php
           $PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
-          $head_pattern = '
-<th class="%2$s" scope="col">
-  <span><a href="' . self::sort_link_base_URI() . '&column_sort=%2$s">%1$s%3$s</a></span>
-</th>
-';
           //template for outputting a column
           $col_pattern = '<td>%s</td>';
 
@@ -742,7 +740,7 @@ class PDb_List_Admin {
               ?>
               <thead>
                 <tr>
-            <?php self::_print_header_row($head_pattern) ?>
+        <?php self::_print_header_row() ?>
                 </tr>
               </thead>
               <?php
@@ -752,7 +750,7 @@ class PDb_List_Admin {
               ?>
               <tfoot>
                 <tr>
-              <?php self::_print_header_row($head_pattern) ?>
+        <?php self::_print_header_row() ?>
                 </tr>
               </tfoot>
               <?php endif; // table footer row 
@@ -768,7 +766,7 @@ class PDb_List_Admin {
                           <?php if (current_user_can(Participants_Db::plugin_capability('plugin_admin_capability', 'delete participants'))) : ?>
                             <input type="checkbox" class="delete-check" name="pid[]" value="<?php echo $value['id'] ?>" />
                     <?php endif ?>
-                          <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&action=edit&id=<?php echo $value['id'] ?>" title="<?php _e('Edit', 'participants-database') ?>"><span class="glyphicon glyphicon-edit"></span></a>
+                            <a href="admin.php?page=<?php echo 'participants-database' ?>-edit_participant&amp;action=edit&amp;id=<?php echo $value['id'] ?>" title="<?php _e('Edit', 'participants-database') ?>"><span class="glyphicon glyphicon-edit"></span></a>
                   </td>
               <?php
               foreach (self::$display_columns as $column) {
@@ -895,6 +893,8 @@ class PDb_List_Admin {
               endif; // participants array
               ?>
         </table>
+              </div>
+            </div>
       </form>
               <?php
             }
@@ -942,13 +942,23 @@ class PDb_List_Admin {
     /**
      * prints a table header row
      */
-  private static function _print_header_row($head_pattern)
+  private static function _print_header_row()
   {
 
+                  $head_pattern = '
+<th class="%2$s" scope="col">
+  <span>%1$s%3$s</span>
+</th>
+';
+                  $sortable_head_pattern = '
+<th class="%2$s" scope="col">
+  <span><a href="' . self::sort_link_base_URI() . '&amp;column_sort=%2$s">%1$s%3$s</a></span>
+</th>
+';
       
     $sorticon_class = strtolower(self::$filter['ascdesc']) === 'asc' ? 'dashicons-arrow-up' : 'dashicons-arrow-down';
     // template for printing the registration page link in the admin
-    $sorticon = '<span class="dashicons ' . $sorticon_class . '"></span>';
+    $sorticon = '<span class="dashicons ' . $sorticon_class . ' sort-icon"></span>';
       // print the "select all" header 
       ?>
     <th scope="col" style="width:3em">
@@ -960,11 +970,13 @@ class PDb_List_Admin {
           <?php
           // print the top header row
           foreach (self::$display_columns as $column) {
-      $title = apply_filters( 'pdb-translate_string', strip_tags(stripslashes($column->title)));
+      $title = apply_filters('pdb-translate_string', strip_tags(stripslashes($column->title)));
+      $field = Participants_Db::$fields[$column->name];
             printf(
-              $head_pattern, str_replace(
-                      array('"', "'"), array('&quot;', '&#39;'), $title
-              ), $column->name, ($column->name === self::$filter['sortBy'] ? $sorticon : '')
+              $field->sortable ? $sortable_head_pattern : $head_pattern, 
+              str_replace(array('"', "'"), array('&quot;', '&#39;'), $title), 
+              $column->name, 
+              $column->name === self::$filter['sortBy'] ? $sorticon : ''
             );
           }
         }
@@ -1007,9 +1019,9 @@ class PDb_List_Admin {
   {
 
     $limit_value = self::get_admin_user_setting('list_limit', Participants_Db::plugin_setting('list_limit'));
-    $input_limit = filter_input(INPUT_GET, 'list_limit', FILTER_VALIDATE_INT, array('min_range' => 1));
+    $input_limit = filter_input(INPUT_GET, 'list_limit', FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
     if (empty($input_limit)) {
-      $input_limit = filter_input(INPUT_POST, 'list_limit', FILTER_VALIDATE_INT, array('min_range' => 1));
+      $input_limit = filter_input(INPUT_POST, 'list_limit', FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
     }
     if (!empty($input_limit)) {
       $limit_value = $input_limit;
@@ -1163,9 +1175,11 @@ class PDb_List_Admin {
    * 
    * @return string a filename-compatible datestamp
    */
-  public static function filename_datestamp() {
+  public static function filename_datestamp()
+  {
     return '-' . str_replace(array('/', '#', '.', '\\', ', ', ',', ' '), '-', date_i18n(Participants_Db::$date_format));
   } 
+
   /**
          * sets up the internationalization strings
          */
@@ -1183,6 +1197,4 @@ class PDb_List_Admin {
           );
         }
 
-      }
-
-      // class ?>
+}

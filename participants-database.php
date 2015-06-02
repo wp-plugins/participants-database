@@ -311,7 +311,7 @@ class Participants_Db extends PDb_Base {
      * 
      * uncomment to enable
      */
-    //add_filter('pre_set_site_transient_update_plugins', array(__CLASS__, 'check_for_plugin_update'));// for plugin update test
+//    add_filter('pre_set_site_transient_update_plugins', array(__CLASS__, 'check_for_plugin_update'));// for plugin update test
     /*
      * uncomment this to enable custom upgrade details window
      */
@@ -1043,7 +1043,7 @@ class Participants_Db extends PDb_Base {
    *                       defined group/field order, 'column' which uses the
    *                       current display column order or 'alpha' which sorts the
    *                       list alphabetially; defaults to 'column'
-   * @return array of form: name => title
+   * @return array of form: title => name
    */
   public static function get_field_list($type = false, $fields = false, $sort = 'column') {
 
@@ -1087,11 +1087,16 @@ class Participants_Db extends PDb_Base {
 
     $result = $wpdb->get_results($sql, ARRAY_N);
 
-    // construct an array of this form: name => title
+    // construct an array of this form: title => name
     $return = array();
-    foreach ($result as $item)
-      $return[$item[1]] = $item[0];
-
+    foreach ($result as $item) {
+      if (isset($return[$item[1]])) {
+        $key = self::title_key($item[1], $item[0]);
+      } else {
+        $key = self::title_key($item[1]);
+      }
+      $return[$key] = $item[0];
+    }
     return $return;
   }
 
@@ -1849,7 +1854,7 @@ class Participants_Db extends PDb_Base {
   }
 
   /**
-   * gets a participant record object with its id
+   * gets an array of record values
    *
    * as of 1.5.5 returns only registered columns
    *
@@ -2210,13 +2215,16 @@ class Participants_Db extends PDb_Base {
          * 
          * set the raw post array filters. We pass in the $_POST array, expecting 
          * a possibly altered copy of it to be returned
+         * 
+         * filter: pdb-before_submit_update
+         * filter: pdb-before_submit_add
          */
         $post_data = self::set_filter('before_submit_' . ($post_input['action'] == 'insert' ? 'add' : 'update'), $_POST);
 
         if (isset($_POST['id'])) {
-          $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, array('min_range' => 1));
+          $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
         } elseif (isset($_GET['id'])) {
-          $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('min_range' => 1));
+          $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
         } else {
           $id = false;
         }
@@ -2231,6 +2239,9 @@ class Participants_Db extends PDb_Base {
         
         /*
          * set the stored record hook.
+         * 
+         * hook: pdb-after_submit_update
+         * hook: pdb-after_submit_add
          */
         $wp_hook = self::$prefix . 'after_submit_' . ($post_input['action'] == 'insert' ? 'add' : 'update');
         do_action($wp_hook,self::get_participant($participant_id));
@@ -2406,7 +2417,11 @@ class Participants_Db extends PDb_Base {
         $_POST['private_id'] = '';
         $columns[] = 'private_id';
         
-        // route the $_POST data through a callback if defined
+        /*
+         * route the $_POST data through a callback if defined
+         * 
+         * filter: pdb-before_submit_signup
+         */
         $post_data = self::set_filter('before_submit_signup', $_POST);
 
         
@@ -2425,7 +2440,7 @@ class Participants_Db extends PDb_Base {
         if (false !== $post_data['id']) {
           
           /*
-           * set the after_submit_signup hook.
+           * hook: pdb-after_submit_signup
            */
           $wp_hook = self::$prefix . 'after_submit_signup';
           do_action($wp_hook,self::get_participant($post_data['id']));
@@ -2529,19 +2544,21 @@ class Participants_Db extends PDb_Base {
     } else {
       $participant_values = self::get_participant($match_id);
     }
-    $body_template = self::plugin_setting('retrieve_link_email_body');
-    $subject = self::plugin_setting('retrieve_link_email_subject');
+    $retrieve_link_email = new stdClass();
+    $retrieve_link_email->body_template = self::plugin_setting('retrieve_link_email_body');
+    $retrieve_link_email->subject = self::plugin_setting('retrieve_link_email_subject');
+    $retrieve_link_email->recipient = $participant_values[self::plugin_setting('primary_email_address_field', 'email')];
     /**
      * @version 1.6
      * 
      * filter pdb-before_send_retrieve_link_email
      */
-    $recipient = self::set_filter('before_send_retrieve_link_email', $participant_values[self::plugin_setting('primary_email_address_field', 'email')], $subject, $body_template);
-    if (!empty($recipient)) {
-      $body = self::proc_tags($body_template, $match_id);
+    self::set_filter('before_send_retrieve_link_email', $retrieve_link_email);
+    if (!empty($retrieve_link_email->recipient)) {
+      $body = self::proc_tags($retrieve_link_email->body_template, $match_id);
       $sent = wp_mail( 
-              $recipient, 
-              self::proc_tags($subject, $match_id), 
+              $retrieve_link_email->recipient, 
+              self::proc_tags($retrieve_link_email->subject, $match_id), 
               (self::plugin_setting('html_email') ? self::process_rich_text($body) : $body), 
               self::$email_headers
               );
@@ -2748,9 +2765,9 @@ class Participants_Db extends PDb_Base {
     $_POST[$field_name . '-deletefile'] = '';
 
     // attempt to create the target directory if it does not exist
-    if (!is_dir(xnau_Image_Handler::concatenate_directory_path(ABSPATH, self::$plugin_options['image_upload_location']))) {
+    if (!is_dir(Participants_Db::files_path())) {
 
-      if (false === self::_make_uploads_dir(self::$plugin_options['image_upload_location'])) {
+      if (false === self::_make_uploads_dir()) {
         return false;
       }
     }
@@ -2784,7 +2801,7 @@ class Participants_Db extends PDb_Base {
       $new_filename = preg_replace(array('#\.#', "/\s+/", "/[^-\.\w]+/"), array("-", "_", ""), $matches[1]) . '.' . $matches[2];
       // now make sure the name is unique by adding an index if needed
       $index = 1;
-      while (file_exists(xnau_Image_Handler::concatenate_directory_path(ABSPATH, self::$plugin_options['image_upload_location']) . $new_filename)) {
+      while (file_exists(Participants_Db::files_path() . $new_filename)) {
         $filename_parts = pathinfo($new_filename);
         $new_filename = preg_replace(array('#_[0-9]+$#'), array(''), $filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
         $index++;
@@ -2813,7 +2830,7 @@ class Participants_Db extends PDb_Base {
       return false;
     }
 
-    if (false === move_uploaded_file($file['tmp_name'], xnau_Image_Handler::concatenate_directory_path( ABSPATH, self::$plugin_options['image_upload_location'] ) . $new_filename)) {
+    if (false === move_uploaded_file($file['tmp_name'], Participants_Db::files_path() . $new_filename)) {
 
       self::_show_validation_error(__('The file could not be saved.', 'participants-database'));
 
@@ -2852,11 +2869,12 @@ class Participants_Db extends PDb_Base {
    * 
    * @param string $dir the name of the new directory
    */
-  public static function _make_uploads_dir($dir) {
+  public static function _make_uploads_dir($dir = '') {
 
+    $dir = empty($dir) ? Participants_Db::files_location() : $dir;
     $savedmask = umask(0);
     $status = true;
-    if (mkdir(ABSPATH . $dir, 0755, true) === false) {
+    if (mkdir(Participants_Db::app_base_path() . $dir, 0755, true) === false) {
 
       if (is_object(self::$validation_errors))
         self::$validation_errors->add_error('', sprintf(__('The uploads directory (%s) could not be created.', 'participants-database'), $dir));
@@ -3322,7 +3340,6 @@ class Participants_Db extends PDb_Base {
     }
     global $post;
     $shortcodes = self::get_plugin_shortcodes($post->post_content);
-    
     if (!empty($shortcodes)) {
       $classes[] = 'participants-database-shortcode';
       foreach ($shortcodes as $shortcode) {

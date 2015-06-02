@@ -2,7 +2,6 @@
 /*
  * class for handling the display of a participant record
  *
- *
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdeign@xnau.com>

@@ -6,14 +6,13 @@
  * @category   
  * @package    WordPress
  * @author     Roland Barker <webdesign@xnau.com>
- * @copyright  2014 xnau webdesign
+ * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.5.5
+ * @version    1.6
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if ( ! defined( 'ABSPATH' ) ) die;
-if (!Participants_Db::current_user_has_plugin_role('admin', 'manage fields'))
-  exit;
+if (!Participants_Db::current_user_has_plugin_role('admin', 'manage fields')) exit;
 
 class PDb_Manage_Fields {
 
@@ -154,7 +153,9 @@ class PDb_Manage_Fields {
             PDb_FormElement::print_hidden_fields(array('group' => $group, 'order' => $last_order));
             ?>
           </p>
-          <table class="wp-list-table widefat fixed manage-fields" cellspacing="0" >
+          <div <?php echo Participants_Db::plugin_setting_is_true('admin_horiz_scroll') ? 'class="pdb-horiz-scroll-scroller"' : '' ?>>
+          <div <?php echo Participants_Db::plugin_setting_is_true('admin_horiz_scroll') ? 'class="pdb-horiz-scroll-width"' : '' ?>>
+            <table class="wp-list-table widefat fixed manage-fields" >
             <thead>
               <tr>
                 <?php if (!$internal_group) : ?>
@@ -211,7 +212,7 @@ class PDb_Manage_Fields {
                       ));
                       if (!$internal_group) :
                         ?>
-                        <a href="#" title="<?php echo $database_row['id'] ?>" name="delete_<?php echo $database_row['id'] ?>" class="delete" ref="<?php _e('field', 'participants-database') ?>"><span class="glyphicon glyphicon-remove"></span></a>
+                          <a href="javascript:return false" title="<?php echo $database_row['id'] ?>" data-thing-name="delete_<?php echo $database_row['id'] ?>" class="delete" data-thing="<?php _e('field', 'participants-database') ?>"><span class="glyphicon glyphicon-remove"></span></a>
                       </td>
                       <?php
                     endif; // internal group test
@@ -247,6 +248,8 @@ class PDb_Manage_Fields {
             ?>
             </tbody>
           </table>
+          </div>
+          </div>
           <p class="submit">
             <?php
             PDb_FormElement::print_element(array(
@@ -304,7 +307,7 @@ class PDb_Manage_Fields {
               PDb_FormElement::print_hidden_fields(array('group_order' => $next_order));
               ?>
             </p>
-            <table class="wp-list-table widefat fixed manage-fields manage-field-groups" cellspacing="0" >
+            <table class="wp-list-table widefat fixed manage-fields manage-field-groups" >
               <thead>
                 <tr>
                   <th scope="col" class="fields vertical-title"><span><?php echo $this->table_header(__('fields', 'participants-database')) ?></span></th>
@@ -330,7 +333,7 @@ class PDb_Manage_Fields {
                     ?>
                   <tr>
                     <td id="field_count_<?php echo $group ?>"><?php echo $group_count ?></td>
-                    <td><a href="<?php echo $group_count ?>" name="delete_<?php echo $group ?>" class="delete" ref="<?php _e('group', 'participants-database') ?>"><span class="glyphicon glyphicon-remove"></span></a></td>
+                    <td><a href="<?php echo $group_count ?>" data-thing-name="delete_<?php echo $group ?>" class="delete" data-thing="<?php _e('group', 'participants-database') ?>"><span class="glyphicon glyphicon-remove"></span></a></td>
                     <?php
                     foreach ($group_values as $column => $value) {
 
@@ -917,4 +920,3 @@ class PDb_Manage_Fields {
     }
 
   }
-  ?>
