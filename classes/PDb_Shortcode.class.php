@@ -266,8 +266,8 @@ abstract class PDb_Shortcode {
     echo '<!-- end template: ' . $this->template_basename($this->template) . ' -->';
     }
 
-    /*
-     * @filter 'pdb-{module}_shortcode_output'
+    /**
+     * @filter 'pdb-{$module}_shortcode_output'
      * 
      * @param string content the shortcode output
      * 

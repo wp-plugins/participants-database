@@ -52,7 +52,7 @@ if ($participant_values) :
 
   $section = '';
   ?>
-  <div class="wrap pdb-admin-edit-participant">
+  <div class="wrap pdb-admin-edit-participant participants_db">
     <h2><?php echo $page_title ?></h2>
     <?php
     if (is_object(Participants_Db::$validation_errors)) {
@@ -78,15 +78,18 @@ if ($participant_values) :
           if (!empty($section)) {
             ?>
             </table>
+        </div>
             <?php
           } else {
             $id_line = '<tr><th>' . _x('ID', 'abbreviation for "identification"', 'participants-database') . '</th><td>' . ( false === $participant_id ? _x('(new record)', 'indicates a new record is being entered', 'participants-database') : $participant_id ) . '</td></tr>';
           }
           $section = $column->group
           ?>
+      <div  class="field-group field-group-<?php echo $groups[$section]['name'] ?>" >
           <h3 class="field-group-title"><?php _e($groups[$section]['title']) ?></h3>
           <?php if ($options['show_group_descriptions']) echo '<p class="' . Participants_Db::$prefix . 'group-description">' . $groups[$section]['description'] . '</p>' ?>
           <table class="form-table">
+          <tbody>
             <?php
           }
           echo $id_line;
@@ -94,9 +97,9 @@ if ($participant_values) :
 
           <tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) . ' ' . $column->name . '-field' ?>">
             <?php
-            $column_title = str_replace(array('"',"'"), array('&quot;','&#39;'), apply_filters( 'pdb-translate_string', stripslashes($column->title)));
+            $column_title = str_replace(array('"', "'"), array('&quot;', '&#39;'), apply_filters('pdb-translate_string', stripslashes($column->title)));
             if ($options['mark_required_fields'] && $column->validation != 'no') {
-              $column_title = sprintf(apply_filters( 'pdb-translate_string', $options['required_field_marker']), $column_title);
+              $column_title = sprintf(apply_filters('pdb-translate_string', $options['required_field_marker']), $column_title);
             }
             ?>
             <?php
@@ -221,9 +224,13 @@ if ($participant_values) :
           <?php
         endforeach;
         ?>
+      </tbody>
       </table>
+  </div>
+  <div  class="field-group field-group-submit" >
      <h3 class="field-group-title"><?php _e('Save the Record', 'participants-database') ?></h3>
       <table class="form-table">
+      <tbody>
   <?php if (is_admin()) : ?>
           <tr>
           <td class="submit-buttons">
@@ -249,6 +256,7 @@ if ($participant_values) :
           </td>
           </tr>
   <?php endif; ?>
+      </tbody>
       </table>
     </form>
   </div>
