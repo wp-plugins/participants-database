@@ -472,43 +472,6 @@ message:
   }
   
   /**
-   * updates the signup transient
-   * 
-   * "true" here indicates that the record signup notification has been sent
-   * 
-   * @param int $id the record id
-   * @param bool $state the state to set the transient value to
-   * @return null
-   */
-  public static function update_sent_status($id, $state) {
-    $check_sent[$id] = $state;
-    $sent_records = get_transient(Participants_Db::$prefix . 'signup-email-sent');
-    if (is_array($sent_records)) $sent_records = $check_sent + $sent_records;
-    else $sent_records = $check_sent;
-    /* 
-     * expires after one year, we need to do this in order to avoid the transient 
-     * being needlessly autoloaded
-     */
-    set_transient(Participants_Db::$prefix . 'signup-email-sent', $sent_records, (365 * 60 * 60 * 12));
-  }
-  
-  /**
-   * checks the status of a signup email status transient
-   * 
-   * @param int $id the id of the record to check
-   * @return bool the stored status of the record
-   */
-  public static function check_sent_status($id)
-  {
-    $check_sent = get_transient(Participants_Db::$prefix . 'signup-email-sent');
-    if ($check_sent === false or !isset($check_sent[$id]) or $check_sent[$id] === false) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  /**
    * changes the readonly status of internal fields used in the retrieve form
    * 
    * @param $field a PDb_Field_Item object

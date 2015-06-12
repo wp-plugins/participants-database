@@ -76,8 +76,54 @@ class PDb_Init
       global $wpdb;
 
       // fresh install: install the tables if they don't exist
-      if ( $wpdb->get_var('show tables like "'.Participants_Db::$participants_table.'"') != Participants_Db::$participants_table ) :
+    if ($wpdb->get_var('show tables like "' . Participants_Db::$participants_table . '"') != Participants_Db::$participants_table) {
+      $this->_fresh_install();
+    }
       
+    error_log(Participants_Db::PLUGIN_NAME . ' plugin activated');
+  }
+
+  private function _deactivate()
+  {
+
+    error_log(Participants_Db::PLUGIN_NAME . ' plugin deactivated');
+  }
+
+  /**
+   * deletes all plugin tables, options and transients
+   * 
+   * @global object $wpdb
+   */
+  private function _uninstall()
+  {
+
+    global $wpdb;
+
+    // delete tables
+    $sql = 'DROP TABLE `' . Participants_Db::$fields_table . '`, `' . Participants_Db::$participants_table . '`, `' . Participants_Db::$groups_table . '`;';
+    $wpdb->query($sql);
+
+    // remove options
+    delete_option(Participants_Db::$participants_db_options);
+    delete_option(Participants_Db::$db_version_option);
+    delete_option(Participants_Db::$default_options);
+
+    // clear transients
+    delete_transient(Participants_Db::$last_record);
+    $sql = 'SELECT `option_name` FROM ' . $wpdb->prefix . 'options WHERE `option_name` LIKE "%' . Participants_Db::$prefix . 'retrieve-count-%" OR `option_name` LIKE "%' . PDb_List_Admin::$user_settings . '%" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'captcha_key" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'signup-email-sent" ';
+    $transients = $wpdb->get_col($sql);
+    foreach ($transients as $name) {
+      delete_transient($name);
+    }
+
+    error_log(Participants_Db::PLUGIN_NAME . ' plugin uninstalled');
+  }
+
+  /**
+   * installs the plugin database tables and default fields
+   */
+  private function _fresh_install()
+  {
       // define the arrays for loading the initial db records
       $this->_define_init_arrays();
 
@@ -204,61 +250,17 @@ class PDb_Init
           $wpdb->insert( Participants_Db::$groups_table, $defaults );
 
           $i++;
-
         }
-
-      endif;// end of the fresh install
-
-      
-				
-      error_log( Participants_Db::PLUGIN_NAME.' plugin activated' );
-      
-    }
-
-    private function _deactivate()
-    {
-				
-				error_log( Participants_Db::PLUGIN_NAME.' plugin deactivated' );
     }
 
     /**
-     * deletes all plugin tables, options and transients
-     * 
-     * @global object $wpdb
+   * performs an update to the database if needed
      */
-    private function _uninstall()
+  public static function on_update()
     {
 
         global $wpdb;
 
-        // delete tables
-        $sql = 'DROP TABLE `'.Participants_Db::$fields_table.'`, `'.Participants_Db::$participants_table.'`, `'.Participants_Db::$groups_table.'`;';
-        $wpdb->query( $sql );
-
-        // remove options
-        delete_option( Participants_Db::$participants_db_options );
-				delete_option( Participants_Db::$db_version_option );
-        delete_option( Participants_Db::$default_options );
-
-				// clear transients
-        delete_transient(Participants_Db::$last_record);
-        $sql = 'SELECT `option_name` FROM ' . $wpdb->prefix . 'options WHERE `option_name` LIKE "%' . Participants_Db::$prefix . 'retrieve-count-%" OR `option_name` LIKE "%' . PDb_List_Admin::$user_settings . '%" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'captcha_key" OR `option_name` LIKE "%' . Participants_Db::$prefix . 'signup-email-sent" ';
-        $transients = $wpdb->get_col($sql);
-        foreach($transients as $name) {
-          delete_transient($name);
-        }
-        
-        error_log( Participants_Db::PLUGIN_NAME.' plugin uninstalled' );
-        
-    }
-    
-    /**
-     * performs an update to the database if needed
-     */
-    public static function on_update() {
-      
-      global $wpdb;
-      
       // determine the actual version status of the database
       self::set_database_real_version();
       

@@ -12,7 +12,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    3.6
+ * @version    3.7
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if (!defined('ABSPATH')) die;
@@ -180,7 +180,6 @@ if (!class_exists('PDb_Aux_Plugin')) :
      */
     public function set_plugin_options() {
       $this->plugin_data = get_plugin_data($this->plugin_path);
-      $this->plugin_path = plugin_basename($this->plugin_path);
       $this->set_attribution();
       $this->register_option_for_translations();
       /*
@@ -471,11 +470,15 @@ if (!class_exists('PDb_Aux_Plugin')) :
     protected function _build_radio($values)
     {
       $selectstring = $this->set_selectstring($values[1]);
+      $set_value = $values[2];
       $html = '';
       $pattern = "\n" . '<label title="%4$s"><input type="%2$s" %9$s value="%3$s" name="' . $this->settings_name() . '[%1$s]"> <span>%4$s</span></label><br />';
       $html .= "\n" . '<div class="' . $values[1] . ' ' . $values[4] . '" >';
       foreach ($values[7] as $name => $title) {
-        $values[8] = $values[2] == $name ? $selectstring : '';
+        if (is_int($name)) {
+          $name = $title;
+        }
+        $values[8] = $set_value == $name ? $selectstring : '';
         $values[2] = $name;
         $values[3] = $title;
         $html .= vsprintf($pattern, $values);

@@ -137,7 +137,8 @@ class PDb_List_Admin {
 
     self::setup_display_columns();
 
-    self::$sortables = Participants_Db::get_sortables(false, false, 'alpha');
+    self::$sortables = Participants_Db::get_field_list(false, false, 'alpha');
+//    self::$sortables = Participants_Db::get_sortables(false, 'alpha');
 
     // set up the basic values
     self::$default_filter = array(
