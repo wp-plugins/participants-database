@@ -16,7 +16,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    Release: 1.6
+ * @version    Release: 1.7
  * @link       http://wordpress.org/extend/plugins/participants-database/
  */
 if (!defined('ABSPATH'))
@@ -336,6 +336,12 @@ class PDb_List_Admin {
           break;
 
         default:
+          /**
+           * action: pdb-process_admin_list_submission
+           * 
+           * @version 1.6
+           */
+          do_action(Participants_Db::$prefix . 'process_admin_list_submission', $this);
       }
     }
   }
@@ -548,8 +554,7 @@ class PDb_List_Admin {
   private static function _admin_top()
   {
     ?>
-    <div  class="wrap participants_db">
-    <a id="pdb-list-admin" name="pdb-list-admin"></a>
+    <div id="pdb-list-admin"   class="wrap participants_db">
       <?php Participants_Db::admin_page_heading() ?>
     <div id="poststuff">
       <div class="post-body">
@@ -572,13 +577,13 @@ class PDb_List_Admin {
         $filter_columns = array();
         foreach (Participants_db::get_column_atts('backend') as $column) {
           // add the field name if a field with the same title is already in the list
-            $title = apply_filters( 'pdb-translate_string', $column->title);
+            $title = Participants_Db::set_filter('translate_string', $column->title);
             $select_title = ( isset($filter_columns[$column->title]) || strlen($column->title) === 0 ) ? $title . ' (' . $column->name . ')' : $title;
           
           $filter_columns[$select_title] = $column->name;
         }
           $record_id_field = Participants_Db::$fields['id'];
-          $filter_columns += array(apply_filters( 'pdb-translate_string', $record_id_field->title) => 'id');
+          $filter_columns += array(Participants_Db::set_filter('translate_string', $record_id_field->title) => 'id');
           ?>
           <div class="pdb-searchform">
             <form method="post" id="sort_filter_form" action="<?php echo self::prepare_page_link($_SERVER['REQUEST_URI']) ?>" >
@@ -694,6 +699,14 @@ class PDb_List_Admin {
       <form id="list_form"  method="post">
             <?php PDb_FormElement::print_hidden_fields(array('action' => 'list_action')) ?>
         <input type="hidden" id="select_count" value="0" />
+            <?php 
+            /**
+             * action pdb-admin_list_form_top
+             * @version 1.6
+             * 
+             * good for adding functionality to the admin list
+             */
+            do_action(Participants_Db::$prefix . 'admin_list_form_top', $this) ?>
                 <table class="form-table"><tbody><tr><td>
         <fieldset class="widefat inline-controls">
                       <?php if (current_user_can(Participants_Db::plugin_capability('plugin_admin_capability', 'delete participants'))) : ?>
@@ -971,7 +984,7 @@ class PDb_List_Admin {
           <?php
           // print the top header row
           foreach (self::$display_columns as $column) {
-      $title = apply_filters('pdb-translate_string', strip_tags(stripslashes($column->title)));
+      $title = Participants_Db::set_filter('translate_string', strip_tags(stripslashes($column->title)));
       $field = Participants_Db::$fields[$column->name];
             printf(
               $field->sortable ? $sortable_head_pattern : $head_pattern, 

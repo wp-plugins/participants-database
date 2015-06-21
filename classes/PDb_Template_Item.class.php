@@ -95,7 +95,7 @@ class PDb_Template_Item {
    */
   protected function prepare_display_value( $string ) {
     
-    return apply_filters( 'pdb-translate_string', $string);
+    return Participants_Db::set_filter('translate_string', $string);
     //str_replace(array('"',"'"), array('&quot;','&#39;'), stripslashes($string));
     //htmlspecialchars( stripslashes( $string ), ENT_QUOTES, "UTF-8", false );
   

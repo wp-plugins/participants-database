@@ -128,7 +128,7 @@ class PDb_Init
       $this->_define_init_arrays();
 
         // create the field values table
-        $sql = 'CREATE TABLE '.Participants_Db::$fields_table.' (
+    $sql = 'CREATE TABLE ' . Participants_Db::$fields_table . ' (
           `id` INT(3) NOT NULL AUTO_INCREMENT,
           `order` INT(3) NOT NULL DEFAULT 0,
           `name` VARCHAR(64) NOT NULL,
@@ -158,7 +158,7 @@ class PDb_Init
         $wpdb->query($sql);
 
         // create the groups table
-        $sql = 'CREATE TABLE '.Participants_Db::$groups_table.' (
+    $sql = 'CREATE TABLE ' . Participants_Db::$groups_table . ' (
           `id` INT(3) NOT NULL AUTO_INCREMENT,
           `order` INT(3) NOT NULL DEFAULT 0,
           `display` BOOLEAN DEFAULT 1,
@@ -241,7 +241,7 @@ class PDb_Init
         // put in the default groups
         $i = 1;
         $defaults = array();
-        foreach( self::$field_groups as $group=>$title ) {
+    foreach (self::$field_groups as $group => $title) {
           $defaults['name'] = $group;
           $defaults['title'] = $title;
           $defaults['display'] = ( in_array( $group, array( 'internal', 'admin', 'source' ) ) ? 0 : 1 );

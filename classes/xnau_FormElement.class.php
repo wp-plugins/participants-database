@@ -671,7 +671,7 @@ abstract class xnau_FormElement {
       $this->_addline( $this->_input_tag( 'checkbox', $checked_value, 'checked' ), 1 );
       
       if ( false !== $title ) {
-        $this->_addline( apply_filters( 'pdb-translate_string', $title), 1 );
+        $this->_addline( Participants_Db::set_filter('translate_string', $title), 1 );
         $this->_addline( '</label>', -1 );
       }
       
@@ -1074,7 +1074,7 @@ abstract class xnau_FormElement {
        
     foreach ($this->_make_assoc($this->options) as $option_key => $option_value) {
       
-      $option_key = apply_filters( 'pdb-translate_string', stripslashes($option_key));
+      $option_key = Participants_Db::set_filter('translate_string', stripslashes($option_key));
       
       if (($option_value === false or $option_value === 'false' or $option_value === 'optgroup') and !empty($option_key)) {
         if ($optgroup) {
@@ -1161,7 +1161,7 @@ abstract class xnau_FormElement {
       } elseif($value === 'other') {
         $otherlabel = $title;
       } elseif (!empty($value) or $value === 0) {
-        $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . apply_filters( 'pdb-translate_string', stripslashes($title)) . '</option>', -1);
+        $this->_addline('<option value="' . $value . '" ' . $this->_set_selected($value, $this->value, 'selected') . ' >' . Participants_Db::set_filter('translate_string', stripslashes($title)) . '</option>', -1);
       }
     }
     // add the "other" option

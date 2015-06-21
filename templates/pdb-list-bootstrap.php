@@ -60,7 +60,7 @@ $this->pagination->set_props(array(
       
 			
       <div class="control-group">
-      	<label class="control-label"><?php _e('Sort by', 'participants-database' )?>:</label>
+          <label class="control-label"><?php _e('Sort by', 'participants-database') ?>:</label>
       	<div class="controls">
 
       		<?php $this->sort_form() ?>
@@ -72,7 +72,7 @@ $this->pagination->set_props(array(
   </div>
   <?php endif ?>
 
-<?php /* LIST DISPLAY */?>
+  <?php /* LIST DISPLAY */ ?>
 
 <?php 
 /* print the count if enabled in the shortcode
@@ -86,7 +86,7 @@ $this->print_list_count('<h5>');
   <table class="table pdb-list list-container" >
   
     
-    <?php if ( $record_count > 0 ) : ?>
+    <?php if ($record_count > 0) : ?>
 
     <thead>
       <tr>

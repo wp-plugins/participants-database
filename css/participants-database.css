@@ -196,7 +196,7 @@ input.otherfield[type=text] {
     margin-right: 10px;
 }
 .dropdown-other input[name=temp] {
-/*  display:none;*/
+  display:none;
 }
 /* LIST */
 
@@ -314,6 +314,7 @@ input.otherfield[type=text] {
 }
 .wp-admin .pdb-list .pagination .glyphicon {
   vertical-align: top;
+  font-size: 12px;
 }
 .pagination .glyphicon.glyphicon-first-page:after {
   content: "❬❬";

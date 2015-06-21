@@ -1190,7 +1190,7 @@ class PDb_Settings extends xnau_Plugin_Settings {
     $pages = get_posts(array('post_type' => 'page', 'posts_per_page' => -1));
 
     foreach ($pages as $page) {
-      $pagelist[Participants_Db::set_filter('pdb-translate_string', $page->post_title)] = $page->ID;
+      $pagelist[Participants_Db::set_filter('translate_string', $page->post_title)] = $page->ID;
     }
 
     /*

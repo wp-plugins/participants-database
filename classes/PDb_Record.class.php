@@ -40,11 +40,6 @@ class PDb_Record extends PDb_Shortcode {
         'module' => 'record',
         'class' => 'edit-participant ' . $this->wrap_class,
         'submit_button' => Participants_Db::plugin_setting('save_changes_button'),
-        /*
-         * @version 1.6
-         * if true, "no record" message is shown using the template
-         */
-        'no_record_template' => '',
     );
     // run the parent class initialization to set up the parent methods 
     parent::__construct($shortcode_atts, $add_atts);

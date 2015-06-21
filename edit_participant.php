@@ -97,9 +97,9 @@ if ($participant_values) :
 
           <tr class="<?php echo ( 'hidden' == $column->form_element ? 'text-line' : $column->form_element ) . ' ' . $column->name . '-field' ?>">
             <?php
-            $column_title = str_replace(array('"', "'"), array('&quot;', '&#39;'), apply_filters('pdb-translate_string', stripslashes($column->title)));
+            $column_title = str_replace(array('"', "'"), array('&quot;', '&#39;'), Participants_Db::set_filter('translate_string', stripslashes($column->title)));
             if ($options['mark_required_fields'] && $column->validation != 'no') {
-              $column_title = sprintf(apply_filters('pdb-translate_string', $options['required_field_marker']), $column_title);
+              $column_title = sprintf(Participants_Db::set_filter('translate_string', $options['required_field_marker']), $column_title);
             }
             ?>
             <?php
@@ -244,12 +244,14 @@ if ($participant_values) :
             <td >
               <?php _e('<strong>Submit:</strong> save record and return to list<br><strong>Apply:</strong> save record and continue with same record<br><strong>Next:</strong> save record and then start a new one', 'participants-database') ?>
               <br />
-              <?php if (!empty($input_id)) {_e('<strong>Previous:</strong> save and move to previous record', 'participants-database'); } ?>
+              <?php if (!empty($input_id)) {
+                _e('<strong>Previous:</strong> save and move to previous record', 'participants-database');
+              } ?>
             </td>
           </tr>
   <?php else : ?>
           <tr>
-            <th><h3><?php echo apply_filters( 'pdb-translate_string', $options['save_changes_label']) ?></h3></th>
+            <th><h3><?php echo Participants_Db::set_filter('translate_string', $options['save_changes_label']) ?></h3></th>
           <td class="submit-buttons">
             <input class="button button-primary pdb-submit" type="submit" value="<?php _e($options['save_changes_button']) ?>" name="save">
             <input name="submit_button" type="hidden" value="<?php echo self::$i18n['apply'] ?>">
@@ -260,21 +262,4 @@ if ($participant_values) :
       </table>
     </form>
   </div>
-<?php endif; // ID is valid  ?>
-<?php /* ?>
-  <script type="text/javascript">
-  jQuery(document).ready( function($) {
-  $.datepicker.setDefaults({
-  dateFormat : '<?php echo Participants_Db::get_jqueryUI_date_format() ?>'
-  });
-  $( ".edit-participant input.date_field" ).each( function() {
-  var datefield = $(this);
-  var fieldname = datefield.attr('name');
-  datefield.datepicker({
-  changeMonth: true,
-  changeYear: true
-  });
-  });
-  });
-  </script>
-  <?php */ ?>
+<?php endif;

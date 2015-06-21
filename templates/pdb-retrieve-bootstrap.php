@@ -26,6 +26,7 @@ $mode = isset($_POST['action']) && $_POST['action'] == 'success' ? 'success' : '
 
   <?php while ($this->have_groups()) : $this->the_group(); ?>
 
+      <?php if ($this->have_fields()) : ?>
 
         <fieldset class="field-group">
 
@@ -56,6 +57,8 @@ $mode = isset($_POST['action']) && $_POST['action'] == 'success' ? 'success' : '
     <?php endwhile; // fields   ?>
 
         </fieldset>
+
+      <?php endif ?>
 
   <?php endwhile; // groups   ?>
 
