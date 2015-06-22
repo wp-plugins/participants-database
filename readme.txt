@@ -517,6 +517,7 @@ Taking defensive precautions against other plugins in the admin:
 = 1.6 =
 
 Version 1.6 is a major update; several new features, code optimizations, many bug fixes.
+[What's New in 1.6?](http://xnau.com/work/wordpress-plugins/participants-database-1-6/participants-database-1-6-whats-new/)
 
 == Using the Plugin ==
 

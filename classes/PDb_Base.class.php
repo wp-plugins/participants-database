@@ -568,9 +568,9 @@ class PDb_Base {
    */
   public static function title_key($title, $name = '') {
     if (empty($name)) {
-      return Participants_Db::set_filter('pdb-translate_string', $title);
+      return Participants_Db::set_filter('translate_string', $title);
     }
-    return sprintf('%s (%s)', Participants_Db::set_filter('pdb-translate_string', $title), $name);
+    return sprintf('%s (%s)', Participants_Db::set_filter('translate_string', $title), $name);
   }
   /**
    * provides a plugin setting
@@ -619,14 +619,14 @@ class PDb_Base {
    * this function also allows for two extra parameters
    * 
    * @param string $slug the base slug of the plugin API filter
-   * @param unknown $term the term to filter (passed by reference)
+   * @param unknown $term the term to filter
    * @param unknown $var1 extra variable
    * @param unknown $var2 extra variable
    * @return unknown the filtered or unfiltered term
    */
   public static function set_filter($slug, $term, $var1 = NULL, $var2 = NULL)
   {
-    if (strpos($slug, Participants_Db::$prefix) === false) {
+    if (strpos($slug, Participants_Db::$prefix) !== 0) {
 			$slug = Participants_Db::$prefix . $slug;
     }
     if (!has_filter($slug)) {

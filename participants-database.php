@@ -289,7 +289,7 @@ class Participants_Db extends PDb_Base {
     add_action('wp_enqueue_scripts',    array(__CLASS__, 'include_scripts'));
     add_action('admin_enqueue_scripts', array(__CLASS__, 'admin_includes'));
     add_filter('wp_headers',            array(__CLASS__, 'control_caching'));
-    add_filter('pdb-translate_string',  array(__CLASS__, 'string_static_translation'), 20);
+    add_filter(self::$prefix . 'translate_string',  array(__CLASS__, 'string_static_translation'), 20);
 
     // handles ajax request from list filter
     add_action('wp_ajax_pdb_list_filter',        array(__CLASS__, 'pdb_list_filter'));
@@ -312,21 +312,7 @@ class Participants_Db extends PDb_Base {
      * 
      * uncomment to enable
      */
-//    add_filter('pre_set_site_transient_update_plugins', array(__CLASS__, 'check_for_plugin_update'));// for plugin update test
-    /*
-     * uncomment this to enable custom upgrade details window
-     */
-    //add_filter('plugins_api', array(__CLASS__, 'plugin_update_info'), 10, 3);
-    /*
-     * this adds a custom update message to the plugin list 
-     */
-    global $pagenow;
-    if ( 'plugins.php' === $pagenow )
-    {
-        $plugin_path = plugin_basename( __FILE__ );
-        $hook = "in_plugin_update_message-" . $plugin_path;
-        //add_action( $hook, array(__CLASS__, 'plugin_update_message'), 20, 2 );
-    }
+    new PDB_Update_Notices(__FILE__);
         }
 
   /**
@@ -1339,7 +1325,7 @@ class Participants_Db extends PDb_Base {
    */
   public static function process_form($post, $action, $participant_id = false, $column_names = false) {
 
-    if (!isset($action) || !in_array($action, array('insert','update')) || $post['subsource'] !== Participants_Db::PLUGIN_NAME) return false;
+    if (!isset($action) || !in_array($action, array('insert','update')) || ( isset($post['subsource']) && $post['subsource'] !== Participants_Db::PLUGIN_NAME ) ) return false;
 
     global $wpdb;
 
@@ -2160,6 +2146,9 @@ class Participants_Db extends PDb_Base {
         'nocookie' => FILTER_VALIDATE_BOOLEAN,
         'previous_multipage' => FILTER_SANITIZE_STRING,
     );
+    /*
+     * $post_input is used for control functions, not for the dataset
+     */
     $post_input = filter_input_array(INPUT_POST, $post_sanitize);
     // only process POST arrays from this plugin's pages
     if (empty($post_input['subsource']) or $post_input['subsource'] != self::PLUGIN_NAME or empty($post_input['action']))
@@ -2220,7 +2209,7 @@ class Participants_Db extends PDb_Base {
          * filter: pdb-before_submit_update
          * filter: pdb-before_submit_add
          */
-        $post_data = self::set_filter('before_submit_' . ($post_input['action'] == 'insert' ? 'add' : 'update'), $_POST);
+        $post_data = self::set_filter('before_submit_' . ($post_input['action'] === 'insert' ? 'add' : 'update'), $_POST);
 
         if (isset($_POST['id'])) {
           $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
@@ -2546,8 +2535,8 @@ class Participants_Db extends PDb_Base {
       $participant_values = self::get_participant($match_id);
     }
     $retrieve_link_email = new stdClass();
-    $retrieve_link_email->body_template = self::plugin_setting('retrieve_link_email_body');
-    $retrieve_link_email->subject = self::plugin_setting('retrieve_link_email_subject');
+    $retrieve_link_email->body_template = self::set_filter('translate_string', self::plugin_setting('retrieve_link_email_body'));
+    $retrieve_link_email->subject = self::set_filter('translate_string', self::plugin_setting('retrieve_link_email_subject'));
     $retrieve_link_email->recipient = $participant_values[self::plugin_setting('primary_email_address_field', 'email')];
     /**
      * @version 1.6
@@ -3340,7 +3329,7 @@ class Participants_Db extends PDb_Base {
       $classes[] = 'has-dashicons';
     }
     global $post;
-    $shortcodes = self::get_plugin_shortcodes($post->post_content);
+    $shortcodes = is_object($post) ? self::get_plugin_shortcodes($post->post_content) : '';
     if (!empty($shortcodes)) {
       $classes[] = 'participants-database-shortcode';
       foreach ($shortcodes as $shortcode) {
@@ -3446,140 +3435,6 @@ class Participants_Db extends PDb_Base {
     return $links;
   }
     
-  /**
-   * prints a plugin update message
-   * 
-   * this is seen in the plugins list
-   * 
-   * @param array $plugin_data
-   * @param object $r
-   * @return string $output
-   */
-  public static function plugin_update_message($plugin_data, $r)
-  {
-
-    $upgrade_notice = self::get_update_message_text();
-
-    $upgrade_notice = preg_replace('#(==?[^=]+==?)#', '', $upgrade_notice);
-
-    $upgrade_notice = preg_replace('#(\*\*([^*]+)\*\*)#', '<span style="color:#BC0B0B">\2</span>', $upgrade_notice);
-
-    $response = $r;
-    $response->name = Participants_Db::$plugin_title;
-    $response->requires = '3.4';
-    $response->tested = '3.7';
-    $response->version = $plugin_data['Version'];
-    $response->homepage = $plugin_data['PluginURI'];
-    
-    // we got all that info, but really we just need to print the message we got from the readme
-    
-    echo wpautop($upgrade_notice);
-  }
-  /**
-   * gets the update message text
-   * 
-   * @return string
-   */
-  public static function get_update_message_text()
-  {
-    // readme contents
-    $data = file_get_contents(plugins_url('readme.txt', __FILE__));
-
-    // assuming you've got a Changelog section
-    // @example == Changelog ==
-    $upgrade_notice = stristr($data, '== Upgrade Notice ==');
-
-    // assuming you've got a Screenshots section
-    // @example == Screenshots ==
-    $upgrade_notice = stristr($upgrade_notice, '== Using the Plugin ==', true);
-    return $upgrade_notice;
-  }
-  /**
-   * creates the update notice for this version
-   * 
-   * @param object $response
-   * @return object
-   */
-  public static function check_for_plugin_update($checkdata)
-  {
-
-    if (empty($checkdata->checked)) {
-      return $checkdata;
-    }
-
-    // readme contents
-    $data = file_get_contents('http://plugins.svn.wordpress.org/participants-database/trunk/readme.txt?format=txt');
-    $plugin_path = plugin_basename(__FILE__);
-    $plugin_data = get_plugin_data(__FILE__);
-    
-    $upgrade_notice = self::get_update_message_text();
-    
-    $upgrade_notice = preg_replace('#(==?[^=]+==?)#', '', $upgrade_notice);
-    
-    $response = (object) array(
-                'slug' => self::PLUGIN_NAME,
-                'new_version' => '1.6', 
-                'requires' => '4.0',  
-                'tested' => '4.1.1',
-                'upgrade_notice' => $upgrade_notice,
-                'package' => 'https://downloads.wordpress.org/plugin/participants-database.1.6.zip',
-                'url' => 'http://wordpress.org/plugins/participants-database/',
-    );
-    
-    $checkdata->response[$plugin_path] = $response;
-
-    //error_log(__METHOD__ . ' data returned:' . print_r($checkdata->response, 1));
-
-    return $checkdata;
-  }
-  /**
-   * creates the update notice for this version
-   * 
-   * @param boolean $false
-   * @param array $action
-   * @param object $arg
-   * @return bool|object
-   */
-  public static function plugin_update_info($false, $action, $arg)
-  {
-    
-    if ($arg->slug !== self::PLUGIN_NAME) return false;
-
-    // readme contents
-    $data = file_get_contents('http://plugins.svn.wordpress.org/participants-database/trunk/readme.txt?format=txt');
-    $plugin_path = plugin_basename(__FILE__);
-    $plugin_data = get_plugin_data(__FILE__);
-    
-    // assuming you've got a Changelog section
-    // @example == Changelog ==
-    $changelog = stristr($data, '== Upgrade Notice ==');
-
-    // assuming you've got a Screenshots section
-    // @example == Screenshots ==
-    $changelog = stristr($changelog, '== Using the Plugin ==', true);
-    
-    $response = (object) array(
-                'slug' => self::PLUGIN_NAME,
-                'new_version' => '1.5',
-                'upgrade_notice' => self::get_update_message_text(),
-                'package' => 'https://downloads.wordpress.org/plugin/participants-database.1.4.9.4.zip',
-                'url' => 'http://wordpress.org/plugins/participants-database/',
-    );
-
-    $response->name = Participants_Db::$plugin_title;
-    $response->requires = '3.4';
-    $response->tested = '3.7';
-    $response->version = $plugin_data['Version'];
-    $response->homepage = $plugin_data['PluginURI'];
-    $response->sections = array(
-        'description' => '<h3>New Features Included in this Update:</h3>',
-        'changelog' => wpautop($changelog),
-    );
-
-    //error_log(__METHOD__ . ' data returned:' . print_r($response, 1));
-
-    return $response;
-  }
 }
 
 // class

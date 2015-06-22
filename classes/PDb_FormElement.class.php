@@ -585,7 +585,7 @@ class PDb_FormElement extends xnau_FormElement {
           // we use the stored value
         } elseif ($option_value == $value) {
           // grab the option title
-            return apply_filters( 'pdb-translate_string', stripslashes($option_title));
+            return Participants_Db::set_filter('translate_string', stripslashes($option_title));
         }
       }
     }

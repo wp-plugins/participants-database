@@ -263,11 +263,37 @@ if (!class_exists('PDb_Aux_Plugin')) :
                 $this->aux_plugin_title, 
                 'manage_options', 
                 $this->settings_page, 
-                array($this, 'render_settings_page')
+                array($this, 'render_settings_parent_page')
         );
       }
     }
-
+    /**
+     * renders the aux plugin settings parent page
+     * 
+     * adds an independent header to the settings page
+     */
+    public function render_settings_parent_page()
+    {
+      echo $this->settings_page_header();
+      /**
+       * @filter 'pdb-aux_plugin_settings_page_header'
+       */
+      do_action(Participants_Db::$prefix . 'aux_plugin_settings_page_header');
+      $this->render_settings_page();
+    }
+    /**
+     * prints a header for an aux plugin settings page
+     * 
+     * @return string HTML
+     */
+    private function settings_page_header()
+    {
+      return;
+    }
+    /**
+     * 
+     * @param array $sections
+     */
     public function _add_settings_sections($sections)
     {
 
