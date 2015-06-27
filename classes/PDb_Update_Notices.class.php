@@ -62,9 +62,9 @@ class PDb_Update_Notices {
     global $pagenow;
     if ( 'plugins.php' === $pagenow )
     {
-        $plugin_path = plugin_basename( $this->plugin_file_path );
-        $hook = "in_plugin_update_message-" . $plugin_path;
-//        add_action( $hook, array($this, 'plugin_update_message'), 20, 2 );
+      $plugin_path = plugin_basename( $this->plugin_file_path );
+      $hook = "in_plugin_update_message-" . $plugin_path;
+      add_action( $hook, array($this, 'plugin_update_message'), 20, 2 );
     }
   }
   /**
@@ -87,7 +87,7 @@ class PDb_Update_Notices {
     
     // we got all that info, but really we just need to print the message we got from the readme
     
-    echo wpautop($upgrade_notice);
+    echo wpautop(self::format_markdown($upgrade_notice));
   }
   /**
    * creates the update notice for this version
@@ -136,7 +136,7 @@ class PDb_Update_Notices {
 
 The database is made up of fields, and each field may be one of several types that are uniquely suited to store a particular kind of information. These fields can also be divided into groups to help organize the information. Fields can also be provided with help text to assist users in providing the information.
 
-[How Does Participants Database Work?](http://xnau.com/work/wordpress-plugins/participants-database-1-6/how-does-participants-database-work/)
+[How Does Participants Database Work?](http://xnau.com/work/wordpress-plugins/participants-database/how-does-participants-database-work/)
 ')),
         'changelog' => wpautop(self::format_markdown($this->upgrade_notice())),
     );
@@ -174,7 +174,7 @@ The database is made up of fields, and each field may be one of several types th
   {
     
     // readme contents
-    $data = file_get_contents($this->readme_url );
+    $data = file_get_contents( $this->readme_url );
     
     $changelog = stristr($data, '== Upgrade Notice ==');
     $changelog = stristr($changelog, '== Using the Plugin ==', true);
@@ -205,3 +205,5 @@ The database is made up of fields, and each field may be one of several types th
             ), $markdown);
   }
 }
+
+?>

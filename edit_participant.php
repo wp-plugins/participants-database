@@ -145,11 +145,6 @@ if ($participant_values) :
 
               if (isset($column->value)) {
 
-                //error_log(basename(__FILE__) . ' ' . $column->name . ':' . $column->value);
-
-//                if ($column->name == 'last_accessed' && (!isset($column->value) or '0000-00-00 00:00:00' == $column->value ))
-//                  $column->value = false;
-
                 switch ($column->form_element) {
                   
 //                  case 'timestamp':

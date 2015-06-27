@@ -596,6 +596,10 @@ a.dragger {
   font-family: inherit;
 }
 
+
+.participants_db .ui-widget-content {
+  background: transparent;
+}
 .participants_db .ui-tabs-nav {
   background-image: none;
   background-color: inherit;
@@ -615,6 +619,7 @@ a.dragger {
   margin: 1px 0 2px;
   height: auto;
   width: auto;
+  float: none;
 }
 .participants_db .ui-tabs-nav li.ui-tabs-active.ui-state-active {
   margin-bottom:0;
@@ -677,6 +682,7 @@ a.dragger {
   clear: both;
   position: relative;
   left:0;
+  padding: 0;
 }
 .settings-class.participants_db .ui-tabs-panel {
   max-width: 60em;

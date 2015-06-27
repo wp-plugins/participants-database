@@ -3,7 +3,7 @@ Contributors: xnau
 Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 4.0
-Tested up to: 4.1.1
+Tested up to: 4.2.2
 Stable tag: 1.5.4.9
 License: GPLv2
 
@@ -517,7 +517,6 @@ Taking defensive precautions against other plugins in the admin:
 = 1.6 =
 
 Version 1.6 is a major update; several new features, code optimizations, many bug fixes.
-[What's New in 1.6?](http://xnau.com/work/wordpress-plugins/participants-database-1-6/participants-database-1-6-whats-new/)
 
 == Using the Plugin ==
 
