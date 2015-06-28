@@ -1,14 +1,14 @@
 <?php
 
 /*
- * class description
+ * manages the query for the list
  *
  * @package    WordPress
  * @subpackage Participants Database Plugin
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    1.2
+ * @version    1.3
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Participants_Db class
  * 
@@ -139,6 +139,7 @@ class PDb_List_Query {
      */
     
 //    error_log(__METHOD__.' post: '.print_r($_POST,1));
+//    error_log(__METHOD__.' session: '.print_r(Participants_Db::$session,1));
     
     if (!empty($this->get_input[Participants_Db::$list_page])) {
       $this->_restore_query_session();
@@ -305,7 +306,8 @@ class PDb_List_Query {
    */
   private function _add_filter_from_get() {
     $this->get_input = filter_input_array(INPUT_GET, self::single_search_input_filter());
-    if (isset($this->get_input)) {
+    
+    if (isset($this->get_input) && (isset($this->get_input['search_field']) || isset($this->get_input['sortBy']))) {
       /*
        * fill in some assumed defaults in case an abbreviated get string is used
        */
@@ -383,10 +385,6 @@ class PDb_List_Query {
         $this->_remove_field_filters($input['search_field']);
         $this->_add_single_statement($input['search_field'], $input['operator'], $input['value']);
         $this->is_search_result = true;
-        
-        error_log(__METHOD__.' '.print_r($this,1));
-        
-        
       } elseif ($input['submit'] !== 'clear' && empty($input['value'])) {
         // we set this to true even for empty searches
         $this->is_search_result = true;
@@ -860,12 +858,14 @@ class PDb_List_Query {
   {
     $this->_clear_query_session();
     
-    Participants_Db::$session->set($this->query_session_name(), array(
-        'where_clauses' => serialize($this->subclauses),
-        'sort' => serialize($this->sort),
+    $save = array(
+        'where_clauses' => $this->subclauses,
+        'sort' => $this->sort,
         'clause_count' => $this->clause_count,
         'is_search' => $this->is_search_result
-    ));
+    );
+    
+    Participants_Db::$session->set($this->query_session_name(), $save);
   }
   /**
    * public method for saving the query session
@@ -902,16 +902,20 @@ class PDb_List_Query {
     
     $data = Participants_Db::$session->get($this->query_session_name());
     
-    $where_clauses = maybe_unserialize($data['where_clauses']);
-    $sort = maybe_unserialize($data['sort']);
+    if (!is_object($data)) {
+      return false;
+    }
+    $where_clauses = $data['where_clauses']->toArray();
+    $sort = $data['sort']->toArray();
     $this->clause_count = $data['clause_count'];
     $this->is_search_result = $data['is_search'];
     if (is_array($where_clauses)) {
       $this->subclauses = $where_clauses;
-    } else return false;
+    }
     if (is_array($sort)) {
       $this->sort = $sort;
     }
+    
     return true;
   }
   /**
