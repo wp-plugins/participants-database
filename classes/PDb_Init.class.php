@@ -124,6 +124,8 @@ class PDb_Init
    */
   private function _fresh_install()
   {
+    
+    global $wpdb;
       // define the arrays for loading the initial db records
       $this->_define_init_arrays();
 
