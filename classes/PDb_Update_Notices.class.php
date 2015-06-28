@@ -27,6 +27,10 @@ class PDb_Update_Notices {
    */
   static $latest_version = '1.6';
   /**
+   * the current plugin version
+   */
+  static $current_version;
+  /**
    * @var string minimum WP version
    */
   static $min_version = '4.1';
@@ -50,6 +54,9 @@ class PDb_Update_Notices {
   {
     $this->plugin_file_path = $plugin_file_path;
     $this->readme_url = $this->testmode ? 'http://wp.xnau.dev/content/plugins/participants-database/readme.txt' : 'http://plugins.svn.wordpress.org/participants-database/trunk/readme.txt?format=txt';
+    
+    $this->set_version_values();
+    
     // checks for a plugin update
     add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_plugin_update'));
     /*
@@ -97,8 +104,15 @@ class PDb_Update_Notices {
    */
   public function check_for_plugin_update($checkdata)
   {
+    $plugin_check_path = plugin_basename($this->plugin_file_path);
 
     if (empty($checkdata->checked)) {
+      return $checkdata;
+    }
+
+    $this->set_version_values($checkdata);
+    
+    if (version_compare(self::$latest_version, self::$current_version) !== 1) {
       return $checkdata;
     }
 
@@ -108,9 +122,7 @@ class PDb_Update_Notices {
     
     $response->upgrade_notice = preg_replace('#(==?[^=]+==?)#', '', $upgrade_notice);
     
-    $checkdata->response[plugin_basename($this->plugin_file_path)] = $response;
-
-    //error_log(__METHOD__ . ' data returned:' . print_r($checkdata->response, 1));
+    $checkdata->response[$plugin_check_path] = $response;
 
     return $checkdata;
   }
@@ -180,6 +192,17 @@ The database is made up of fields, and each field may be one of several types th
     $changelog = stristr($changelog, '== Using the Plugin ==', true);
     
     return $changelog;
+  }
+  /**
+   * sets the current and latest version values
+   * 
+   * @param object $update_info the current plugin update status
+   */
+  private function set_version_values($update_info = false) {
+    $update_info = $update_info ? $update_info : get_site_transient('update_plugins');
+    $plugin_check_path = plugin_basename($this->plugin_file_path);
+    self::$latest_version = isset($update_info->response[$plugin_check_path]) ? $update_info->response[$plugin_check_path]->new_version : $update_info->no_update[$plugin_check_path]->new_version;
+    self::$current_version = isset($update_transient->checked[$plugin_check_path]) ?  $update_transient->checked[$plugin_check_path] : Participants_Db::$plugin_version;
   }
   /**
    * super simple markdown to HTML converter
