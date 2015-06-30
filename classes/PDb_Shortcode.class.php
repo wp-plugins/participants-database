@@ -506,6 +506,10 @@ abstract class PDb_Shortcode {
    * checks for additional records to show
    */
   public function have_records() {
+    
+    if ($this->shortcode_atts['list_limit'] === -1) {
+      $this->shortcode_atts['list_limit'] = $this->num_records;
+    }
 
     $remaining = $this->num_records - ( ( $this->pagination->page - 1 ) * $this->shortcode_atts['list_limit'] );
 
