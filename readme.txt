@@ -254,6 +254,16 @@ You can define a "captcha" form element which will show a simple math question f
 
 == Changelog ==
 
+= 1.6.2 =
+bugs fixed:
+slashed numeric dates not parsing correctly
+total shortcode not totaling data
+default images broken
+value titles not shown in lists
+
+= 1.6.1 =
+minor bug fixes
+
 = 1.6 =
 
 * database optimizations for large data sets

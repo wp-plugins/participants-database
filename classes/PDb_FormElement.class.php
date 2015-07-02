@@ -341,7 +341,7 @@ class PDb_FormElement extends xnau_FormElement {
   static function array_display($field) 
   {
     $multivalues = maybe_unserialize($field->value);
-    if (!is_array($multivalues)) return $field->value;
+    if (!is_array($multivalues)) return self::get_value_title ($field->value, $field->name);
     // remove empty elements and convert to string for display
     $multivalues = array_filter((array)$multivalues, array( __CLASS__, 'is_displayable'));
 

@@ -1591,8 +1591,8 @@ abstract class xnau_FormElement {
    * 
    * @return string the ID attribute or empty string
    */
-  protected function element_id() {
-    return isset($this->attributes['id']) ? $this->attributes['id'] : $this->prefix . $this->name;
+  public function element_id() {
+    return isset($this->attributes['id']) ? $this->attributes['id'] : $this->prefix . str_replace('[]', '', $this->name);
   }
   
   /**

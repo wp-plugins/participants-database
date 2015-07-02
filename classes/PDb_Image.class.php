@@ -66,9 +66,8 @@ class PDb_Image extends xnau_Image_Handler {
       
     }
     
-    // check that the file exists, then set the absolute path
-    $default_image = self::concatenate_directory_path( Participants_Db::app_base_path(), $this->default_image, false );
-    if ( !empty($this->default_image) and is_file( $default_image ) ) {
+    $default_image = trailingslashit(home_url()) . ltrim($this->default_image, '/');
+    if ( !empty($this->default_image) and @getimagesize( $default_image ) ) {
       
       $this->default_image = $default_image;
       

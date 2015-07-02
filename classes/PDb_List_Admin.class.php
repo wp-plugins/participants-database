@@ -704,9 +704,13 @@ class PDb_List_Admin {
              * action pdb-admin_list_form_top
              * @version 1.6
              * 
+             * todo: add relevent data to action
+             * 
              * good for adding functionality to the admin list
              */
-            do_action(Participants_Db::$prefix . 'admin_list_form_top', $this) ?>
+//            do_action(Participants_Db::$prefix . 'admin_list_form_top', $this);
+            do_action(Participants_Db::$prefix . 'admin_list_form_top');
+            ?>
                 <table class="form-table"><tbody><tr><td>
         <fieldset class="widefat inline-controls">
                       <?php if (current_user_can(Participants_Db::plugin_capability('plugin_admin_capability', 'delete participants'))) : ?>

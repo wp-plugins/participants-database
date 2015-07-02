@@ -4,7 +4,7 @@
  * Plugin URI: http://xnau.com/wordpress-plugins/participants-database
  * Description: Plugin for managing a database of participants, members or volunteers
  * Author: Roland Barker
- * Version: 1.6.1
+ * Version: 1.6.2
  * Author URI: http://xnau.com
  * License: GPL2
  * Text Domain: participants-database
@@ -3213,19 +3213,7 @@ class Participants_Db extends PDb_Base {
       
       $date = false; // no valid date yet
       
-      if (is_object($column) && $column->form_element == 'date') {
-        /*
-         * deal with the common special case of non-American-style numeric date with slashes
-         */
-        if (false !== strpos($string,'/') ) {
-          $date_parts = explode('/',self::$date_format);
-          $day_index = array_search('d',$date_parts) !== false ? array_search('d',$date_parts) : array_search('j',$date_parts);
-          $month_index = array_search('m',$date_parts) !== false ? array_search('m',$date_parts) : array_search('n',$date_parts);
-          if ( $day_index !== false && $month_index !== false && $day_index < $month_index ) {
-            $string = str_replace('/','-',$string);
-          }
-        };
-      } elseif (is_object($column) && $column->form_element == 'timestamp') {
+      if (is_object($column) && $column->form_element == 'timestamp') {
         if ($zero_time) {
           /*
            * we need to zero the time, we first try to do it using the DateTime class
@@ -3254,9 +3242,11 @@ class Participants_Db extends PDb_Base {
       setlocale(LC_ALL, get_locale());
       /*
        * @version 1.6
-       * added strptime method for locaized dates wihtout using strict formatting
+       * added strptime method for locaized dates
+       * 
+       * this only works for known formats...so timestamps and when "strict dates" is enabled
        */
-      if (function_exists('strptime')) {
+      if (function_exists('strptime') && (self::plugin_setting_is_true('strict_dates', false) || $is_MySQL_timestamp)) {
         self::$date_mode = 'strptime';
         if ($is_MySQL_timestamp) {
           $format = '%Y-%m-%d';
@@ -3265,19 +3255,55 @@ class Participants_Db extends PDb_Base {
           $format = Participants_Db::translate_date_format($format_setting, 'strftime');
         }
         $date_array = strptime($string, $format);
-        
         $date = mktime(
                 $date_array['tm_hour'], $date_array['tm_min'], $date_array['tm_sec'], $date_array['tm_mon'] + 1, $date_array['tm_mday'], $date_array['tm_year'] + 1900
                 );
       }
       if ($date === false) {
         self::$date_mode = 'strtotime';
-        // strptime couldn't parse, try this as a fallback
-        $date = strtotime($string);
+        $date = strtotime(self::date_order_fix($string));
       }
     }
-
     return $date;
+  }
+  
+  /**
+   * inverts the month and date figures so that strtotime can work on European date strings
+   * 
+   * this only kicks in if the month/day numeric date order is detected in the general date settings
+   * 
+   * @param string $string the date string as written
+   * 
+   * @return string
+   */
+  public static function date_order_fix($string) {
+    // first check if it's a numeric date divided by dashes, dots or slashes
+    preg_match('/([.\/-])/', $string, $matches);
+    $divider = empty($matches) ? false : $matches[1];
+    if ($divider) {
+      // now check the order to see if it's a European day/month/year type numeric date
+      $date_parts = explode($divider, self::$date_format);
+      $day_index = array_search('d',$date_parts) !== false ? array_search('d',$date_parts) : array_search('j',$date_parts);
+      $month_index = array_search('m',$date_parts) !== false ? array_search('m',$date_parts) : array_search('n',$date_parts);
+      if ( $day_index !== false && $month_index !== false && $day_index < $month_index ) {
+        // yes, it's a European-style date
+        self::$date_mode .= ' european';
+        return self::reorder_date_string($string, $divider);
+      }
+    }
+    return $string;
+  }
+  /**
+   * re-orders the date string so it can be parsed by strtotime
+   * 
+   * @param string the date string
+   * @params string the divider string
+   * 
+   * @return string the reordered string
+   */
+  public static function reorder_date_string($string, $divider) {
+    list($day, $month, $year) = explode($divider, $string);
+    return sprintf("%s$divider%s$divider%s", $month, $day, $year);
   }
   
   /**
