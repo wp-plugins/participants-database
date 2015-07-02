@@ -524,9 +524,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.6 =
+= 1.6.2 =
 
-Version 1.6 is a major update; several new features, code optimizations, many bug fixes.
+Version 1.6.2 is a bug fix update, check the update log for details
 
 == Using the Plugin ==
 
