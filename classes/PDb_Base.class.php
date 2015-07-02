@@ -680,7 +680,7 @@ class PDb_Base {
    * @return string
    */
   public static function files_uri() {
-    return trailingslashit(home_url(Participants_Db::files_location()));
+    return trailingslashit(site_url(Participants_Db::files_location()));
   }
   /**
    * deletes a file
