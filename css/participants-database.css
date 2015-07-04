@@ -196,7 +196,7 @@ input.otherfield[type=text] {
     margin-right: 10px;
 }
 .dropdown-other input[name=temp] {
-  display:none;
+/*  display:none;*/
 }
 /* LIST */
 

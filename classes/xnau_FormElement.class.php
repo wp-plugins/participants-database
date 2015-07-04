@@ -1105,7 +1105,7 @@ abstract class xnau_FormElement {
       $this->_addline('<label ' . $this->_class() . ' for="' . $this->attributes['id'] . '">');
       $this->_addline(sprintf('<input type="%s" name="%s"  value="%s" %s %s />', 
               $type, 
-              $this->name, 
+              'pdb-otherselector', 
               $otherlabel, 
               $this->_set_selected($this->options, $value, 'checked', $value === ''), 
               $this->_attributes() . $this->_class('otherselect')
