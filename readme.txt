@@ -4,7 +4,7 @@ Donate link: http://xnau.com/wordpress-plugins/participants-database
 Tags: supporter, member, volunteer, database, sign up form, survey, management, non-profit, political, community, organization, mailing list, team, records
 Requires at least: 4.0
 Tested up to: 4.2.2
-Stable tag: 1.6.2
+Stable tag: 1.6.2.1
 License: GPLv2
 
 Build and maintain a fully customizable database of participants, members or anything with signup forms, admin backend, custom lists, and CSV support.
@@ -256,6 +256,8 @@ You can define a "captcha" form element which will show a simple math question f
 
 = 1.6.2.1 =
 fixed bug with dropdown- and checkbox-other fields
+fixed horizontal scrolling in admin list
+added scrollbars at top of horizontally-scrolling admin pages
 
 = 1.6.2 =
 bugs fixed:
