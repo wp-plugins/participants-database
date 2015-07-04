@@ -256,6 +256,8 @@ You can define a "captcha" form element which will show a simple math question f
 
 = 1.6.2.1 =
 fixed bug with dropdown- and checkbox-other fields
+fixed horizontal scrolling in admin list
+added scrollbars at top of horizontally-scrolling admin pages
 
 = 1.6.2 =
 bugs fixed:
