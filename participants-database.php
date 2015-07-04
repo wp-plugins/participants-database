@@ -452,7 +452,8 @@ class Participants_Db extends PDb_Base {
     wp_register_script(self::$prefix.'settings_script', plugins_url('js/settings.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs',self::$prefix.'cookie'), false, true);
     wp_register_script(self::$prefix.'record_edit_script', plugins_url('js/record_edit.js', __FILE__), array('jquery','jquery-ui-core','jquery-ui-tabs',self::$prefix.'cookie'), false, true);
     wp_register_script(self::$prefix.'jq-placeholder', plugins_url('js/jquery.placeholder.min.js', __FILE__), array('jquery'));
-    wp_register_script(self::$prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery'));
+    wp_register_script('jq-doublescroll', plugins_url('js/jquery.doubleScroll.js', __FILE__), array('jquery', 'jquery-ui-widget'));
+    wp_register_script(self::$prefix.'admin', plugins_url('js/admin.js', __FILE__), array('jquery','jq-doublescroll'));
     wp_register_script(self::$prefix.'otherselect', plugins_url('js/otherselect.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'list-admin', plugins_url('js/list_admin.js', __FILE__), array('jquery'));
     wp_register_script(self::$prefix.'debounce',        plugins_url('js/jq_debounce.js', __FILE__), array('jquery'));
@@ -582,6 +583,7 @@ class Participants_Db extends PDb_Base {
       wp_enqueue_script(self::$prefix.'jq-placeholder');
       wp_enqueue_script(self::$prefix.'admin');
       wp_enqueue_script(self::$prefix.'otherselect');
+      wp_enqueue_script('jq-doublescroll');
     }
 
     if (false !== stripos($hook, 'participants-database-list_participants')) {

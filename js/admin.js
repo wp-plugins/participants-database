@@ -24,6 +24,7 @@ PDbAdmin = (function($) {
       $('a.obfuscate[data-email-values]').each(function () {
         $(this).PDb_email_obfuscate();
       });
+      $('.pdb-horiz-scroll-scroller').doubleScroll();
     }
   }
 })(jQuery);
