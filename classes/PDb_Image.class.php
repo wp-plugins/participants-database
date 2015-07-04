@@ -1,6 +1,6 @@
 <?php
 /*
- * class for handling the display of images for the participants database plugin
+ * class for handling the display of an individual image
  *
  *
  * @package    WordPress
@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdeign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.2
+ * @version    0.3
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    Image_Handler class
  */
@@ -44,9 +44,9 @@ class PDb_Image extends xnau_Image_Handler {
    *
    */
   public function set_image_directory() {
+    $this->image_directory = Participants_Db::set_filter('image_base_path', PDb_Path::files_path(), $this);
+    $this->image_directory_uri = Participants_Db::set_filter('image_base_uri', PDb_Path::files_uri(), $this);
 
-    $this->image_directory = Participants_Db::files_path();
-    $this->image_directory_uri = Participants_Db::files_uri();
   }
   
   /**
@@ -66,7 +66,10 @@ class PDb_Image extends xnau_Image_Handler {
       
     }
     
-    $default_image = trailingslashit(home_url()) . ltrim($this->default_image, '/');
+    $default_image = trailingslashit(PDb_Path::base_url()) . ltrim($this->default_image, '/');
+    
+//    error_log(__METHOD__.' setting: '.$this->default_image.' full: '.$default_image);
+    
     if ( !empty($this->default_image) and @getimagesize( $default_image ) ) {
       
       $this->default_image = $default_image;

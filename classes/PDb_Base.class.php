@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.9
+ * @version    1.0
  * @link       http://xnau.com/wordpress-plugins/
  */
 if ( ! defined( 'ABSPATH' ) ) die;
@@ -18,30 +18,6 @@ class PDb_Base {
    * @var bool
    */
   public static $shortcode_present = false;
-  /**
-   * finds the WP installation root
-   * 
-   * this uses constants, so it's not filterable, but the constants (if customized) 
-   * are defined in the config file, so should be accurate for a particular installation
-   * 
-   * this works by finding the common path to both ABSPATH and WP_CONTENT_DIR which 
-   * we can assume is the base install path of WP, even if the WP application is in 
-   * another directory and/or the content directory is in a different place
-   * 
-   * @return string
-   */
-  public static function app_base_path() {
-    $content_path = explode('/', WP_CONTENT_DIR);
-    $wp_app_path = explode('/', ABSPATH);
-    $end = min(count($content_path), count($wp_app_path));
-    $i = 0;
-    $common = array();
-    while ($content_path[$i] === $wp_app_path[$i] and $i < $end) {
-      $common[] = $content_path[$i];
-      $i++;
-    }
-    return trailingslashit(implode('/', $common));
-  }
   /**
    * parses a list shortcode filter string into an array
    * 
@@ -275,7 +251,6 @@ class PDb_Base {
 
     return maybe_unserialize($string);
   }
-
   /**
    * adds the URL conjunction to a GET string
    *
@@ -655,33 +630,6 @@ class PDb_Base {
     }
     return true;
   }
-
-  /**
-   * supplies an image/file upload location
-   * 
-   * relative to WP root
-   * 
-   * @return string realtive path to the plugin files location
-   */
-  public static function files_location() {
-    return Participants_Db::set_filter('files_location', Participants_Db::plugin_setting('image_upload_location'));
-  }
-  /**
-   * supplies the absolute path to the files location
-   * 
-   * @return string
-   */
-  public static function files_path() {
-    return trailingslashit(PDb_Image::concatenate_directory_path( self::app_base_path(), Participants_Db::files_location()));
-  }
-  /**
-   * supplies the absolute path to the files location
-   * 
-   * @return string
-   */
-  public static function files_uri() {
-    return trailingslashit(site_url(Participants_Db::files_location()));
-  }
   /**
    * deletes a file
    * 
@@ -693,7 +641,7 @@ class PDb_Base {
   public static function delete_file($filename)
   {
     $current_dir = getcwd(); // save the cirrent dir
-    chdir(self::files_path()); // set the plugin uploads dir
+    chdir(PDb_Path::files_path()); // set the plugin uploads dir
     $result = unlink(basename($filename)); // delete the file
     chdir($current_dir); // change back to the previous directory
     return $result;

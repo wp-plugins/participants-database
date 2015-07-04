@@ -31,7 +31,7 @@ abstract class xnau_CSV_Import {
    */
   var $column_count;
   /**
-   * @var string holds the system path to the web root
+   * @var string holds the absolute system path to the web root
    */
   var $root_path;
   /**
@@ -150,10 +150,7 @@ abstract class xnau_CSV_Import {
    *
    * defaults to the WP root
    */
-  function _set_root_path() {
-
-    $this->root_path = Participants_Db::app_base_path();
-  }
+  abstract protected function _set_root_path();
 
   /**
    * inserts a series of records from a csv file

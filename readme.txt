@@ -254,6 +254,9 @@ You can define a "captcha" form element which will show a simple math question f
 
 == Changelog ==
 
+= 1.6.2.1 =
+fixed bug with dropdown- and checkbox-other fields
+
 = 1.6.2 =
 bugs fixed:
 slashed numeric dates not parsing correctly
@@ -524,9 +527,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.6.2 =
+= 1.6.2.1 =
 
-Version 1.6.2 is a bug fix update, check the update log for details
+Version 1.6.2.1 is a bug fix update addressing issues with the dropdown-other fields
 
 == Using the Plugin ==
 

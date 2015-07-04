@@ -4,7 +4,7 @@
  * Plugin URI: http://xnau.com/wordpress-plugins/participants-database
  * Description: Plugin for managing a database of participants, members or volunteers
  * Author: Roland Barker
- * Version: 1.6.2
+ * Version: 1.6.3
  * Author URI: http://xnau.com
  * License: GPL2
  * Text Domain: participants-database
@@ -2756,9 +2756,9 @@ class Participants_Db extends PDb_Base {
     $_POST[$field_name . '-deletefile'] = '';
 
     // attempt to create the target directory if it does not exist
-    if (!is_dir(Participants_Db::files_path())) {
+    if (!is_dir(PDb_Path::files_path())) {
 
-      if (false === self::_make_uploads_dir()) {
+      if (false === PDb_Path::_make_uploads_dir()) {
         return false;
       }
     }
@@ -2792,7 +2792,7 @@ class Participants_Db extends PDb_Base {
       $new_filename = preg_replace(array('#\.#', "/\s+/", "/[^-\.\w]+/"), array("-", "_", ""), $matches[1]) . '.' . $matches[2];
       // now make sure the name is unique by adding an index if needed
       $index = 1;
-      while (file_exists(Participants_Db::files_path() . $new_filename)) {
+      while (file_exists(PDb_Path::files_path() . $new_filename)) {
         $filename_parts = pathinfo($new_filename);
         $new_filename = preg_replace(array('#_[0-9]+$#'), array(''), $filename_parts['filename']) . '_' . $index . '.' . $filename_parts['extension'];
         $index++;
@@ -2821,7 +2821,7 @@ class Participants_Db extends PDb_Base {
       return false;
     }
 
-    if (false === move_uploaded_file($file['tmp_name'], Participants_Db::files_path() . $new_filename)) {
+    if (false === move_uploaded_file($file['tmp_name'], PDb_Path::files_path() . $new_filename)) {
 
       self::_show_validation_error(__('The file could not be saved.', 'participants-database'));
 
@@ -2851,29 +2851,6 @@ class Participants_Db extends PDb_Base {
      */
 
       return $new_filename;
-  }
-
-  /**
-   * attempt to create the uploads directory
-   *
-   * sets an error if it fails
-   * 
-   * @param string $dir the name of the new directory
-   */
-  public static function _make_uploads_dir($dir = '') {
-
-    $dir = empty($dir) ? Participants_Db::files_location() : $dir;
-    $savedmask = umask(0);
-    $status = true;
-    if (mkdir(Participants_Db::app_base_path() . $dir, 0755, true) === false) {
-
-      if (is_object(self::$validation_errors))
-        self::$validation_errors->add_error('', sprintf(__('The uploads directory (%s) could not be created.', 'participants-database'), $dir));
-
-      $status = false;
-    }
-    umask($savedmask);
-    return $status;
   }
 
   /**
@@ -3202,10 +3179,6 @@ class Participants_Db extends PDb_Base {
       }
     }
       
-      // ob_start();
-      // var_dump($date);
-      // error_log(__METHOD__.' date value:'.ob_get_clean().' mode:'.self::$date_mode);
-    
     /*
      * if we haven't got a timestamp, parse the date the regular way
      */

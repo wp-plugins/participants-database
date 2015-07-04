@@ -40,7 +40,14 @@ class PDb_CSV_Import extends xnau_CSV_Import {
         
     
   }
-  
+  /**
+   * sets up the root path for the uploaded file
+   *
+   * defaults to the WP root
+   */
+  protected function _set_root_path() {
+    $this->root_path = PDb_Path::app_base_path();
+  }
   /**
    * takes a raw title row from the CSV and sets the column names array with it
    * if the imported row is different from the plugin's defined CSV columns
@@ -61,13 +68,17 @@ class PDb_CSV_Import extends xnau_CSV_Import {
       $this->column_count = count($this->column_names);
     }
   }
-  
+  /**
+   * sets the uploads directory path
+   * 
+   * @return bool true if the directory is located
+   */
   function _set_upload_dir() {
 
-    $this->upload_directory = Participants_Db::files_location();
+    $this->upload_directory = PDb_Path::files_location();
   
     // check for the target directory; attept to create if it doesn't exist
-    return is_dir( $this->root_path.$this->upload_directory ) ? true : Participants_Db::_make_uploads_dir( $this->upload_directory ) ;
+    return is_dir( $this->root_path.$this->upload_directory ) ? true : PDb_Path::_make_uploads_dir( $this->upload_directory ) ;
     
   }
   

@@ -35,7 +35,7 @@ var PDbOtherSelect = (function ($) {
             .end()
             .find('.otherselect option[value=other]').prop('selected', true)
             .end()
-            .find('.otherselect').attr('name', 'temp');
+            .find('select.otherselect').attr('name', 'temp');
     return true;
   };
   var checkbox_update = function () {

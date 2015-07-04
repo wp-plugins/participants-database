@@ -203,7 +203,7 @@ class PDb_FormElement extends xnau_FormElement {
             $field->link = false;
             $return = $field->value;
           } else {
-            $field->link = Participants_Db::files_uri() . $field->value;
+            $field->link = PDb_Path::files_uri() . $field->value;
              $return = self::make_link($field);
           }
           break;
