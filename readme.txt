@@ -254,10 +254,16 @@ You can define a "captcha" form element which will show a simple math question f
 
 == Changelog ==
 
+= 1.6.2.2 =
+bugfix: 
+CAPTCHA not showing previous solution
+CAPTCHA help text not shown
+horizontal scroll setting on admin list
+
+added top scrollbar to horizontal scroll elements in admin
+
 = 1.6.2.1 =
 fixed bug with dropdown- and checkbox-other fields
-fixed horizontal scrolling in admin list
-added scrollbars at top of horizontally-scrolling admin pages
 
 = 1.6.2 =
 bugs fixed:
@@ -529,9 +535,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.6.2.1 =
+= 1.6.2.2 =
 
-Version 1.6.2.1 is a bug fix update addressing issues with the dropdown-other fields
+Version 1.6.2.2 is a bug fix update addressing issues with the CAPTCHA field and horizontal scrolling in the admin
 
 == Using the Plugin ==
 

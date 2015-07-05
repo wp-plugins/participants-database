@@ -296,7 +296,7 @@ class PDb_Field_Item extends PDb_Template_Item {
    */
   public function has_help_text() {
     
-    return ! empty( $this->help_text ) &&  $this->readonly !== '1' ;
+    return ! empty( $this->help_text );
   
   }
   
@@ -305,14 +305,14 @@ class PDb_Field_Item extends PDb_Template_Item {
    */
   public function print_help_text( ) {
     
-    if ( ! empty( $this->help_text )) {
+    if ($this->module == 'record' && $this->readonly) {
+      return;
+    }
       
       echo $this->prepare_display_value( $this->help_text );  
       
     }
     
-  }
-  
   /**
    * returns a field's error status
    *
