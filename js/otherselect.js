@@ -8,6 +8,7 @@ var PDbOtherSelect = (function ($) {
   "use strict";
   var groupClass = '[class*="-other-control-group"]';
   var nameData = 'other-name';
+  var tempName = 'temp';
   var dropdown_update = function () {
     var dropdown = $(this);
     var thisGroup = dropdown.closest(groupClass);
@@ -15,13 +16,13 @@ var PDbOtherSelect = (function ($) {
     var otherfield = thisGroup.find('.otherfield');
     cache_other_value(otherfield);
     if (dropdown.val() === 'other') {
-      thisGroup.find('.otherselect').attr('name', 'temp');
+      thisGroup.find('.otherselect').attr('name', tempName);
       otherfield.attr('name', thisName).select();
       set_saved_value(otherfield);
     } else {
       thisGroup.find('.otherselect').attr('name', thisName);
       otherfield
-              .attr('name', 'temp')
+              .attr('name', tempName)
               .val("");
     }
   };
@@ -35,7 +36,7 @@ var PDbOtherSelect = (function ($) {
             .end()
             .find('.otherselect option[value=other]').prop('selected', true)
             .end()
-            .find('select.otherselect').attr('name', 'temp');
+            .find('select.otherselect').attr('name', tempName);
     return true;
   };
   var checkbox_update = function () {
@@ -71,7 +72,7 @@ var PDbOtherSelect = (function ($) {
       otherfield.attr('name', thisName);
       otherfield.focus();
     } else {
-      otherfield.attr('name', 'temp').val("");
+      otherfield.attr('name', tempName).val("");
     }
   };
   var otherfield_select = function (field) {
@@ -90,7 +91,7 @@ var PDbOtherSelect = (function ($) {
     var name = control.attr('name'); //.replace(/\[[^\]]*\]/, '');
     var otherinput = el.find('input.otherfield');
     el.data(nameData, name);
-    otherinput.attr('name', otherinput.attr('name').replace(name, 'temp'));
+    otherinput.attr('name', otherinput.attr('name').replace(name, tempName));
   };
   $.fn.PDb_is_checkbox = function () {
     return this.closest('.selectother[class*="checkbox"]').length > 0;

@@ -115,6 +115,7 @@ class PDb_Manage_Fields {
     protected function print_group_tab_content($group)
     {
       $internal_group = $group === 'internal';
+      $hscroll = Participants_Db::plugin_setting_is_true('admin_horiz_scroll');
       ?>
       <div id="<?php echo $group ?>" class="manage-fields-wrap" >
         <form id="manage_<?php echo $group ?>_fields" method="post" autocomplete="off">
@@ -153,8 +154,10 @@ class PDb_Manage_Fields {
             PDb_FormElement::print_hidden_fields(array('group' => $group, 'order' => $last_order));
             ?>
           </p>
-          <div <?php echo Participants_Db::plugin_setting_is_true('admin_horiz_scroll') ? 'class="pdb-horiz-scroll-scroller"' : '' ?>>
-          <div <?php echo Participants_Db::plugin_setting_is_true('admin_horiz_scroll') ? 'class="pdb-horiz-scroll-width"' : '' ?>>
+          <?php if($hscroll) : ?>
+          <div class="pdb-horiz-scroll-scroller">
+          <div class="pdb-horiz-scroll-width">
+            <?php endif ?>
             <table class="wp-list-table widefat fixed manage-fields" >
             <thead>
               <tr>
@@ -248,8 +251,10 @@ class PDb_Manage_Fields {
             ?>
             </tbody>
           </table>
+            <?php if ($hscroll) : ?>
           </div>
           </div>
+          <?php endif ?>
           <p class="submit">
             <?php
             PDb_FormElement::print_element(array(

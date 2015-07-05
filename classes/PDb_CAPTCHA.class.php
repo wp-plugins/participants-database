@@ -157,7 +157,7 @@ class PDb_CAPTCHA {
      * if the last CAPTCHA submission was correct, we display it again
      */
     if ($this->last_challenge_met() && !empty($this->value)) {
-      extract(Participants_Db::$session->get('captcha_vars'));
+      extract(Participants_Db::$session->getArray('captcha_vars'));
     } else {
       /* generate the math question. We try to make it a simple arithmetic problem
        */
@@ -295,5 +295,4 @@ class PDb_CAPTCHA {
     }
     return $key;
   }
-  
 }

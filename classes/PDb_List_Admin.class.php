@@ -743,9 +743,12 @@ class PDb_List_Admin {
        */
               private static function _main_table($mode = '')
               {
+    $hscroll = Participants_Db::plugin_setting_is_true('admin_horiz_scroll');
         ?>
+            <?php if ($hscroll) : ?>
             <div class="pdb-horiz-scroll-scroller">
               <div class="pdb-horiz-scroll-width" style="width: <?php echo count(self::$display_columns) * 10 ?>em">
+    <?php endif ?>
         <table class="wp-list-table widefat fixed pages pdb-list stuffbox" cellspacing="0" >
           <?php
           $PID_pattern = '<td><a href="%2$s">%1$s</a></td>';
@@ -911,8 +914,10 @@ class PDb_List_Admin {
               endif; // participants array
               ?>
         </table>
+                  <?php if ($hscroll) : ?>
               </div>
             </div>
+    <?php endif ?>
       </form>
               <?php
             }
