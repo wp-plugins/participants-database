@@ -8,7 +8,7 @@
  * @author     Roland Barker <webdesign@xnau.com>
  * @copyright  2015  xnau webdesign
  * @license    GPL2
- * @version    0.1
+ * @version    0.2
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    
  */
@@ -201,8 +201,10 @@ The database is made up of fields, and each field may be one of several types th
   private function set_version_values($update_info = false) {
     $update_info = $update_info ? $update_info : get_site_transient('update_plugins');
     $plugin_check_path = plugin_basename($this->plugin_file_path);
+    if (is_object($update_info)) {
     self::$latest_version = isset($update_info->response[$plugin_check_path]) ? $update_info->response[$plugin_check_path]->new_version : $update_info->no_update[$plugin_check_path]->new_version;
-    self::$current_version = isset($update_transient->checked[$plugin_check_path]) ?  $update_transient->checked[$plugin_check_path] : Participants_Db::$plugin_version;
+      self::$current_version = isset($update_info->checked[$plugin_check_path]) ?  $update_info->checked[$plugin_check_path] : Participants_Db::$plugin_version;
+    }
   }
   /**
    * super simple markdown to HTML converter

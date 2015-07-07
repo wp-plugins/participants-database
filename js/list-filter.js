@@ -154,6 +154,8 @@ PDbListFilter = (function ($) {
           } else {
             container.find('.list-container').after(replacePagination);
           }
+        } else {
+          pagination.remove();
         }
         spinner.remove();
       },

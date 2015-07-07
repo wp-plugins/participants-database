@@ -122,7 +122,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
       add_action('admin_menu', array($this, 'add_settings_page'));
       add_action('admin_init', array($this, 'settings_api_init'));
       add_action('init', array($this, 'set_plugin_options'), 1);
-      add_action('init', array($this, 'load_textdomain'));
+      add_action('init', array($this, 'load_textdomain'), 1);
       add_action('init', array($this, 'initialize_updater'), 50);
     }
 
@@ -172,7 +172,7 @@ if (!class_exists('PDb_Aux_Plugin')) :
      */
     public function load_textdomain()
     {
-      Participants_Db::load_plugin_textdomain($this->plugin_path, null, $this->aux_plugin_name);
+      Participants_Db::load_plugin_textdomain($this->plugin_path, $this->aux_plugin_name);
     }
 
     /**

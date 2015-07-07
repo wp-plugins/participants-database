@@ -702,7 +702,7 @@ class PDb_List extends PDb_Shortcode {
    */
   public function print_list_count($wrap_tag = false, $print = true) {
     
-    $display_count_shortcode = ($this->shortcode_atts['display_count'] == '1' or $this->shortcode_atts['display_count'] == 'true');
+    $display_count_shortcode = ($this->shortcode_atts['display_count'] != '0');
     
     if ($display_count_shortcode) {
       if (!$wrap_tag) $wrap_tag = '<caption>';
@@ -1138,14 +1138,13 @@ class PDb_List extends PDb_Shortcode {
     $limit = filter_input(
             INPUT_POST, 
             'list_limit', 
-            FILTER_VALIDATE_INT, 
-            array(
-                'options' => array(
-                    'min_range' => 1, 
-                    'default' => $this->shortcode_atts['list_limit']
-                )
-            )
+            FILTER_VALIDATE_INT
     );
+    
+    if (is_null($limit) || $limit === 0) {
+      $limit = $this->shortcode_atts['list_limit'];
+    }
+    
     if ($limit < 1 || $limit > $this->num_records) {
       $this->page_list_limit = $this->num_records;
     } else {

@@ -254,6 +254,11 @@ You can define a "captcha" form element which will show a simple math question f
 
 == Changelog ==
 
+= 1.6.2.3 =
+bug fixes:
+list pagination not refreshed with AJAX searches
+missing object in PDb_Update_Notices class
+
 = 1.6.2.2 =
 bugfix: 
 CAPTCHA not showing previous solution
@@ -535,9 +540,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.6.2.2 =
+= 1.6.2.3 =
 
-Version 1.6.2.2 is a bug fix update addressing issues with the CAPTCHA field and horizontal scrolling in the admin
+Version 1.6.2.3 is a bug fix update addressing issues with the list pagination while using AJAX searches
 
 == Using the Plugin ==
 

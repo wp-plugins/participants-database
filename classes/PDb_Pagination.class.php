@@ -321,7 +321,7 @@ class PDb_Pagination {
     $totalPages += $perPage > 0 ? ($totalItems % $perPage != 0 ? 1 : 0) : 0;
 
     if ($totalPages <= 1) {
-      return null;
+      return '';
     } elseif ($totalPages > 5) {
       $this->first_last = true;
     }
