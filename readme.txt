@@ -258,6 +258,9 @@ You can define a "captcha" form element which will show a simple math question f
 bug fixes:
 list pagination not refreshed with AJAX searches
 missing object in PDb_Update_Notices class
+fixed db error when user search overrides shortcode filter
+
+implemented -1 list_limit value to show all records
 
 = 1.6.2.2 =
 bugfix: 
@@ -542,7 +545,7 @@ Taking defensive precautions against other plugins in the admin:
 
 = 1.6.2.3 =
 
-Version 1.6.2.3 is a bug fix update addressing issues with the list pagination while using AJAX searches
+Version 1.6.2.3 is a bug fix update addressing issues with the list pagination while using AJAX searches and more (see upgrade note for details)
 
 == Using the Plugin ==
 

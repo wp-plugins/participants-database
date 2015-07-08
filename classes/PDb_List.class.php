@@ -714,10 +714,11 @@ class PDb_List extends PDb_Shortcode {
         $tags = array_reverse($tags);
         $wrap_tag_close = '</' . implode('></', $tags) . '>';
       }
+      $per_page = $this->shortcode_atts['list_limit'] == '-1' ? $this->num_records : $this->shortcode_atts['list_limit'];
       $output = $wrap_tag . sprintf(
               Participants_Db::plugin_setting('count_template'),
               $this->num_records, // total number of records found
-              $this->shortcode_atts['list_limit'], // number of records to show each page
+              $per_page, // number of records to show each page
               (($this->pagination->page - 1) * $this->shortcode_atts['list_limit']) + ($this->num_records > 1 ? 1 : 0), // starting record number
               ($this->num_records - (($this->pagination->page - 1) * $this->shortcode_atts['list_limit']) > $this->shortcode_atts['list_limit'] ? 
                       $this->pagination->page * $this->shortcode_atts['list_limit'] : 

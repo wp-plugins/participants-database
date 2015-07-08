@@ -1455,11 +1455,17 @@ class PDb_Settings extends xnau_Plugin_Settings {
             $settings[$name] = '';
           break;
         case 'list_limit':
+          if (intval($value) < -1) {
+            add_settings_error( $name, $name, sprintf(__('Only numeric values can be used for the "%s" setting.', 'participants-database'), $this->get_option_title($name)), 'error' );
+            $settings[$name] = $this->get_default_value($name);
+          }
+          break;
         case 'image_upload_limit':
           if (intval($value) < 1) {
             add_settings_error( $name, $name, sprintf(__('Only numeric values can be used for the "%s" setting.', 'participants-database'), $this->get_option_title($name)), 'error' );
             $settings[$name] = $this->get_default_value($name);
           }
+          break;
       }
     }
     return $settings;

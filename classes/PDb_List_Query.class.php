@@ -120,9 +120,10 @@ class PDb_List_Query {
      * 
      * now, we process the GET and POST arrays to arrive at the final query structure 
      * 
-     * a working GET request must contain these three values to return a search result:
+     * a working GET request must contain these two values to return a search result:
      *    search_field - the name of the field to search in
      *    value - the search string, can be empty depending on settings
+     * an operator value is optional:
      *    operator - one of the valid operators: ~,!,ne,eq,lt,gt
      * you cannot perform a search and specify a page number in the same GET request, 
      * the page number will get that page of the last query
@@ -527,7 +528,24 @@ class PDb_List_Query {
    * @param string $column
    */
   private function _remove_field_filters($column) {
+    $this->decrement_clause_index(count($this->subclauses[$column]));
     unset($this->subclauses[$column]);
+  }
+  /**
+   * increment clause index
+   * 
+   * @param int $amount to increment
+   */
+  private function increment_clause_index($amount = 1) {
+    $this->clause_index = $this->clause_index + $amount;
+  }
+  /**
+   * increment clause index
+   * 
+   * @param int $amount to decrement
+   */
+  private function decrement_clause_index($amount = 1) {
+    $this->clause_index = max(array($this->clause_index - $amount, 0));
   }
   /**
    * sets the is search value
@@ -682,8 +700,7 @@ class PDb_List_Query {
             )
     );
 
-    // increment the index value
-    $this->clause_index++;
+    $this->increment_clause_index();
 
     $statement = false;
 
