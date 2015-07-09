@@ -181,6 +181,8 @@ abstract class PDb_Shortcode {
 
     $this->prefix = Participants_Db::$prefix;
 
+    $module = isset($subclass_shortcode_defaults['module']) ? $subclass_shortcode_defaults['module'] : 'unknown';
+
     global $post;
 
     $this->shortcode_defaults = array(
@@ -191,7 +193,7 @@ abstract class PDb_Shortcode {
         'groups' => '',
         'action' => '',
         'instance_index' => $this->instance_index,
-        'target_instance' => ($shortcode_atts['module'] == 'search' ? '1' : $this->instance_index), // if no target instance is specified, assume it's the first instance
+        'target_instance' => ($module == 'search' ? '1' : $this->instance_index), // if no target instance is specified, assume it's the first instance
         'target_page' => '',
         'record_id' => false,
         'filtering' => 0, // this is set to '1' if we're coming here from an AJAX call

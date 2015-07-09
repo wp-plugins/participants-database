@@ -254,7 +254,7 @@ You can define a "captcha" form element which will show a simple math question f
 
 == Changelog ==
 
-= 1.6.2.4 =
+= 1.6.2.5 =
 fixed issue where remote search controls weren't targeting the correct list instance
 
 = 1.6.2.3 =
@@ -546,9 +546,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.6.2.3 =
+= 1.6.2.5 =
 
-Version 1.6.2.3 is a bug fix update addressing issues with the list pagination while using AJAX searches and more (see upgrade note for details)
+Version 1.6.2.5 is a bug fix update addressing issues with the use of remote search forms and AJAX
 
 == Using the Plugin ==
 
