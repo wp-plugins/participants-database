@@ -254,6 +254,9 @@ You can define a "captcha" form element which will show a simple math question f
 
 == Changelog ==
 
+= 1.6.2.4 =
+fixed issue where remote search controls weren't targeting the correct list instance
+
 = 1.6.2.3 =
 bug fixes:
 list pagination not refreshed with AJAX searches
