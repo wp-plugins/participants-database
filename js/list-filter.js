@@ -125,7 +125,7 @@ PDbListFilter = (function ($) {
     }
   };
   var post_submission = function (button) {
-    var target_instance = $('.pdb-list.pdb-instance-' + submission.instance_index);
+    var target_instance = $('.pdb-list.pdb-instance-' + submission.target_instance);
     var container = target_instance.length ? target_instance : $('.pdb-list').first();
     var pagination = container.find('.pdb-pagination');
     var buttonParent = button.parent('fieldset, div');

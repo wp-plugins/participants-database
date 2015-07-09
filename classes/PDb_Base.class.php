@@ -1061,6 +1061,7 @@ class PDb_Base {
         'submit' => FILTER_SANITIZE_STRING,
         'action' => FILTER_SANITIZE_STRING,
         'instance_index' => FILTER_VALIDATE_INT,
+        'target_instance' => FILTER_VALIDATE_INT,
         'pagelink' => FILTER_SANITIZE_STRING,
         'sortstring' => FILTER_SANITIZE_STRING,
         'orderstring' => FILTER_SANITIZE_STRING,

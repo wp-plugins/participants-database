@@ -4,7 +4,7 @@
  * Plugin URI: http://xnau.com/wordpress-plugins/participants-database
  * Description: Plugin for managing a database of participants, members or volunteers
  * Author: Roland Barker
- * Version: 1.6.2.3
+ * Version: 1.6.2.4
  * Author URI: http://xnau.com
  * License: GPL2
  * Text Domain: participants-database
@@ -3009,8 +3009,8 @@ class Participants_Db extends PDb_Base {
   public static function pdb_list_filter() {
     
     $multi = is_array($_POST['search_field']);
-    self::$instance_index = filter_input( INPUT_POST, 'instance_index', FILTER_SANITIZE_NUMBER_INT );
     $postinput = filter_input_array(INPUT_POST, self::search_post_filter($multi));
+    self::$instance_index = empty($postinput['target_instance']) ? $postinput['instance_index'] : $postinput['target_instance'];
 
     if (!self::nonce_check($postinput['filterNonce'], PDb_List::$list_filter_nonce_key))
       die('nonce check failed');
@@ -3020,9 +3020,7 @@ class Participants_Db extends PDb_Base {
     if (!is_object($post))
       $post = get_post($postinput['postID']);
     
-    $instance = empty($postinput['target_index']) ? $postinput['instance_index'] : $postinput['target_index'];
-    
-    self::print_list_search_result($post, $instance);
+    self::print_list_search_result($post, self::$instance_index);
     
     do_action(Participants_Db::$prefix . 'list_ajax_complete', $post);
     
@@ -3041,13 +3039,13 @@ class Participants_Db extends PDb_Base {
      * get the attributes array; these values were saved in the session array by 
      * the Shortcode class when it was instantiated
      */
-    $session = self::$session->get('shortcode_atts');
-    if (!is_object($session[$post->ID]['list'][$instance])) {
+    $session = self::$session->getArray('shortcode_atts');
+    $shortcode_atts = $session[$post->ID]['list'][$instance];
+    
+    if (!is_array($shortcode_atts)) {
       printf( 'session for list instance %s not found', $instance );
       return;
     }
-    // translate the ArrayAccess object to a straight array
-    $shortcode_atts = $session[$post->ID]['list'][$instance]->toArray();
       
     // add the AJAX filtering flag
     $shortcode_atts['filtering'] = 1;
@@ -3204,10 +3202,6 @@ class Participants_Db extends PDb_Base {
       }
     }
       
-      // ob_start();
-      // var_dump($date);
-      // error_log(__METHOD__.' date value:'.ob_get_clean().' mode:'.self::$date_mode);
-    
     /*
      * if we haven't got a timestamp, parse the date the regular way
      */
