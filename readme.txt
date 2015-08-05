@@ -254,6 +254,9 @@ You can define a "captcha" form element which will show a simple math question f
 
 == Changelog ==
 
+= 1.6.2.6 =
+fixed problem with multipage signup forms not sending correct notifications
+
 = 1.6.2.5 =
 fixed issue where remote search controls weren't targeting the correct list instance
 
@@ -546,9 +549,9 @@ Taking defensive precautions against other plugins in the admin:
 
 == Upgrade Notice ==
 
-= 1.6.2.5 =
+= 1.6.2.6 =
 
-Version 1.6.2.5 is a bug fix update addressing issues with the use of remote search forms and AJAX
+Version 1.6.2.6 is a bug fix update addressing a problem with multi page signup forms. Don't bother updating if you're not experiencing this issue.
 
 == Using the Plugin ==
 
