@@ -4,7 +4,7 @@
  * Plugin URI: http://xnau.com/wordpress-plugins/participants-database
  * Description: Plugin for managing a database of participants, members or volunteers
  * Author: Roland Barker
- * Version: 1.6.2.5
+ * Version: 1.6.2.6
  * Author URI: http://xnau.com
  * License: GPL2
  * Text Domain: participants-database
@@ -1399,7 +1399,7 @@ class Participants_Db extends PDb_Base {
          * 
          * we don't allow the "update" preference for multipage forms
          */
-        if (Participants_Db::$session->get('form_status') === 'multipage') {
+        if (self::is_multipage_form()) {
           $duplicate_record_preference = '2';
         }
         /*
@@ -1430,7 +1430,7 @@ class Participants_Db extends PDb_Base {
             /*
              * this is skipped if we're in the middle of an unfinished multi-page form
              */
-            if (Participants_Db::$session->get('form_status') === 'multipage')  {
+            if (self::is_multipage_form())  {
               // multipage form incomplete, update the current record with the new post data
               $participant_id = Participants_Db::$session->get('pdbid');
               $action = 'update';
@@ -2254,7 +2254,7 @@ class Participants_Db extends PDb_Base {
             
           self::$validation_errors->add_error('', self::$plugin_options['record_updated_message']);
 
-          if (self::$plugin_options['send_record_update_notify_email'] && Participants_Db::$session->get('form_status') !== 'multipage') {
+          if (self::$plugin_options['send_record_update_notify_email'] && ! self::is_multipage_form()) {
 
             $sent = wp_mail(
                     self::$plugin_options['email_signup_notify_addresses'],
@@ -2270,7 +2270,14 @@ class Participants_Db extends PDb_Base {
           
             self::$session->set('pdbid', $post_data['id']);
             
-            $redirect = $post_input['action'] == 'insert' ? $post_data['thanks_page'] : self::add_uri_conjunction($post_data['thanks_page']) . 'action=update';
+            $redirect = $post_data['thanks_page'];
+            /**
+             * this is to handle the sepcial case where the frontend record form uses a separate 
+             * thanks page using the [pdb_signup_thanks] shortcode
+             */
+            if ($post_input['action'] == 'insert' && ! self::is_multipage_form() ) {
+            	self::add_uri_conjunction($redirect) . 'action=update';
+            }
 
             wp_redirect($redirect);
             

@@ -1269,7 +1269,6 @@ abstract class PDb_Shortcode {
   public function get_form_status() {
     return Participants_Db::$session->get('form_status', 'normal');
   }
-
   /**
    * sets up the shortcode atts session save
    * 

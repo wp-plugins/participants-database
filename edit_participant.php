@@ -109,8 +109,8 @@ if ($participant_values) :
               $add_title = sprintf($fieldnote_pattern, __('hidden', 'participants-database'));
             } elseif (in_array($column->name, $readonly_columns) or $column->form_element == 'timestamp') {
               $attributes['class'] = 'readonly-field';
-              if (!Participants_Db::current_user_has_plugin_role('editor', 'readonly access')) {
-              $attributes['readonly'] = 'readonly';
+              if (!Participants_Db::current_user_has_plugin_role('editor', 'readonly access') || $column->name === 'private_id') {
+              	$attributes['readonly'] = 'readonly';
               }
               $add_title = sprintf($fieldnote_pattern, __('read only', 'participants-database'));
             }

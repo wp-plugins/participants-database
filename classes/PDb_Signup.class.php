@@ -9,7 +9,7 @@
  * @author     Roland Barker <webdeign@xnau.com>
  * @copyright  2015 xnau webdesign
  * @license    GPL2
- * @version    0.8
+ * @version    0.9
  * @link       http://xnau.com/wordpress-plugins/
  * @depends    xnau_FormElement class, Shortcode class
  */
@@ -117,7 +117,7 @@ class PDb_Signup extends PDb_Shortcode {
        * if we've opened a regular signup form while in a multipage session, treat it 
        * as a normal signup form and terminate the multipage session
        */
-    if ($shortcode_atts['module'] === 'signup' && $this->participant_id !== false && !isset($shortcode_atts['action']) && $form_status === 'multipage') {
+    if ($shortcode_atts['module'] === 'signup' && $this->participant_id !== false && !isset($shortcode_atts['action']) && Participants_Db::is_multipage_form()) {
       $this->participant_id = false;
       $this->_clear_multipage_session();
     }
@@ -125,11 +125,11 @@ class PDb_Signup extends PDb_Shortcode {
      * if no ID is set, no submission has been received
      */
     if ($this->participant_id === false) {
-    if (filter_input(INPUT_GET, 'm') === 'r' || $shortcode_atts['module'] == 'retrieve') {
-      /*
-       * we're proceesing a link retrieve request
-       */
-      $shortcode_atts['module'] = 'retrieve';
+    	if (filter_input(INPUT_GET, 'm') === 'r' || $shortcode_atts['module'] == 'retrieve') {
+	      /*
+	       * we're proceesing a link retrieve request
+	       */
+	      $shortcode_atts['module'] = 'retrieve';
         add_filter('pdb-before_field_added_to_iterator', array($this, 'allow_readonly_fields_in_form'));
       }
       if ($shortcode_atts['module'] == 'signup') {
@@ -147,7 +147,7 @@ class PDb_Signup extends PDb_Shortcode {
        */
       $this->participant_values = Participants_Db::get_participant($this->participant_id);
       
-      if ($this->participant_values && ($form_status === 'normal' || ($shortcode_atts['module'] == 'thanks' && $form_status === 'multipage'))) {
+      if ($this->participant_values && ($form_status === 'normal' || ($shortcode_atts['module'] == 'thanks' && Participants_Db::is_multipage_form()))) {
         /*
          * the submission is successful, clear the session and set the submitted flag
        */
@@ -186,10 +186,10 @@ class PDb_Signup extends PDb_Shortcode {
           $signup_feedback->$prop = &$this->$prop;
         }
 
-        apply_filters(Participants_Db::$prefix . 'before_signup_thanks', $signup_feedback);
+        apply_filters(Participants_Db::$prefix . 'before_signup_thanks', $signup_feedback, $this->get_form_status());
       }
 
-        $this->_send_email();
+      $this->_send_email();
 
       // form has been submitted, close it
       Participants_Db::$session->clear('form_status');
@@ -266,19 +266,20 @@ class PDb_Signup extends PDb_Shortcode {
   protected function _set_submission_page()
   {
 
-    $form_status = 'normal';
+    $form_status = $this->get_form_status();
+    $this->submission_page = false;
     if (!empty($this->shortcode_atts['action'])) {
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
       if ($this->submission_page !== false) {
-        $form_status = 'multipage';
+        $form_status = 'multipage-signup';
       }
     }
     if (!$this->submission_page) {
       if (Participants_Db::plugin_setting('signup_thanks_page', 'none') != 'none') { 
-      $this->submission_page = get_permalink(Participants_Db::plugin_setting('signup_thanks_page'));
+      	$this->submission_page = get_permalink(Participants_Db::plugin_setting('signup_thanks_page'));
       }
     }
-    if (!$this->submission_page) {
+    if ($this->submission_page === false) {
       // the signup thanks page is not set up, so we submit to the page the form is on
       $this->submission_page = $_SERVER['REQUEST_URI'];
     }
@@ -347,20 +348,42 @@ class PDb_Signup extends PDb_Shortcode {
    *
    */
   private function _send_email() {
-
-    if (filter_input(INPUT_GET, 'action') === 'update') {
-
-      if ($this->send_notification) {
-        $this->_do_update_notify();
-      }
-    } else {
-      if ($this->send_notification) {
-				$this->_do_notify();
-      }
-      if ($this->send_reciept) {
-				$this->_do_receipt();
-			}
-    }
+  	$action = $this->get_form_status();
+  	
+		switch ($action) {
+      case 'multipage-update':
+      	// this is a multipage record form
+	      if ($this->send_notification) {
+	        $this->_do_update_notify();
+	      }
+	      break;
+      case 'multipage-signup':
+				// this is a multipage signup form
+	      if ($this->send_notification) {
+					$this->_do_notify();
+	      }
+	      if ($this->send_reciept) {
+					$this->_do_receipt();
+				}
+				break;
+			case 'normal':
+			default:
+				if (filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING) === 'update') {
+					// this is a record form using a thanks page
+		      if ($this->send_notification) {
+		        $this->_do_update_notify();
+		      }
+				} else {
+					// this is a normal signup form
+		      if ($this->send_notification) {
+						$this->_do_notify();
+		      }
+		      if ($this->send_reciept) {
+						$this->_do_receipt();
+					}
+				}
+	      break;
+		}
   }
 
   /**
@@ -402,7 +425,7 @@ class PDb_Signup extends PDb_Shortcode {
   }
 
   /**
-   * sends a new signup notification email to the admin
+   * sends an update notification email to the admin
    */
   private function _do_update_notify() {
 

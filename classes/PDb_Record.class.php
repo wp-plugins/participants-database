@@ -179,11 +179,12 @@ class PDb_Record extends PDb_Shortcode {
   protected function _set_submission_page()
   {
 
-    $form_status = 'normal';
+    $form_status = $this->get_form_status();
+    
     if (!empty($this->shortcode_atts['action'])) {
       $this->submission_page = Participants_Db::find_permalink($this->shortcode_atts['action']);
-      if ($this->submission_page !== false) {
-        $form_status = 'multipage';
+      if ($this->submission_page !== false && $form_status === 'normal') {
+        $form_status = 'multipage-update';
       }
     }
     if (!$this->submission_page) {

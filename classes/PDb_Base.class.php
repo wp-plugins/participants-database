@@ -1082,12 +1082,21 @@ class PDb_Base {
    * @return array altered headers array
    */
   public static function control_caching($headers) {
-    $form_status = Participants_Db::$session->get('form_status');
 //    $headers['X-xnau-plugin'] = $headers['X-xnau-plugin'] . ' ' . Participants_Db::$plugin_title . '-' . Participants_Db::$plugin_version;
-    if ($form_status === 'multipage') {
+    if (self::is_multipage_form()) {
       $headers['Cache-Control'] = 'no-cache, max-age=0, must-revalidate, no-store';
     }
     return $headers;
+  }
+  
+  /**
+   * determines if the current form status is a kind of multipage
+   * 
+   * @return bool true if the form is part of a multipage form
+   */
+  public static function is_multipage_form() {
+  	$form_status = Participants_Db::$session->get('form_status');
+  	return stripos($form_status, 'multipage') !== false;
   }
   
   /**

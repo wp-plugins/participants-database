@@ -17,6 +17,7 @@ this is a more detailed template showing how the parts of the display can be cus
    * 
    */
   if ( $filter_mode != 'none' && ! $filtering ) : ?>
+  <?php echo $this->search_error_style ?>
   <div class="pdb-searchform">
   
 		<?php

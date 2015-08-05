@@ -74,18 +74,17 @@ $this->pagination->set_props(array(
 
   <?php /* LIST DISPLAY */ ?>
 
-<?php 
-/* print the count if enabled in the shortcode
- * 
- * the tag wrapping the count statment can be supplied in the function argument, example here
- */
-$this->print_list_count('<h5>'); 
-?>
-
 
   <table class="table pdb-list list-container" >
   
-    
+		<?php 
+		/* print the count if enabled in the shortcode
+		 * 
+		 * the tag wrapping the count statment can be supplied in the function argument, example here
+		 */
+		$this->print_list_count('<h5>'); 
+		?>
+
     <?php if ($record_count > 0) : ?>
 
     <thead>

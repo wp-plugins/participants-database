@@ -55,13 +55,7 @@ this template demonstrates a "table-less" reponsive layout for the list of recor
   </div>
   <?php endif ?>
 
-<?php 
-/* print the count if enabled in the shortcode
- * 
- * the tag wrapping the count statment can be supplied in the function argument, example here
- */
-$this->print_list_count('<h5>'); 
-?>
+
 <?php // this is an example of a way to style the records, delete this or edit as needed ?>
 <style type="text/css">
   section {
@@ -77,7 +71,13 @@ $this->print_list_count('<h5>');
 </style>
 
 <div class="pdb-list list-container" >
-  
+		<?php 
+		/* print the count if enabled in the shortcode
+		 * 
+		 * the tag wrapping the count statment can be supplied in the function argument, example here
+		 */
+		$this->print_list_count('<h5>'); 
+		?>  
     
     <?php if ( $record_count > 0 ) : ?>
 
